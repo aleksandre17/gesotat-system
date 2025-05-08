@@ -1,0 +1,37 @@
+security:
+  type: web
+server:
+  port: 8080
+spring:
+  mvc:
+    static-path-pattern: /static/**
+  web:
+    resources:
+      static-locations: classpath:/static/
+      chain:
+        strategy:
+          content:
+            enabled: true
+            paths: /static/**
+        cache: true
+  application:
+    name: web
+  datasource:
+    url:
+    username:
+    password:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    hibernate:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.SQLServerDialect
+jwt:
+  secret:
+  expiration:
+
+logging:
+  level:
+    org.springframework.security: DEBUG

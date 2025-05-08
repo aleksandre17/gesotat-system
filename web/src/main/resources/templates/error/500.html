@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Error</title>
+    <link rel="stylesheet" th:href="@{/static/css/error.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h1>500</h1>
+        <h2>Server Error</h2>
+        <p>Sorry, something went wrong on our servers.</p>
+        <div class="error-details" th:if="${@environment.getActiveProfiles().length > 0 and @environment.getActiveProfiles()[0] == 'dev'}">
+            <p th:text="${exception}"></p>
+        </div>
+        <div class="action-buttons">
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Go Back
+            </a>
+            <a th:href="@{/}" class="btn btn-primary">
+                <i class="fas fa-home"></i> Home Page
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,30 @@
+server:
+    port: 8081
+
+security:
+  type: api
+
+spring:
+  application:
+    name: api
+  datasource:
+    url:
+    username:
+    password:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    hibernate:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.SQLServerDialect
+
+jwt:
+  secret:
+  expiration:
+
+logging:
+  level:
+    org.springframework.security: DEBUG
