@@ -26,6 +26,7 @@ dependencies {
     api 'org.springframework.security:spring-security-web'
     api 'org.springframework.data:spring-data-jpa'
     api 'org.springframework.boot:spring-boot-autoconfigure'
+    api 'org.hibernate:hibernate-core:7.0.0.CR1'
 
     // JPA & Validation
     api 'jakarta.servlet:jakarta.servlet-api'

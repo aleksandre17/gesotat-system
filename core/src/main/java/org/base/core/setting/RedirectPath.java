@@ -3,6 +3,7 @@ package org.base.core.setting;
 import org.base.core.anotation.Sign;
 import org.base.core.anotation.Web;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
@@ -14,23 +15,11 @@ import java.lang.reflect.Method;
 public class RedirectPath implements WebMvcConfigurer, WebMvcRegistrations {  //WebServerFactoryCustomizer<ConfigurableServletWebServerFactory>
 
 
+
+
     @Override
     public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
-        return new RequestMappingHandlerMapping() {
-            @Override
-            protected void registerHandlerMethod(Object handler, Method method, RequestMappingInfo mapping) {
-                Class<?> controllerClass = method.getDeclaringClass();
-                if (controllerClass.isAnnotationPresent(Sign.class) || controllerClass.isAnnotationPresent(Web.class)) {
-                    super.registerHandlerMethod(handler, method, mapping);
-                } else {
-                    RequestMappingInfo newMapping = RequestMappingInfo
-                            .paths("/api/v1")
-                            .build()
-                            .combine(mapping);
-                    super.registerHandlerMethod(handler, method, newMapping);
-                }
-            }
-        };
+        return new CustomRequestMappingHandlerMapping();
     }
 
 

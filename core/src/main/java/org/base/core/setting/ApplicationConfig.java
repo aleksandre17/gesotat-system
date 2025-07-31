@@ -3,6 +3,7 @@ package org.base.core.setting;
 import lombok.RequiredArgsConstructor;
 import org.base.core.exeption.api.ApiAccessDeniedHandler;
 import org.base.core.repository.UserRepository;
+import org.base.core.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,29 +25,39 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ApplicationConfig {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
+                "http://192.168.2.87",
+                "http://localhost",
+                "http://localhost:80",
+                "http://localhost:5173",
+                "http://localhost:5174",
                 "http://localhost:8080",
                 "http://localhost:8081"
         ));// Add your frontend URL
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*"));
+        configuration.setMaxAge(3600L);
+
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("**", configuration); ///api/**
+        //source.registerCorsConfiguration("**", configuration); ///api/**
+        source.registerCorsConfiguration("/sign/**", configuration);
+        source.registerCorsConfiguration("/api/**", configuration);
+        source.registerCorsConfiguration("/ws/**", configuration);
         return source;
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return userService;
     }
 
     @Bean

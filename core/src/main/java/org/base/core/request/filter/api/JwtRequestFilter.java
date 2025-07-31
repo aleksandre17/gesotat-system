@@ -42,11 +42,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 path.equals("/error") ||
                 path.equals("/") ||
                 path.endsWith(".html") ||
+                path.endsWith("/api/v1/pages/roots") ||
                 path.endsWith(".css") ||
                 path.endsWith(".js") ||
                 path.equals("/favicon.ico") ||
                 path.startsWith("/static/") ||
-                path.startsWith("/resources/");
+                path.startsWith("/resources/") ||
+                path.startsWith("/ws/") ||
+                path.contains("import") ||
+                path.contains("mobile/") ||
+                path.contains("mobile-text/");
     }
 
 
@@ -107,6 +112,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             // Forward to /error endpoint to trigger global exception handling
             //request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
             //request.getRequestDispatcher("/error").forward(request, response);
+            e.printStackTrace();
             sendErrorResponse(e, response, HttpServletResponse.SC_BAD_REQUEST, "Not Valid JWT token");
         }
 

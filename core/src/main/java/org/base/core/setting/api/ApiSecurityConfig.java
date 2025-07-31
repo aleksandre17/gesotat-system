@@ -48,7 +48,10 @@ public class ApiSecurityConfig {
                 .securityMatchers(matchers -> matchers.requestMatchers(SecurityPaths.API_PATHS))
                 .addFilterBefore(apiFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/sign/**").permitAll()
+                        .requestMatchers("/api/v1/mobile/**", "/api/v1/mobile-text/**").permitAll()
+                        .requestMatchers("/api/v1/import", "/api/v1/import/**").permitAll()
+                        .requestMatchers("/sign/**", "/ws/**").permitAll()
+                        .requestMatchers("/api/v1/pages/roots").permitAll()
                         .requestMatchers("/api/v1/**").authenticated()
                         .anyRequest().authenticated()
                 )

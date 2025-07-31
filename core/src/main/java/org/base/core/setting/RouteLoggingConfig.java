@@ -10,8 +10,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Configuration
 public class RouteLoggingConfig {
@@ -23,31 +22,51 @@ public class RouteLoggingConfig {
         return new RouteLoggingBean(handlerMapping);
     }
 
-
     @Component
     public static class RouteLoggingBean {
         public RouteLoggingBean(RequestMappingHandlerMapping handlerMapping) {
             Map<RequestMappingInfo, HandlerMethod> map = handlerMapping.getHandlerMethods();
 
             logger.info("=== Registered Routes ===");
+
+            // Create a list to store all route information
+            List<RouteInfo> routes = new ArrayList<>();
+
             map.forEach((mapping, method) -> {
-                // Get the actual paths after all transformations
                 Set<String> patterns = mapping.getPatternValues();
                 Set<RequestMethod> httpMethods = mapping.getMethodsCondition().getMethods();
 
                 patterns.forEach(pattern ->
                         httpMethods.forEach(httpMethod ->
-                                logger.info("{} {} => {}#{}()",
+                                routes.add(new RouteInfo(
                                         httpMethod,
                                         pattern,
                                         method.getBeanType().getSimpleName(),
-                                        method.getMethod().getName())
+                                        method.getMethod().getName()
+                                ))
                         )
                 );
             });
+
+            // Sort routes by HTTP method and then by pattern
+            routes.stream()
+                    .sorted(Comparator
+                            .comparing((RouteInfo r) -> r.httpMethod != null ? r.httpMethod.name() : "")
+                            .thenComparing(r -> r.pattern))
+                    .forEach(route ->
+                            logger.info("{} {} => {}#{}()",
+                                    route.httpMethod,
+                                    route.pattern,
+                                    route.controllerName,
+                                    route.methodName)
+                    );
+
             logger.info("=====================");
         }
+
+        private record RouteInfo(RequestMethod httpMethod, String pattern, String controllerName, String methodName) {}
     }
+
 
 }
 

@@ -5,26 +5,66 @@ security:
   type: api
 
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1000MB
+      max-request-size: 1000MB
+      file-size-threshold: 0B
+      location: /tmp/uploads
+  main:
+    allow-bean-definition-overriding: true
   application:
     name: api
   datasource:
-    url:
-    username:
-    password:
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-
+    primary:
+      jdbc-url: jdbc:sqlserver://192.168.0.230;databaseName=geostat-system;useBulkCopyForBatchInsert=true;encrypt=true;useBulkCopyForBatchInsert=true;trustServerCertificate=true;serverTimezone=Asia/Tbilisi;cachePrepStmts=true;reWriteBatchedInserts=true
+      username: sa
+      password: Ozzy112358
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    secondary:
+      jdbc-url: jdbc:sqlserver://192.168.0.230;databaseName=auto;encrypt=true;useBulkCopyForBatchInsert=true;useBulkCopyForBatchInsert=true;trustServerCertificate=true;serverTimezone=Asia/Tbilisi;cachePrepStmts=true;reWriteBatchedInserts=true
+      username: sa
+      password: Ozzy112358
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
     hibernate:
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
+        jdbc:
+          batch_size: 1000
+          batch_versioned_data: true
         format_sql: true
         dialect: org.hibernate.dialect.SQLServerDialect
+        order_updates: true
+        order_inserts: true
 
 jwt:
-  secret:
-  expiration:
+  secret: "5A7C8E1F2A3C5E7A8C1E2F3A5C7E8A1F2C3F5A7C8E1F2A3C5E7A8C1E2F3A5C7E"
+  expiration: 86400000
+  refresh-expiration: 86400000  # 24 hours in milliseconds
 
 logging:
   level:
-    org.springframework.security: DEBUG
+    org:
+      springframework:
+        jdbc: DEBUG
+storage:
+  export-dir: api/storage/access_exports
+
+#logging:
+#  level:
+#    org:
+#      springframework.security: DEBUG
+#      hibernate:
+#        SQL: DEBUG
+#        type:
+#          descriptor:
+#            sql:
+#              BasicBinder: TRACE
+
+
+#app.tables.allowed-tables=main_auto,secondary_auto,other_auto
+#app.tables.allowed-lang-names=en_name,ka_name

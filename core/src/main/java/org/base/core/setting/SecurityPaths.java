@@ -1,7 +1,7 @@
 package org.base.core.setting;
 
 public class SecurityPaths {
-    public static final String[] API_PATHS = {"/api/v1/**", "/sign/**"};
+    public static final String[] API_PATHS = {"/api/v1/**", "/sign/**", "/ws/**"};
     public static final String[] WEB_PATHS = {"/**"};
     public static final String[] PUBLIC_PATHS = {
             "/",

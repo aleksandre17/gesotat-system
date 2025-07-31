@@ -1,0 +1,372 @@
+[
+  {
+    "name": "ფასები",
+    "description": "ფასების კალკულატორები და ანალიტიკა",
+    "isFolder": true,
+    "level": 1,
+    "slug": "fast",
+    "icon": "AttachMoney",
+    "children": [
+      {
+        "name": "სფი კალკულატორი",
+        "description": "საფასო ცვლილებების კალკულატორი",
+        "isFolder": true,
+        "level": 2,
+        "slug": "sfi-kalkulatori",
+        "icon": "Calculate",
+        "children": [
+          {
+            "name": "Laptops",
+            "isFolder": false,
+            "level": 3,
+            "resource": "Laptop products...",
+            "metaTitle": "Laptops",
+            "metaDescription": "Browse our laptops",
+            "slug": "laptops",
+            "icon": "LaptopMac"
+          }
+        ]
+      },
+      {
+        "name": "პერსონალური ინფლაციის კალკულატორი",
+        "description": "ინდივიდუალური ინფლაციის დათვლის ინსტრუმენტი",
+        "isFolder": true,
+        "level": 2,
+        "slug": "personaluri-inflaciis-kalkulatori",
+        "icon": "TrendingUp",
+        "children": []
+      },
+      {
+        "name": "ფასების კალეიდოსკოპი",
+        "description": "ფასების ვიზუალური წარმოდგენა",
+        "isFolder": true,
+        "level": 2,
+        "slug": "fasebis-kaleidoskopi",
+        "icon": "ViewInAr",
+        "children": []
+      },
+      {
+        "name": "ფასთა ინდექსაციის კალკულატორი",
+        "description": "ფასთა ინდექსაციის გამოთვლის ხელსაწყო",
+        "isFolder": true,
+        "level": 2,
+        "slug": "fastha-indeksatsiis-kalkulatori",
+        "icon": "Equalizer",
+        "children": []
+      }
+    ]
+  },
+  {
+    "name": "საგარეო ვაჭრობა",
+    "description": "საგარეო ვაჭრობის სტატისტიკა და პორტალები",
+    "isFolder": true,
+    "level": 1,
+    "slug": "sagareo-vachroba",
+    "icon": "Public",
+    "children": [
+      {
+        "name": "საგარეო ვაჭრობის პორტალი",
+        "description": "საგარეო ვაჭრობის დეტალური მონაცემები",
+        "isFolder": true,
+        "level": 2,
+        "slug": "sagareo-vachrobis-portali",
+        "icon": "ImportExport",
+        "children": []
+      },
+      {
+        "name": "პუი პორტალი",
+        "description": "პუი მონაცემების პორტალი",
+        "isFolder": true,
+        "level": 2,
+        "slug": "pui-portali",
+        "icon": "AccountBalance",
+        "children": []
+      }
+    ]
+  },
+  {
+    "name": "სოფლის მეურნეობა",
+    "description": "სოფლის მეურნეობისა და გარემოს სტატისტიკა",
+    "isFolder": true,
+    "level": 1,
+    "slug": "soflis-meurneoba",
+    "icon": "Agriculture",
+    "children": [
+      {
+        "name": "სოფლის მეურნეობის სტატისტიკის პორტალი",
+        "description": "მეურნეობის მონაცემები და ანალიზი",
+        "isFolder": true,
+        "level": 2,
+        "slug": "soflis-statistikis-portali",
+        "icon": "BarChart",
+        "children": []
+      },
+      {
+        "name": "გარემოს სტატისტიკის პორტალი",
+        "description": "გარემოსთან დაკავშირებული სტატისტიკა",
+        "isFolder": true,
+        "level": 2,
+        "slug": "garemos-statistikis-portali",
+        "icon": "Eco",
+        "children": []
+      }
+    ]
+  },
+  {
+    "name": "ეროვნული ანგარიშები",
+    "description": "ეროვნული ანგარიშებისა და ეკონომიკური ანალიზის მონაცემები",
+    "isFolder": true,
+    "level": 1,
+    "slug": "erovnuli-angarishabi",
+    "icon": "Assessment",
+    "children": [
+      {
+        "name": "ეროვნული ანგარიშების პორტალი",
+        "description": "ეროვნული ანგარიშების ცენტრალიზებული ბაზა",
+        "isFolder": true,
+        "level": 2,
+        "slug": "erovnuli-angarishis-portali",
+        "icon": "Storage",
+        "children": []
+      },
+      {
+        "name": "ეკონომილური ანალიზის პორტალი",
+        "description": "ეკონომიკური მონაცემების ანალიზი",
+        "isFolder": true,
+        "level": 2,
+        "slug": "ekonomikuri-analizis-portali",
+        "icon": "ShowChart",
+        "children": []
+      }
+    ]
+  },
+  {
+    "name": "საზოგადოებასთან ურთიერთობა",
+    "description": "სტატისტიკა და ანალიტიკა საზოგადოებისათვის",
+    "isFolder": true,
+    "level": 1,
+    "slug": "sazogadoebastan-urtiertoba",
+    "icon": "People",
+    "children": [
+      {
+        "name": "სტატისტიკა ბავშვებისა და მოზარდებისთვის",
+        "description": "ბავშვებისა და მოზარდების სტატისტიკა",
+        "isFolder": true,
+        "level": 2,
+        "slug": "statistika-bavshvebisa-da-mozardebisatvis",
+        "icon": "ChildCare",
+        "children": []
+      },
+      {
+        "name": "სართაშორისო შედარების პორტალი",
+        "description": "საერთაშორისო სტატისტიკური შედარებები",
+        "isFolder": true,
+        "level": 2,
+        "slug": "saintereso-shedarebis-portali",
+        "icon": "CompareArrows",
+        "children": []
+      },
+      {
+        "name": "რეგიონული და მუნიციპალური სტატისტიკა",
+        "description": "რეგიონული და ადგილობრივი მონაცემები",
+        "isFolder": true,
+        "level": 2,
+        "slug": "regionuli-municipaluri-statistika",
+        "icon": "Map",
+        "children": []
+      }
+    ]
+  },
+  {
+    "name": "ბიზნეს სტატისტიკა",
+    "description": "ბიზნესთან დაკავშირებული სტატისტიკა და კალკულატორები",
+    "isFolder": true,
+    "level": 1,
+    "slug": "biznes-statistika",
+    "icon": "BusinessCenter",
+    "children": [
+      {
+        "name": "გადასახადების კალკულატორი",
+        "description": "საგადასახადო კალკულატორი ბიზნესისთვის",
+        "isFolder": true,
+        "level": 2,
+        "slug": "gadasakhadebis-kalkulatori",
+        "icon": "RequestQuote",
+        "children": []
+      },
+      {
+        "name": "ტურიზმის სტატისტიკის პორტალი",
+        "description": "ტურიზმის მონაცემების ანალიზი",
+        "isFolder": true,
+        "level": 2,
+        "slug": "turizmis-statistikis-portali",
+        "icon": "TravelExplore",
+        "children": []
+      },
+      {
+        "name": "ავტომობილების სტატისტიკის პორტალი",
+        "description": "ავტომობილების რაოდენობა და მახასიათებლები",
+        "isFolder": true,
+        "level": 2,
+        "slug": "avtomobilebis-statistikis-portali",
+        "icon": "DirectionsCar",
+        "children": [
+          {
+            "name": "სლაიდერის მონაცემები",
+            "isFolder": false,
+            "level": 4,
+            "resource": "slider-data",
+            "metaTitle": "სლაიდერის მონაცემები",
+            "metaDescription": "სლაიდერის მონაცემების დეტალური ინფორმაცია",
+            "slug": "slider-data",
+            "icon": "BarChart"
+          },
+          {
+            "name": "ავტომობილები პერიოდის ბოლოსთვის",
+            "isFolder": false,
+            "level": 4,
+            "resource": "cars-end-period",
+            "metaTitle": "ავტომობილები პერიოდის ბოლოსთვის",
+            "metaDescription": "ავტომობილების რაოდენობა პერიოდის ბოლოსთვის",
+            "slug": "cars-end-period",
+            "icon": "DirectionsCar"
+          },
+          {
+            "name": "ექსპორტ-იმპორტი",
+            "isFolder": false,
+            "level": 4,
+            "resource": "export-import",
+            "metaTitle": "ექსპორტ-იმპორტი",
+            "metaDescription": "ავტომობილების ექსპორტისა და იმპორტის მონაცემები",
+            "slug": "export-import",
+            "icon": "ImportExport"
+          },
+          {
+            "name": "ავტომობილები მიმდინარე პერიოდში",
+            "isFolder": false,
+            "level": 4,
+            "resource": "cars-current-period",
+            "metaTitle": "ავტომობილები მიმდინარე პერიოდში",
+            "metaDescription": "მიმდინარე პერიოდის ავტომობილების მონაცემები",
+            "slug": "cars-current-period",
+            "icon": "DirectionsCar"
+          },
+          {
+            "name": "ავტომობილები 1000 კაცზე",
+            "isFolder": false,
+            "level": 4,
+            "resource": "cars-per-1000",
+            "metaTitle": "ავტომობილები 1000 კაცზე",
+            "metaDescription": "1000 კაცზე ავტომობილების რაოდენობა",
+            "slug": "cars-per-1000",
+            "icon": "Equalizer"
+          },
+          {
+            "name": "საგზაო სატრანსპორტო შემთხვევები",
+            "isFolder": false,
+            "level": 4,
+            "resource": "road-accidents",
+            "metaTitle": "საგზაო სატრანსპორტო შემთხვევები",
+            "metaDescription": "საგზაო სატრანსპორტო შემთხვევების სტატისტიკა",
+            "slug": "road-accidents",
+            "icon": "Warning"
+          },
+          {
+            "name": "ექსპორტ-იმპორტი",
+            "isFolder": false,
+            "level": 4,
+            "resource": "export-import-2",
+            "metaTitle": "ექსპორტ-იმპორტი",
+            "metaDescription": "ავტომობილების ექსპორტისა და იმპორტის მონაცემები",
+            "slug": "export-import-2",
+            "icon": "ImportExport"
+          },
+          {
+            "name": "მართვის მოწმობები",
+            "isFolder": false,
+            "level": 4,
+            "resource": "driver-licenses",
+            "metaTitle": "მართვის მოწმობები",
+            "metaDescription": "მართვის მოწმობების სტატისტიკა",
+            "slug": "driver-licenses",
+            "icon": "Badge"
+          }
+        ]
+      },
+      {
+        "name": "GIS - ანალიზი",
+        "description": "გეოგრაფიული ინფორმაციის ანალიზი",
+        "isFolder": true,
+        "level": 2,
+        "slug": "gis-analizi",
+        "icon": "MapOutlined",
+        "children": []
+      }
+    ]
+  },
+  {
+    "name": "დემოგრაფია",
+    "description": "დემოგრაფიული მონაცემები და ანალიზი",
+    "isFolder": true,
+    "level": 1,
+    "slug": "demografia",
+    "icon": "Groups",
+    "children": [
+      {
+        "name": "დემოგრაფიული პორტალი",
+        "description": "დემოგრაფიული მონაცემების ვიზუალიზაცია",
+        "isFolder": true,
+        "level": 2,
+        "slug": "demografiuli-portali",
+        "icon": "PieChart",
+        "children": []
+      }
+    ]
+  },
+  {
+    "name": "სოციალური სტატისტიკა",
+    "description": "სოციალური საკითხების სტატისტიკური ანალიზი",
+    "isFolder": true,
+    "level": 1,
+    "slug": "socialuri-statistika",
+    "icon": "Diversity3",
+    "children": [
+      {
+        "name": "ხელფასების კალკულატორი",
+        "description": "ხელფასის გამოთვლის ინსტრუმენტი",
+        "isFolder": true,
+        "level": 3,
+        "slug": "khelpasebis-kalkulatori",
+        "icon": "Paid",
+        "children": []
+      },
+      {
+        "name": "გენდერული სტატისტიკა",
+        "description": "გენდერული თანასწორობის სტატისტიკა",
+        "isFolder": true,
+        "level": 3,
+        "slug": "genderuli-statistika",
+        "icon": "Wc",
+        "children": []
+      },
+      {
+        "name": "შშმ - პირთა სტატისტიკის პორტალი",
+        "description": "შშმ პირთა მონაცემები",
+        "isFolder": true,
+        "level": 3,
+        "slug": "shshm-pirta-statistikis-portali",
+        "icon": "Accessible",
+        "children": []
+      },
+      {
+        "name": "ბავშვთა და მოზარდების სტატისტიკის პორტალი",
+        "description": "ბავშვებისა და მოზარდების სოციალური ანალიზი",
+        "isFolder": true,
+        "level": 3,
+        "slug": "bavshvta-mozardebis-statistikis-portali",
+        "icon": "ChildFriendly",
+        "children": []
+      }
+    ]
+  }
+]
