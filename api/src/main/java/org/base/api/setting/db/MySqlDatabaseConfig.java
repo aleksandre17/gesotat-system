@@ -1,8 +1,5 @@
-// File: api/src/main/java/org/base/api/setting/db/MySqlDatabaseConfig.java
-// ---
-// This class creates the permanent, managed connection for your new MySQL database.
 
-package org.base.api.repository.MySql;
+package org.base.api.setting.db;
 
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManagerFactory;
@@ -58,4 +55,5 @@ public class MySqlDatabaseConfig {
     public JdbcTemplate mysqlJdbcTemplate(@Qualifier("mysqlDataSource") DataSource dataSource) {
         return new JdbcTemplate(dataSource);
     }
+
 }

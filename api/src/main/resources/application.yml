@@ -1,5 +1,5 @@
 server:
-    port: 8081
+  port: 8081
 
 security:
   type: api
@@ -17,16 +17,25 @@ spring:
   application:
     name: api
   datasource:
+    # --- MS SQL Primary Connection ---
     primary:
-      jdbc-url: jdbc:sqlserver://192.168.0.230;databaseName=geostat-system;useBulkCopyForBatchInsert=true;encrypt=true;useBulkCopyForBatchInsert=true;trustServerCertificate=true;serverTimezone=Asia/Tbilisi;cachePrepStmts=true;reWriteBatchedInserts=true
+      jdbc-url: jdbc:sqlserver://192.168.0.230;databaseName=geostat-system;useBulkCopyForBatchInsert=true;encrypt=true;trustServerCertificate=true;serverTimezone=Asia/Tbilisi;cachePrepStmts=true;reWriteBatchedInserts=true
       username: sa
       password: Ozzy112358
       driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    # --- MS SQL Secondary Connection ---
     secondary:
-      jdbc-url: jdbc:sqlserver://192.168.0.230;databaseName=auto;encrypt=true;useBulkCopyForBatchInsert=true;useBulkCopyForBatchInsert=true;trustServerCertificate=true;serverTimezone=Asia/Tbilisi;cachePrepStmts=true;reWriteBatchedInserts=true
+      jdbc-url: jdbc:sqlserver://192.168.0.230;databaseName=auto;encrypt=true;useBulkCopyForBatchInsert=true;trustServerCertificate=true;serverTimezone=Asia/Tbilisi;cachePrepStmts=true;reWriteBatchedInserts=true
       username: sa
       password: Ozzy112358
       driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    # --- Your New MySQL Connection ---
+    tertiary:
+      jdbc-url: jdbc:mysql://192.168.1.29:3306/soplis_meurneoba?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      username: fdi
+      password: Asd123$%
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -37,6 +46,7 @@ spring:
           batch_size: 1000
           batch_versioned_data: true
         format_sql: true
+        # This dialect will be overridden by the specific configs, but it's good to have a default
         dialect: org.hibernate.dialect.SQLServerDialect
         order_updates: true
         order_inserts: true
@@ -44,7 +54,7 @@ spring:
 jwt:
   secret: "5A7C8E1F2A3C5E7A8C1E2F3A5C7E8A1F2C3F5A7C8E1F2A3C5E7A8C1E2F3A5C7E"
   expiration: 86400000
-  refresh-expiration: 86400000  # 24 hours in milliseconds
+  refresh-expiration: 86400000
 
 logging:
   level:
@@ -52,19 +62,4 @@ logging:
       springframework:
         jdbc: DEBUG
 storage:
-  export-dir: api/storage/access_exports
-
-#logging:
-#  level:
-#    org:
-#      springframework.security: DEBUG
-#      hibernate:
-#        SQL: DEBUG
-#        type:
-#          descriptor:
-#            sql:
-#              BasicBinder: TRACE
-
-
-#app.tables.allowed-tables=main_auto,secondary_auto,other_auto
-#app.tables.allowed-lang-names=en_name,ka_name
+  export-dir: api/storage/access_export

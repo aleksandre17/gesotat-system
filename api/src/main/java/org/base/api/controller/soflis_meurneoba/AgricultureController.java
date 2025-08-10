@@ -1,7 +1,4 @@
-// Create this new file in a new package, e.g.,
-// org.base.api.controller.soflis_meurneoba
-
-package org.base.api.controller.SoflisMeurneboa;
+package org.base.api.controller.soflis_meurneoba;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
