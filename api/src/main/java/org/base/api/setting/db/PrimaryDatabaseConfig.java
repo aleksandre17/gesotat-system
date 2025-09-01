@@ -18,7 +18,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableJpaRepositories(
-        basePackages = {"org.base.api.repository.primary", "org.base.core.repository"},
+        basePackages = {"org.base.api.repository.mobile", "org.base.core.repository"},
         entityManagerFactoryRef = "primaryEntityManagerFactory",
         transactionManagerRef = "primaryTransactionManager"
 )

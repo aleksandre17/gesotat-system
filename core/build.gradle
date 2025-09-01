@@ -26,7 +26,7 @@ dependencies {
     api 'org.springframework.security:spring-security-web'
     api 'org.springframework.data:spring-data-jpa'
     api 'org.springframework.boot:spring-boot-autoconfigure'
-    api 'org.hibernate:hibernate-core:7.0.0.CR1'
+    api 'org.hibernate.orm:hibernate-core:6.4.4.Final' // Aligned with api module
 
     // JPA & Validation
     api 'jakarta.servlet:jakarta.servlet-api'
@@ -52,7 +52,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.junit.jupiter:junit-jupiter-api'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-
 }
 
 tasks.withType(JavaCompile) {
@@ -67,19 +66,8 @@ tasks.withType(JavaCompile) {
     ]
 }
 
-//bootJar {
-//    enabled = false
-//}
-
 jar {
     enabled = true
     exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
-test {
-    useJUnitPlatform()
-    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
-    minHeapSize = "256m"
-    maxHeapSize = "1g"
 }
