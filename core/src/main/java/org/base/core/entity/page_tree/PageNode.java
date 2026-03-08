@@ -1,6 +1,7 @@
 package org.base.core.entity.page_tree;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -20,6 +21,7 @@ import java.util.List;
 @Table(name = "page_nodes")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "node_type")
+@JsonIgnoreProperties(ignoreUnknown = true)  // ← Add this
 public abstract class PageNode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,7 +59,7 @@ public abstract class PageNode {
     @Formula("node_type")
     private String nodeType;
 
-    @Pattern(regexp = "^[A-Z][a-zA-Z0-9]*$|^$", message = "Invalid icon name")
+    //@Pattern(regexp = "^[A-Z][a-zA-Z0-9]*$|^$", message = "Invalid icon name")
     @Column(name = "icon")
     private String icon;
 

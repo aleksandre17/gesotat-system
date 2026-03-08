@@ -17,6 +17,7 @@ configurations {
 
 dependencies {
     implementation project(':core')
+    implementation project(':mobile')
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -43,6 +44,14 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
     testImplementation 'org.springframework.security:spring-security-test'
+
+
+    // Apache POI - Excel-ის დასამუშავებლად
+    implementation 'org.apache.poi:poi:5.4.0'
+    implementation 'org.apache.poi:poi-ooxml:5.4.0'
+
+    // Apache Commons CSV - CSV-ის ჩასაწერად
+    implementation 'org.apache.commons:commons-csv:1.10.0'
 }
 
 tasks.withType(JavaCompile) {

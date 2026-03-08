@@ -72,7 +72,7 @@ public class MSSQLToAccess {
     }
 
     private String buildSelectQuery(String metaDatabaseType, String databaseName, String tableName, String metaDatabaseUrl) {
-        if (metaDatabaseType.toLowerCase().contains("sqlserver")) {
+        if (metaDatabaseType.toLowerCase().contains("mssql")) {
             // SQL Server uses square brackets and explicit schema (dbo)
             return "SELECT * FROM [" + databaseName + "].dbo.[" + tableName + "]";
         } else if (metaDatabaseType.toLowerCase().contains("mysql")) {
@@ -117,6 +117,10 @@ public class MSSQLToAccess {
         String[] dbAndTable = parseDatabaseAndTableName(fileName);
         String mssqlDatabaseName = dbAndTable[0];
         String mssqlTableName = dbAndTable[1];
+
+        if (mssqlDatabaseName.equalsIgnoreCase("international_ratings")) {
+            mssqlDatabaseName = "international-ratings";
+        }
 
         String mssqlUrl = buildConnectionUrl(metaDatabaseType, metaDatabaseUrl, mssqlDatabaseName);
         String mssqlUser = metaDatabaseUser;
@@ -190,31 +194,15 @@ public class MSSQLToAccess {
     }
 
     private static DataType mapSqlTypeToAccessType(int sqlType) {
-        switch (sqlType) {
-            case Types.VARCHAR:
-            case Types.NVARCHAR:
-            case Types.CHAR:
-            case Types.NCHAR:
-                return DataType.TEXT;
-            case Types.INTEGER:
-                return DataType.LONG;
-            case Types.BIGINT:
-                return DataType.NUMERIC;
-            case Types.FLOAT:
-            case Types.DOUBLE:
-            case Types.REAL:
-                return DataType.DOUBLE;
-            case Types.DATE:
-            case Types.TIMESTAMP:
-                return DataType.SHORT_DATE_TIME;
-            case Types.BIT:
-            case Types.BOOLEAN:
-                return DataType.BOOLEAN;
-            case Types.DECIMAL:
-            case Types.NUMERIC:
-                return DataType.NUMERIC;
-            default:
-                return DataType.TEXT;
-        }
+        return switch (sqlType) {
+            case Types.VARCHAR, Types.NVARCHAR, Types.CHAR, Types.NCHAR -> DataType.TEXT;
+            case Types.INTEGER -> DataType.LONG;
+            case Types.BIGINT -> DataType.NUMERIC;      // ← Changed
+            case Types.FLOAT, Types.DOUBLE, Types.REAL, Types.DECIMAL, Types.NUMERIC ->      // ← Changed
+                    DataType.DOUBLE;  // Use DOUBLE for all decimal types
+            case Types.DATE, Types.TIMESTAMP -> DataType.SHORT_DATE_TIME;
+            case Types.BIT, Types.BOOLEAN -> DataType.BOOLEAN;
+            default -> DataType.TEXT;
+        };
     }
 }

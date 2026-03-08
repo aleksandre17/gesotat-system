@@ -6,7 +6,11 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 public class MySqlImportStrategy implements DatabaseImportStrategy {
     @Override
     public void configureDataSource(UploadPayload payload, DriverManagerDataSource dataSource) {
+
         String[] dbAndTable = parseDatabaseAndTableName(payload.getMetaDatabaseName());
+        if (dbAndTable[0].equalsIgnoreCase("international_ratings")) {
+            dbAndTable[0] = "international-ratings";
+        }
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         dataSource.setUrl("jdbc:mysql://" + payload.getMetaDatabaseUrl() + "/" + dbAndTable[0] +
                 "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Tbilisi&rewriteBatchedStatements=true");
@@ -16,6 +20,15 @@ public class MySqlImportStrategy implements DatabaseImportStrategy {
 
     @Override
     public String quoteTableName(String rawTableName) {
+
+        if (rawTableName.equalsIgnoreCase("international_ratings/international_ratings")) {
+            rawTableName = "international-ratings/international_ratings";
+        }
+
+        if (rawTableName.equalsIgnoreCase("international_ratings/main_economic_indicator")) {
+            rawTableName = "international-ratings/main_economic_indicator";
+        }
+
         String[] parts = rawTableName.split("/");
         StringBuilder sb = new StringBuilder();
 
@@ -30,5 +43,10 @@ public class MySqlImportStrategy implements DatabaseImportStrategy {
     @Override
     public String quoteColumn(String columnName) {
         return "`" + columnName + "`";
+    }
+
+    @Override
+    public int getMaxParamsPerBatch() {
+        return 65535; // MySQL supports much larger batches; rewriteBatchedStatements handles optimization
     }
 }

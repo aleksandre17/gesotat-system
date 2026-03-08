@@ -3,7 +3,7 @@ package org.base.api.service;
 public class ImportStrategyFactory {
     public static DatabaseImportStrategy getStrategy(String dbType) {
         switch (dbType.toLowerCase()) {
-            case "sqlserver":
+            case "mssql":
                 return new SqlServerImportStrategy();
             case "mysql":
                 return new MySqlImportStrategy();

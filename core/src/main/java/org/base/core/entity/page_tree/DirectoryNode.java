@@ -16,4 +16,6 @@ public class DirectoryNode extends PageNode {
     @Nationalized
     @Column(name = "description")
     private String description;
+
+    private Long userId;
 }

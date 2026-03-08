@@ -1,2 +1,2 @@
 rootProject.name = 'gesotat-system'
-include 'core', 'api', 'web'
+include 'core', 'mobile', 'api', 'web'

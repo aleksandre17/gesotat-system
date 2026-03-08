@@ -1,0 +1,20 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: mobile
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    primary:
+      jdbc-url: jdbc:sqlserver://192.168.0.230;databaseName=geostat-system;encrypt=true;trustServerCertificate=true;serverTimezone=Asia/Tbilisi;cachePrepStmts=true
+      username: sa
+      password: Ozzy112358
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    secondary:
+      jdbc-url: jdbc:sqlserver://192.168.0.230;databaseName=auto;encrypt=true;trustServerCertificate=true;serverTimezone=Asia/Tbilisi;cachePrepStmts=true
+      username: sa
+      password: Ozzy112358
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+

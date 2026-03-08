@@ -42,6 +42,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 path.equals("/error") ||
                 path.equals("/") ||
                 path.endsWith(".html") ||
+                path.endsWith("/download-all") ||
+                path.contains("/api/v1/xlsx-to-csv/convert") ||
+                path.contains("/api/v1/xlsx-to-csv/download-zip") ||
                 path.endsWith("/api/v1/pages/roots") ||
                 path.endsWith(".css") ||
                 path.endsWith(".js") ||
@@ -49,7 +52,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 path.startsWith("/static/") ||
                 path.startsWith("/resources/") ||
                 path.startsWith("/ws/") ||
-                path.contains("import") ||
+                path.contains("import/") ||
                 path.contains("mobile/") ||
                 path.contains("mobile-text/");
     }

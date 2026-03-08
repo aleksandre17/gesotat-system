@@ -1,5 +1,6 @@
 package org.base.core.controller.api;
 
+import jakarta.transaction.Transactional;
 import lombok.Getter;
 import org.base.core.entity.User;
 import org.base.core.repository.RoleRepository;
@@ -8,6 +9,7 @@ import org.base.core.security.UserPrincipal;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,11 +33,12 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
-
-    public UserController(UserRepository userRepository, RoleRepository roleRepository) {
+    public UserController(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
@@ -60,12 +63,16 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('WRITE_RESOURCE')")
+    @Transactional
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
         return userRepository.findById(id)
                 .map(user -> {
                     user.setUsername(updatedUser.getUsername());
+                    if (updatedUser.getPassword() != null) {
+                        user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+                    }
                     //user.setEmail(updatedUser.getEmail());
-                    user.setRoles(updatedUser.getRoles());
+                    //user.setRoles(updatedUser.getRoles());
                     return ResponseEntity.ok(userRepository.save(user));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());

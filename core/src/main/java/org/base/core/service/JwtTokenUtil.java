@@ -74,6 +74,7 @@ public class JwtTokenUtil {
                 ))
                 .collect(Collectors.toList());
 
+        claims.put("userId", ((UserPrincipal)userDetails).getUser().getId());
         claims.put("roles", roles);
         return createToken(claims, userDetails.getUsername(), expiration);
     }

@@ -16,6 +16,8 @@ public class NodeRequest {
     private Integer sortOrder;
     private List<NodeRequest> children;
 
+    private Long userId;
+
 
     // Page-specific fields
     private String resource;

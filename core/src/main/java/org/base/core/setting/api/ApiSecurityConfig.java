@@ -45,9 +45,11 @@ public class ApiSecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .securityMatchers(matchers -> matchers.requestMatchers(SecurityPaths.API_PATHS))
                 .addFilterBefore(apiFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/xlsx-to-csv/convert", "/api/v1/xlsx-to-csv/download-all", "/api/v1/xlsx-to-csv/download-zip").permitAll()
                         .requestMatchers("/api/v1/mobile/**", "/api/v1/mobile-text/**").permitAll()
                         .requestMatchers("/api/v1/import", "/api/v1/import/**").permitAll()
                         .requestMatchers("/sign/**", "/ws/**").permitAll()

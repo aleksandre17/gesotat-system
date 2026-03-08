@@ -3,359 +3,359 @@ package org.base.api.service;
 import com.healthmarketscience.jackcess.*;
 
 import org.base.api.model.request.UploadPayload;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * High-performance dynamic Access (.mdb/.accdb) file importer.
+ * <p>
+ * Reads any Access table via Jackcess and batch-inserts into SQL Server / MySQL
+ * using a single reusable {@link PreparedStatement}. The batch size is automatically
+ * calculated to stay within the database parameter limit (e.g. SQL Server's 2100 limit).
+ * <p>
+ * Progress phases:
+ * <ul>
+ *   <li>0–5%    — File transfer to temp</li>
+ *   <li>5–10%   — Open Access DB, read metadata, optional DELETE</li>
+ *   <li>10–95%  — Row iteration + batch inserts (throttled progress updates)</li>
+ *   <li>95–100% — Commit + cleanup</li>
+ * </ul>
+ */
 @Service
 public class AccessFileImporter {
 
-    private final JdbcTemplate jdbcTemplate;
+    private static final Logger log = LoggerFactory.getLogger(AccessFileImporter.class);
 
-    public AccessFileImporter(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    // ─── Progress phase boundaries ───
+    private static final double PHASE_FILE_COPY   = 5.0;
+    private static final double PHASE_METADATA    = 10.0;
+    private static final double PHASE_INSERT_START = 10.0;
+    private static final double PHASE_INSERT_END  = 95.0;
+    private static final double PHASE_DONE        = 100.0;
 
+    /** Minimum interval (ms) between WebSocket progress messages to prevent flooding. */
+    private static final long PROGRESS_THROTTLE_MS = 250;
+
+    /** Buffer size for file copy. */
+    private static final int COPY_BUFFER_SIZE = 8192;
+
+    // ─── Public contract ───
+
+    @FunctionalInterface
     public interface ProgressListener {
         void onProgressUpdate(double progress, String message);
     }
 
+    /**
+     * Main entry point — parses an uploaded Access file and bulk-inserts into the target DB.
+     *
+     * @param file     the uploaded .mdb/.accdb file
+     * @param payload  import configuration (DB credentials, years to clear, etc.)
+     * @param listener progress callback (typically sends WebSocket messages)
+     * @throws IOException if file I/O fails
+     */
+    public void parseAndSaveAccessFile(MultipartFile file,
+                                       UploadPayload payload,
+                                       ProgressListener listener) throws IOException {
 
-    public static void main(String[] args) {
+        validatePayload(payload);
 
-    }
+        // ── Phase 1: Transfer uploaded file to a temp location (0–5%) ──
+        File tempFile = File.createTempFile("access-import-", ".accdb");
+        try {
+            copyToTemp(file, tempFile, listener);
+            notify(listener, PHASE_FILE_COPY, "File copied (" + formatBytes(file.getSize()) + ")");
 
+            // ── Phase 2+3+4: Open DB → insert → commit ──
+            DatabaseImportStrategy strategy = ImportStrategyFactory.getStrategy(payload.getMetaDatabaseType());
+            DriverManagerDataSource dataSource = new DriverManagerDataSource();
+            strategy.configureDataSource(payload, dataSource);
 
-    private static DataType mapSqlTypeToAccessType(int sqlType) {
-        switch (sqlType) {
-            case Types.VARCHAR:
-            case Types.CHAR:
-                return DataType.TEXT;
-            case Types.INTEGER:
-                return DataType.LONG;
-            case Types.BIGINT:
-                return DataType.NUMERIC;
-            case Types.DOUBLE:
-            case Types.FLOAT:
-                return DataType.DOUBLE;
-            case Types.DATE:
-                return DataType.SHORT_DATE_TIME;
-            case Types.TIMESTAMP:
-                return DataType.SHORT_DATE_TIME;
-            case Types.BOOLEAN:
-                return DataType.BOOLEAN;
-            default:
-                return DataType.TEXT; // ნაგულისხმევი
-        }
-    }
+            long startTime = System.nanoTime();
+            importFromAccessFile(tempFile, payload, strategy, dataSource, listener, startTime);
 
-    private String[] parseDatabaseAndTableName(String fileName) {
-        if (fileName == null || !fileName.contains("-")) {
-            throw new IllegalArgumentException("fileName must be in the format 'database-table'");
-        }
-        String[] parts = fileName.split("-", 2);
-        if (parts.length != 2 || parts[0].isEmpty() || parts[1].isEmpty()) {
-            throw new IllegalArgumentException("fileName must be in the format 'database-table'");
-        }
-        return parts;
-    }
-
-    public void parseAndSaveAccessFile(MultipartFile file, UploadPayload payload, ProgressListener listener) throws IOException {
-
-        File tempFile = File.createTempFile("upload-", ".mdb");
-
-        DatabaseImportStrategy strategy = ImportStrategyFactory.getStrategy(payload.getMetaDatabaseType());
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        strategy.configureDataSource(payload, dataSource);
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-
-        Connection connection = null;
-
-        try (InputStream is = file.getInputStream();
-             FileOutputStream fos = new FileOutputStream(tempFile)) {
-
-            byte[] buffer = new byte[8192];
-            long totalBytes = file.getSize();
-            long bytesWritten = 0;
-            int bytesRead;
-
-            while ((bytesRead = is.read(buffer)) != -1) {
-                fos.write(buffer, 0, bytesRead);
-                bytesWritten += bytesRead;
-
-                if (listener != null && totalBytes > 0) {
-                    double progress = ((double) bytesWritten / totalBytes) * 10.0;
-                    listener.onProgressUpdate(progress, "Copying file: " + bytesWritten + " of " + totalBytes + " bytes");
-                }
+        } finally {
+            if (tempFile.exists() && !tempFile.delete()) {
+                log.warn("Failed to delete temp file: {}", tempFile.getAbsolutePath());
             }
         }
+    }
 
-        try (Database db = DatabaseBuilder.open(tempFile)) {
-            connection = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection();
+    // ────────────────────────────────────────────────────────────────────────────
+    //  Core import logic
+    // ────────────────────────────────────────────────────────────────────────────
+
+    private void importFromAccessFile(File accessFile,
+                                      UploadPayload payload,
+                                      DatabaseImportStrategy strategy,
+                                      DriverManagerDataSource dataSource,
+                                      ProgressListener listener,
+                                      long startNanos) {
+        Database db = null;
+        Connection connection = null;
+
+        try {
+            db = DatabaseBuilder.open(accessFile);
+            connection = Objects.requireNonNull(dataSource.getConnection());
             connection.setAutoCommit(false);
 
+            // ── Phase 2: Read metadata (5–10%) ──
             String rawTableName = db.getTableNames().iterator().next();
             String quotedTableName = strategy.quoteTableName(rawTableName);
             Table table = db.getTable(rawTableName);
 
-            int totalRows = getRowCount(table);
-            int processedRows = 0;
+            int totalRows = table.getRowCount();
+            log.info("Table [{}]: {} rows, {} columns", rawTableName, totalRows, table.getColumnCount());
 
             List<String> columnNames = table.getColumns().stream()
                     .map(Column::getName)
                     .collect(Collectors.toList());
 
-            // Clear server data
-            if (payload.isClearServerData()) {
-                try (PreparedStatement ps = connection.prepareStatement("DELETE FROM " + quotedTableName)) {
-                    ps.executeUpdate();
-                }
-                notify(listener, 10.0, "Cleared all existing server data");
-            }
+            // Delete existing data if requested
+            executeDeletes(connection, payload, quotedTableName, strategy, listener);
 
-            // Clear data for specific years
-            if (payload.getYears() != null && !payload.getYears().isEmpty()) {
-                String yearList = payload.getYears().stream()
-                        .map(String::valueOf)
-                        .collect(Collectors.joining(","));
-                try (PreparedStatement ps = connection.prepareStatement("DELETE FROM " + quotedTableName + " WHERE [year] IN (" + yearList + ")")) {
-                    ps.executeUpdate();
-                }
-                notify(listener, 10.0, "Cleared data for years: " + yearList);
-            }
+            notify(listener, PHASE_METADATA, "Starting insert of " + totalRows + " rows…");
 
-            final int batchSize = 1000;
-            List<Object[]> batch = new ArrayList<>(batchSize);
+            // ── Phase 3: Batch insert (10–95%) ──
+            int effectiveBatchSize = computeEffectiveBatchSize(columnNames.size(), strategy);
+            log.info("Batch size: {} (columns: {}, maxParams: {})",
+                    effectiveBatchSize, columnNames.size(), strategy.getMaxParamsPerBatch());
 
-            for (Row row : table) {
-                Object[] values = columnNames.stream().map(row::get).toArray();
-                batch.add(values);
-                processedRows++;
+            executeBatchInsert(connection, quotedTableName, columnNames, table, totalRows,
+                    effectiveBatchSize, strategy, listener);
 
-                if (batch.size() >= batchSize) {
-                    batchInsert(connection, quotedTableName, columnNames, batch, listener, totalRows, processedRows, strategy);
-                    batch.clear();
-                }
-            }
-
-            if (!batch.isEmpty()) {
-                batchInsert(connection, quotedTableName, columnNames, batch, listener, totalRows, processedRows, strategy);
-            }
-
+            // ── Phase 4: Commit (95–100%) ──
+            notify(listener, PHASE_INSERT_END, "Committing transaction…");
             connection.commit();
-            notify(listener, 100.0, "Upload and insert completed successfully");
+
+            long elapsedMs = (System.nanoTime() - startNanos) / 1_000_000;
+            notify(listener, PHASE_DONE, "Completed: " + totalRows + " rows in " + elapsedMs + "ms");
+            log.info("Import completed: {} rows in {}ms → {}", totalRows, elapsedMs, rawTableName);
+
         } catch (Exception e) {
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                } catch (SQLException ex) {
-                    notify(listener, 0.0, "Rollback failed: " + ex.getCause().getMessage());
-                }
-            }
-            notify(listener, 0.0, "Upload failed and rolled back: " + e.getCause().getMessage());
-            throw new RuntimeException("Upload failed", e);
+            rollbackQuietly(connection);
+            notify(listener, 0.0, "Upload failed: " + extractMessage(e));
+            log.error("Import failed for file: {}", accessFile.getName(), e);
+            throw new RuntimeException("Import failed: " + extractMessage(e), e);
         } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException ignore) {}
-            }
-            if (tempFile.exists()) tempFile.delete();
-            notify(listener, 100.0, "Temporary file deleted");
+            closeQuietly(db);
+            closeQuietly(connection);
         }
     }
 
-    private void notify(ProgressListener listener, double progress, String message) {
-        if (listener != null) listener.onProgressUpdate(progress, message);
-    }
+    // ────────────────────────────────────────────────────────────────────────────
+    //  Batch insert
+    // ────────────────────────────────────────────────────────────────────────────
 
-    private int getRowCount(Table table) {
-        int count = 0;
-        for (Row ignored : table) {
-            count++;
-        }
-        table.reset();
-        return count;
-    }
+    /**
+     * Reads rows from Jackcess table and inserts via a single reusable PreparedStatement.
+     * Progress updates are throttled to avoid WebSocket flooding.
+     */
+    private void executeBatchInsert(Connection connection,
+                                    String quotedTableName,
+                                    List<String> columnNames,
+                                    Table table,
+                                    int totalRows,
+                                    int batchSize,
+                                    DatabaseImportStrategy strategy,
+                                    ProgressListener listener) throws SQLException {
 
-    private String convertToSqlSafeName(String rawName) {
-        String[] parts = rawName.split("/");
-        StringBuilder sb = new StringBuilder();
-
-        if (parts.length == 2) {
-            // For 2 parts: insert [dbo] in the middle
-            sb.append("[").append(parts[0]).append("].");
-            sb.append("[dbo].");
-            sb.append("[").append(parts[1]).append("]");
-        } else {
-            // For 1 part or 3+ parts: just wrap all parts
-            for (int i = 0; i < parts.length; i++) {
-                if (i > 0) sb.append(".");
-                sb.append("[").append(parts[i]).append("]");
-            }
-        }
-        return sb.toString();
-    }
-
-    private void batchInsert(
-            Connection connection,
-            String tableName,
-            List<String> columnNames,
-            List<Object[]> batchArgs,
-            ProgressListener listener,
-            int totalRows,
-            int processedRows,
-            DatabaseImportStrategy strategy
-    ) {
-
-        int batchSize = 500;
-
-        String columns = columnNames.stream()
-                .map(strategy::quoteColumn)
-                .collect(Collectors.joining(", "));
-        String placeholders = columnNames.stream().map(col -> "?").collect(Collectors.joining(", "));
-        String sql = "INSERT INTO " + tableName + " (" + columns + ") VALUES (" + placeholders + ")";
+        String sql = buildInsertSql(quotedTableName, columnNames, strategy);
+        int columnCount = columnNames.size();
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            int count = 0;
-            connection.setAutoCommit(false);
+            int processedRows = 0;
+            int pendingInBatch = 0;
+            long lastProgressTime = System.currentTimeMillis();
 
-            for (Object[] args : batchArgs) {
-                for (int i = 0; i < args.length; i++) {
-                    ps.setObject(i + 1, args[i]);
+            for (Row row : table) {
+                // Set parameters directly — no intermediate Object[] allocation
+                for (int i = 0; i < columnCount; i++) {
+                    ps.setObject(i + 1, row.get(columnNames.get(i)));
                 }
                 ps.addBatch();
-                count++;
+                pendingInBatch++;
+                processedRows++;
+
+                if (pendingInBatch >= batchSize) {
+                    ps.executeBatch();
+                    ps.clearBatch();
+                    pendingInBatch = 0;
+
+                    // Throttled progress update — avoids flooding WebSocket
+                    long now = System.currentTimeMillis();
+                    if (now - lastProgressTime >= PROGRESS_THROTTLE_MS) {
+                        reportInsertProgress(listener, processedRows, totalRows);
+                        lastProgressTime = now;
+                    }
+                }
             }
 
-            if (count % batchSize == 0) {
-                count = 0;
+            // Flush remaining rows
+            if (pendingInBatch > 0) {
                 ps.executeBatch();
                 ps.clearBatch();
             }
 
-            if (count > 0) {
-                ps.executeBatch();
+            // Final progress update (always send)
+            reportInsertProgress(listener, processedRows, totalRows);
+        }
+    }
+
+    // ────────────────────────────────────────────────────────────────────────────
+    //  Delete operations
+    // ────────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Executes optional DELETE statements — either clear all data or specific years.
+     * Short-circuits: if clearServerData is true, year-based delete is skipped.
+     */
+    private void executeDeletes(Connection connection,
+                                UploadPayload payload,
+                                String quotedTableName,
+                                DatabaseImportStrategy strategy,
+                                ProgressListener listener) throws SQLException {
+
+        if (payload.isClearServerData()) {
+            try (PreparedStatement ps = connection.prepareStatement("DELETE FROM " + quotedTableName)) {
+                int deleted = ps.executeUpdate();
+                notify(listener, 8.0, "Cleared all server data (" + deleted + " rows)");
             }
+            return; // No need to also delete by year
+        }
 
-            if (listener != null) {
-                double progress = Math.min(10.0 + ((double) processedRows / totalRows) * 90.0, 100.0);
-                listener.onProgressUpdate(progress, "Inserted " + batchArgs.size() + " rows (Total: " + processedRows + "/" + totalRows + ")");
+        List<String> years = payload.getYears();
+        if (years != null && !years.isEmpty()) {
+            String yearColumn = strategy.quoteColumn("year");
+            // Build parameterized DELETE to prevent SQL injection
+            String placeholders = years.stream().map(y -> "?").collect(Collectors.joining(","));
+            String sql = "DELETE FROM " + quotedTableName + " WHERE " + yearColumn + " IN (" + placeholders + ")";
+
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                for (int i = 0; i < years.size(); i++) {
+                    ps.setString(i + 1, years.get(i));
+                }
+                int deleted = ps.executeUpdate();
+                notify(listener, 8.0, "Cleared data for years [" + String.join(", ", years) + "] (" + deleted + " rows)");
             }
-
-        } catch (SQLException e) {
-            notify(listener, 10.0, "Batch insert failed: " + e.getMessage());
-            throw new RuntimeException("Insert error", e);
         }
     }
 
+    // ────────────────────────────────────────────────────────────────────────────
+    //  SQL building
+    // ────────────────────────────────────────────────────────────────────────────
 
-    private String getStringValue(Row row, String columnName) {
-        if (row == null || columnName == null) return "";
-        Object val = row.get(columnName);
-        if (val == null) return "";
-        return val.toString();
+    /**
+     * Builds a parameterized INSERT statement for the given table and columns.
+     */
+    private String buildInsertSql(String quotedTableName, List<String> columnNames, DatabaseImportStrategy strategy) {
+        String columns = columnNames.stream()
+                .map(strategy::quoteColumn)
+                .collect(Collectors.joining(", "));
+        String placeholders = columnNames.stream()
+                .map(c -> "?")
+                .collect(Collectors.joining(", "));
+        return "INSERT INTO " + quotedTableName + " (" + columns + ") VALUES (" + placeholders + ")";
     }
 
-    private int getIntValue(Row row, String columnName) {
-        if (row == null || columnName == null) return 0;
-        Object val = row.get(columnName);
-        if (val instanceof Number) {
-            return ((Number) val).intValue();
-        }
-        try {
-            return Integer.parseInt(val.toString());
-        } catch (NumberFormatException e) {
-            return 0;
+    /**
+     * Computes optimal batch size based on column count and DB parameter limit.
+     * SQL Server: hard limit of 2100 parameters per statement.
+     * MySQL: much higher; rewriteBatchedStatements handles optimization.
+     */
+    private int computeEffectiveBatchSize(int columnCount, DatabaseImportStrategy strategy) {
+        int maxParams = strategy.getMaxParamsPerBatch();
+        return Math.max(1, maxParams / columnCount);
+    }
+
+    // ────────────────────────────────────────────────────────────────────────────
+    //  File I/O helpers
+    // ────────────────────────────────────────────────────────────────────────────
+
+    private void copyToTemp(MultipartFile file, File tempFile, ProgressListener listener) throws IOException {
+        long totalBytes = file.getSize();
+        long bytesWritten = 0;
+
+        try (InputStream is = file.getInputStream();
+             OutputStream os = Files.newOutputStream(tempFile.toPath())) {
+
+            byte[] buffer = new byte[COPY_BUFFER_SIZE];
+            int bytesRead;
+            while ((bytesRead = is.read(buffer)) != -1) {
+                os.write(buffer, 0, bytesRead);
+                bytesWritten += bytesRead;
+
+                if (totalBytes > 0) {
+                    double progress = ((double) bytesWritten / totalBytes) * PHASE_FILE_COPY;
+                    notify(listener, progress, "Copying file: " + formatBytes(bytesWritten) + " / " + formatBytes(totalBytes));
+                }
+            }
         }
     }
 
-    private double getDoubleValue(Row row, String columnName) {
-        if (row == null || columnName == null) return 0.0;
-        Object val = row.get(columnName);
-        if (val instanceof Number) {
-            return ((Number) val).doubleValue();
-        }
-        try {
-            return Double.parseDouble(val.toString());
-        } catch (NumberFormatException e) {
-            return 0.0;
+    // ────────────────────────────────────────────────────────────────────────────
+    //  Progress & utility helpers
+    // ────────────────────────────────────────────────────────────────────────────
+
+    private void reportInsertProgress(ProgressListener listener, int processedRows, int totalRows) {
+        double progress = PHASE_INSERT_START
+                + ((double) processedRows / Math.max(totalRows, 1)) * (PHASE_INSERT_END - PHASE_INSERT_START);
+        notify(listener,
+                Math.min(progress, PHASE_INSERT_END),
+                "Inserted " + processedRows + " / " + totalRows + " rows");
+    }
+
+    private void notify(ProgressListener listener, double progress, String message) {
+        if (listener != null) {
+            listener.onProgressUpdate(progress, message);
         }
     }
 
+    private void validatePayload(UploadPayload payload) {
+        Objects.requireNonNull(payload, "UploadPayload must not be null");
+        Objects.requireNonNull(payload.getMetaDatabaseType(), "metaDatabaseType must not be null");
+    }
 
-//    private void batchInsert(String tableName, List<String> columnNames, List<Object[]> batchArgs) {
-//        if (batchArgs.isEmpty()) return;
-//
-//        String columns = columnNames.stream()
-//                .map(col -> "[" + col + "]")
-//                .collect(Collectors.joining(", "));
-//
-//        try {
-//            // Calculate optimal batch size based on column count to stay under the 2100 parameter limit
-//            // Adding a safety margin by using 2000 instead of 2100
-//            int maxParamsPerBatch = 2000;
-//            int rowsPerBatch = Math.max(1, maxParamsPerBatch / columnNames.size());
-//
-//            // Use the smaller of the calculated size or the requested batch size
-//            int effectiveBatchSize = Math.min(rowsPerBatch, 1000);
-//
-//            System.out.println("Using batch size: " + effectiveBatchSize + " for " + columnNames.size() + " columns");
-//
-//            for (int i = 0; i < batchArgs.size(); i += effectiveBatchSize) {
-//                List<Object[]> subBatch = batchArgs.subList(i, Math.min(i + effectiveBatchSize, batchArgs.size()));
-//                String placeholders = IntStream.range(0, subBatch.size())
-//                        .mapToObj(j -> "(" + "?,".repeat(columnNames.size()).replaceAll(",$", "") + ")")
-//                        .collect(Collectors.joining(", "));
-//                String sql = "INSERT INTO " + tableName + " (" + columns + ") VALUES " + placeholders;
-//
-//                Object[] flatArgs = subBatch.stream()
-//                        .flatMap(Arrays::stream)
-//                        .toArray();
-//
-//                // Debug info, but be careful with large parameter lists
-//                System.out.println("Executing SQL with " + subBatch.size() + " rows and " +
-//                        flatArgs.length + " parameters");
-//
-//                jdbcTemplate.update(sql, flatArgs);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new RuntimeException("Failed to insert batch", e);
-//        }
-//    }
+    private static String formatBytes(long bytes) {
+        if (bytes < 1024) return bytes + " B";
+        if (bytes < 1024 * 1024) return String.format("%.1f KB", bytes / 1024.0);
+        return String.format("%.1f MB", bytes / (1024.0 * 1024.0));
+    }
 
+    private static String extractMessage(Exception e) {
+        return e.getCause() != null ? e.getCause().getMessage() : e.getMessage();
+    }
 
+    private static void rollbackQuietly(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                log.warn("Rollback failed", ex);
+            }
+        }
+    }
 
-//    private void batchInsertUsingBatchUpdate(String tableName, List<String> columnNames, List<Object[]> batchArgs) {
-//        String columns = columnNames.stream()
-//                .map(col -> "[" + col + "]")
-//                .collect(Collectors.joining(", "));
-//        String sql = "INSERT INTO " + tableName + " (" + columns + ") VALUES (" +
-//                columnNames.stream().map(c -> "?").collect(Collectors.joining(", ")) + ")";
-//
-//        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-//            @Override
-//            public void setValues(PreparedStatement ps, int i) throws SQLException {
-//                Object[] row = batchArgs.get(i);
-//                for (int j = 0; j < row.length; j++) {
-//                    ps.setObject(j + 1, row[j]);
-//                }
-//            }
-//
-//            @Override
-//            public int getBatchSize() {
-//                return batchArgs.size();
-//            }
-//        });
-//    }
+    private static void closeQuietly(AutoCloseable resource) {
+        if (resource != null) {
+            try {
+                resource.close();
+            } catch (Exception e) {
+                log.warn("Failed to close resource", e);
+            }
+        }
+    }
 }
+

@@ -14,6 +14,7 @@ import org.base.core.security.UserPrincipal;
 import org.base.core.service.SignService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -60,16 +61,18 @@ public class SignController {
                 ))
                 .collect(Collectors.toList());
 
-        UserInfoResponse response = new UserInfoResponse(userPrincipal.getUsername(), roles);
+        UserInfoResponse response = new UserInfoResponse(userPrincipal.getUser().getId(), userPrincipal.getUsername(), roles);
         return ResponseEntity.ok(response);
     }
 
     @Getter
     private static class UserInfoResponse {
+        private final Long id;
         private final String username;
         private final List<Map<String, Object>> roles;
 
-        public UserInfoResponse(String username, List<Map<String, Object>> roles) {
+        public UserInfoResponse(Long id, String username, List<Map<String, Object>> roles) {
+            this.id = id;
             this.username = username;
             this.roles = roles;
         }

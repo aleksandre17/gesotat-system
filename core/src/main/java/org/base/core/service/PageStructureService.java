@@ -58,6 +58,7 @@ public class PageStructureService {
         if (request.getIsFolder()) {
             DirectoryNode folder = new DirectoryNode();
             folder.setDescription(request.getDescription());
+            folder.setUserId(request.getUserId());
             node = folder;
         } else {
             PageLeafNode page = new PageLeafNode();
@@ -131,6 +132,7 @@ public class PageStructureService {
             // Update type-specific fields
             if (node instanceof DirectoryNode) {
                 ((DirectoryNode) node).setDescription(request.getDescription());
+                ((DirectoryNode) node).setUserId(request.getUserId());
             } else if (node instanceof PageLeafNode) {
                 PageLeafNode leafNode = (PageLeafNode) node;
                 leafNode.setMetaDatabaseType(request.getMetaDatabaseType());

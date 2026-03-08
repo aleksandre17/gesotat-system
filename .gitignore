@@ -1,37 +1,172 @@
-HELP.md
-.gradle
+# ============================================================================
+#  GeoStat System — .gitignore
+#  Multi-module Spring Boot / Gradle project
+# ============================================================================
+
+# ──────────────────────────────────────────────────────────────────────────────
+#  Gradle
+# ──────────────────────────────────────────────────────────────────────────────
+.gradle/
 build/
 !gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
+# ──────────────────────────────────────────────────────────────────────────────
+#  Java / JVM
+# ──────────────────────────────────────────────────────────────────────────────
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
 
-### IntelliJ IDEA ###
-.idea
+# ──────────────────────────────────────────────────────────────────────────────
+#  IntelliJ IDEA
+# ──────────────────────────────────────────────────────────────────────────────
+.idea/
 *.iws
 *.iml
 *.ipr
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+atlassian-ide-plugin.xml
+com_crashlytics_export_strings.xml
 
-### NetBeans ###
+# ──────────────────────────────────────────────────────────────────────────────
+#  Eclipse / STS
+# ──────────────────────────────────────────────────────────────────────────────
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+# ──────────────────────────────────────────────────────────────────────────────
+#  NetBeans
+# ──────────────────────────────────────────────────────────────────────────────
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
+# ──────────────────────────────────────────────────────────────────────────────
+#  VS Code
+# ──────────────────────────────────────────────────────────────────────────────
 .vscode/
+*.code-workspace
+
+# ──────────────────────────────────────────────────────────────────────────────
+#  Spring Boot
+# ──────────────────────────────────────────────────────────────────────────────
+spring-shell.log
+
+# ──────────────────────────────────────────────────────────────────────────────
+#  OS Generated Files
+# ──────────────────────────────────────────────────────────────────────────────
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ──────────────────────────────────────────────────────────────────────────────
+#  Logs
+# ──────────────────────────────────────────────────────────────────────────────
+*.log
+logs/
+spring.log
+
+# ──────────────────────────────────────────────────────────────────────────────
+#  Temporary / Runtime Files
+# ──────────────────────────────────────────────────────────────────────────────
+*.tmp
+*.bak
+*.swp
+*.swo
+*~.nib
+tmp/
+temp/
+
+# ──────────────────────────────────────────────────────────────────────────────
+#  Secrets & Environment (NEVER commit credentials)
+# ──────────────────────────────────────────────────────────────────────────────
+*.env
+.env.*
+!.env.example
+application-local.yml
+application-local.properties
+application-secret.yml
+application-secret.properties
+
+# ──────────────────────────────────────────────────────────────────────────────
+#  Data Files / Uploads (large binary files)
+# ──────────────────────────────────────────────────────────────────────────────
+*.accdb
+*.mdb
+*.xlsx
+*.xls
+*.csv
+!**/src/main/resources/static/**
+storage/access_exports/data/
+api/src/main/storage/input/
+api/storage/
+
+# ──────────────────────────────────────────────────────────────────────────────
+#  Node.js (if frontend tooling is present)
+# ──────────────────────────────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+
+# ──────────────────────────────────────────────────────────────────────────────
+#  Docker (if applicable)
+# ──────────────────────────────────────────────────────────────────────────────
+.docker/
+docker-compose.override.yml
+
+# ──────────────────────────────────────────────────────────────────────────────
+#  Test Reports & Coverage
+# ──────────────────────────────────────────────────────────────────────────────
+**/test-results/
+**/reports/
+jacoco/
+*.exec
+
