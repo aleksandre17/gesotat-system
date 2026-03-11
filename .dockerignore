@@ -1,0 +1,49 @@
+# ── Build outputs ────────────────────────────────────────────
+**/build/
+**/.gradle/
+
+# ── IDE ──────────────────────────────────────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# ── Git ──────────────────────────────────────────────────────
+.git/
+.gitattributes
+
+# ── OS ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ── Docker (avoid recursive copy) ───────────────────────────
+docker-compose*.yml
+.dockerignore
+.env*
+!.env.example
+
+# ── Data files ───────────────────────────────────────────────
+*.accdb
+*.mdb
+*.xlsx
+*.xls
+storage/access_exports/data/
+api/src/main/storage/input/
+api/storage/
+
+# ── Docs ─────────────────────────────────────────────────────
+README.md
+HELP.md
+*.md
+
+# ── Node ─────────────────────────────────────────────────────
+node_modules/
+package.json
+package-lock.json
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+logs/
+

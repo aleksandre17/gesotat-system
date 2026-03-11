@@ -1,10 +1,12 @@
 server:
-    port: 8081
+  port: 8081
 
 security:
   type: api
 
 spring:
+  config:
+    import: optional:classpath:application-local.yml
   web:
     resources:
       static-locations: classpath:/static/
@@ -23,53 +25,35 @@ spring:
     name: api
   datasource:
     primary:
-      jdbc-url: jdbc:sqlserver://192.168.0.230;databaseName=geostat-system;useBulkCopyForBatchInsert=true;encrypt=true;useBulkCopyForBatchInsert=true;trustServerCertificate=true;serverTimezone=Asia/Tbilisi;cachePrepStmts=true;reWriteBatchedInserts=true
-      username: sa
-      password: Ozzy112358
+      jdbc-url: ${DB_PRIMARY_URL}
+      username: ${DB_PRIMARY_USER}
+      password: ${DB_PRIMARY_PASS}
       driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     secondary:
-      jdbc-url: jdbc:sqlserver://192.168.0.230;databaseName=auto;encrypt=true;useBulkCopyForBatchInsert=true;useBulkCopyForBatchInsert=true;trustServerCertificate=true;serverTimezone=Asia/Tbilisi;cachePrepStmts=true;reWriteBatchedInserts=true
-      username: sa
-      password: Ozzy112358
+      jdbc-url: ${DB_SECONDARY_URL}
+      username: ${DB_SECONDARY_USER}
+      password: ${DB_SECONDARY_PASS}
       driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         jdbc:
           batch_size: 1000
           batch_versioned_data: true
-        format_sql: true
-        dialect: org.hibernate.dialect.SQLServerDialect
         order_updates: true
         order_inserts: true
 
 jwt:
-  secret: "5A7C8E1F2A3C5E7A8C1E2F3A5C7E8A1F2C3F5A7C8E1F2A3C5E7A8C1E2F3A5C7E"
-  expiration: 86400000
-  refresh-expiration: 86400000  # 24 hours in milliseconds
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:86400000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:86400000}
 
 logging:
   level:
-    org:
-      springframework:
-        jdbc: DEBUG
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
+
 storage:
   export-dir: api/storage/access_exports
-
-#logging:
-#  level:
-#    org:
-#      springframework.security: DEBUG
-#      hibernate:
-#        SQL: DEBUG
-#        type:
-#          descriptor:
-#            sql:
-#              BasicBinder: TRACE
-
-
-#app.tables.allowed-tables=main_auto,secondary_auto,other_auto
-#app.tables.allowed-lang-names=en_name,ka_name

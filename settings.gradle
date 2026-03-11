@@ -1,2 +1,25 @@
 rootProject.name = 'gesotat-system'
-include 'core', 'mobile', 'api', 'web'
+
+// Core is always included - shared foundation
+include 'core'
+
+// Dynamically include modules from activeModules property
+// Default: api,mobile  |  Override: gradlew build -PactiveModules=mobile
+String modules = settings.hasProperty('activeModules')
+        ? settings.getProperty('activeModules')
+        : 'api,mobile'
+
+String[] active = modules.tokenize(',').collect { it.trim().toLowerCase() }
+
+active.each { String mod ->
+    if (file(mod).exists()) {
+        include(":${mod}")
+        println "  ✓ Module included: ${mod}"
+    } else {
+        println "  ✗ Module not found: ${mod} (skipped)"
+    }
+}
+
+println "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+println "  Active modules: core, ${active.join(', ')}"
+println "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

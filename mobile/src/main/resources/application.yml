@@ -2,19 +2,29 @@ server:
   port: 8081
 
 spring:
+  config:
+    import: optional:classpath:application-local.yml
   application:
     name: mobile
   main:
     allow-bean-definition-overriding: true
   datasource:
     primary:
-      jdbc-url: jdbc:sqlserver://192.168.0.230;databaseName=geostat-system;encrypt=true;trustServerCertificate=true;serverTimezone=Asia/Tbilisi;cachePrepStmts=true
-      username: sa
-      password: Ozzy112358
+      jdbc-url: ${DB_PRIMARY_URL}
+      username: ${DB_PRIMARY_USER}
+      password: ${DB_PRIMARY_PASS}
       driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
     secondary:
-      jdbc-url: jdbc:sqlserver://192.168.0.230;databaseName=auto;encrypt=true;trustServerCertificate=true;serverTimezone=Asia/Tbilisi;cachePrepStmts=true
-      username: sa
-      password: Ozzy112358
+      jdbc-url: ${DB_SECONDARY_URL}
+      username: ${DB_SECONDARY_USER}
+      password: ${DB_SECONDARY_PASS}
       driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+logging:
+  level:
+    # Mobile route logging on startup
+    org.base.mobile: INFO
+    org.base.mobile.config.RouteLoggingConfig: INFO
+    # Spring MVC — logs all mapped request handlers during initialization
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
 

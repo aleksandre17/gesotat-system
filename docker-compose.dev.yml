@@ -1,0 +1,60 @@
+# ============================================================
+#  GeoStat System — Development Docker Compose
+# ============================================================
+#  Usage:
+#    docker-compose -f docker-compose.dev.yml up --build
+#    docker-compose -f docker-compose.dev.yml up --build api
+#    docker-compose -f docker-compose.dev.yml up --build mobile
+#    docker-compose -f docker-compose.dev.yml down -v
+# ============================================================
+
+services:
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: geostat-api-dev
+    env_file: .env.dev
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      JAVA_TOOL_OPTIONS: >-
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=75.0
+        -Xms256m -Xmx1g
+    volumes:
+      - api-storage:/app/storage
+      - api-uploads:/tmp/uploads
+    networks:
+      - geostat-net
+    restart: unless-stopped
+
+  mobile:
+    build:
+      context: ./mobile
+      dockerfile: Dockerfile
+    container_name: geostat-mobile-dev
+    env_file: .env.dev
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: "8082"
+      JAVA_TOOL_OPTIONS: >-
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=75.0
+        -Xms128m -Xmx512m
+    networks:
+      - geostat-net
+    restart: unless-stopped
+
+volumes:
+  api-storage:
+  api-uploads:
+
+networks:
+  geostat-net:
+    driver: bridge
+

@@ -1,4 +1,4 @@
-package org.base.api.entity.mobile;
+package org.base.mobile.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -41,3 +41,4 @@ public class AuEoy {
 
     private String quantity;
 }
+

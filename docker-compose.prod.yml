@@ -1,0 +1,106 @@
+# ============================================================
+#  GeoStat System — Production Docker Compose
+# ============================================================
+#  სერვერზე სტრუქტურა:
+#    /home/administrator/backend/    (ან frontend/)
+#      docker-compose.prod.yml
+#      .env.prod
+#      logs/
+#      api/
+#        Dockerfile
+#        api.jar
+#      mobile/
+#        Dockerfile
+#        mobile-boot.jar
+# ============================================================
+
+services:
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: geostat-api
+    ports:
+      - "${API_PORT:-8083}:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_PRIMARY_JDBC_URL: ${DB_PRIMARY_URL}
+      SPRING_DATASOURCE_PRIMARY_USERNAME: ${DB_PRIMARY_USER}
+      SPRING_DATASOURCE_PRIMARY_PASSWORD: ${DB_PRIMARY_PASS}
+      SPRING_DATASOURCE_SECONDARY_JDBC_URL: ${DB_SECONDARY_URL}
+      SPRING_DATASOURCE_SECONDARY_USERNAME: ${DB_SECONDARY_USER}
+      SPRING_DATASOURCE_SECONDARY_PASSWORD: ${DB_SECONDARY_PASS}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-86400000}
+      JAVA_TOOL_OPTIONS: >-
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=75.0
+        -XX:+UseG1GC
+        -Xms512m -Xmx2g
+    volumes:
+      - api-storage:/app/storage
+      - api-uploads:/tmp/uploads
+      - ./logs:/app/logs
+    networks:
+      - geostat-net
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8081/health | grep -q UP"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  mobile:
+    build:
+      context: ./mobile
+      dockerfile: Dockerfile
+    container_name: geostat-mobile
+    ports:
+      - "${MOBILE_PORT:-8082}:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SERVER_PORT: "8082"
+      SPRING_DATASOURCE_PRIMARY_JDBC_URL: ${DB_PRIMARY_URL}
+      SPRING_DATASOURCE_PRIMARY_USERNAME: ${DB_PRIMARY_USER}
+      SPRING_DATASOURCE_PRIMARY_PASSWORD: ${DB_PRIMARY_PASS}
+      SPRING_DATASOURCE_SECONDARY_JDBC_URL: ${DB_SECONDARY_URL}
+      SPRING_DATASOURCE_SECONDARY_USERNAME: ${DB_SECONDARY_USER}
+      SPRING_DATASOURCE_SECONDARY_PASSWORD: ${DB_SECONDARY_PASS}
+      JAVA_TOOL_OPTIONS: >-
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=75.0
+        -XX:+UseG1GC
+        -Xms256m -Xmx1g
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - geostat-net
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8082/health | grep -q UP"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+volumes:
+  api-storage:
+  api-uploads:
+
+networks:
+  geostat-net:
+    driver: bridge
+

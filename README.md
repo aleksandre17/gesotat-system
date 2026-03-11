@@ -6,6 +6,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-brightgreen?logo=springboot)](https://spring.io/projects/spring-boot)
 [![Gradle](https://img.shields.io/badge/Gradle-Multi--Module-blue?logo=gradle)](https://gradle.org/)
 [![SQL Server](https://img.shields.io/badge/SQL%20Server-2019+-red?logo=microsoftsqlserver)](https://www.microsoft.com/sql-server)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/license-Internal-lightgrey)]()
 
 ---
@@ -20,6 +21,8 @@
 - [API Endpoints](#api-endpoints)
 - [Configuration](#configuration)
 - [Build & Deployment](#build--deployment)
+- [Docker & Containerization](#docker--containerization)
+- [Scripts](#scripts)
 - [Project Conventions](#project-conventions)
 
 ---
@@ -120,6 +123,8 @@ Server-side rendered portal using Thymeleaf templates.
 | **Gradle** | 8.x (wrapper included) | ✅ |
 | **SQL Server** | 2019+ | ✅ |
 | **Git** | 2.x+ | ✅ |
+| **Docker** | 24.x+ | Optional (for containerized deployment) |
+| **Docker Compose** | 2.x+ | Optional (for containerized deployment) |
 
 ---
 
@@ -160,6 +165,33 @@ spring:
 ```bash
 ./gradlew clean build -x test
 ```
+
+### 4. Configure Active Modules (Optional)
+
+Control which modules are built and deployed via `gradle.properties`:
+
+```properties
+# gradle.properties
+activeModules=api,mobile        # default — both
+activeModules=api               # api only (without mobile)
+activeModules=mobile            # mobile standalone only
+activeModules=api,mobile,web    # everything
+```
+
+Or override from CLI without editing the file:
+
+```bash
+# Build only mobile
+./gradlew build -x test -PactiveModules=mobile
+
+# Build only api (without mobile embedded)
+./gradlew build -x test -PactiveModules=api
+
+# Build all
+./gradlew build -x test -PactiveModules=api,mobile,web
+```
+
+> **Note:** `core` is always included — it's the shared foundation library.
 
 ---
 
@@ -351,6 +383,389 @@ java -jar mobile-boot.jar --server.port=9090
 
 ---
 
+## Docker & Containerization
+
+Both `api` and `mobile` modules include production-ready Dockerfiles with **multi-stage builds** (JDK 17 build → JRE 17 runtime).
+
+### Project Docker Files
+
+```
+gesotat-system/
+├── docker-compose.prod.yml     # Production compose
+├── .env.prod                   # Production environment (credentials)
+├── .env.example                # Environment template
+├── .dockerignore               # Build context exclusions
+├── api/
+│   └── Dockerfile              # API module Dockerfile
+├── mobile/
+│   └── Dockerfile              # Mobile module Dockerfile
+└── scripts/
+    ├── deploy.bat              # Build + upload + deploy (Windows)
+    ├── manage.bat              # Service management (Windows → SSH)
+    └── manage.sh               # Service management (Linux server)
+```
+
+### Dockerfile Features
+
+| Feature | Description |
+|---------|-------------|
+| **Base image** | `eclipse-temurin:17-jre-focal` (Ubuntu 20.04, OpenSSL 1.1.1 — SQL Server compatible) |
+| **Non-root user** | Runs as `app:app` via `gosu` for security |
+| **Health checks** | Built-in `wget` health check on `/health` |
+| **JVM tuning** | G1GC, container-aware memory (`MaxRAMPercentage=75%`) via `JAVA_TOOL_OPTIONS` |
+| **Minimal layers** | `apt-get` + user creation in single `RUN` layer |
+
+### Spring Profiles
+
+| Profile | API | Mobile | Description |
+|---------|-----|--------|-------------|
+| **dev** | `application-dev.yml` | `application-dev.yml` | Debug logging, show-sql, route TRACE |
+| **prod** | `application-prod.yml` | `application-prod.yml` | `${ENV}` variables, ddl-auto=validate, WARN logging |
+
+### Quick Start — Development
+
+```bash
+# Start both api + mobile
+docker-compose -f docker-compose.dev.yml up --build
+
+# Start only mobile
+docker-compose -f docker-compose.dev.yml up --build mobile
+
+# Start only api
+docker-compose -f docker-compose.dev.yml up --build api
+
+# View logs
+docker-compose -f docker-compose.dev.yml logs -f mobile
+
+# Stop everything
+docker-compose -f docker-compose.dev.yml down -v
+```
+
+> **Dev mode** connects to the host database via `host.docker.internal`, uses debug logging, and allocates moderate memory (512M–1G).
+
+### Quick Start — Production
+
+```bash
+# 1. Create environment file from template
+cp .env.example .env.prod
+
+# 2. Edit .env.prod with real credentials
+
+# 3. Deploy to server (build + upload + start)
+scripts\deploy.bat
+
+# 4. Check status
+./manage.sh all status
+
+# 5. View logs
+./manage.sh api logs
+./manage.sh mobile logs errors
+
+# 6. Stop
+./manage.sh all stop
+```
+
+### Environment Variables (`.env.prod`)
+
+```bash
+# Ports
+API_PORT=8081
+MOBILE_PORT=8082
+
+# Primary Database (geostat-system)
+DB_PRIMARY_URL=jdbc:sqlserver://YOUR_HOST;databaseName=geostat-system;encrypt=true;trustServerCertificate=true
+DB_PRIMARY_USER=sa
+DB_PRIMARY_PASS=CHANGE_ME
+
+# Secondary Database (auto)
+DB_SECONDARY_URL=jdbc:sqlserver://YOUR_HOST;databaseName=auto;encrypt=true;trustServerCertificate=true
+DB_SECONDARY_USER=sa
+DB_SECONDARY_PASS=CHANGE_ME
+
+# JWT
+JWT_SECRET=CHANGE_ME_TO_A_SECURE_64_CHAR_HEX_STRING
+```
+
+### Container Resource Limits
+
+| Service | Memory Limit | CPU Limit | JVM Heap | Profile |
+|---------|-------------|-----------|----------|---------|
+| **api** (dev) | — | — | 256m–1g | dev |
+| **api** (prod) | 2560M | 2.0 cores | 512m–2g | prod (G1GC) |
+| **mobile** (dev) | — | — | 128m–512m | dev |
+| **mobile** (prod) | 1280M | 1.5 cores | 256m–1g | prod (G1GC) |
+
+### Production Compose Features
+
+| Feature | Description |
+|---------|-------------|
+| **Resource limits** | CPU and memory caps via `deploy.resources` |
+| **Restart policy** | `on-failure`, max 5 attempts, 10s delay |
+| **Log rotation** | `json-file` driver, 50MB max, 5 files |
+| **Health checks** | 30s interval, 60s start period, 5 retries |
+| **Named volumes** | `api-storage`, `api-uploads` for persistent data |
+| **Bridge network** | `geostat-net` for inter-service communication |
+| **G1GC** | Production JVM tuned with G1GC + StringDeduplication |
+
+### Docker Architecture
+
+```
+┌─────────────────── Docker Host ───────────────────────┐
+│                                                       │
+│  ┌─── geostat-net (bridge) ────────────────────────┐  │
+│  │                                                 │  │
+│  │  ┌──────────────────┐  ┌─────────────────────┐  │  │
+│  │  │  geostat-api     │  │  geostat-mobile     │  │  │
+│  │  │  :8081           │  │  :8082              │  │  │
+│  │  │                  │  │                     │  │  │
+│  │  │  Spring Boot     │  │  Spring Boot        │  │  │
+│  │  │  + JPA/Hibernate │  │  + JDBC only        │  │  │
+│  │  │  + WebSocket     │  │  + 35 REST endpoints│  │  │
+│  │  │  + File Import   │  │  + Lightweight      │  │  │
+│  │  └────────┬─────────┘  └──────────┬──────────┘  │  │
+│  │           │                       │              │  │
+│  └───────────┼───────────────────────┼──────────────┘  │
+│              │                       │                 │
+│  ┌───────────▼───────────────────────▼──────────────┐  │
+│  │              SQL Server (external)               │  │
+│  │         geostat-system DB  +  auto DB            │  │
+│  └──────────────────────────────────────────────────┘  │
+│                                                       │
+│  Volumes: [api-storage] [api-uploads]                 │
+└───────────────────────────────────────────────────────┘
+```
+
+### Useful Commands
+
+```bash
+# Check status + resource usage
+./manage.sh all status
+
+# View logs
+./manage.sh api logs
+./manage.sh mobile logs errors
+
+# Restart a service
+./manage.sh api restart
+
+# Full cleanup (container + image + volumes + files)
+./manage.sh api nuke -y
+
+# Rebuild without re-uploading
+./manage.sh mobile rebuild
+
+# Enter running container
+docker exec -it geostat-mobile sh
+
+
+# Inspect health status
+docker inspect --format='{{.State.Health.Status}}' geostat-api
+```
+
+---
+
+## Deploy to Server
+
+Automated deploy scripts handle the full pipeline: **build → upload → docker build → start**.
+
+### Prerequisites
+
+1. **SSH access** to the server:
+   ```bash
+   ssh-keygen -t ed25519
+   ssh-copy-id administrator@192.168.1.199
+   ```
+2. **Docker & Docker Compose** installed on the server
+3. **`.env.prod`** file in project root with database credentials
+
+### Deploy Commands
+
+```bash
+# Deploy everything (build + upload + docker start)
+scripts\deploy.bat
+
+# Deploy only api service
+scripts\deploy.bat api
+
+# Deploy only mobile service
+scripts\deploy.bat mobile
+
+# Skip local Gradle build (upload existing jars)
+scripts\deploy.bat --no-build
+scripts\deploy.bat api --no-build
+```
+
+### Module Selection
+
+`gradle.properties`-ში `activeModules` property-ით კონტროლდება რა ჩაირთვება:
+
+```properties
+# Both (default)
+activeModules=api,mobile
+
+# Only api (mobile won't be embedded)
+activeModules=api
+
+# Only mobile standalone
+activeModules=mobile
+```
+
+`deploy.bat` ავტომატურად გამოიყენებს ამ კონფიგურაც��ას.  
+CLI override-იც შეიძლება: `gradlew build -PactiveModules=mobile`
+
+### Deploy Flow
+
+```
+scripts\deploy.bat [service]
+  │
+  ├─ [1/4] gradlew bootJar             — build jar locally
+  ├─ [2/4] prepare jar                  — copy to service folder
+  ├─ [3/4] scp upload                   — jar + Dockerfile + compose + .env.prod
+  └─ [4/4] docker-compose up --build -d — build image & start on server
+```
+
+### Server Structure
+
+```
+/home/administrator/geostat/
+├── docker-compose.prod.yml
+├── .env.prod
+├── manage.sh                   ← service manager
+├── logs/
+│   ├── api/                    ← api log files (error, auth, db, app)
+│   └── mobile/                 ← mobile log files
+├── api/
+│   ├── Dockerfile
+│   └── api.jar
+└── mobile/
+    ├── Dockerfile
+    └── mobile-boot.jar
+```
+
+---
+
+## Scripts
+
+All scripts are in the `scripts/` directory. Only **3 files** — no redundancy.
+
+| File | Description | Runs on |
+|------|-------------|---------|
+| `scripts/deploy.bat` | Build + upload + docker deploy | Windows (local) |
+| `scripts/manage.bat` | Service management via SSH | Windows (local → server) |
+| `scripts/manage.sh` | Service management directly | Linux (server) |
+
+> **Dynamic:** სერვისები ავტომატურად აღმოჩენილია `docker-compose.prod.yml`-იდან.  
+> ახალი სერვისი compose-ში რომ დაემატება, სკრიპტებში კოდის შეცვლა არ ჭირდება.
+
+### `deploy.bat` — Build & Deploy
+
+```bash
+scripts\deploy.bat              # deploy all services
+scripts\deploy.bat api          # deploy api only
+scripts\deploy.bat mobile       # deploy mobile only
+scripts\deploy.bat --no-build   # skip gradle build, upload existing jars
+scripts\deploy.bat api --no-build
+```
+
+Steps: Gradle build → prepare jars → SCP upload → docker-compose up --build -d
+
+### `manage.bat` / `manage.sh` — Service Manager
+
+ორივე ფაილი იდენტური ფუნქციონალის — `.bat` Windows-იდან SSH-ით, `.sh` სერვერზე პირდაპირ.
+
+#### Usage
+
+```bash
+# Windows (SSH-ით სერვერზე)
+scripts\manage.bat <service> <action> [flags]
+
+# Linux (სერვერზე პირდაპირ)
+./manage.sh <service> <action> [flags]
+
+# Interactive menu (არგუმენტების გარეშე)
+scripts\manage.bat
+./manage.sh
+```
+
+#### Actions
+
+| Action | Description | Example |
+|--------|-------------|---------|
+| `stop` | Stop container(s) | `manage.sh api stop` |
+| `start` | Start container(s) | `manage.sh mobile start` |
+| `restart` | Restart container(s) | `manage.sh all restart` |
+| `logs` | Docker logs (last 50 lines) | `manage.sh api logs` |
+| `logs errors` | Show error.log (tail -f) | `manage.sh api logs errors` |
+| `logs auth` | Show auth.log (tail -f) | `manage.sh api logs auth` |
+| `logs db` | Show db.log (tail -f) | `manage.sh api logs db` |
+| `logs files` | List all log files | `manage.sh all logs files` |
+| `status` | Container status + CPU/Memory | `manage.sh all status` |
+| `rm` | Stop + remove container(s) | `manage.sh api rm` |
+| `nuke` | Remove container + volumes + image + files + logs | `manage.sh api nuke` |
+| `rebuild` | No-cache rebuild + start | `manage.sh mobile rebuild` |
+
+#### Service Targets
+
+| Target | Scope |
+|--------|-------|
+| `api` | API service only |
+| `mobile` | Mobile service only |
+| `all` | All services |
+| *(any new service)* | Auto-discovered from compose |
+
+#### Flags
+
+| Flag | Description |
+|------|-------------|
+| `-y` / `--force` | Skip `nuke` confirmation prompt |
+
+#### Examples
+
+```bash
+# Check status
+./manage.sh all status
+
+# View mobile errors
+./manage.sh mobile logs errors
+
+# Deploy & start api
+scripts\deploy.bat api
+
+# Full cleanup of api (container + image + files + logs)
+./manage.sh api nuke -y
+
+# Rebuild mobile without re-uploading jar
+./manage.sh mobile rebuild
+
+# Interactive menu
+./manage.sh
+```
+
+#### Interactive Menu
+
+```
+  ==========================================
+   GeoStat Service Manager
+  ==========================================
+
+   Services:
+     1) api
+     2) mobile
+     3) all
+
+  Service [1-3]: 1
+
+   Action for [api]:
+     1) stop       5) status
+     2) start      6) rm
+     3) restart    7) nuke
+     4) logs       8) rebuild
+
+  Action [1-8]: 
+```
+
+---
+
 ## Project Conventions
 
 ### Design Patterns Used
@@ -396,6 +811,7 @@ org.base.api        — API/Admin module
 | **Template** | Thymeleaf (web module) |
 | **File Processing** | Apache POI (Excel), Jackcess (Access), Commons CSV |
 | **Serialization** | Jackson |
+| **Containerization** | Docker, Docker Compose (dev/prod profiles) |
 
 ---
 

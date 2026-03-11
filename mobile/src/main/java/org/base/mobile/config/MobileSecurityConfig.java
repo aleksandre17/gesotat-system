@@ -28,6 +28,7 @@ public class MobileSecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers("/mobile/**", "/mobile-text/**").permitAll()
                         .anyRequest().denyAll()
                 );

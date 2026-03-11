@@ -1,0 +1,13 @@
+## ─── Mobile: Development Profile ────────────────────────────
+## Activated with: --spring.profiles.active=dev
+## Credentials: add mobile/src/main/resources/application-local.yml (gitignored)
+
+server:
+  port: 8082
+
+logging:
+  level:
+    org.base.mobile: DEBUG
+    org.base.mobile.config.RouteLoggingConfig: INFO
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: TRACE
+    org.springframework.jdbc: DEBUG

@@ -49,6 +49,7 @@ public class ApiSecurityConfig {
                 .securityMatchers(matchers -> matchers.requestMatchers(SecurityPaths.API_PATHS))
                 .addFilterBefore(apiFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers("/api/v1/xlsx-to-csv/convert", "/api/v1/xlsx-to-csv/download-all", "/api/v1/xlsx-to-csv/download-zip").permitAll()
                         .requestMatchers("/api/v1/mobile/**", "/api/v1/mobile-text/**").permitAll()
                         .requestMatchers("/api/v1/import", "/api/v1/import/**").permitAll()

@@ -1,0 +1,11 @@
+## ─── Mobile: Production Profile ─────────────────────────────
+## Activated with: SPRING_PROFILES_ACTIVE=prod
+
+logging:
+  file:
+    path: /app/logs/mobile
+  level:
+    root: WARN
+    org.base.mobile: INFO
+    org.base.mobile.config.RouteLoggingConfig: INFO
+    org.springframework: WARN

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================
+     API Module — Logback Configuration
+     Logs: /app/logs/api/
+       app.log     — ყველაფერი
+       error.log   — ERROR/WARN
+       auth.log    — JWT, Security, Sign
+       db.log      — Hibernate, SQL, DataSource
+     ============================================================ -->
+<configuration>
+
+    <springProperty scope="context" name="LOG_DIR" source="logging.file.path" defaultValue="/app/logs/api"/>
+
+    <!-- ── Console (Docker logs) ── -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger{36}) — %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ── app.log — ყველაფერი (INFO+) ── -->
+    <appender name="APP_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/archive/app.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50} — %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ── error.log — ERROR + WARN ── -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/error.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/archive/error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>20MB</maxFileSize>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>300MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50} — %msg%n%xException</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ── auth.log — JWT, Security, Authentication ── -->
+    <appender name="AUTH_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/auth.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/archive/auth.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>20MB</maxFileSize>
+            <maxHistory>90</maxHistory>
+            <totalSizeCap>300MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50} — %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ── db.log — Hibernate, SQL, DataSource ── -->
+    <appender name="DB_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/db.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/archive/db.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>30MB</maxFileSize>
+            <maxHistory>14</maxHistory>
+            <totalSizeCap>200MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50} — %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ═══════════════════════════════════════════════
+         Logger Routing
+         ═══════════════════════════════════════════════ -->
+
+    <!-- Auth / Security → auth.log -->
+    <logger name="org.base.api.setting.security" level="INFO" additivity="true">
+        <appender-ref ref="AUTH_FILE"/>
+    </logger>
+    <logger name="org.base.api.setting.jwt" level="INFO" additivity="true">
+        <appender-ref ref="AUTH_FILE"/>
+    </logger>
+    <logger name="org.base.api.controller.sign" level="INFO" additivity="true">
+        <appender-ref ref="AUTH_FILE"/>
+    </logger>
+    <logger name="org.springframework.security" level="WARN" additivity="true">
+        <appender-ref ref="AUTH_FILE"/>
+    </logger>
+
+    <!-- DB / Hibernate → db.log -->
+    <logger name="org.hibernate" level="WARN" additivity="true">
+        <appender-ref ref="DB_FILE"/>
+    </logger>
+    <logger name="org.hibernate.SQL" level="WARN" additivity="true">
+        <appender-ref ref="DB_FILE"/>
+    </logger>
+    <logger name="com.zaxxer.hikari" level="WARN" additivity="true">
+        <appender-ref ref="DB_FILE"/>
+    </logger>
+    <logger name="org.base.api.setting.db" level="INFO" additivity="true">
+        <appender-ref ref="DB_FILE"/>
+    </logger>
+    <logger name="org.springframework.jdbc" level="WARN" additivity="true">
+        <appender-ref ref="DB_FILE"/>
+    </logger>
+
+    <!-- App loggers -->
+    <logger name="org.base.api" level="INFO"/>
+    <logger name="org.base.mobile" level="INFO"/>
+    <logger name="org.base.core" level="INFO"/>
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" level="WARN"/>
+
+    <!-- ═══════════════════════════════════════════════
+         Profiles
+         ═══════════════════════════════════════════════ -->
+
+    <!-- Production: file + console -->
+    <springProfile name="prod">
+        <root level="WARN">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="APP_FILE"/>
+            <appender-ref ref="ERROR_FILE"/>
+        </root>
+    </springProfile>
+
+    <!-- Development: console only, verbose -->
+    <springProfile name="!prod">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+</configuration>
+

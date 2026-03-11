@@ -1,6 +1,7 @@
 package org.base.core.setting;
 
 import org.base.core.anotation.FolderPrefix;
+import org.base.core.anotation.NoApiPrefix;
 import org.base.core.anotation.Sign;
 import org.base.core.anotation.Web;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -83,8 +84,10 @@ public class CustomRequestMappingHandlerMapping extends RequestMappingHandlerMap
 
         RequestMappingInfo finalMapping = builder.build();
 
-        // Add global API prefix if annotated
-        if (!AnnotatedElementUtils.hasAnnotation(controllerClass, Sign.class) && !AnnotatedElementUtils.hasAnnotation(controllerClass, Web.class)) {
+        // Add global API prefix unless excluded
+        if (!AnnotatedElementUtils.hasAnnotation(controllerClass, Sign.class)
+                && !AnnotatedElementUtils.hasAnnotation(controllerClass, Web.class)
+                && !AnnotatedElementUtils.hasAnnotation(controllerClass, NoApiPrefix.class)) {
             RequestMappingInfo apiPrefixMapping = RequestMappingInfo.paths(API_PREFIX).build();
             finalMapping = apiPrefixMapping.combine(finalMapping);
         }

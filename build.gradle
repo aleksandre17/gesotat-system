@@ -36,3 +36,138 @@ subprojects {
 
 
 gradle.startParameter.maxWorkerCount = Runtime.runtime.availableProcessors()
+
+// ============================================================
+//  Custom Tasks — visible in IntelliJ Gradle panel
+//  Location: Gradle panel → gesotat-system → Tasks → geostat
+// ============================================================
+
+// --- Build tasks ---
+tasks.register('buildApi') {
+    group = 'geostat'
+    description = 'Build API module only (with mobile embedded)'
+    dependsOn 'api:bootJar'
+}
+
+tasks.register('buildMobile') {
+    group = 'geostat'
+    description = 'Build Mobile module standalone only'
+    dependsOn 'mobile:bootJar'
+}
+
+tasks.register('buildAll') {
+    group = 'geostat'
+    description = 'Build all modules (api + mobile)'
+    dependsOn 'buildApi', 'buildMobile'
+}
+
+// --- Run tasks ---
+// API + Mobile ჩაშენებული (default)
+tasks.register('runApi') {
+    group = 'geostat'
+    description = 'Run API locally with Mobile embedded (port 8081). Default mode.'
+    dependsOn ':api:bootRun'
+}
+
+// Mobile standalone — API-სგან დამოუკიდებლად
+tasks.register('runMobile') {
+    group = 'geostat'
+    description = 'Run Mobile standalone (port 8082). Independent from API.'
+    dependsOn ':mobile:bootRun'
+}
+
+// API mobile-ის გარეშე — გამოიყენე როცა Mobile ცალკე დგას
+tasks.register('runApiOnly', Exec) {
+    group = 'geostat'
+    description = 'Run API without Mobile embedded (port 8081). Use when Mobile runs standalone.'
+    workingDir rootProject.projectDir
+    commandLine 'cmd', '/c', 'gradlew.bat', ':api:bootRun', '-PactiveModules=api'
+}
+
+// --- Deploy tasks (build jar first, then upload+docker via deploy.bat --no-build) ---
+// NOTE: SSH will ask for password — works in CLI terminal.
+//       In IntelliJ, use CLI: scripts\deploy.bat api
+tasks.register('deployApi', Exec) {
+    group = 'geostat'
+    description = 'Deploy API to server (build + upload + docker). Use CLI for password prompt.'
+    dependsOn ':api:bootJar'
+    workingDir rootProject.projectDir
+    standardInput = System.in
+    commandLine 'cmd', '/c', 'scripts\\deploy.bat', 'api', '--no-build'
+}
+
+tasks.register('deployMobile', Exec) {
+    group = 'geostat'
+    description = 'Deploy Mobile to server (build + upload + docker). Use CLI for password prompt.'
+    dependsOn ':mobile:bootJar'
+    workingDir rootProject.projectDir
+    standardInput = System.in
+    commandLine 'cmd', '/c', 'scripts\\deploy.bat', 'mobile', '--no-build'
+}
+
+tasks.register('deployAll', Exec) {
+    group = 'geostat'
+    description = 'Deploy all to server (build + upload + docker). Use CLI for password prompt.'
+    dependsOn ':api:bootJar', ':mobile:bootJar'
+    workingDir rootProject.projectDir
+    standardInput = System.in
+    commandLine 'cmd', '/c', 'scripts\\deploy.bat', 'all', '--no-build'
+}
+
+// --- Server management tasks (calls manage.bat) ---
+tasks.register('serverStatus', Exec) {
+    group = 'geostat'
+    description = 'Show server container status'
+    workingDir rootProject.projectDir
+    standardInput = System.in
+    commandLine 'cmd', '/c', 'scripts\\manage.bat', 'all', 'status'
+}
+
+tasks.register('serverStopApi', Exec) {
+    group = 'geostat'
+    description = 'Stop API on server'
+    workingDir rootProject.projectDir
+    standardInput = System.in
+    commandLine 'cmd', '/c', 'scripts\\manage.bat', 'api', 'stop'
+}
+
+tasks.register('serverStopMobile', Exec) {
+    group = 'geostat'
+    description = 'Stop Mobile on server'
+    workingDir rootProject.projectDir
+    standardInput = System.in
+    commandLine 'cmd', '/c', 'scripts\\manage.bat', 'mobile', 'stop'
+}
+
+tasks.register('serverStartApi', Exec) {
+    group = 'geostat'
+    description = 'Start API on server'
+    workingDir rootProject.projectDir
+    standardInput = System.in
+    commandLine 'cmd', '/c', 'scripts\\manage.bat', 'api', 'start'
+}
+
+tasks.register('serverStartMobile', Exec) {
+    group = 'geostat'
+    description = 'Start Mobile on server'
+    workingDir rootProject.projectDir
+    standardInput = System.in
+    commandLine 'cmd', '/c', 'scripts\\manage.bat', 'mobile', 'start'
+}
+
+tasks.register('serverRestartAll', Exec) {
+    group = 'geostat'
+    description = 'Restart all services on server'
+    workingDir rootProject.projectDir
+    standardInput = System.in
+    commandLine 'cmd', '/c', 'scripts\\manage.bat', 'all', 'restart'
+}
+
+tasks.register('serverLogs', Exec) {
+    group = 'geostat'
+    description = 'Show server logs (all services)'
+    workingDir rootProject.projectDir
+    standardInput = System.in
+    commandLine 'cmd', '/c', 'scripts\\manage.bat', 'all', 'logs'
+}
+

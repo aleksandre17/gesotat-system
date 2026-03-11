@@ -17,7 +17,11 @@ configurations {
 
 dependencies {
     implementation project(':core')
-    implementation project(':mobile')
+
+    // Include mobile module if it's in the active build
+    if (findProject(':mobile') != null) {
+        implementation project(':mobile')
+    }
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -32,7 +36,9 @@ dependencies {
 
 
     // https://mvnrepository.com/artifact/com.healthmarketscience.jackcess/jackcess
-    implementation("com.healthmarketscience.jackcess:jackcess:4.0.7")
+    implementation("com.healthmarketscience.jackcess:jackcess:4.0.7") {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
 
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
 

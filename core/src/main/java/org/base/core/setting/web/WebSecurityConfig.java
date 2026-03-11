@@ -61,6 +61,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         !request.getRequestURI().startsWith("/sign/")
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/dashboard")).authenticated()
                         .requestMatchers("/error").permitAll()  // Add explicit /error path

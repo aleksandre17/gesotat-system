@@ -120,6 +120,7 @@ spring.log
 *~.nib
 tmp/
 temp/
+deploy-tmp/
 
 # ──────────────────────────────────────────────────────────────────────────────
 #  Secrets & Environment (NEVER commit credentials)
@@ -127,6 +128,8 @@ temp/
 *.env
 .env.*
 !.env.example
+scripts/deploy.conf
+!scripts/deploy.conf.example
 application-local.yml
 application-local.properties
 application-secret.yml
