@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- ============================================================
      API Module — Logback Configuration
-     Logs: /app/logs/api/
+     Logs: /app/logs/
        app.log     — ყველაფერი
        error.log   — ERROR/WARN
        auth.log    — JWT, Security, Sign
@@ -9,7 +9,7 @@
      ============================================================ -->
 <configuration>
 
-    <springProperty scope="context" name="LOG_DIR" source="logging.file.path" defaultValue="/app/logs/api"/>
+    <springProperty scope="context" name="LOG_DIR" source="logging.file.path" defaultValue="/app/logs"/>
 
     <!-- ── Console (Docker logs) ── -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">

@@ -134,6 +134,13 @@ application-local.yml
 application-local.properties
 application-secret.yml
 application-secret.properties
+*.p12
+*.jks
+*.keystore
+*.pem
+*.key
+*credentials*.json
+*service-account*.json
 
 # ──────────────────────────────────────────────────────────────────────────────
 #  Data Files / Uploads (large binary files)

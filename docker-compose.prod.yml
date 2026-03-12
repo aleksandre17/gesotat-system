@@ -1,17 +1,18 @@
 # ============================================================
-#  GeoStat System — Production Docker Compose
-# ============================================================
-#  სერვერზე სტრუქტურა:
-#    /home/administrator/backend/    (ან frontend/)
-#      docker-compose.prod.yml
-#      .env.prod
-#      logs/
+#  GeoStat System — Production Docker Compose (source / dev reference)
+#
+#  სერვერზე სტრუქტურა (deploy.bat ქმნის ავტომატურად):
+#    /home/administrator/geostat/backend/
 #      api/
+#        docker-compose.prod.yml  ← per-service (generated)
+#        .env.prod
 #        Dockerfile
-#        api.jar
+#        app.jar
 #      mobile/
+#        docker-compose.prod.yml  ← per-service (generated)
+#        .env.prod
 #        Dockerfile
-#        mobile-boot.jar
+#        app.jar
 # ============================================================
 
 services:
@@ -41,7 +42,7 @@ services:
         -Xms512m -Xmx2g
     volumes:
       - api-storage:/app/storage
-      - api-uploads:/tmp/uploads
+      - api-uploads:/app/uploads
       - ./logs:/app/logs
     networks:
       - geostat-net

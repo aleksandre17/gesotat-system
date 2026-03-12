@@ -3,7 +3,7 @@
 
 logging:
   file:
-    path: /app/logs/mobile
+    path: /app/logs
   level:
     root: WARN
     org.base.mobile: INFO

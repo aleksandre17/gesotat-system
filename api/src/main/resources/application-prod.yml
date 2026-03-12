@@ -13,7 +13,7 @@ spring:
 
 logging:
   file:
-    path: /app/logs/api
+    path: /app/logs
   level:
     root: WARN
     org.base.api: INFO

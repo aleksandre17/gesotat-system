@@ -4,10 +4,15 @@ rootProject.name = 'gesotat-system'
 include 'core'
 
 // Dynamically include modules from activeModules property
-// Default: api,mobile  |  Override: gradlew build -PactiveModules=mobile
+// Default: auto-discovered (subdirs with build.gradle, excluding core)
+// Override: gradlew build -PactiveModules=api  or  -PactiveModules=api,mobile
 String modules = settings.hasProperty('activeModules')
         ? settings.getProperty('activeModules')
-        : 'api,mobile'
+        : rootDir.listFiles()
+                .findAll { it.isDirectory() && new File(it, 'build.gradle').exists() && it.name != 'core' }
+                .collect { it.name }
+                .sort()
+                .join(',')
 
 String[] active = modules.tokenize(',').collect { it.trim().toLowerCase() }
 

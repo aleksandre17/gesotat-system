@@ -1,21 +1,27 @@
 #!/bin/bash
 # ============================================================
-#  GeoStat System — Service Manager (Dynamic)
+#  Service Manager — SSH Remote
 #
-#  Discovers services from docker-compose.prod.yml automatically.
-#  New services appear in menu without code changes.
+#  Runs on local machine (Git Bash / WSL).
+#  All operations execute on the remote server via SSH.
 #
 #  Usage:
-#    ./manage.sh                          interactive menu (backend default)
-#    ./manage.sh api stop                 stop api (backend)
-#    ./manage.sh api stop frontend        stop api (frontend)
-#    ./manage.sh all nuke -y              remove everything (no confirm)
-#    ./manage.sh api logs errors backend  show error.log (backend)
+#    scripts/manage.sh                          interactive menu
+#    scripts/manage.sh api stop                 stop api (backend)
+#    scripts/manage.sh api stop frontend        stop api (frontend)
+#    scripts/manage.sh all nuke -y              nuke all (no confirm)
+#    scripts/manage.sh api logs errors          show error.log
+#    scripts/manage.sh all logs files           list all log files
 # ============================================================
 
+# ══════════════════════════════════════════════
+#  CONFIG — change these 3 lines per project
+SERVER="administrator@192.168.1.199"
 SERVER_BASE="/home/administrator"
+PROJECT="geostat"
+# ══════════════════════════════════════════════
 
-# ── Parse TARGET (backend/frontend) from any arg ──
+# ── Parse TARGET from any arg ──
 TARGET="backend"
 for arg in "$@"; do
     case "$arg" in
@@ -24,25 +30,26 @@ for arg in "$@"; do
     esac
 done
 
-REMOTE="$SERVER_BASE/geostat/$TARGET"
-COMPOSE="docker-compose -f $REMOTE/docker-compose.prod.yml --env-file $REMOTE/.env.prod"
-LOGS_DIR="$REMOTE/logs"
+REMOTE="$SERVER_BASE/$PROJECT/$TARGET"
+COMPOSE="docker-compose -f docker-compose.prod.yml --env-file ../.env.prod"
 
-# ── Discover services dynamically ──
-mapfile -t SERVICES < <($COMPOSE config --services 2>/dev/null)
+# ── Discover services via SSH ──
+mapfile -t SERVICES < <(
+    ssh -n "$SERVER" \
+        "python3 -c \"import os; [print(d) for d in sorted(os.listdir('$REMOTE')) if os.path.isfile('$REMOTE/'+d+'/docker-compose.prod.yml')]\" 2>/dev/null" \
+    | tr -d '\r'
+)
 if [ ${#SERVICES[@]} -eq 0 ]; then
-    echo "  ERROR: No services found. Check connection or compose file."
+    echo "  ERROR: No services found at $REMOTE. Deploy first."
     exit 1
 fi
 
-# ── Parse positional args (skip backend/frontend) ──
-SVC=""
-ACTION=""
-ARG3=""
+# ── Parse positional args (skip target/flags) ──
+SVC="" ACTION="" ARG3=""
 pos=0
 for arg in "$@"; do
     case "$arg" in
-        backend|frontend|-y|--force|YES) continue ;;
+        backend|frontend|-y|--force) continue ;;
     esac
     pos=$((pos+1))
     case $pos in
@@ -52,24 +59,23 @@ for arg in "$@"; do
     esac
 done
 
-# Parse force flag
 FORCE=""
 for arg in "$@"; do
-    case "$arg" in -y|--force|YES) FORCE="YES" ;; esac
+    case "$arg" in -y|--force) FORCE="YES" ;; esac
 done
 
-# ── Validate service name ──
+# ── Validate service ──
 is_valid_service() {
     [ "$1" = "all" ] && return 0
     for s in "${SERVICES[@]}"; do [ "$s" = "$1" ] && return 0; done
     return 1
 }
 
-# ── Interactive menu ──
-if [ -z "$SVC" ] || [ -z "$ACTION" ]; then
+# ── Level 1: Service selection ──
+if [ -z "$SVC" ]; then
     echo ""
     echo "  =========================================="
-    echo "   GeoStat Service Manager [$TARGET]"
+    echo "   Service Manager  [$PROJECT/$TARGET]"
     echo "  =========================================="
     echo ""
     echo "   Services:"
@@ -79,7 +85,6 @@ if [ -z "$SVC" ] || [ -z "$ACTION" ]; then
     echo "     $((${#SERVICES[@]}+1))) all"
     echo ""
     read -rp "  Service [1-$((${#SERVICES[@]}+1))]: " choice
-
     if [ "$choice" = "$((${#SERVICES[@]}+1))" ]; then
         SVC="all"
     elif [ "$choice" -ge 1 ] 2>/dev/null && [ "$choice" -le "${#SERVICES[@]}" ]; then
@@ -87,7 +92,10 @@ if [ -z "$SVC" ] || [ -z "$ACTION" ]; then
     else
         echo "  Invalid."; exit 1
     fi
+fi
 
+# ── Level 2: Action selection ──
+if [ -z "$ACTION" ]; then
     echo ""
     echo "   Action for [$SVC]:"
     echo "     1) stop       5) status"
@@ -105,7 +113,6 @@ if [ -z "$SVC" ] || [ -z "$ACTION" ]; then
     esac
 fi
 
-# ── Validate ──
 if ! is_valid_service "$SVC"; then
     echo "  ERROR: Unknown service '$SVC'"
     echo "  Available: ${SERVICES[*]} all"
@@ -113,79 +120,129 @@ if ! is_valid_service "$SVC"; then
 fi
 
 echo ""
-echo "  [$SVC] $ACTION  ($TARGET)"
+echo "  [$SVC] $ACTION  ($PROJECT/$TARGET)"
 echo "  ------------------------------------------"
 
-# ── Helper: run compose for one or all ──
-compose_cmd() {
-    if [ "$SVC" = "all" ]; then
-        $COMPOSE "$@"
-    else
-        $COMPOSE "$@" "$SVC"
-    fi
+# ── SSH helpers ──
+ssh_svc()  { ssh "$SERVER" "cd $REMOTE/$SVC && $COMPOSE $*"; }
+ssh_all()  {
+    for s in "${SERVICES[@]}"; do
+        ssh "$SERVER" "cd $REMOTE/$s && $COMPOSE $*"
+    done
 }
 
+# ── Actions ──
 case "$ACTION" in
 
     stop)
-        compose_cmd stop
+        if [ "$SVC" = "all" ]; then ssh_all stop
+        else ssh_svc stop; fi
         echo "  [OK] Stopped."
         ;;
 
     start)
-        compose_cmd up -d
+        if [ "$SVC" = "all" ]; then ssh_all up -d
+        else ssh_svc up -d; fi
         echo "  [OK] Started."
         ;;
 
     restart)
-        compose_cmd restart
+        if [ "$SVC" = "all" ]; then ssh_all restart
+        else ssh_svc restart; fi
         echo "  [OK] Restarted."
         ;;
 
     logs)
+        if [ -z "$ARG3" ]; then
+            echo ""
+            echo "   Log source:"
+            echo "     1) docker  — live container output"
+            echo "     2) app     — app.log (all)"
+            echo "     3) errors  — error.log"
+            echo "     4) auth    — auth.log"
+            echo "     5) db      — db.log"
+            echo "     6) files   — list log files"
+            echo ""
+            read -rp "  Source [1-6]: " lc
+            case "$lc" in
+                1) ARG3="docker" ;; 2) ARG3="app"    ;;
+                3) ARG3="errors" ;; 4) ARG3="auth"   ;;
+                5) ARG3="db"     ;; 6) ARG3="files"  ;;
+                *) echo "  Invalid."; exit 1 ;;
+            esac
+
+            if [[ "$ARG3" != "files" && "$ARG3" != "docker" ]]; then
+                echo ""
+                echo "   Level filter:"
+                echo "     1) ALL"
+                echo "     2) ERROR"
+                echo "     3) WARN"
+                echo "     4) INFO"
+                echo ""
+                read -rp "  Level [1-4, enter=ALL]: " lvl
+                case "$lvl" in
+                    2) LOG_LEVEL="ERROR" ;; 3) LOG_LEVEL="WARN" ;;
+                    4) LOG_LEVEL="INFO"  ;; *) LOG_LEVEL=""      ;;
+                esac
+            fi
+        fi
+
+        # ── Build grep filter ──
+        GREP_FILTER=""
+        if [ -n "$LOG_LEVEL" ]; then
+            GREP_FILTER="| grep \" $LOG_LEVEL \""
+        fi
+
         case "$ARG3" in
             errors)
                 if [ "$SVC" = "all" ]; then
                     for s in "${SERVICES[@]}"; do
-                        echo "=== $s ERRORS ===" && tail -100 "$LOGS_DIR/$s/error.log" 2>/dev/null || echo "  (no error.log)"
-                        echo ""
+                        ssh "$SERVER" "echo '=== $s ERRORS ===' && tail -100 $REMOTE/$s/logs/error.log 2>/dev/null $GREP_FILTER || echo '  (no error.log)'; echo"
                     done
                 else
-                    tail -f "$LOGS_DIR/$SVC/error.log"
+                    ssh "$SERVER" "tail -f $REMOTE/$SVC/logs/error.log $GREP_FILTER"
+                fi
+                ;;
+            app)
+                if [ "$SVC" = "all" ]; then
+                    for s in "${SERVICES[@]}"; do
+                        ssh "$SERVER" "echo '=== $s ===' && tail -100 $REMOTE/$s/logs/app.log 2>/dev/null $GREP_FILTER || echo '  (no app.log)'; echo"
+                    done
+                else
+                    ssh "$SERVER" "tail -f $REMOTE/$SVC/logs/app.log $GREP_FILTER"
                 fi
                 ;;
             auth)
-                [ "$SVC" = "all" ] && SVC="${SERVICES[0]}"
-                tail -f "$LOGS_DIR/$SVC/auth.log"
+                local_svc="$SVC"
+                [ "$SVC" = "all" ] && local_svc="${SERVICES[0]}"
+                ssh "$SERVER" "tail -f $REMOTE/$local_svc/logs/auth.log $GREP_FILTER"
                 ;;
             db)
-                [ "$SVC" = "all" ] && SVC="${SERVICES[0]}"
-                tail -f "$LOGS_DIR/$SVC/db.log"
+                local_svc="$SVC"
+                [ "$SVC" = "all" ] && local_svc="${SERVICES[0]}"
+                ssh "$SERVER" "tail -f $REMOTE/$local_svc/logs/db.log $GREP_FILTER"
                 ;;
             files)
-                find "$LOGS_DIR" -name '*.log' -exec ls -lh {} \;
+                ssh "$SERVER" "find $REMOTE -name '*.log' -exec ls -lh {} \;"
                 ;;
             *)
-                if [ "$SVC" = "all" ]; then
-                    $COMPOSE logs --tail=50
-                else
-                    docker logs --tail=50 "geostat-$SVC"
+                if [ "$SVC" = "all" ]; then ssh_all logs --tail=50
+                else ssh "$SERVER" "docker logs --tail=50 $PROJECT-$SVC"
                 fi
                 ;;
         esac
         ;;
 
     status)
-        docker ps --filter name=geostat --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
-        echo ""
-        docker stats --no-stream --format 'table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}' $(docker ps -q --filter name=geostat) 2>/dev/null || true
+        ssh "$SERVER" "docker ps --filter name=$PROJECT --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'; echo; docker stats --no-stream --format 'table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}' \$(docker ps -q --filter name=$PROJECT) 2>/dev/null || true"
         ;;
 
     rm)
         if [ "$SVC" = "all" ]; then
-            $COMPOSE down
+            ssh_all down
         else
-            $COMPOSE stop "$SVC" && $COMPOSE rm -f "$SVC"
+            ssh_svc stop
+            ssh_svc rm -f
         fi
         echo "  [OK] Removed."
         ;;
@@ -197,35 +254,38 @@ case "$ACTION" in
             read -rp "  Type YES to confirm: " confirm
             [ "$confirm" != "YES" ] && echo "  Cancelled." && exit 0
         fi
-
         if [ "$SVC" = "all" ]; then
-            $COMPOSE down -v --rmi local
-            docker image prune -f
-            for s in "${SERVICES[@]}"; do rm -rf "$REMOTE/$s"/; done
-            docker run --rm -v "$LOGS_DIR:/logs" alpine rm -rf /logs 2>/dev/null || true
+            for s in "${SERVICES[@]}"; do
+                ssh "$SERVER" "bash -c 'cd $REMOTE/$s && $COMPOSE down -v --rmi local 2>/dev/null; true'"
+            done
+            ssh "$SERVER" "docker image prune -f"
+            for s in "${SERVICES[@]}"; do
+                ssh "$SERVER" "docker run --rm -v $REMOTE/$s:/target alpine find /target -mindepth 1 -delete"
+                ssh "$SERVER" "rm -rf $REMOTE/$s"
+            done
         else
-            $COMPOSE stop "$SVC" && $COMPOSE rm -f "$SVC"
-            docker volume ls -q --filter "name=geostat_${SVC}" | xargs -r docker volume rm 2>/dev/null || true
-            docker rmi "geostat-$SVC" 2>/dev/null || true
-            rm -rf "$REMOTE/$SVC"/
-            docker run --rm -v "$LOGS_DIR:/logs" alpine rm -rf "/logs/$SVC" 2>/dev/null || true
+            ssh "$SERVER" "bash -c 'cd $REMOTE/$SVC && $COMPOSE down -v --rmi local 2>/dev/null; true'"
+            ssh "$SERVER" "docker run --rm -v $REMOTE/$SVC:/target alpine find /target -mindepth 1 -delete"
+            ssh "$SERVER" "rm -rf $REMOTE/$SVC"
         fi
         echo "  [OK] Nuked."
         ;;
 
     rebuild)
         if [ "$SVC" = "all" ]; then
-            $COMPOSE down && $COMPOSE build --no-cache && $COMPOSE up -d
+            for s in "${SERVICES[@]}"; do
+                ssh "$SERVER" "cd $REMOTE/$s && $COMPOSE down && $COMPOSE build --no-cache && $COMPOSE up -d"
+            done
         else
-            $COMPOSE stop "$SVC" && $COMPOSE rm -f "$SVC"
-            $COMPOSE build --no-cache "$SVC" && $COMPOSE up -d "$SVC"
+            ssh_svc down
+            ssh_svc build --no-cache
+            ssh_svc up -d
         fi
         echo "  [OK] Rebuilt and started."
         ;;
 
     *)
         echo "  Unknown action: $ACTION"
-        echo "  Available: stop start restart logs status rm nuke rebuild"
         exit 1
         ;;
 esac

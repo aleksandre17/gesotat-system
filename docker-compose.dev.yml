@@ -26,7 +26,7 @@ services:
         -Xms256m -Xmx1g
     volumes:
       - api-storage:/app/storage
-      - api-uploads:/tmp/uploads
+      - api-uploads:/app/uploads
     networks:
       - geostat-net
     restart: unless-stopped

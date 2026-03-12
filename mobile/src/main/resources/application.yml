@@ -1,6 +1,9 @@
 server:
   port: 8081
 
+security:
+  type: mobile
+
 spring:
   config:
     import: optional:classpath:application-local.yml

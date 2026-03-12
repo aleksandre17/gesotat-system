@@ -18,8 +18,8 @@ configurations {
 dependencies {
     implementation project(':core')
 
-    // Include mobile module if it's in the active build
-    if (findProject(':mobile') != null) {
+    // Include mobile module if it's in the active build (skip with -PincludeMobile=no)
+    if (findProject(':mobile') != null && findProperty('includeMobile') != 'n') {
         implementation project(':mobile')
     }
 
