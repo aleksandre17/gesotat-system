@@ -39,7 +39,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         return path.equals("/health") ||
-                path.startsWith("/sign/") ||
+                path.equals("/sign/login") ||
+                path.equals("/sign/register") ||
+                path.equals("/sign/refresh") ||
                 path.equals("/error") ||
                 path.equals("/") ||
                 path.endsWith(".html") ||

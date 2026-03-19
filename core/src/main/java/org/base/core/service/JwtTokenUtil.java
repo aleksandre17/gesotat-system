@@ -62,22 +62,32 @@ public class JwtTokenUtil {
 
 
     public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        //claims.put("roles", userDetails.getAuthorities());
+        User user = ((UserPrincipal) userDetails).getUser();
 
-        List<Map<String, Object>> roles = ((UserPrincipal)userDetails).getUser().getRoles().stream()
-                .map(role -> Map.of(
-                        "name", role.getName(),
-                        "permissions", role.getPermissions().stream()
-                                .map(Permission::getName)
-                                .collect(Collectors.toList())
-                ))
+        List<Map<String, Object>> rolesList = user.getRoles().stream()
+                .map(role -> {
+                    Map<String, Object> roleMap = new LinkedHashMap<>();
+                    roleMap.put("id", role.getId());
+                    roleMap.put("name", role.getName());
+                    roleMap.put("permissions", role.getPermissions().stream()
+                            .map(p -> Map.<String, Object>of("id", p.getId(), "name", p.getName()))
+                            .collect(Collectors.toList()));
+                    return roleMap;
+                })
                 .collect(Collectors.toList());
 
-        claims.put("userId", ((UserPrincipal)userDetails).getUser().getId());
-        claims.put("roles", roles);
+        // nested "roles" claim — exactly matches JwtPayload.roles: { userId, roles[] }
+        Map<String, Object> rolesClaim = new LinkedHashMap<>();
+        rolesClaim.put("userId", user.getId());
+        rolesClaim.put("roles", rolesList);
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("name", user.getUsername()); // frontend-ი ამას fullName-ად ჩვენებს
+        claims.put("roles", rolesClaim);
+
         return createToken(claims, userDetails.getUsername(), expiration);
     }
+
 
 
     public String refreshToken(UserDetails userDetails, String refreshToken) {
@@ -97,16 +107,16 @@ public class JwtTokenUtil {
         return createToken(new HashMap<>(), userDetails.getUsername(), refreshExpiration);
     }
 
-    private String createToken(Map<String, Object> roles, String subject, Long expiration) {
-        return Jwts
-                .builder()
-                .claim("roles", roles)
+    private String createToken(Map<String, Object> claims, String subject, Long expiration) {
+        return Jwts.builder()
+                .setClaims(claims)               // ← .claim("roles", roles) ნაცვლად
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS512)
                 .compact();
     }
+
 
 
     public TokenResponse generateTokens(UserDetails userDetails, User user) {

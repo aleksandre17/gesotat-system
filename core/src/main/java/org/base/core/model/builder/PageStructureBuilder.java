@@ -3,6 +3,7 @@ package org.base.core.model.builder;
 import lombok.RequiredArgsConstructor;
 import org.base.core.entity.page_tree.PageNode;
 import org.base.core.model.request.NodeRequest;
+import org.base.core.model.request.ParentRef;
 import org.base.core.service.PageStructureService;
 import org.springframework.stereotype.Component;
 
@@ -16,45 +17,44 @@ public class PageStructureBuilder {
     private final PageStructureService pageStructureService;
 
     public List<PageNode> createSampleStructure() {
-        // Create the structure with levels
-        NodeRequest mainMenu = folder("Main Menu", 1)
+        NodeBuilder mainMenu = folder("Main Menu")
                 .withChildren(
-                        folder("Products", 2)
+                        folder("Products")
                                 .withChildren(
-                                        folder("Electronics", 3)
+                                        folder("Electronics")
                                                 .withChildren(
-                                                        folder("Computers", 4)
+                                                        folder("Computers")
                                                                 .withChildren(
-                                                                        page("Laptops", "laptops", 5).build(),
-                                                                        page("Desktops", "desktops", 5).build()
-                                                                ).build(),
-                                                        folder("Smartphones", 4)
+                                                                        page("Laptops", "laptops"),
+                                                                        page("Desktops", "desktops")
+                                                                ),
+                                                        folder("Smartphones")
                                                                 .withChildren(
-                                                                        page("Android Phones", "android-phones", 5).build(),
-                                                                        page("iPhones", "iphones", 5).build()
-                                                                ).build()
-                                                ).build()
-                                ).build(),
-                        folder("About", 2)
+                                                                        page("Android Phones", "android-phones"),
+                                                                        page("iPhones", "iphones")
+                                                                )
+                                                )
+                                ),
+                        folder("About")
                                 .withChildren(
-                                        page("Company History", "history", 3).build(),
-                                        page("Contact Us", "contact", 3).build()
-                                ).build()
-                ).build();
+                                        page("Company History", "history"),
+                                        page("Contact Us", "contact")
+                                )
+                );
 
-
-        return List.of(pageStructureService.createNodeFromRequest(mainMenu));
+        return List.of(mainMenu.save(pageStructureService, null));
     }
+
+    // ── Builder ────────────────────────────────────────────────────────────────
 
     public static class NodeBuilder {
         private final NodeRequest node;
+        private final List<NodeBuilder> children = new ArrayList<>();
 
-        private NodeBuilder(String name, boolean isFolder, int level) {
+        private NodeBuilder(String name, boolean isFolder) {
             node = new NodeRequest();
             node.setName(name);
             node.setIsFolder(isFolder);
-            node.setLevel(level);
-            node.setChildren(new ArrayList<>());
         }
 
         public NodeBuilder withDescription(String description) {
@@ -62,8 +62,8 @@ public class PageStructureBuilder {
             return this;
         }
 
-        public NodeBuilder withResource(String content) {
-            node.setResource(content);
+        public NodeBuilder withResource(String resource) {
+            node.setResource(resource);
             return this;
         }
 
@@ -73,27 +73,36 @@ public class PageStructureBuilder {
             return this;
         }
 
-        public NodeBuilder withChildren(NodeRequest... children) {
-            node.getChildren().addAll(List.of(children));
+        public NodeBuilder withChildren(NodeBuilder... children) {
+            this.children.addAll(List.of(children));
             return this;
         }
 
-        public NodeRequest build() {
-            return node;
+        public PageNode save(PageStructureService service, Long parentId) {
+            if (parentId != null) {
+                ParentRef ref = new ParentRef();
+                ref.setId(parentId);
+                node.setParent(ref);
+            }
+            PageNode saved = service.create(node);
+            for (int i = 0; i < children.size(); i++) {
+                children.get(i).node.setOrderIndex(i);
+                children.get(i).save(service, saved.getId());
+            }
+            return saved;
         }
     }
 
-    private static NodeBuilder folder(String name, int level) {
-        return new NodeBuilder(name, true, level)
-                .withDescription("Folder: " + name);
+    // ── Factory helpers ────────────────────────────────────────────────────────
 
+    private static NodeBuilder folder(String name) {
+        return new NodeBuilder(name, true)
+                .withDescription("Folder: " + name);
     }
 
-    private static NodeBuilder page(String name, String slug, int level) {
-        return new NodeBuilder(name, false, level)
+    private static NodeBuilder page(String name, String slug) {
+        return new NodeBuilder(name, false)
                 .withResource("Resource for " + name)
                 .withMeta("Page: " + name, "Description for " + name);
-
     }
 }
-

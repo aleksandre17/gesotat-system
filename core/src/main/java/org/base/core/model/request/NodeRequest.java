@@ -1,35 +1,30 @@
 package org.base.core.model.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-
-import java.util.List;
-
 @Data
 public class NodeRequest {
+
+    @NotBlank
     private String name;
-    private String description;
-    private Boolean isFolder;
+    private String slug;
+    private String icon;
     private String nodeType;
-    private Integer level;  // Current level in the hierarchy
+    private Boolean isFolder;
+    private Integer orderIndex;
+    private ParentRef parent;
 
-    // Common fields
-    private Integer sortOrder;
-    private List<NodeRequest> children;
+    // DIRECTORY-specific
+    private String description;
+    private AccessControlRequest accessControl;
 
-    private Long userId;
-
-
-    // Page-specific fields
+    // PAGE-specific
     private String resource;
+    private String metaTitle;
+    private String metaDescription;
     private String metaDatabaseType;
     private String metaDatabaseUrl;
     private String metaDatabaseUser;
     private String metaDatabasePassword;
     private String metaDatabaseName;
-    private String metaTitle;
-    private String metaDescription;
-    private String slug;
-    private Long parentId;
-    private String icon;
 }
-

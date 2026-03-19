@@ -1,11 +1,11 @@
 package org.base.core.entity.page_tree;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
@@ -21,8 +21,9 @@ import java.util.List;
 @Table(name = "page_nodes")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "node_type")
-@JsonIgnoreProperties(ignoreUnknown = true)  // ← Add this
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public abstract class PageNode {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,15 +32,21 @@ public abstract class PageNode {
     @Column(name = "name")
     private String name;
 
+    // @JsonBackReference — circular reference-ს ასარიდებლად (@JsonManagedReference-ის წყვილი)
+    // parent object არ ჩანს response-ში; parentId @Formula-ით მოდის
     @JsonBackReference
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private PageNode parent;
 
+    // parentId პირდაპირ SQL-ით — parent proxy-ს ჩატვირთვის გარეშე
     @Formula("parent_id")
-    @JsonProperty("parent_id")
+    @JsonProperty("parentId")
     private Long parentId;
 
+    // LAZY by default; @BatchSize N+1-ს ასარიდებლად ბატჩებად ტვირთავს
+    // @JsonManagedReference + Hibernate6Module(FORCE_LAZY_LOADING=false):
+    //   loaded → ჩანს response-ში; unloaded proxy → null (ბაზა არ ხვდება)
     @JsonManagedReference
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("sortOrder ASC")
@@ -59,42 +66,18 @@ public abstract class PageNode {
     @Formula("node_type")
     private String nodeType;
 
-    //@Pattern(regexp = "^[A-Z][a-zA-Z0-9]*$|^$", message = "Invalid icon name")
     @Column(name = "icon")
     private String icon;
 
-//    @Override
-//    public void serialize(PageNode value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-//        gen.writeStartObject();
-//        // Reflect on fields
-//        for (Field field : PageNode.class.getDeclaredFields()) {
-//            if (!field.getName().equals("parent")) {
-//                field.setAccessible(true);
-//                try {
-//                    Object propValue = field.get(value);
-//                    gen.writeFieldName(field.getName());
-//                    if (propValue == null) {
-//                        gen.writeNull();
-//                    } else {
-//                        serializers.findValueSerializer(field.getType()).serialize(propValue, gen, serializers);
-//                    }
-//                } catch (IllegalAccessException e) {
-//                    throw new IOException("Failed to access field: " + field.getName(), e);
-//                }
-//            }
-//        }
-//        // Add parentId
-//        gen.writeFieldName("parentId");
-//        if (value.getParent() != null) {
-//            gen.writeNumber(value.getParent().getId());
-//        } else {
-//            gen.writeNull();
-//        }
-//        gen.writeEndObject();
-//    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PageNode other)) return false;
+        return id != null && id.equals(other.id);
+    }
 
-//    @JsonProperty("parentId")
-//    public Long getParentId() {
-//        return parent != null ? parent.getId() : null;
-//    }
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

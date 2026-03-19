@@ -1,14 +1,13 @@
-package org.base.api.setting;
+package org.base.api.config;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.databind.module.SimpleDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleSerializers;
+import com.fasterxml.jackson.datatype.hibernate6.Hibernate6Module;
 import org.base.core.entity.page_tree.PageNode;
 import org.base.core.model.PageNodeMixIn;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
@@ -19,11 +18,25 @@ import java.io.IOException;
 
 @Configuration
 public class JacksonConfig {
+
+    /**
+     * Prevents Jackson from force-loading uninitialized Hibernate lazy proxies
+     * during serialization. Unloaded associations serialize as null instead of
+     * triggering a DB query outside a transaction.
+     */
+    @Bean
+    public Hibernate6Module hibernate6Module() {
+        Hibernate6Module module = new Hibernate6Module();
+        module.configure(Hibernate6Module.Feature.FORCE_LAZY_LOADING, false);
+        module.configure(Hibernate6Module.Feature.SERIALIZE_IDENTIFIER_FOR_LAZY_NOT_LOADED_OBJECTS, false);
+        return module;
+    }
+
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jacksonCustomizer() {
         return builder -> {
             builder.mixIn(PageNode.class, PageNodeMixIn.class);
-            builder.modulesToInstall(new Module() {
+            builder.modulesToInstall(new com.fasterxml.jackson.databind.Module() {
                 @Override
                 public String getModuleName() {
                     return "PageNodeMixInModule";
@@ -45,35 +58,6 @@ public class JacksonConfig {
                                     @Override
                                     public void serialize(PageNode value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
                                         gen.writeStartObject();
-                                        // Serialize all fields except parent
-//                                        for (BeanPropertyWriter prop : beanDesc.findProperties()) {
-//                                            if (!prop.getName().equals("parent")) {
-//                                                prop.serializeAsField(value, gen, serializers);
-//                                            }
-//                                        }
-//
-//                                        JsonSerializer<Object> defaultSerializer = serializers.findValueSerializer(PageNode.class);
-//                                        JsonSerializer<Object> filteredSerializer = new JsonSerializer<Object>() {
-//                                            @Override
-//                                            public void serialize(Object obj, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-//                                                gen.writeStartObject();
-//                                                BeanSerializerBase beanSerializer = (BeanSerializerBase) defaultSerializer;
-//                                                for (BeanPropertyWriter prop : beanSerializer.properties()) {
-//                                                    if (!prop.getName().equals("parent")) {
-//                                                        prop.serializeAsField(obj, gen, serializers);
-//                                                    }
-//                                                }
-//                                                // Add parentId
-//                                                gen.writeFieldName("parentId");
-//                                                if (((PageNode) obj).getParent() != null) {
-//                                                    gen.writeNumber(((PageNode) obj).getParent().getId());
-//                                                } else {
-//                                                    gen.writeNull();
-//                                                }
-//                                                gen.writeEndObject();
-//                                            }
-//                                        };
-//                                        filteredSerializer.serialize(value, gen, serializers);
 
                                         for (BeanPropertyDefinition propDef : beanDesc.findProperties()) {
                                             if (!propDef.getName().equals("parent")) {
@@ -111,16 +95,11 @@ public class JacksonConfig {
                                         JsonNode node = p.getCodec().readTree(p);
                                         ObjectMapper mapper = (ObjectMapper) p.getCodec();
                                         PageNode pageNode = mapper.treeToValue(node, PageNode.class);
-                                        // Handle parentId
                                         if (node.has("parentId")) {
                                             Long parentId = node.get("parentId").isNull() ? null : node.get("parentId").longValue();
                                             if (parentId != null) {
-                                                PageNode parent = new PageNode() {
-                                                    @Override
-                                                    public Long getId() {
-                                                        return parentId;
-                                                    }
-                                                };
+                                                PageNode parent = new PageNode() {};
+                                                parent.setId(parentId);
                                                 pageNode.setParent(parent);
                                             } else {
                                                 pageNode.setParent(null);

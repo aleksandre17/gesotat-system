@@ -1,8 +1,11 @@
 package org.base.core.repository;
 
 import org.base.core.entity.page_tree.PageNode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -21,5 +24,8 @@ public interface PageNodeRepository extends JpaRepository<PageNode, Long> {
 
     @Query("SELECT p FROM PageNode p WHERE p.parent.id = :parentId ORDER BY p.sortOrder")
     List<PageNode> findByParentIdOrdered(Long parentId);
+
+    @Query("SELECT p FROM PageNode p WHERE TYPE(p) = :type")
+    Page<PageNode> findByType(@Param("type") Class<? extends PageNode> type, Pageable pageable);
 }
 

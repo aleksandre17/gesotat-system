@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.*;
 import java.util.*;
 
@@ -60,7 +61,7 @@ public class MSSQLToAccess {
         Files.createDirectories(getExportDir(empty));
         Path accessFilePath = getAccessFilePath(fileName, empty);
 
-        if (!Files.exists(accessFilePath)) {
+        if (!empty || !Files.exists(accessFilePath)) {
             generateAccess(metaDatabaseType, fileName, metaDatabaseUrl, metaDatabaseUser, metaDatabasePassword, empty);
         }
 
@@ -111,9 +112,6 @@ public class MSSQLToAccess {
                                String metaDatabaseUser,
                                String metaDatabasePassword,  @RequestParam(defaultValue = "false") boolean empty) {
 
-        //String mssqlDatabaseName = "auto";
-        //String mssqlTableName = fileName;
-
         String[] dbAndTable = parseDatabaseAndTableName(fileName);
         String mssqlDatabaseName = dbAndTable[0];
         String mssqlTableName = dbAndTable[1];
@@ -123,19 +121,15 @@ public class MSSQLToAccess {
         }
 
         String mssqlUrl = buildConnectionUrl(metaDatabaseType, metaDatabaseUrl, mssqlDatabaseName);
-        String mssqlUser = metaDatabaseUser;
-        String mssqlPassword = metaDatabasePassword;
         String accessTableName = mssqlDatabaseName.replace("-", "_") + "/" + mssqlTableName;
+
+        Path accessFilePath = getAccessFilePath(fileName, empty);
+        Path tempPath = accessFilePath.resolveSibling(accessFilePath.getFileName() + ".tmp");
 
         try {
             Files.createDirectories(getExportDir(empty));
-            Path accessFilePath = getAccessFilePath(fileName, empty);
 
-            if (Files.exists(accessFilePath)) {
-                Files.delete(accessFilePath);
-            }
-
-            Connection mssqlConn = DriverManager.getConnection(mssqlUrl, mssqlUser, mssqlPassword);
+            Connection mssqlConn = DriverManager.getConnection(mssqlUrl, metaDatabaseUser, metaDatabasePassword);
             DatabaseMetaData metaData = mssqlConn.getMetaData();
             ResultSet columns = metaData.getColumns(null, "dbo", mssqlTableName, null);
 
@@ -148,47 +142,51 @@ public class MSSQLToAccess {
                 columnBuilders.add(new ColumnBuilder(columnName).setType(accessType));
             }
 
-            Database db = new DatabaseBuilder(accessFilePath.toFile())
+            try (Database db = new DatabaseBuilder(tempPath.toFile())
                     .setFileFormat(Database.FileFormat.V2010)
                     .setAutoSync(false)
-                    .create();
+                    .create()) {
 
-            TableBuilder tableBuilder = new TableBuilder(accessTableName);
-            for (ColumnBuilder col : columnBuilders) {
-                tableBuilder.addColumn(col);
-            }
-            Table newTable = tableBuilder.toTable(db);
+                TableBuilder tableBuilder = new TableBuilder(accessTableName);
+                for (ColumnBuilder col : columnBuilders) {
+                    tableBuilder.addColumn(col);
+                }
+                Table newTable = tableBuilder.toTable(db);
 
-            if (!empty) {
-                Statement stmt = mssqlConn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-                stmt.setFetchSize(500);
-                ResultSet rs = stmt.executeQuery(buildSelectQuery(metaDatabaseType, mssqlDatabaseName, mssqlTableName, metaDatabaseUrl));
-                final int BATCH_SIZE = 1000;
-                List<Map<String, Object>> batch = new ArrayList<>(BATCH_SIZE);
-                while (rs.next()) {
-                    Map<String, Object> row = new HashMap<>();
-                    for (ColumnBuilder col : columnBuilders) {
-                        row.put(col.getName(), rs.getObject(col.getName()));
+                if (!empty) {
+                    Statement stmt = mssqlConn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+                    stmt.setFetchSize(500);
+                    ResultSet rs = stmt.executeQuery(buildSelectQuery(metaDatabaseType, mssqlDatabaseName, mssqlTableName, metaDatabaseUrl));
+                    final int BATCH_SIZE = 1000;
+                    List<Map<String, Object>> batch = new ArrayList<>(BATCH_SIZE);
+                    while (rs.next()) {
+                        Map<String, Object> row = new HashMap<>();
+                        for (ColumnBuilder col : columnBuilders) {
+                            row.put(col.getName(), rs.getObject(col.getName()));
+                        }
+                        batch.add(row);
+                        if (batch.size() == BATCH_SIZE) {
+                            newTable.addRowsFromMaps(batch);
+                            batch.clear();
+                        }
                     }
-                    batch.add(row);
-                    if (batch.size() == BATCH_SIZE) {
+                    if (!batch.isEmpty()) {
                         newTable.addRowsFromMaps(batch);
-                        batch.clear();
                     }
+                    rs.close();
+                    stmt.close();
                 }
-                if (!batch.isEmpty()) {
-                    newTable.addRowsFromMaps(batch);
-                }
-                rs.close();
-                stmt.close();
             }
 
             mssqlConn.close();
-            db.close();
+
+            // Atomically replace final file only after generation is complete
+            Files.move(tempPath, accessFilePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
 
             System.out.println("MS Access file created: " + accessFilePath);
 
         } catch (Exception e) {
+            try { Files.deleteIfExists(tempPath); } catch (IOException ignored) {}
             e.printStackTrace();
         }
     }

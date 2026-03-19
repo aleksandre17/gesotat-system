@@ -52,7 +52,7 @@ public class XlsxToCsvController {
     }
 
     /**
-     * კონკრეტული შიტის კონვერტაცია
+     * Convert a specific sheet
      * GET /xlsx-to-csv/convert?sheet=0
      * GET /xlsx-to-csv/convert?url=https://example.com/file.xlsx&sheet=0
      */
@@ -60,11 +60,11 @@ public class XlsxToCsvController {
     public ResponseEntity<StreamingResponseBody> convertFromUrl(
             @RequestParam(value = "url", required = false) String fileUrl,
             @RequestParam(value = "sheet", required = false) Integer sheetIndex) throws IOException {
-
+    
         Path tempFile;
         String baseName;
         boolean deleteAfter;
-
+    
         if (fileUrl == null || fileUrl.isEmpty()) {
             // Try to load from classpath first (works in JAR)
             tempFile = loadDefaultFile();
@@ -75,17 +75,17 @@ public class XlsxToCsvController {
             baseName = extractFileNameFromUrl(fileUrl);
             deleteAfter = true;
         }
-
+    
         int sheet = sheetIndex != null ? sheetIndex : 0;
         return convertSpecificSheet(tempFile, baseName, sheet, deleteAfter);
     }
-
+    
     /**
      * Load default file from classpath or filesystem
      */
     private Path loadDefaultFile() throws IOException {
-        String resourcePath = "storage/input/პროდუქციის-გამოშვება.xlsx";
-
+        String resourcePath = "storage/input/Product Release.xlsx";
+    
         // Try classpath first (for JAR deployment)
         try (InputStream is = getClass().getClassLoader().getResourceAsStream(resourcePath)) {
             if (is != null) {
@@ -94,42 +94,42 @@ public class XlsxToCsvController {
                 return tempFile;
             }
         }
-
+    
         // Fallback to filesystem paths (for development)
         Path[] possiblePaths = {
-            Paths.get("api/src/main/resources/storage/input/პროდუქციის-გამოშვება.xlsx").toAbsolutePath(),
-            Paths.get("src/main/resources/storage/input/პროდუქციის-გამოშვება.xlsx").toAbsolutePath(),
-            Paths.get("api/src/main/storage/input/პროდუქციის-გამოშვება.xlsx").toAbsolutePath(),
-            Paths.get("src/main/storage/input/პროდუქციის-გამოშვება.xlsx").toAbsolutePath()
+            Paths.get("api/src/main/resources/storage/input/Product Release.xlsx").toAbsolutePath(),
+            Paths.get("src/main/resources/storage/input/Product Release.xlsx").toAbsolutePath(),
+            Paths.get("api/src/main/storage/input/Product Release.xlsx").toAbsolutePath(),
+            Paths.get("src/main/storage/input/Product Release.xlsx").toAbsolutePath()
         };
-
+    
         for (Path path : possiblePaths) {
             if (Files.exists(path)) {
                 return path;
             }
         }
-
-        throw new FileNotFoundException("Default ფაილი ვერ მოიძებნა. შეამოწმეთ რომ ფაილი მოთავსებულია resources/storage/input/ საქაღალდეში");
+    
+        throw new FileNotFoundException("Default file not found. Ensure the file is placed in the resources/storage/input/ directory");
     }
 
     /**
-     * ყველა შიტის ჩამოტვირთვა - HTML გვერდი (iframe-ისთვის)
+     * Download all sheets - HTML page (for iframe display)
      * GET /xlsx-to-csv/download-all
      * GET /xlsx-to-csv/download-all?url=https://example.com/file.xlsx
      */
     @GetMapping(value = "/download-all", produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<String> downloadAllSheets(
             @RequestParam(value = "url", required = false) String fileUrl) throws IOException {
-
+    
         Path filePath;
         String displayFileName;
         boolean isLocalFile;
         String urlForLinks;
         boolean deleteTempFile = false;
-
+    
         if (fileUrl == null || fileUrl.isEmpty()) {
             filePath = loadDefaultFile();
-            displayFileName = "პროდუქციის-გამოშვება";
+            displayFileName = "Product Release";
             urlForLinks = null;
             isLocalFile = true;
             // Check if it's a temp file (from classpath loading)
@@ -140,16 +140,16 @@ public class XlsxToCsvController {
             urlForLinks = fileUrl;
             isLocalFile = false;
         }
-
+    
         try (InputStream fis = Files.newInputStream(filePath);
              Workbook workbook = WorkbookFactory.create(fis)) {
-
+    
             int sheetCount = workbook.getNumberOfSheets();
             String encodedUrl = urlForLinks != null ? URLEncoder.encode(urlForLinks, StandardCharsets.UTF_8) : null;
-
+    
             StringBuilder html = new StringBuilder();
             html.append("<!DOCTYPE html><html><head><meta charset='UTF-8'>");
-            html.append("<title>CSV ჩამოტვირთვა</title>");
+            html.append("<title>CSV Download</title>");
             html.append("<style>");
             html.append("* { margin: 0; padding: 0; box-sizing: border-box; }");
             html.append("body { font-family: 'Segoe UI', Arial, sans-serif;  min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }");
@@ -172,22 +172,22 @@ public class XlsxToCsvController {
             html.append("<div class='popup'>");
             html.append("<div class='popup-header'>");
 //            html.append("<h1>📥 CSV ექსპორტი</h1>");
-            html.append("<p>").append(displayFileName).append(" • ").append(sheetCount).append(" შიტი</p>");
+            html.append("<p>").append(displayFileName).append(" • ").append(sheetCount).append(" sheets</p>");
             html.append("</div>");
             html.append("<div class='popup-body'>");
-
+            
             for (int i = 0; i < sheetCount; i++) {
                 String sheetName = workbook.getSheetAt(i).getSheetName();
                 html.append("<div class='sheet' id='sheet-").append(i).append("'>");
                 html.append("<span class='sheet-name'>📄 ").append(sheetName).append("</span>");
-                html.append("<span class='sheet-status' id='status-").append(i).append("'>მოლოდინში</span>");
+                html.append("<span class='sheet-status' id='status-").append(i).append("'>Pending</span>");
                 html.append("</div>");
             }
-
+            
             html.append("</div>");
             html.append("<div class='popup-footer'>");
             html.append("<div class='progress-bar'><div class='progress-fill' id='progress'></div></div>");
-            html.append("<p class='status-text' id='final-status'>⏳ მიმდინარეობს ჩამოტვირთვა...</p>");
+            html.append("<p class='status-text' id='final-status'>⏳ Downloading in progress...</p>");
             html.append("</div></div>");
 
             html.append("<script>");
@@ -238,18 +238,18 @@ public class XlsxToCsvController {
 
             html.append("async function downloadNext() {");
             html.append("  if (currentIndex >= sheets.length) {");
-            html.append("    document.getElementById('final-status').innerHTML = 'ყველა ფაილი ჩამოტვირთულია!';");
+            html.append("    document.getElementById('final-status').innerHTML = 'All files have been downloaded!';");
             html.append("    document.getElementById('final-status').className = 'status-text complete';");
             html.append("    document.getElementById('progress').style.width = '100%';");
             html.append("    return;");
             html.append("  }");
             html.append("  const sheet = sheets[currentIndex];");
             html.append("  document.getElementById('sheet-' + sheet.index).className = 'sheet downloading';");
-            html.append("  document.getElementById('status-' + sheet.index).innerHTML = 'იტვირთება...';");
+            html.append("  document.getElementById('status-' + sheet.index).innerHTML = 'Downloading...';");
             html.append("  document.getElementById('final-status').innerHTML = '⏳ ' + (currentIndex + 1) + '/' + total + ' - ' + sheet.name;");
             html.append("  await downloadFile(sheet);");
             html.append("  document.getElementById('sheet-' + sheet.index).className = 'sheet done';");
-            html.append("  document.getElementById('status-' + sheet.index).innerHTML = '✓ მზადაა';");
+            html.append("  document.getElementById('status-' + sheet.index).innerHTML = '✓ Ready';");
             html.append("  currentIndex++;");
             html.append("  updateProgress();");
             html.append("  setTimeout(downloadNext, 800);");
@@ -343,20 +343,20 @@ public class XlsxToCsvController {
     }
 
     /**
-     * Excel ფაილის ატვირთვა და CSV-ად კონვერტაცია
+     * Upload Excel file and convert to CSV
      */
     @PostMapping("/upload")
     public ResponseEntity<StreamingResponseBody> uploadAndConvert(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "sheet", required = false) Integer sheetIndex) throws IOException {
-
+    
         if (file.isEmpty()) {
-            throw new IllegalArgumentException("ფაილი არ არის ატვირთული");
+            throw new IllegalArgumentException("The file has not been uploaded");
         }
-
+    
         String originalFilename = file.getOriginalFilename();
         if (originalFilename == null || (!originalFilename.endsWith(".xlsx") && !originalFilename.endsWith(".xls"))) {
-            throw new IllegalArgumentException("მხოლოდ .xlsx ან .xls ფაილები დასაშვებია");
+            throw new IllegalArgumentException("Only .xlsx or .xls files are allowed");
         }
 
         String baseName = originalFilename.replaceFirst("[.][^.]+$", "");
@@ -376,7 +376,7 @@ public class XlsxToCsvController {
             }
             return tempFile;
         } catch (Exception e) {
-            throw new IOException("ფაილის გადმოწერა ვერ მოხერხდა: " + fileUrl, e);
+            throw new IOException("Failed to download the file: " + fileUrl, e);
         }
     }
 
