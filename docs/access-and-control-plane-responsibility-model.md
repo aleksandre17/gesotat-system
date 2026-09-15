@@ -58,3 +58,13 @@ An Access file cannot autonomously create a new logical structure. A new require
 
 No later layer weakens an earlier layer. A manually edited package, a management-panel action, and an API caller all travel through the same lifecycle and audit trail.
 **Runtime baseline:** KIDS_PORTAL_V1 revision 8. See [KIDS R8 current status and acceptance](KIDS-R8-current-status-and-acceptance.md) for deployed evidence.
+
+
+- შეიქმნა ხელმოწერილი release tag: geostat-v1.0.0
+    - შეიქმნა ხელმოწერილი deploy-authority tag: geostat-v1.0.0-authority
+    - დამტკიცებული commit: f99068720b6056a0b0b3858ea18f6e01a17afade
+    - release owner: Aleksandre Sisvadze
+    - deploy authority: administrator@192.168.1.199
+    - scope: მხოლოდ GEOSOTAT geostat project
+    - ორივე tag-ის SSH signature ვალიდურია
+    - working tree კვლავ სუფთაა
