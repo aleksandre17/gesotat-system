@@ -65,7 +65,7 @@ Legacy `ID/category/title_geo/title_eng/path_*` becomes a typed entity with loca
 
 Legacy `category` and `sub_category` are transport fields. In R8 they are resolved through declared relations/classifier aliases; `__rel_kids_resource_subcategory_assignment` preserves many-to-many assignments. `chartdata` is retained as raw lineage and is interpreted only by an approved statistical projection. It is not a free-form serving schema.
 
-Observed legacy rows: **159** across categories 1–4. R8 resources: **225**, assignments: **230**. This is a **reconciliation item**, not a safe one-to-one assertion. Required next check: compare stable source identifiers and classify each delta as duplicate, additional governed resource, filtered legacy subset, or unresolved mapping.
+Observed legacy rows: **159** across categories 1–4. R8 canonical resources: **225**, assignments: **230**. The page-9 runtime query is now snapshot-bound through `dataset_version_id → publication.dataset_snapshot_id → entity.entity_record`; the 159/225 difference remains a **reconciliation item**, not a safe one-to-one assertion. Required next check: compare stable source identifiers and classify each delta as duplicate, additional governed resource, filtered legacy subset, or unresolved mapping.
 
 ### Glossary (page 10)
 
