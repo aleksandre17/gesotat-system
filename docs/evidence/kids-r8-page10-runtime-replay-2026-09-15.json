@@ -1,0 +1,57 @@
+{
+  "schema": "geostat.kids.page-runtime-replay.v1",
+  "recordedAt": "2026-09-15",
+  "site": "kids",
+  "contract": { "code": "KIDS_PORTAL_V1", "revision": 8 },
+  "page": {
+    "pageId": 10,
+    "nodeCode": "KIDS_GLOSSARY",
+    "datasetCode": "KIDS_GLOSSARY_ENTRY",
+    "projection": "KIDS_GLOSSARY_ENTRY_ENTITY"
+  },
+  "execution": {
+    "endpoint": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/10/query",
+    "method": "POST",
+    "request": {
+      "filters": {},
+      "sort": "source_glossary_id",
+      "descending": false,
+      "page": 1,
+      "limit": 2,
+      "select": [
+        "source_glossary_id",
+        "language_item_ref",
+        "language_raw",
+        "entry_text",
+        "source_row_key",
+        "operation"
+      ],
+      "include": []
+    },
+    "httpStatus": 200,
+    "returned": 2,
+    "total": 178,
+    "hasNext": true,
+    "responseSchema": "urn:geostat:kids_portal_v1:kids_glossary_entry:v8"
+  },
+  "materialization": {
+    "datasetSnapshotId": 48,
+    "contractSourceId": 570,
+    "family": "ENTITY",
+    "writtenRows": 178,
+    "status": "SEMANTIC_REVIEW",
+    "dataPlaneTable": "__ent_kids_glossary_entry",
+    "naturalKey": "source_glossary_id",
+    "keyCount": 178,
+    "missingRequiredEntryText": 0
+  },
+  "semanticDecisions": [
+    "Glossary entries are independent entities; no cross-language grouping key is fabricated.",
+    "Full glossary text is exposed as localized content, not forced into the bounded title field.",
+    "Language references remain governed classifier links through GLOSSARY_LANGUAGE.",
+    "source_row_key preserves immutable raw lineage through GLOSSARY_RAW_LINEAGE."
+  ],
+  "relations": ["GLOSSARY_LANGUAGE", "GLOSSARY_RAW_LINEAGE"],
+  "status": "TECHNICAL_REPLAY_PASS",
+  "publication": "BLOCKED_PENDING_QUALITY_PRIVACY_RECONCILIATION_AND_STEWARD_APPROVAL"
+}
