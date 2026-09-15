@@ -36,7 +36,8 @@
     "datasetSnapshotId": 50,
     "contractSourceId": 572,
     "family": "STATISTICAL",
-    "dataPlaneTable": "__stat_kids_statistical_input",
+    "dataPlaneTable": "statistics.observation",
+    "snapshotBinding": "dataset_version_id → publication.dataset_snapshot_id → statistics.series.dataset_snapshot_id",
     "writtenRows": 880,
     "uniqueInputKeys": 880,
     "nullNumericValues": 0
