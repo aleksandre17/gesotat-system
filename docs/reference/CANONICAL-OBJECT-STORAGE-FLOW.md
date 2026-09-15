@@ -80,3 +80,48 @@ Frontend
 - DB locator binding and final published signed-download projection are the next
   governed step;
 - frontend static files remain unchanged until that binding reaches `VERIFIED`.
+
+## სრული განმარტება
+
+ჩვენი Object Storage არის geostat-ის იზოლირებული MinIO/S3 სისტემა.
+
+განთავსება:
+
+```text
+Linux server: 192.168.1.199
+Project: /home/administrator/geostat
+Infra: /home/administrator/geostat/backend/infra/geostat-platform
+Container: geostat-minio
+Network: geostat-net
+```
+
+ფაილის metadata-სა და ბაიტების გაყოფა განზრახულია:
+
+- Object Storage-ში არის თვითონ Excel-ის ბაიტები;
+- Data Plane-ში არის resource identity და typed metadata;
+- `entity.resource_locator` ინახავს URI-ს, MIME type-ს, checksum-სა და access policy-ს;
+- Control Plane წყვეტს, შეიძლება თუ არა resource-ის გამოქვეყნება;
+- API არ აბრუნებს ფიზიკურ storage path-ს;
+- API აბრუნებს მხოლოდ კონტრაქტით დაშვებულ metadata-ს და დროებით signed URL-ს;
+- Frontend პირდაპირ MinIO-ს ან `/files/...` path-ს არ უნდა მიმართავდეს.
+
+ამჟამად შესრულებულია:
+
+- 719 KIDS ფაილის inventory;
+- 532 უნიკალური object-ის ingest bucket-ში ატვირთვა;
+- checksum-based deduplication;
+- `inventory.json`-ის შენახვა;
+- frontend-ის static ფაილები ჯერ არ წაშლილა.
+
+დარჩენილი დამაკავშირებელი ნაბიჯია:
+
+```text
+inventory.json
+  → KIDS_RESOURCE.source_resource_id/source_row_key
+  → entity.resource_locator
+  → dataset_snapshot
+  → API signed download
+```
+
+ამის დასრულების შემდეგ frontend-ის არსებული `public/files` სტრუქტურა აღარ იქნება
+runtime authority და მისი უსაფრთხოდ retirement შესაძლებელი გახდება.
