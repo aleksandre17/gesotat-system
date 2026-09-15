@@ -319,3 +319,14 @@ foundation → concept → architecture → mechanism → example
 ```
 
 ეს წესი მოქმედებს KIDS-ისა და ყველა მომავალი provider/site-ის დოკუმენტაციაზე.
+
+## Cardinal no-temporary-substitute rule
+
+დროებითი გამოსავალი, workaround, ხელოვნური მნიშვნელობა ან consumer-ზე მორგებული
+გამონაკლისი არ შეიძლება ჩაითვალოს დასრულებულ implementაციად. ნებისმიერი ნაბიჯი
+უნდა დასრულდეს platform-ის უმაღლესი მოთხოვნებით: canonical abstraction,
+metadata-driven behavior, provider/site agnosticism, SOLID/Ports & Adapters,
+უსაფრთხოება, versioning, test და evidence. თუ გარე authority ან production
+გარემო აკლია, იგი აღირიცხება როგორც მკაფიოly bounded external gate და არა როგორც
+ფარული substitute. შემდეგი სამუშაო ყოველთვის გრძელდება ბოლო რეალურად ღია
+invariant-იდან; ხარისხის შესამცირებლად უკან დახევა დაუშვებელია.
