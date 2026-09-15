@@ -104,6 +104,8 @@ sourceSets {
         java.include 'KidsPortalCanonicalAccessPackageGenerator.java'
         java.include 'KidsPortalProductionAccessAudit.java'
         java.include 'KidsStatisticalSemanticProfiler.java'
+        java.include 'KidsGoalsParityAudit.java'
+        java.include 'KidsGoalsCapabilityAudit.java'
         java.include 'ContractRegistryAccessPackageGenerator.java'
         compileClasspath += sourceSets.main.runtimeClasspath
         runtimeClasspath += output + compileClasspath
@@ -117,6 +119,25 @@ tasks.register('profileKidsStatisticalSemantics', JavaExec) {
     classpath = sourceSets.kidsCanonicalTool.runtimeClasspath
     mainClass = 'KidsStatisticalSemanticProfiler'
     args '../../../../../samples/kids-children-portal-full-data.accdb'
+}
+
+tasks.register('auditKidsGoalsParity', JavaExec) {
+    group = 'geostat'
+    description = 'Read-only stable-key and localized-field parity audit for KIDS page 8'
+    dependsOn tasks.named('compileKidsCanonicalToolJava')
+    classpath = sourceSets.kidsCanonicalTool.runtimeClasspath
+    mainClass = 'KidsGoalsParityAudit'
+    args '../../../../../samples/kids-children-portal-full-data.accdb',
+         (project.findProperty('kidsAccessFile') ?: 'kids-portal-v1-canonical-r8-final.accdb')
+}
+
+tasks.register('auditKidsGoalsCapability', JavaExec) {
+    group = 'geostat'
+    description = 'Read-only Control Plane capability consistency audit for KIDS page 8'
+    dependsOn tasks.named('compileKidsCanonicalToolJava')
+    classpath = sourceSets.kidsCanonicalTool.runtimeClasspath
+    mainClass = 'KidsGoalsCapabilityAudit'
+    args (project.findProperty('kidsAccessFile') ?: 'kids-portal-v1-canonical-r8-final.accdb')
 }
 
 tasks.register('auditKidsCanonicalAccess', JavaExec) {

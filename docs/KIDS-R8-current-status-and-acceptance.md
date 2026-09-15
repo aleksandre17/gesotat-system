@@ -10,7 +10,7 @@
 | Site revision | `8 / APPROVED` |
 | Ingestion revision | `8 / APPROVED` |
 | Access artifact | `platform/apps/geostat/backend/api/kids-portal-v1-canonical-r8-final.accdb` (canonical generated R8 artifact; source samples remain under `samples/`) |
-| Current repository fingerprint | 2,920,448 bytes; SHA-256 `1930EAD852912858F25D85867FC075AAFFECD7F6704C2540E41E623764D27ACC` (revalidated 2026-09-15) |
+| Current repository fingerprint | 2,834,432 bytes; SHA-256 `D62C58C9633766BC597C1EF67F5984FD7104F922C837224374E5D194F6F0BFF7` (revalidated 2026-09-15 after page-8 projection approval) |
 | Production API | `http://192.168.1.199:8083` |
 | API health | `UP` — primary, data, archive, object storage and secondary |
 | Bootstrap authentication | Disabled |

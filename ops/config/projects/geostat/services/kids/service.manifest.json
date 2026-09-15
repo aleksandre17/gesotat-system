@@ -1,0 +1,32 @@
+{
+  "schema": "geostat.service-manifest.v1",
+  "serviceId": "kids",
+  "projectId": "geostat",
+  "kind": "frontend",
+  "sourceRoot": "platform/apps/geostat/frontend/kids",
+  "configRoot": "ops/config/projects/geostat/services/kids",
+  "runtimeRoot": "ops/runtime/projects/geostat/kids",
+  "contract": {
+    "contractCode": "KIDS_PORTAL_V1",
+    "revision": 8,
+    "pageIds": {
+      "root": 7,
+      "goals": 8,
+      "resources": 9,
+      "glossary": 10,
+      "statistics": 11,
+      "classifiers": 12
+    }
+  },
+  "api": {
+    "baseUrlEnv": "VITE_PLATFORM_API_URL",
+    "authModeEnv": "VITE_PLATFORM_AUTH_MODE",
+    "tokenStorage": "runtime-only",
+    "legacyFallbackEnv": "VITE_LEGACY_API_FALLBACK"
+  },
+  "isolation": {
+    "ownsSecrets": true,
+    "crossProjectSecrets": false,
+    "crossProjectDatabaseAccess": false
+  }
+}

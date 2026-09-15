@@ -9,13 +9,18 @@ Accepted artifact size: **1,916,928 bytes**. SHA-256: `A2760BE2220816205976C3B20
 
 ## Repository artifact revalidation — 2026-09-15
 
-The canonical repository file at the path above currently measures **2,920,448
+The canonical repository file at the path above currently measures **2,834,432
 bytes** and has SHA-256
-`1930EAD852912858F25D85867FC075AAFFECD7F6704C2540E41E623764D27ACC`.
+`D62C58C9633766BC597C1EF67F5984FD7104F922C837224374E5D194F6F0BFF7`.
 This is recorded as a new artifact fingerprint, not as a silent rewrite of the
 historical 2026-09-10 acceptance record. Any production replay must select one
 fingerprint explicitly and rerun the ingest/reconciliation gates against that
 exact immutable byte stream.
+
+The 2026-09-15 replacement is a deliberate contract revision of the generated
+artifact: `KIDS_GOAL_ENTITY` projection is now `READY`, with page-8 parity and
+capability evidence recorded in the comparison and AIR documents. The prior
+fingerprint remains historical evidence and is not silently overwritten.
 
 ## Source boundary
 

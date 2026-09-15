@@ -1,0 +1,290 @@
+.goals-page .goals-hero {
+  position: relative;
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+.goals-page .goals-hero-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 30px;
+}
+
+.goals-page .goals-hero-title {
+  position: absolute;
+  left: clamp(20px, 4vw, 60px);
+  bottom: clamp(20px, 4vw, 40px);
+  color: white;
+  font-family: FiraGO, sans-serif;
+  font-size: clamp(22px, 4vw, 40px);
+  font-weight: 700;
+  line-height: 1.15;
+  font-feature-settings: "case" on;
+  max-width: min(80%, 640px);
+}
+
+.goals-page .goals-container {
+  display: flex;
+  justify-content: center;
+  justify-items: flex-start;
+  width: 1124px;
+  max-width: 100%;
+  margin: 0 auto;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.goals-page .goal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  border-radius: 20px;
+  background: #f0f5fc;
+  overflow: hidden;
+  width: 100%;
+}
+
+.goals-page .goals-filelist {
+  display: none;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex: 1 1 100%;
+}
+
+.goals-page .goal.active .goals-filelist {
+  display: flex;
+}
+
+.goals-page .goals-filelist-item:nth-of-type(2n - 1) {
+  background: linear-gradient(
+    90deg,
+    rgba(224, 234, 252, 0.35) 0%,
+    rgba(207, 222, 243, 0.35) 100%
+  );
+}
+
+.goals-page .goals-filelist-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 40px;
+  padding: 16px;
+  box-sizing: border-box;
+  padding-right: 15px;
+  width: 1124px;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+
+.goals-page .goals-filelist-item .image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 83px;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: 20px;
+  background: linear-gradient(
+    90deg,
+    rgba(224, 234, 252, 0.35) 0%,
+    rgba(207, 222, 243, 0.35) 100%
+  );
+}
+
+.goals-page .goals-filelist-item .title {
+  color: #37496d;
+  font-family: FiraGO, sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  flex: 1;
+  min-width: 220px;
+}
+
+.goals-page .goals-filelist-item .title span {
+  display: inline-block;
+}
+
+.goals-page .goals-filelist-item .download {
+  display: flex;
+  border-radius: 15px;
+  background: #363795;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  text-decoration: none;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.goals-page .goals-filelist-item .download:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.goals-page .goals-filelist-item .download div {
+  color: white;
+  text-align: center;
+  font-feature-settings: "case" on;
+  font-family: FiraGO, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.goals-page .goals-filelist-item .download-icon.hidden {
+  display: none;
+}
+
+.goals-page .goals-filelist-item .downloaded-icon {
+  display: none;
+}
+
+.goals-page .goals-filelist-item .downloaded-icon.visible {
+  display: inline-block;
+}
+
+.goals-page .goals-show.open svg {
+  transform: rotate(180deg);
+}
+
+.goals-page .goals-show svg {
+  transition: transform 0.2s ease;
+}
+
+.goals-page .goals-title {
+  color: #37496d;
+  font-feature-settings: "case" on;
+  font-family: FiraGO, sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  flex: 1;
+  min-width: 220px;
+}
+
+.goals-page .goals-image {
+  padding: 20px;
+}
+
+.goals-page .goals-image img {
+  width: 70px;
+}
+
+.goals-page .goals-show {
+  margin-left: auto;
+  padding: 20px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+@media (max-width: 991px) {
+  .goals-page .goals-hero-image {
+    border-radius: 22px;
+  }
+
+  .goals-page .goal {
+    gap: 14px;
+  }
+
+  .goals-page .goals-title {
+    font-size: 18px;
+  }
+
+  .goals-page .goals-filelist-item {
+    gap: 18px;
+  }
+
+  .goals-page .goals-filelist-item .title {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 767px) {
+  .goals-page {
+    padding-top: 24px !important;
+  }
+
+  .goals-page .goals-hero {
+    margin-bottom: 28px;
+  }
+
+  .goals-page .goals-hero-image {
+    border-radius: 16px;
+    min-height: 180px;
+    object-fit: cover;
+  }
+
+  .goals-page .goals-hero-title {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    max-width: none;
+    font-size: clamp(18px, 5vw, 24px);
+  }
+
+  .goals-page .goal {
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .goals-page .goals-image {
+    padding: 14px 14px 0;
+  }
+
+  .goals-page .goals-image img {
+    width: 56px;
+  }
+
+  .goals-page .goals-title {
+    min-width: 0;
+    width: calc(100% - 116px);
+    font-size: 16px;
+    padding-top: 14px;
+  }
+
+  .goals-page .goals-show {
+    padding: 8px 14px 14px;
+    margin-left: auto;
+  }
+
+  .goals-page .goals-show svg {
+    width: 40px;
+    height: 42px;
+  }
+
+  .goals-page .goals-filelist-item {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .goals-page .goals-filelist-item .image {
+    width: 64px;
+    height: 64px;
+  }
+
+  .goals-page .goals-filelist-item .title {
+    font-size: 16px;
+    min-width: 100%;
+    width: 100%;
+    order: 2;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .goals-page .goals-filelist-item .title span {
+    display: block;
+    width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .goals-page .goals-filelist-item .download {
+    order: 3;
+    margin-top: 4px;
+    align-self: flex-start;
+  }
+}

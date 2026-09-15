@@ -33,6 +33,20 @@ The record is versioned together with the release and is referenced by its SHA-2
 
 Only `verified` records may satisfy a production release gate. Changing an issuer, tenant policy, quota provider, telemetry destination, recovery objective, release reference or test window creates a new revision; the old record remains immutable history.
 
+## Temporary local/staging authentication mode
+
+Temporary `none`/disabled authentication may be used only by an explicitly
+named local or isolated staging overlay for contract development and synthetic
+tests. It must never be inherited by production configuration, container image
+defaults or a deploy command. The overlay must be clearly labelled
+`NON_PRODUCTION_ONLY`, contain no production data, and be rejected by the
+production preflight when `ENVIRONMENT=production`.
+
+This mode does not satisfy any production OIDC/ABAC gate and cannot produce
+production evidence. Before production activation the authority record must
+contain a verified HTTPS issuer, JWKS discovery, audience, claim-to-role and
+tenant mapping, negative authorization results, and an authenticated replay.
+
 ## 3. Non-negotiable invariants
 
 1. No secret value is committed, logged, rendered in an API response, or placed in an Access artifact.

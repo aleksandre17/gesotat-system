@@ -1,0 +1,33 @@
+@use "./fonts";
+
+// BG
+$main-bg: #212b35;
+$soft-bg: #384256;
+$dark-bg: #222b3c;
+//TEXT
+$blue-text: #0090d6;
+
+$main-color: white;
+$soft-color: #ddd;
+$dark-color: #2a3447;
+
+$blueLinearGradient: linear-gradient(135deg, #0080be, #0396a6);
+
+$greenSeaweed: rgba(2, 128, 144, 1);
+$blue: #0080be;
+$cyan: #cce6f2;
+$red: #ec1b2e;
+$green: #28a745;
+$grey: #808080;
+
+.sections-header {
+  font-size: 24px;
+  transition: 0.6s;
+  font-weight: 400;
+  line-height: 19.2px;
+  letter-spacing: normal;
+  color: $blue-text;
+  font-family: fonts.$font-bpg-nino;
+  text-transform: uppercase;
+  text-align: center;
+}
