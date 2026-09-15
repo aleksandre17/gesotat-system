@@ -20,7 +20,11 @@ public class ContractPhysicalQueryService {
    if(fields.isEmpty()) throw new IllegalArgumentException("Contract table has no approved fields: "+datasetCode);
    Set<String> allowed=new HashSet<>(fields); var compiled=ContractQueryCompiler.compile(filters,allowed,sort,desc);
    String select=fields.stream().map(x->"["+identifier(x)+"]").collect(java.util.stream.Collectors.joining(","));
-   String sql="SELECT "+select+" FROM "+table+compiled.whereSql()+compiled.orderSql()+" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+   // SQL Server requires ORDER BY whenever OFFSET/FETCH is used.  A plain
+   // contract read may intentionally omit a sort; use a deterministic,
+   // provider-neutral no-order expression rather than emitting invalid SQL.
+   String order = compiled.orderSql().isBlank() ? " ORDER BY (SELECT NULL)" : compiled.orderSql();
+   String sql="SELECT "+select+" FROM "+table+compiled.whereSql()+order+" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
    List<Object> p=new ArrayList<>(compiled.parameters()); p.add((Math.max(1,page)-1)*Math.min(Math.max(1,limit),1000));p.add(Math.min(Math.max(1,limit),1000));
    return data.query(sql,(rs,n)->{Map<String,Object>x=new LinkedHashMap<>();for(int i=1;i<=fields.size();i++)x.put(fields.get(i-1),rs.getObject(i));return x;},p.toArray());
  }

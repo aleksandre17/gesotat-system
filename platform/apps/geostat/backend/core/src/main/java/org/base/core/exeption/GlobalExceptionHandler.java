@@ -384,11 +384,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpServletRequest request,
             HandlerMethod handlerMethod
     ) {
-
+        // IllegalArgumentException is also used by governed platform services for
+        // contract/ingestion validation.  Do not mislabel those failures as an
+        // empty JWT claim; retain a safe, actionable validation reason instead.
+        String detail = (ex.getMessage() == null || ex.getMessage().isBlank())
+                ? "Invalid request"
+                : ex.getMessage();
         ApiExceptionResponse response = new ApiExceptionResponse(
                 HttpStatus.BAD_REQUEST,
-                "JWT claims string is empty",
-                Collections.singletonList("JWT claims string is empty")
+                detail,
+                Collections.singletonList(detail)
         );
         response.setErrorCode(ErrorCode.UNSIGN.getCode());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);

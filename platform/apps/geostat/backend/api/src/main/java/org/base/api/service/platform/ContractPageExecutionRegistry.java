@@ -19,7 +19,12 @@ public final class ContractPageExecutionRegistry {
         ContractPageExecutionAdapter relational = new ContractPageExecutionAdapter() {
             @Override public PageFamily family() { return PageFamily.ENTITY; }
             @Override public List<Map<String,Object>> read(PageDataAdapterRegistry.ReadContext c, long rid, ContractPhysicalQueryService p) {
-                return c.where().isEmpty() ? p.rowsWithRelations(rid, dataset(c), c.page(), c.limit(), c.filters(), null, false)
+                // Relations are an explicit query concern.  Expanding every
+                // declared edge for a plain page read makes an entity query
+                // depend on unrelated reference/child tables and turns a
+                // bounded request into an accidental fan-out.  Relation
+                // predicates still use the graph evaluator below.
+                return c.where().isEmpty() ? p.rows(rid, dataset(c), c.page(), c.limit(), c.filters(), null, false)
                         : p.rowsWithRelationsWhere(rid, dataset(c), c.page(), c.limit(), c.where(), null, false);
             }
             @Override public Long total(PageDataAdapterRegistry.ReadContext c, long rid, ContractPhysicalQueryService p) { return p.count(rid, dataset(c), c.filters()); }
@@ -31,7 +36,7 @@ public final class ContractPageExecutionRegistry {
             adapters.put(selected, new ContractPageExecutionAdapter() {
                 @Override public PageFamily family() { return selected; }
                 @Override public List<Map<String,Object>> read(PageDataAdapterRegistry.ReadContext c, long rid, ContractPhysicalQueryService p) {
-                    return c.where().isEmpty() ? p.rowsWithRelations(rid, dataset(c), c.page(), c.limit(), c.filters(), null, false)
+                    return c.where().isEmpty() ? p.rows(rid, dataset(c), c.page(), c.limit(), c.filters(), null, false)
                             : p.rowsWithRelationsWhere(rid, dataset(c), c.page(), c.limit(), c.where(), null, false);
                 }
                 @Override public Long total(PageDataAdapterRegistry.ReadContext c, long rid, ContractPhysicalQueryService p) { return p.count(rid, dataset(c), c.filters()); }
