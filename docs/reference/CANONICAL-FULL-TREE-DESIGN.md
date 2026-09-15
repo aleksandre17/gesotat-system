@@ -76,3 +76,35 @@ service namespace-ში. ცვლილების შემდეგ სა�
 5. host-layout და documentation drift შემოწმება.
 
 ერთი ფაილი — ერთი owner, ერთი lifecycle, ერთი authority.
+
+## Session-start and implementation path
+
+ყოველი ახალი სესია, audit, implementation ან onboarding იწყება უმაღლესი ფენიდან
+და მხოლოდ დამოწმებული ზემდგომი ფენის შემდეგ გადადის ქვედაზე. პირდაპირ consumer,
+page ან ერთ კონკრეტულ ფაილზე გადასვლა ამ მიმდევრობის გარეშე დაუშვებელია.
+
+```text
+Doctrine of Doctrines
+  → Meta-schema / Control Plane
+  → Physical database planes
+  → Object Storage
+  → Site contract
+  → Access artifact schema
+  → Ingestion/materialization
+  → Snapshot/publication
+  → API contract
+  → Consumer/frontend
+```
+
+საწყისად reviewer ამოწმებს:
+
+1. `docs/reference/ENGINEERING-QUALITY-DOCTRINE.md`-ს;
+2. `docs/reference/CANONICAL-FULL-TREE.md`-ს;
+3. meta-schema-სა და Control Plane authority-ს;
+4. სამივე physical database plane-ის schema/table/column/relationship-ს;
+5. Object Storage bucket-სა და artifact authority-ს;
+6. მხოლოდ ამის შემდეგ site contract/Access/page/API-ს.
+
+ეს sequence არის directory/system blueprint-ის ნაწილი და არა კონკრეტული project-ის
+completion checklist. მისი მიზანია context loss-ის, დუბლირების, ownership drift-ის
+და ქვემოდან-ზემოთ არასწორი ცვლილების თავიდან აცილება.
