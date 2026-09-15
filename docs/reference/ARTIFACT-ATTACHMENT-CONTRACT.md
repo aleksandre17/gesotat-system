@@ -460,7 +460,42 @@ derivation და supersession კავშირებს.
 package, artifact, row, relation, snapshot, policy, API response, download,
 archive and rollback chain has automated tests and immutable evidence.**
 
-## 22. User responsibilities versus platform responsibilities
+## 22. Blocking implementation gate
+
+Artifact/file-system implementation MUST NOT begin until the upper layers are
+ready and verified. The required order is:
+
+```text
+Doctrine of Doctrines
+  → Meta-schema / Control Plane
+  → Physical database planes
+  → Object Storage
+  → Site contract
+  → Access artifact schema
+  → Ingestion/materialization
+  → Snapshot/publication
+  → API contract
+  → Consumer/frontend
+```
+
+Before creating or migrating attachment tables, relations or generators, the
+session must verify:
+
+- Doctrine and cardinal invariants are approved;
+- meta-schema declares artifact, locator, relation, snapshot and evidence
+  primitives;
+- Control/Ingestion/Data/Archive/Serving schemas and ownership are verified;
+- private ingest/quarantine/archive/export storage is available;
+- contract revision → dataset version binding exists;
+- Access prefixes and generic attachment relation are declared;
+- rollback, quarantine, checksum and evidence paths are defined.
+
+If any prerequisite is missing, work stops with a blocker record in AIR. No
+temporary table, hardcoded KIDS path, manual object key or silent fallback may be
+introduced to bypass the gate. The complete session-start route is maintained in
+`docs/reference/CANONICAL-FULL-TREE-DESIGN.md`.
+
+## 23. User responsibilities versus platform responsibilities
 
 ### User supplies only
 
@@ -482,7 +517,7 @@ manifest → checksum → artifact identity → object URI → relation edge
 → lineage → canonical locator → snapshot membership → signed distribution
 ```
 
-## 23. Automatic manifest generation
+## 24. Automatic manifest generation
 
 If `manifest.json` is absent, the platform generates a preview manifest from the
 Access package, file inventory and contract-declared key rules. It records:
@@ -500,7 +535,7 @@ The generated manifest is presented for review, persisted immutably after
 acceptance and reused for idempotent retries. A user-supplied manifest is never
 trusted without the same validation pipeline.
 
-## 24. One-click package experience
+## 25. One-click package experience
 
 The supported operator flow is intentionally small:
 
@@ -515,7 +550,7 @@ Select package
 The platform still performs the full pipeline. A simple UX is not a simpler
 data model; it is a governed orchestration facade over the complete model.
 
-## 25. Explicit 1000-row / 1500-file rule
+## 26. Explicit 1000-row / 1500-file rule
 
 For 1000 business rows and 1500 files:
 
@@ -529,7 +564,7 @@ The same physical file may be referenced by many rows without byte duplication.
 The same row may reference many files with role and ordinal metadata. No implicit
 Cartesian product is generated.
 
-## 26. No-loss and no-downgrade invariant
+## 27. No-loss and no-downgrade invariant
 
 The migration must preserve original bytes, source paths, source keys, row
 ordering where material, lexical values, checksums, relations, provenance and
@@ -538,7 +573,7 @@ the package is blocked and the loss is reported; silent truncation, fabricated
 value, forced one-to-one mapping or consumer-specific quality downgrade is
 forbidden.
 
-## 27. Current KIDS implementation boundary
+## 28. Current KIDS implementation boundary
 
 The KIDS source inventory has been staged as 719 files and 532 unique
 checksum-addressed objects under `geostat-ingest/kids/r8/resources/`, with an
