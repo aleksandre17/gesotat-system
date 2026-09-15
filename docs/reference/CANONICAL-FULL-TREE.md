@@ -1,5 +1,7 @@
 # GeoStat Canonical Directory Tree
 
+Access schema → contract fields → language/classifier relation → lineage → Data Plane materialization → projection → API response → legacy comparison → structural improvement review
+
 ```text
 gesotat-system/
 ├── README.md · AGENTS.md · CLAUDE.md · CHANGELOG.md
