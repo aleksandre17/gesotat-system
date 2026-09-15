@@ -1,0 +1,15 @@
+{
+  "status": "RUNTIME_REPLAY_PASS",
+  "contractCode": "KIDS_PORTAL_V1",
+  "revision": 8,
+  "pageId": 9,
+  "datasetCode": "KIDS_RESOURCE",
+  "dataPlaneBinding": "__ent_kids_resource",
+  "materializedRows": 225,
+  "query": { "status": 200, "returned": 2, "total": 225 },
+  "projection": "KIDS_RESOURCE_ENTITY",
+  "oidc": true,
+  "anonymousBypass": false,
+  "relations": ["RESOURCE_CATEGORY", "SUBCATEGORY_FOR_RESOURCE", "METRIC_FOR_RESOURCE", "CARRIER_FOR_RESOURCE", "RESOURCE_RAW_LINEAGE"],
+  "notes": "Canonical resource response is contract-projected; legacy payload names are not used as the serving schema."
+}
