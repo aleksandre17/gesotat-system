@@ -15,4 +15,5 @@
 8. `08-operational-runbook.md` — გამეორებადი ოპერაციული პროცესი;
 9. `09-acceptance-tests.md` — security acceptance;
 10. `10-end-to-end-example.md` — pageId=8 სრული მაგალითი;
-11. `CHECKLIST.md` — თავის closure.
+11. `11-production-activation.md` — production prerequisite და gate;
+12. `CHECKLIST.md` — თავის closure.
