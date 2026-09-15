@@ -1,0 +1,53 @@
+{
+  "schema": "geostat.kids.page-runtime-replay.v1",
+  "recordedAt": "2026-09-15",
+  "site": "kids",
+  "contract": { "code": "KIDS_PORTAL_V1", "revision": 8 },
+  "page": {
+    "pageId": 11,
+    "nodeCode": "KIDS_STATISTICS",
+    "datasetCode": "KIDS_STATISTICAL_INPUT",
+    "projection": "KIDS_STATS_INPUT"
+  },
+  "execution": {
+    "endpoint": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/11/query",
+    "method": "POST",
+    "request": {
+      "filters": {},
+      "sort": "input_key",
+      "descending": false,
+      "page": 1,
+      "limit": 2,
+      "select": [
+        "input_key", "carrier_code", "cell_ordinal", "period_raw",
+        "period_normalized", "dimension_key_raw", "age_group_item_ref",
+        "value_lexical", "value_decimal", "json_path", "source_encoding",
+        "source_row_key", "operation"
+      ],
+      "include": []
+    },
+    "httpStatus": 200,
+    "returned": 2,
+    "total": 880,
+    "hasNext": true,
+    "responseSchema": "urn:geostat:kids_portal_v1:kids_statistical_input:v8"
+  },
+  "materialization": {
+    "datasetSnapshotId": 50,
+    "contractSourceId": 572,
+    "family": "STATISTICAL",
+    "dataPlaneTable": "__stat_kids_statistical_input",
+    "writtenRows": 880,
+    "uniqueInputKeys": 880,
+    "nullNumericValues": 0
+  },
+  "semanticDecisions": [
+    "The source carrier × cell grain is preserved as input_key; no row collapsing is performed.",
+    "Age-group values remain governed AGE_GROUP classifier references.",
+    "value_lexical is retained for source fidelity while value_decimal is used for numeric execution.",
+    "period, dimension, carrier and raw row lineage remain separate contract fields."
+  ],
+  "relations": ["INPUT_FOR_CARRIER", "INPUT_RAW_LINEAGE"],
+  "status": "TECHNICAL_REPLAY_PASS",
+  "publication": "BLOCKED_PENDING_QUALITY_PRIVACY_RECONCILIATION_AND_STEWARD_APPROVAL"
+}

@@ -13,15 +13,17 @@ complete declared page surface:
 | 12 | `KIDS_CLASSIFIERS` | REFERENCE | `KIDS_CLASSIFIER_ITEM` | `KIDS_CLASSIFIER_ITEM` |
 
 Runtime discovery also exposed the declared fields, filters, aggregations and
-relation include names for every data page. Pages 8, 9 and 10 were replayed
+relation include names for every data page. Pages 8, 9, 10 and 11 were replayed
 through OIDC and returned HTTP 200 from Data Plane-backed `__ent_kids_goal`,
-`__ent_kids_resource` and `__ent_kids_glossary_entry` bindings. Page 10's
+`__ent_kids_resource`, `__ent_kids_glossary_entry` and
+`__stat_kids_statistical_input` bindings. Page 10's
 full-text glossary content is served as localized content rather than being
 forced into the bounded entity title field; its 178 natural keys are unique.
 
 Detailed replay evidence: `kids-r8-page8-runtime-replay-2026-09-15.json`,
 `kids-r8-page9-runtime-replay-2026-09-15.json` and
-`kids-r8-page10-runtime-replay-2026-09-15.json`.
+`kids-r8-page10-runtime-replay-2026-09-15.json` and
+`kids-r8-page11-runtime-replay-2026-09-15.json`.
 
 This inventory is descriptive evidence; it does not claim publication approval
 for datasets whose quality, privacy, reconciliation or steward gates remain
