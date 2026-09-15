@@ -114,3 +114,9 @@ were merged into the owning `backend/api/.env.prod` and `backend/mobile/.env.pro
 files; `IMAGE_REVISION` is owned by `api/.env.prod`. Both service-local Compose
 configurations validate successfully, and no frontend/chat project was
 modified.
+
+The final service-root release candidate is commit
+`6fe8701d71b1c340cbc2c7c8d081447c76032414`; its remote API image digest is
+`sha256:fd6884e53f44cca65231f29993a9fa770c55f3e7ed26d4b1fc0244f5112f453a`
+with a matching OCI revision label. The live container remains unchanged until
+the signed release/activation gate is approved.
