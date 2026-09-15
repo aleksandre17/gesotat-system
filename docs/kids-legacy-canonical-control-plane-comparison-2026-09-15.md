@@ -123,7 +123,8 @@ R8 Access და Control Plane უკვე აღწერს უფრო მ�
 - [x] legacy numeric cells `880` = canonical `statistics.observation` inputs `880`.
 - [x] `missing=0`, `extra=0`, `countMismatch=0`; audit status `STATISTICAL_SHADOW_PARITY_PASS`.
 - [x] განმეორებადი task: `:api:auditKidsStatisticalShadowParity`.
-- [ ] protected live response shadow diff და steward/publication approval — ეს არის production authority gate, არა semantic parity defect.
+- [x] protected live response shadow diff-ის განმეორებადი runner შეიქმნა: `ops/scripts/kids-page11-runtime-replay.ps1`; ის ამოწმებს introspection/pages/capabilities/query-ს, response envelope-ს და `total=880`-ს.
+- [ ] runner-ის live execution მოქმედი approved OIDC principal-ით და steward/publication approval — ეს არის production authority gate, არა semantic parity defect.
 
 **pageId 11-ის სტატუსი: `TECHNICAL PARITY PASS — LIVE AUTHORITY/RESPONSE GATE OPEN`.**
 
