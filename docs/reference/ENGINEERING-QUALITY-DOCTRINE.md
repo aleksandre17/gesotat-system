@@ -86,6 +86,33 @@ consumer-ისთვის ხარისხის დაკლება ე�
 ამოწმებს site-ის სქემას, პოულობს უკეთეს სტრუქტურულ შესაძლებლობას და მხოლოდ
 დამტკიცებული, უკუთავსებადი/მიგრირებადი გზით ტოვებს საბოლოო კანონიკას.
 
+### Cardinal whole-system improvement invariant
+
+არც ერთი არტეფაქტი არ ფასდება იზოლირებულად. ყოველი page, contract, meta-contract,
+Access table, mapping, relation, projection და API response უნდა განიხილებოდეს
+სრული ხაზით: `source → Access schema → contract → meta-contract → ingestion →
+Data Plane → relation → projection → API → export → evidence`.
+
+Review სავალდებულოდ უნდა ეძებდეს საერთაშორისო და თანამედროვე data-product,
+metadata, schema-registry, SDMX და API პრაქტიკებთან შედარებით უკეთეს ვარიანტს:
+
+- უფრო მკაფიო grain, key, type, nullability, naming და ownership;
+- დუბლირებული ან დამალული semantic-ის ნორმალიზაციას;
+- უფრო ძლიერ relation, lineage, quality, privacy და versioning საზღვრებს;
+- შევსებისა და მართვის გამარტივებას ხარისხის შემცირების გარეშე;
+- reusable, provider/site-agnostic abstraction-ს;
+- backward compatibility-ს, migration-ს, rollback-სა და measurable evidence-ს.
+
+`WORKS` არ ნიშნავს `FINAL`-ს. არტეფაქტი დასრულებულად ჩაითვლება მხოლოდ მაშინ,
+როცა ის ერთდროულად არის სწორი, მკაფიო, ძლიერი, მარტივად შესავსები,
+მარტივად გასაფართოებელი და სხვა site/provider-ისთვის reusable. თუ review უკეთეს
+სტრუქტურას აღმოაჩენს, ცვლილება უნდა განხორციელდეს versioned contract/schema
+revision-ით და არა consumer-ისთვის პლატფორმის ხარისხის შემცირებით.
+
+ეს არის cardinal rule: **ყოველ ცვლილებაში უნდა დავინახოთ სრული სისტემა,
+დავაკვირდეთ უხილავ კავშირებს, შევადაროთ საუკეთესო პრაქტიკებს და მხოლოდ
+გაუმჯობესების მიმართულებით წავიდეთ. უკან დახევა და ხარისხის დათმობა აკრძალულია.**
+
 ### Meta-schema supremacy and self-evolution
 
 ეს review ვრცელდება თვითონ **უმაღლეს სქემაზეც** — meta-schema/control-plane
