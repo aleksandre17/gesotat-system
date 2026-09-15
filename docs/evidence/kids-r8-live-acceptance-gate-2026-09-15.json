@@ -1,0 +1,29 @@
+{
+  "schema": "geostat.kids.live-acceptance-gate.v1",
+  "recordedAt": "2026-09-15",
+  "contract": { "code": "KIDS_PORTAL_V1", "revision": 8 },
+  "relationIncludeAcceptance": {
+    "pages": [8, 9, 10, 11],
+    "status": "TECHNICAL_ACCEPTANCE_PASS",
+    "evidence": "kids-r8-relation-include-acceptance-2026-09-15.json"
+  },
+  "protectedResponseShadowDiff": {
+    "runner": "ops/scripts/kids-page11-runtime-replay.ps1",
+    "status": "CREDENTIAL_REQUIRED",
+    "anonymousBypass": false,
+    "reason": "approved OIDC test principal is an external runtime authority"
+  },
+  "qualityPrivacyReconciliation": {
+    "statisticalShadowParity": "PASS",
+    "resourceScopeReconciliation": "PASS",
+    "glossaryParity": "PASS",
+    "snapshotBinding": "PASS",
+    "status": "TECHNICAL_EVIDENCE_READY"
+  },
+  "stewardPublicationApproval": {
+    "status": "EXTERNAL_APPROVAL_REQUIRED",
+    "publication": "BLOCKED",
+    "reason": "no steward signature or approved production authority is present in the workspace"
+  },
+  "overall": "FAIL_CLOSED_PENDING_EXTERNAL_AUTHORITY"
+}

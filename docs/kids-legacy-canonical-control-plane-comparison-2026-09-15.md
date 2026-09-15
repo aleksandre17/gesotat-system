@@ -138,6 +138,12 @@ R8 Access და Control Plane უკვე აღწერს უფრო მ�
 
 **pageId 11-ის სტატუსი: `TECHNICAL PARITY PASS — LIVE AUTHORITY/RESPONSE GATE OPEN`.**
 
+### 8.9 Cross-page live acceptance and publication gate
+
+ტექნიკური relation/include acceptance ოთხივე გვერდზე უკვე `TECHNICAL_ACCEPTANCE_PASS`-ია. ხარისხის, privacy-ის, source-key/snapshot reconciliation-ის evidence მზად არის და ერთიან gate record-შია თავმოყრილი: `docs/evidence/kids-r8-live-acceptance-gate-2026-09-15.json`.
+
+დაცული live response shadow diff და steward publication approval განზრახ fail-closed დარჩა: workspace-ში არ არსებობს მოქმედი approved OIDC test principal-ის secret ან steward-ის ხელმოწერა. ამ ორი გარე authority-ის გარეშე `PASS`-ის ხელოვნურად ჩაწერა დაუშვებელია.
+
 ## 8. ნაბიჯ-ნაბიჯ განხილვა — ქეისი 1: Goals / pageId 8
 
 ### 8.1 წყაროების ჯაჭვი
