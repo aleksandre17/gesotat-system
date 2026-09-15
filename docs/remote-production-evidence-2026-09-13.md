@@ -88,9 +88,9 @@ before activation.
 ### 2026-09-15 final clean-candidate rebuild
 
 After the release documentation commit, the canonical API image was rebuilt
-with `IMAGE_REVISION=e6e00419dca3e3717187a68f3b81bb183240953e`. The resulting
+with `IMAGE_REVISION=c782623b601337777d31983b52a2373db237a843`. The resulting
 image digest is
-`sha256:80f4fbbbbe7e503bd9e5769968dd5cdf3fd9d50465c8a31afa4bafa987f52434`,
+`sha256:c9d04c28958a0fb1d7125e380c90905aa029a7ff5d1f6d5b1ef1b69b6f1fce03`,
 and inspection confirms the matching OCI revision and source labels. The env
 file backup is `/.env.prod.pre-image-revision-20260915T091457Z`. The live
 container remains on the previous image until signed release approval and the

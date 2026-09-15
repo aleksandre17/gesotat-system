@@ -1081,8 +1081,8 @@ remains unset until an approved immutable release commit/tag is selected.
 
 ### Clean-candidate provenance — 2026-09-15
 
-The clean release candidate is `e6e00419dca3e3717187a68f3b81bb183240953e`.
+The clean release candidate is `c782623b601337777d31983b52a2373db237a843`.
 The remote API image rebuilt with that revision has digest
-`sha256:80f4fbbbbe7e503bd9e5769968dd5cdf3fd9d50465c8a31afa4bafa987f52434`
+`sha256:c9d04c28958a0fb1d7125e380c90905aa029a7ff5d1f6d5b1ef1b69b6f1fce03`
 and matching OCI labels. The live container has not been recreated; signed tag
 and deployment authority remain the final activation gates.
