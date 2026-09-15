@@ -69,7 +69,7 @@ Observed legacy rows: **159** across categories 1–4. R8 canonical resources: *
 
 ### Glossary (page 10)
 
-Legacy language is a query parameter (`lang=ka|en`) and ordering is implicit. R8 stores localized fields and language semantics in the entity/field contract. Observed combined legacy rows: **177**; R8 entity rows: **178**. Required next check: identify the one-row delta by source key and verify whether it is a legitimate canonical record or a duplicate.
+Legacy language is a query parameter (`lang=ka|en`) and ordering is implicit. R8 stores localized fields and language semantics in the entity/field contract. The read-only stable-key/language/text audit now reports **178 ↔ 178**, `missing=0`, `extra=0`, `textMismatch=0` (`GLOSSARY_PARITY_PASS`). The earlier 177 observation was an incomplete legacy probe, not a canonical data delta.
 
 ### Statistics (page 11)
 
@@ -100,7 +100,7 @@ Capabilities response is the executable boundary: it tells the client which fiel
 | Contract/page registry | Access `__gs_page`, `__gs_dataset`, `__gs_field`, `__gs_projection`; Control Plane revision 8 | **OBSERVED/PASS** | verify live introspection payload against artifact checksum |
 | Goal cardinality | legacy 36; Access 36 | **PASS** | normalized field parity test |
 | Resource cardinality | legacy 159 (categories 1–4); canonical 225 | **PARTIAL — scope delta identified** | stable source-key diff and explicit category-scope report; do not force count equality |
-| Glossary cardinality | legacy 177; Access 178 | **OPEN** | locate one-row delta and language normalization decision |
+| Glossary cardinality | legacy/canonical stable-key audit 178 ↔ 178 | **PASS** | retain normalized parity evidence and verify live response lineage/privacy |
 | Statistical carrier identity | legacy category-1 files 43; Access carriers 43 | **CANDIDATE PASS** | compare stable IDs and carrier metadata |
 | Statistical values | legacy embedded `chartdata`; Access 880 typed cells | **OPEN** | shadow projection parity by carrier/period/dimension |
 | Relations | legacy endpoints expose no explicit graph; Access declares 21 relations | **PASS structurally** | API cross-family execution acceptance |

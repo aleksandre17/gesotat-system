@@ -56,6 +56,15 @@
     "source_row_key preserves immutable raw lineage through GLOSSARY_RAW_LINEAGE."
   ],
   "relations": ["GLOSSARY_LANGUAGE", "GLOSSARY_RAW_LINEAGE"],
+  "parity": {
+    "status": "GLOSSARY_PARITY_PASS",
+    "sourceRows": 178,
+    "canonicalRows": 178,
+    "missing": 0,
+    "extra": 0,
+    "textMismatch": 0,
+    "audit": "KidsGlossaryParityAudit"
+  },
   "status": "TECHNICAL_REPLAY_PASS",
   "publication": "BLOCKED_PENDING_QUALITY_PRIVACY_RECONCILIATION_AND_STEWARD_APPROVAL"
 }
