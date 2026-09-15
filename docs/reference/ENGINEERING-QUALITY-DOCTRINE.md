@@ -140,6 +140,18 @@ Meta-schema-ის გაუმჯობესებისას სავალ
 ზღვარი: თვითონ ცვლილება ვერ შევა ძალაში საკუთარი governance/validation/evidence
 გზის გარეშე.
 
+### Canonical artifact-attachment doctrine
+
+ფიზიკური artifact-ის business row-სთან მიბმა არის პლატფორმის generic primitive:
+იგი უნდა გამოცხადდეს meta-schema/contract-ში როგორც typed relation და არ უნდა
+განხორციელდეს კონკრეტული site-ის filename convention-ით ან KIDS-specific table-ით.
+ერთი artifact შეიძლება ბევრ row-ს ეკუთვნოდეს, ერთ row-ს შეიძლება ბევრი artifact
+ჰქონდეს, ხოლო bytes ყოველთვის Object Storage-ის authority-ში რჩება. Contract
+აუცილებლად აღწერს role-ს, cardinality-ს, ordering-ს, lifecycle-ს, access policy-ს,
+checksum-ს, snapshot scope-სა და provenance-ს. მომხმარებლისთვის ეს სირთულე
+იმალება manifest-driven package upload-ში; პლატფორმის შიდა validation, lineage,
+quarantine, rollback და evidence არასდროს მარტივდება ხარისხის ხარჯზე.
+
 ## Data-family design rule — prefix is a boundary, not a shortcut
 
 `__raw_`, `__cl_`, `__stat_`, `__ent_`, `__rel_` და `__gs_` არის Access
