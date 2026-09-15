@@ -16,7 +16,7 @@ $required = @(
   ,'docs/reference/canonical-directory-blueprint.md', 'docs/reference/CANONICAL-FULL-TREE.md', 'docs/reference/CANONICAL-FULL-TREE-DESIGN.md', 'docs/reference/ENGINEERING-QUALITY-DOCTRINE.md'
 )
 foreach ($path in $required) {
-  if (-not (Test-Path -LiteralPath (Join-Path $root $path))) { throw "Host layout missing: $path" }
+  if (-not (Test-Path -LiteralPath (Join-Path -Path $root -ChildPath ([string]$path)))) { throw "Host layout missing: $path" }
 }
 $upstreamKit = Join-Path $root 'agent-framework/kit'
 if (@(Get-ChildItem -Force -LiteralPath $upstreamKit -ErrorAction SilentlyContinue).Count -ne 0) { throw 'agent-framework/kit must remain empty' }
@@ -58,7 +58,11 @@ if ($controlUi.LinkType -or -not (Test-Path -LiteralPath $controlUi.FullName -Pa
 foreach ($legacy in @('core','api','mobile','web','settings.gradle','build.gradle','gradlew','gradlew.bat','infra','scripts')) {
   if (Test-Path -LiteralPath (Join-Path $root $legacy)) { throw "Legacy root source remains: $legacy" }
 }
-$links = @(Get-ChildItem -Recurse -Force -Path (Join-Path $root 'platform'),(Join-Path $root '.agents') -ErrorAction SilentlyContinue | Where-Object LinkType)
+$scanRoots = @(
+  (Join-Path -Path $root -ChildPath 'platform')
+  (Join-Path -Path $root -ChildPath '.agents')
+)
+$links = @(Get-ChildItem -Recurse -Force -Path $scanRoots -ErrorAction SilentlyContinue | Where-Object LinkType)
 if ($links.Count -gt 0) { throw "Unexpected linked folders: $($links.FullName -join ', ')" }
 [pscustomobject]@{
   status = 'PASS'
