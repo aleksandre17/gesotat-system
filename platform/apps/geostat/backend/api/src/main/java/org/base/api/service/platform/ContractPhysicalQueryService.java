@@ -21,15 +21,16 @@ public class ContractPhysicalQueryService {
    List<String> fields=control.query("SELECT field_name FROM platform.contract_field_definition WHERE table_definition_id=? AND lifecycle_status IN ('APPROVED','ACTIVE') ORDER BY ordinal",(r,n)->r.getString(1),t.get("table_definition_id"));
    if(fields.isEmpty()) throw new IllegalArgumentException("Contract table has no approved fields: "+datasetCode);
    Set<String> allowed=new HashSet<>(fields); var compiled=ContractQueryCompiler.compile(filters,allowed,sort,desc);
-   String table=canonicalEntity ? "(SELECT "+fields.stream().map(x->"JSON_VALUE(payload_json,'$."+identifier(x)+"') AS ["+identifier(x)+"]").collect(java.util.stream.Collectors.joining(","))+" FROM entity.entity_record WHERE record_type=? AND is_current=1) AS canonical" : canonicalStat ? "(SELECT "+fields.stream().map(x->"CASE WHEN '"+identifier(x)+"'='value_decimal' THEN CONVERT(nvarchar(128),o.numeric_value) ELSE JSON_VALUE(r.payload_json,'$."+identifier(x)+"') END AS ["+identifier(x)+"]").collect(java.util.stream.Collectors.joining(","))+" FROM raw.source_record r JOIN [statistics].observation o ON o.source_record_id=r.source_record_id) AS canonical" : identifier(String.valueOf(t.get("physical_table_name")));
+   Long datasetVersionId=(canonicalEntity||canonicalStat)?datasetVersion(revisionId,datasetCode):null;
+   if((canonicalEntity||canonicalStat) && datasetVersionId==null) throw new IllegalStateException("No dataset version binding for "+datasetCode);
+   String table=(canonicalEntity||canonicalStat)?canonicalSource(fields,canonicalEntity):identifier(String.valueOf(t.get("physical_table_name")));
    String select=fields.stream().map(x->"["+identifier(x)+"]").collect(java.util.stream.Collectors.joining(","));
    // SQL Server requires ORDER BY whenever OFFSET/FETCH is used.  A plain
    // contract read may intentionally omit a sort; use a deterministic,
    // provider-neutral no-order expression rather than emitting invalid SQL.
    String order = compiled.orderSql().isBlank() ? " ORDER BY (SELECT NULL)" : compiled.orderSql();
-   if(canonicalEntity) table=table.replace("is_current=1)","is_current=1 AND dataset_snapshot_id=(SELECT MAX(dataset_snapshot_id) FROM entity.entity_record WHERE record_type=? AND is_current=1))");
    String sql="SELECT "+select+" FROM "+table+compiled.whereSql()+order+" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-   List<Object> p=new ArrayList<>(); if(canonicalEntity){p.add(datasetCode);p.add(datasetCode);} p.addAll(compiled.parameters()); p.add((Math.max(1,page)-1)*Math.min(Math.max(1,limit),1000));p.add(Math.min(Math.max(1,limit),1000));
+   List<Object> p=new ArrayList<>(); if(canonicalEntity){p.add(datasetCode);p.add(datasetVersionId);} else if(canonicalStat){p.add(datasetVersionId);} p.addAll(compiled.parameters()); p.add((Math.max(1,page)-1)*Math.min(Math.max(1,limit),1000));p.add(Math.min(Math.max(1,limit),1000));
    return data.query(sql,(rs,n)->{Map<String,Object>x=new LinkedHashMap<>();for(int i=1;i<=fields.size();i++)x.put(fields.get(i-1),rs.getObject(i));return x;},p.toArray());
  }
 
@@ -42,9 +43,10 @@ public class ContractPhysicalQueryService {
    boolean canonicalStat="STATISTICAL".equalsIgnoreCase(String.valueOf(t.get("table_role"))) || declaredPhysical.startsWith("__stat_");
    List<String> fields=control.query("SELECT field_name FROM platform.contract_field_definition WHERE table_definition_id=? AND lifecycle_status IN ('APPROVED','ACTIVE') ORDER BY ordinal",(r,n)->r.getString(1),t.get("table_definition_id"));
    var compiled=ContractQueryCompiler.compile(filters==null?Map.of():filters,new HashSet<>(fields),null,false);
-   String table=canonicalEntity ? "(SELECT "+fields.stream().map(x->"JSON_VALUE(payload_json,'$."+identifier(x)+"') AS ["+identifier(x)+"]").collect(java.util.stream.Collectors.joining(","))+" FROM entity.entity_record WHERE record_type=? AND is_current=1) AS canonical" : canonicalStat ? "(SELECT "+fields.stream().map(x->"CASE WHEN '"+identifier(x)+"'='value_decimal' THEN CONVERT(nvarchar(128),o.numeric_value) ELSE JSON_VALUE(r.payload_json,'$."+identifier(x)+"') END AS ["+identifier(x)+"]").collect(java.util.stream.Collectors.joining(","))+" FROM raw.source_record r JOIN [statistics].observation o ON o.source_record_id=r.source_record_id) AS canonical" : identifier(String.valueOf(t.get("physical_table_name")));
-   if(canonicalEntity) table=table.replace("is_current=1)","is_current=1 AND dataset_snapshot_id=(SELECT MAX(dataset_snapshot_id) FROM entity.entity_record WHERE record_type=? AND is_current=1))");
-   List<Object> params=new ArrayList<>(); if(canonicalEntity){params.add(datasetCode);params.add(datasetCode);} params.addAll(compiled.parameters());
+   Long datasetVersionId=(canonicalEntity||canonicalStat)?datasetVersion(revisionId,datasetCode):null;
+   if((canonicalEntity||canonicalStat) && datasetVersionId==null) throw new IllegalStateException("No dataset version binding for "+datasetCode);
+   String table=(canonicalEntity||canonicalStat)?canonicalSource(fields,canonicalEntity):identifier(String.valueOf(t.get("physical_table_name")));
+   List<Object> params=new ArrayList<>(); if(canonicalEntity){params.add(datasetCode);params.add(datasetVersionId);} else if(canonicalStat){params.add(datasetVersionId);} params.addAll(compiled.parameters());
    Long value=data.queryForObject("SELECT COUNT_BIG(*) FROM "+table+compiled.whereSql(),Long.class,params.toArray());
    return value==null?0L:value;
  }
@@ -111,6 +113,14 @@ public class ContractPhysicalQueryService {
      childRows=expand(childRows,revisionId,child,new HashSet<>(path),depth+1);
      parents=ContractRelationGraphExecutor.attach(parents,String.valueOf(rel.get("code")),childRows,String.valueOf(rel.get("fromField")),String.valueOf(rel.get("toField")),String.valueOf(rel.get("cardinality")).contains("MANY"));
    } return parents;
+ }
+ private Long datasetVersion(long revisionId,String datasetCode){
+   return control.query("SELECT TOP 1 dataset_version_id FROM platform.site_contract_dataset WHERE site_contract_revision_id=? AND dataset_code=? ORDER BY dataset_version_id DESC",(rs,n)->(Long)rs.getObject(1),revisionId,datasetCode).stream().findFirst().orElse(null);
+ }
+ private static String canonicalSource(List<String> fields,boolean entity){
+   String projection=fields.stream().map(x->entity?"JSON_VALUE(payload_json,'$."+identifier(x)+"') AS ["+identifier(x)+"]":"CASE WHEN '"+identifier(x)+"'='value_decimal' THEN CONVERT(nvarchar(128),o.numeric_value) ELSE JSON_VALUE(r.payload_json,'$."+identifier(x)+"') END AS ["+identifier(x)+"]").collect(java.util.stream.Collectors.joining(","));
+   if(entity) return "(SELECT "+projection+" FROM entity.entity_record WHERE record_type=? AND is_current=1 AND dataset_snapshot_id IN (SELECT dataset_snapshot_id FROM publication.dataset_snapshot WHERE dataset_version_id=? AND status IN ('SEMANTIC_REVIEW','PUBLISHED','APPROVED'))) AS canonical";
+   return "(SELECT "+projection+" FROM raw.source_record r JOIN [statistics].observation o ON o.source_record_id=r.source_record_id JOIN [statistics].series s ON s.series_id=o.series_id WHERE s.dataset_snapshot_id IN (SELECT dataset_snapshot_id FROM publication.dataset_snapshot WHERE dataset_version_id=? AND status IN ('SEMANTIC_REVIEW','PUBLISHED','APPROVED'))) AS canonical";
  }
  private static String identifier(String s){ String[] parts=s.split("\\."); if(parts.length>2)throw new IllegalArgumentException("Unsafe contract identifier"); for(String p:parts)if(!ID.matcher(p).matches())throw new IllegalArgumentException("Unsafe contract identifier"); return String.join(".",parts); }
  private static Map<String,Object> m(Object...v){Map<String,Object>x=new LinkedHashMap<>();for(int i=0;i<v.length;i+=2)x.put(String.valueOf(v[i]),v[i+1]);return x;}
