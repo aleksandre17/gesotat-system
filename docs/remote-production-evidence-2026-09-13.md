@@ -106,3 +106,11 @@ the secret value was never printed or recorded. File permissions were set to
 `0600`, and the isolated infrastructure Compose validation now passes.
 `IMAGE_REVISION` remains intentionally unset until an approved immutable Git
 release is selected.
+### 2026-09-15 service-root environment split
+
+The shared backend-root `.env.prod` was removed from active use and preserved
+as a recoverable `.pre-project-split-*` backup. Missing non-secret/runtime keys
+were merged into the owning `backend/api/.env.prod` and `backend/mobile/.env.prod`
+files; `IMAGE_REVISION` is owned by `api/.env.prod`. Both service-local Compose
+configurations validate successfully, and no frontend/chat project was
+modified.

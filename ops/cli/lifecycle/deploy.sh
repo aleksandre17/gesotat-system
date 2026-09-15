@@ -259,7 +259,9 @@ upload_service() {
         else
             echo "infrastructure service: no application artifact upload"
         fi
-        # env file in service dir (for env_file: reference in compose)
+# Each service owns its runtime env at its own project root. Never place a
+# service secret file in the shared backend root: sibling projects share that
+# parent directory and must remain isolated.
         scp "$PROJECT_DIR/$ENV_FILE" "$SERVER:$REMOTE/$s/$ENV_BASENAME" 2>&1
     } | ssh "$SERVER" "cat >> $srv_log/upload.log"
 
@@ -300,7 +302,8 @@ done
 log "  [4/5] Generating compose files..."
 
 scp "$PROJECT_DIR/$COMPOSE_FILE" "$SERVER:/tmp/compose-src.yml" >/dev/null 2>&1
-scp "$PROJECT_DIR/$ENV_FILE"     "$SERVER:$REMOTE/$ENV_BASENAME" >/dev/null 2>&1
+# The service upload above is the sole env-file placement. Keeping the parent
+# directory free of project secrets prevents cross-project configuration bleed.
 
 gen_compose() {
     local s="$1"
@@ -392,7 +395,7 @@ docker_up() {
     ssh "$SERVER" "
         echo '=== Deploy [$s] \$(date) ===' >> $srv_log/deploy.log
         cd $REMOTE/$s
-        IMAGE_REVISION='$IMAGE_REVISION' docker-compose -f docker-compose.${ENVIRONMENT}.yml --env-file ../$ENV_FILE up --build -d 2>&1 | tee -a $srv_log/deploy.log
+        IMAGE_REVISION='$IMAGE_REVISION' docker-compose -f docker-compose.${ENVIRONMENT}.yml --env-file ./$ENV_BASENAME up --build -d 2>&1 | tee -a $srv_log/deploy.log
     "
 
     # ── Health check ──
@@ -442,7 +445,7 @@ docker_up() {
                 set -e
                 cp $prev_jar $REMOTE/$s/app.jar
                 cd $REMOTE/$s
-                IMAGE_REVISION='$IMAGE_REVISION' docker-compose -f docker-compose.${ENVIRONMENT}.yml --env-file ../$ENV_FILE up --build -d 2>&1 | tee -a $srv_log/deploy.log
+                IMAGE_REVISION='$IMAGE_REVISION' docker-compose -f docker-compose.${ENVIRONMENT}.yml --env-file ./$ENV_BASENAME up --build -d 2>&1 | tee -a $srv_log/deploy.log
             "
             log "  [ROLLBACK] $s restored"
         else

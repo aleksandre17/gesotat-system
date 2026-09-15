@@ -31,7 +31,9 @@ for arg in "$@"; do
 done
 
 REMOTE="$SERVER_BASE/$PROJECT/$TARGET"
-COMPOSE="docker-compose -f docker-compose.prod.yml --env-file ../.env.prod"
+# Runtime configuration is owned by each service project root. This keeps
+# sibling projects under backend/ isolated from one another.
+COMPOSE="docker-compose -f docker-compose.prod.yml --env-file ./.env.prod"
 
 # ── Discover services via SSH ──
 mapfile -t SERVICES < <(
