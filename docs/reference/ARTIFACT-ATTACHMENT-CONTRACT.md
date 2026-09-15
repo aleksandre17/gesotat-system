@@ -495,7 +495,118 @@ temporary table, hardcoded KIDS path, manual object key or silent fallback may b
 introduced to bypass the gate. The complete session-start route is maintained in
 `docs/reference/CANONICAL-FULL-TREE-DESIGN.md`.
 
-## 23. User responsibilities versus platform responsibilities
+## 23. Upper-layer preparation scope
+
+Before attachment/file-system implementation, the following upper-layer work
+must be completed and verified in order.
+
+### Doctrine of Doctrines
+
+Freeze platform invariants: contract-first, metadata-driven, no-loss/
+no-downgrade, identity, lineage, snapshot, publication, ownership, fail-closed
+blockers and evidence requirements. The artifact cardinality rule is part of the
+doctrine, not a consumer-specific convention.
+
+### Meta-schema / Control Plane
+
+Declare and version these generic primitives:
+
+```text
+contract · contract_revision · dataset · dataset_version · field · key · relation
+projection · policy · artifact · artifact_version · artifact_locator · snapshot
+publication · evidence
+```
+
+Artifact attachment additionally requires declared identity, version, relation
+role, cardinality, ordinal, access policy, checksum and snapshot membership.
+
+### Physical database planes
+
+Verify the ownership, schema, constraints and lifecycle of:
+
+```text
+Control Plane  — contract/policy/registry/governance
+Ingestion Plane — package/artifact/load/staging/checkpoints/issues
+Data Plane     — raw/source_record, entity_record, resource_locator,
+                 entity_link, statistics/series, statistics/observation
+Archive Plane  — immutable snapshots, artifact references, retention/legal hold,
+                 rollback
+Serving Plane  — cache, projection and response metadata
+```
+
+Required controls are PK/UK/FK, tenant/site ownership, checksum uniqueness,
+immutable snapshot binding, artifact-to-row lineage, orphan detection, relation
+cardinality, temporal validity and retention policy.
+
+### Object Storage
+
+Provision isolated `ingest`, `quarantine`, `archive` and `export` namespaces.
+Every object requires an immutable key, checksum, MIME type, byte size, version,
+retention, encryption and access policy. Multipart/resumable upload, idempotent
+retry, deduplication, existence/checksum verification, quarantine/archive copy,
+backup/restore and signed URL generation must be available.
+
+### Contract binding
+
+The contract must connect:
+
+```text
+contract revision
+  → dataset version
+  → artifact policy
+  → row-artifact relation definition
+  → immutable snapshot
+```
+
+It must declare allowed row targets, artifact roles, cardinality, primary/
+supporting/derived semantics, mandatory/optional attachments, ordering, file
+type/size rules and publication policy.
+
+### Package and manifest engine
+
+The operator flow is:
+
+```text
+package upload
+  → automatic inventory
+  → automatic manifest
+  → deterministic matching
+  → preview
+  → approval
+```
+
+The manifest records package identity, contract/revision, original paths, safe
+object keys, checksums, sizes/MIME, row keys, candidate relations, generator
+version and package checksum.
+
+### Upper-layer acceptance gate
+
+The following must be `PASS` before Access attachment tables or relation rows are
+created:
+
+```text
+Doctrine PASS
+Meta-schema PASS
+Physical schemas PASS
+Object Storage PASS
+Contract binding PASS
+Security policy PASS
+Rollback design PASS
+Evidence model PASS
+```
+
+Only then may the implementation proceed:
+
+```text
+Access artifact tables
+  → attachment relation rows
+  → materialization
+  → snapshot
+  → API signed-download serving
+  → frontend static-file retirement
+```
+
+## 24. User responsibilities versus platform responsibilities
 
 ### User supplies only
 
@@ -517,7 +628,7 @@ manifest → checksum → artifact identity → object URI → relation edge
 → lineage → canonical locator → snapshot membership → signed distribution
 ```
 
-## 24. Automatic manifest generation
+## 25. Automatic manifest generation
 
 If `manifest.json` is absent, the platform generates a preview manifest from the
 Access package, file inventory and contract-declared key rules. It records:
@@ -535,7 +646,7 @@ The generated manifest is presented for review, persisted immutably after
 acceptance and reused for idempotent retries. A user-supplied manifest is never
 trusted without the same validation pipeline.
 
-## 25. One-click package experience
+## 26. One-click package experience
 
 The supported operator flow is intentionally small:
 
@@ -550,7 +661,7 @@ Select package
 The platform still performs the full pipeline. A simple UX is not a simpler
 data model; it is a governed orchestration facade over the complete model.
 
-## 26. Explicit 1000-row / 1500-file rule
+## 27. Explicit 1000-row / 1500-file rule
 
 For 1000 business rows and 1500 files:
 
@@ -564,7 +675,7 @@ The same physical file may be referenced by many rows without byte duplication.
 The same row may reference many files with role and ordinal metadata. No implicit
 Cartesian product is generated.
 
-## 27. No-loss and no-downgrade invariant
+## 28. No-loss and no-downgrade invariant
 
 The migration must preserve original bytes, source paths, source keys, row
 ordering where material, lexical values, checksums, relations, provenance and
@@ -573,7 +684,7 @@ the package is blocked and the loss is reported; silent truncation, fabricated
 value, forced one-to-one mapping or consumer-specific quality downgrade is
 forbidden.
 
-## 28. Current KIDS implementation boundary
+## 29. Current KIDS implementation boundary
 
 The KIDS source inventory has been staged as 719 files and 532 unique
 checksum-addressed objects under `geostat-ingest/kids/r8/resources/`, with an
