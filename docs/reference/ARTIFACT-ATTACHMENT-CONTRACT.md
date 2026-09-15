@@ -459,3 +459,91 @@ derivation და supersession კავშირებს.
 **Completion criterion:** artifact attachment work is complete only when the
 package, artifact, row, relation, snapshot, policy, API response, download,
 archive and rollback chain has automated tests and immutable evidence.**
+
+## 22. User responsibilities versus platform responsibilities
+
+### User supplies only
+
+```text
+1. business row stable key;
+2. source data file (Access/CSV/XLSX/etc.);
+3. physical attachments;
+4. explicit row↔file mapping only when it cannot be derived safely;
+5. contract code/revision and declared semantic choices.
+```
+
+The user does **not** enter artifact IDs, object keys, buckets, checksums,
+snapshot IDs, signed URLs or SQL. These are platform-owned values.
+
+### Platform creates and verifies
+
+```text
+manifest → checksum → artifact identity → object URI → relation edge
+→ lineage → canonical locator → snapshot membership → signed distribution
+```
+
+## 23. Automatic manifest generation
+
+If `manifest.json` is absent, the platform generates a preview manifest from the
+Access package, file inventory and contract-declared key rules. It records:
+
+- every original relative path;
+- normalized safe object key;
+- SHA-256 and byte size;
+- MIME/type;
+- source row key and artifact key;
+- all deterministic row↔file candidates;
+- contract code/revision and dataset version;
+- package checksum and generator version.
+
+The generated manifest is presented for review, persisted immutably after
+acceptance and reused for idempotent retries. A user-supplied manifest is never
+trusted without the same validation pipeline.
+
+## 24. One-click package experience
+
+The supported operator flow is intentionally small:
+
+```text
+Select package
+  → Validate (preview + exact issues)
+  → Confirm
+  → Track progress
+  → Receive governed result/download links
+```
+
+The platform still performs the full pipeline. A simple UX is not a simpler
+data model; it is a governed orchestration facade over the complete model.
+
+## 25. Explicit 1000-row / 1500-file rule
+
+For 1000 business rows and 1500 files:
+
+```text
+1000 entity identities
+1500 artifact identities (or fewer unique content objects)
+N relation edges, where N is the actual number of attachments
+```
+
+The same physical file may be referenced by many rows without byte duplication.
+The same row may reference many files with role and ordinal metadata. No implicit
+Cartesian product is generated.
+
+## 26. No-loss and no-downgrade invariant
+
+The migration must preserve original bytes, source paths, source keys, row
+ordering where material, lexical values, checksums, relations, provenance and
+historical versions. If a target representation cannot preserve a source fact,
+the package is blocked and the loss is reported; silent truncation, fabricated
+value, forced one-to-one mapping or consumer-specific quality downgrade is
+forbidden.
+
+## 27. Current KIDS implementation boundary
+
+The KIDS source inventory has been staged as 719 files and 532 unique
+checksum-addressed objects under `geostat-ingest/kids/r8/resources/`, with an
+inventory manifest preserving every original path. The remaining implementation
+boundary is deterministic inventory-to-resource binding, persistence of
+`entity.resource_locator`/generic attachment relations, snapshot membership,
+checksum reconciliation and governed signed-download serving. Only after those
+checks reach `VERIFIED` may the frontend's static `public/files` copy be retired.
