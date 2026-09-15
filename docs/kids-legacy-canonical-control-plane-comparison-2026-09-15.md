@@ -65,7 +65,7 @@ Legacy `ID/category/title_geo/title_eng/path_*` becomes a typed entity with loca
 
 Legacy `category` and `sub_category` are transport fields. In R8 they are resolved through declared relations/classifier aliases; `__rel_kids_resource_subcategory_assignment` preserves many-to-many assignments. `chartdata` is retained as raw lineage and is interpreted only by an approved statistical projection. It is not a free-form serving schema.
 
-Observed legacy rows: **159** across categories 1–4. R8 canonical resources: **225**, assignments: **230**. The page-9 runtime query is now snapshot-bound through `dataset_version_id → publication.dataset_snapshot_id → entity.entity_record`. Because the legacy request only exposes categories 1–4, the 66-row delta is currently classified as **filtered legacy subset candidate** (scope mismatch), not as duplicate or deletion. Stable-key reconciliation remains required before final closure; no count is artificially normalized.
+Observed legacy rows: **159** across categories 1–4. R8 canonical resources: **225**, assignments: **230**. The page-9 runtime query is snapshot-bound through `dataset_version_id → publication.dataset_snapshot_id → entity.entity_record`. The source-key reconciliation now proves all 159 legacy IDs exist in canonical storage (`missing=0`), with exact category counts `43/55/43/18`; the remaining 66 canonical rows are explicitly outside the legacy category 1–4 scope (categories 5–10, `unexpectedInScope=0`). No count is artificially normalized and no canonical data is deleted.
 
 ### Glossary (page 10)
 
@@ -99,7 +99,7 @@ Capabilities response is the executable boundary: it tells the client which fiel
 |---|---|---|---|
 | Contract/page registry | Access `__gs_page`, `__gs_dataset`, `__gs_field`, `__gs_projection`; Control Plane revision 8 | **OBSERVED/PASS** | verify live introspection payload against artifact checksum |
 | Goal cardinality | legacy 36; Access 36 | **PASS** | normalized field parity test |
-| Resource cardinality | legacy 159 (categories 1–4); canonical 225 | **PARTIAL — scope delta identified** | stable source-key diff and explicit category-scope report; do not force count equality |
+| Resource cardinality | legacy scope 159 (categories 1–4); canonical 225 | **PASS (scope reconciliation)** | stable source-key/category audit; 66 rows explicitly classified outside legacy scope |
 | Glossary cardinality | legacy/canonical stable-key audit 178 ↔ 178 | **PASS** | retain normalized parity evidence and verify live response lineage/privacy |
 | Statistical carrier identity | legacy scoped carriers 43; Access carriers 43 | **PASS** | stable carrier/resource key and carrier registry parity |
 | Statistical values | legacy embedded `chartdata`; Access 880 typed cells | **PASS (shadow parity)** | retain repeatable carrier/period/dimension audit and complete protected API response diff |
@@ -113,7 +113,17 @@ Capabilities response is the executable boundary: it tells the client which fiel
 R8 Access და Control Plane უკვე აღწერს უფრო მდიდარ, typed და relation-aware მოდელს, ვიდრე legacy API. Goal-ისთვის პირდაპირი parity დადასტურებულია, glossary და statistical payload-ის shadow parity-ც PASS-ია. Resource-ის 66-რიანი სხვაობა კვლავ scope-delta-დ არის კლასიფიცირებული და არ უნდა “გასწორდეს” მონაცემის ხელოვნური წაშლით ან KIDS-specific branch-ით.
 
 **ამ დოკუმენტის სტატუსი: `OBSERVED → READY_FOR_AGREEMENT`.**  
-შემდეგი შეთანხმებული ნაბიჯი არის resource source-key delta-classification და დაცული API response shadow diff. UI wiring და legacy endpoint retirement ამ შედარების დამტკიცებამდე არ იცვლება.
+შემდეგი შეთანხმებული ნაბიჯი არის დაცული API response shadow diff. UI wiring და legacy endpoint retirement ამ შედარების დამტკიცებამდე არ იცვლება.
+
+### 8.8 Resources / pageId 9 — scope reconciliation closure
+
+- [x] legacy category 1–4 rows: `159` (`43 + 55 + 43 + 18`).
+- [x] canonical resource rows: `225`; all legacy source IDs found (`missing=0`).
+- [x] canonical category 1–4 subset exactly equals the legacy scope; `unexpectedInScope=0`, `scopeMismatch=0`.
+- [x] remaining `66` rows classified by declared classifier categories `5–10`, not treated as deletion or duplication.
+- [x] repeatable task: `:api:auditKidsResourceScopeReconciliation`.
+
+**pageId 9 resource cardinality status: `SCOPE RECONCILIATION PASS`.**
 
 ### 8.7 Statistics / pageId 11 — shadow parity closure
 

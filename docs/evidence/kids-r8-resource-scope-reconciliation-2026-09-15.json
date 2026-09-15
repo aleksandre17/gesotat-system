@@ -1,0 +1,9 @@
+{
+  "schema": "geostat.kids.resource-scope-reconciliation.v1",
+  "recordedAt": "2026-09-15",
+  "contract": { "code": "KIDS_PORTAL_V1", "revision": 8 },
+  "legacyScope": { "endpoint": "/api/files?category=1..4", "rows": 159, "byCategory": { "1": 43, "2": 55, "3": 43, "4": 18 } },
+  "canonical": { "datasetCode": "KIDS_RESOURCE", "rows": 225, "scopedRows": 159, "outOfScopeRows": 66, "outOfScopeCategories": { "5": 13, "6": 10, "7": 6, "8": 5, "9": 16, "10": 16 }, "scopedByCategory": { "1": 43, "2": 55, "3": 43, "4": 18 } },
+  "reconciliation": { "missing": 0, "unexpectedInScope": 0, "scopeMismatch": 0, "extraOutOfScope": 66, "method": "stable source_resource_id plus declared category classifier" },
+  "status": "RESOURCE_SCOPE_RECONCILIATION_PASS"
+}

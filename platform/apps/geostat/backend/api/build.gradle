@@ -107,6 +107,7 @@ sourceSets {
         java.include 'KidsGoalsParityAudit.java'
         java.include 'KidsGlossaryParityAudit.java'
         java.include 'KidsStatisticalShadowParityAudit.java'
+        java.include 'KidsResourceScopeReconciliationAudit.java'
         java.include 'KidsGoalsCapabilityAudit.java'
         java.include 'ContractRegistryAccessPackageGenerator.java'
         compileClasspath += sourceSets.main.runtimeClasspath
@@ -158,6 +159,16 @@ tasks.register('auditKidsStatisticalShadowParity', JavaExec) {
     dependsOn tasks.named('compileKidsCanonicalToolJava')
     classpath = sourceSets.kidsCanonicalTool.runtimeClasspath
     mainClass = 'KidsStatisticalShadowParityAudit'
+    args (project.findProperty('kidsSourceFile') ?: '../../../../../samples/kids-children-portal-full-data.accdb'),
+         (project.findProperty('kidsAccessFile') ?: 'kids-portal-v1-canonical-r8-final.accdb')
+}
+
+tasks.register('auditKidsResourceScopeReconciliation', JavaExec) {
+    group = 'geostat'
+    description = 'Read-only source-key reconciliation for legacy category 1..4 resources vs canonical R8 resources'
+    dependsOn tasks.named('compileKidsCanonicalToolJava')
+    classpath = sourceSets.kidsCanonicalTool.runtimeClasspath
+    mainClass = 'KidsResourceScopeReconciliationAudit'
     args (project.findProperty('kidsSourceFile') ?: '../../../../../samples/kids-children-portal-full-data.accdb'),
          (project.findProperty('kidsAccessFile') ?: 'kids-portal-v1-canonical-r8-final.accdb')
 }
