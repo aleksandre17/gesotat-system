@@ -1086,3 +1086,74 @@ The remote API image rebuilt with that revision has digest
 `sha256:c9d04c28958a0fb1d7125e380c90905aa029a7ff5d1f6d5b1ef1b69b6f1fce03`
 and matching OCI labels. The live container has not been recreated; signed tag
 and deployment authority remain the final activation gates.
+## Canonical top-down execution order — mandatory
+
+ყოველი ახალი სესია, audit, implementation ან onboarding იწყება უმაღლესი ფენიდან
+და მხოლოდ დამოწმებული ზემდგომი ფენის შემდეგ გადადის ქვედაზე. პირდაპირ KIDS
+page-ზე, frontend-ზე ან ერთ კონკრეტულ ფაილზე გადასვლა ამ მიმდევრობის გარეშე
+დაუშვებელია.
+
+```text
+1. Doctrine of Doctrines
+   უმაღლესი პრინციპები, invariants და quality gates
+
+2. Meta-schema / Control Plane schema
+   contract, dataset, field, key, relation, projection, policy,
+   artifact, snapshot და evidence primitives
+
+3. Physical database planes
+   Control Plane · Ingestion Plane · Data Plane · Archive Plane · Serving/Cache
+
+4. Object Storage
+   ingest · quarantine · archive · export buckets
+
+5. Site contract
+   contract revision → dataset version → bindings
+
+6. Access artifact schema
+   __gs_* · __raw_* · __ent_* · __rel_* · __stat_* · __cl_*
+
+7. Ingestion/materialization
+   Access → raw → canonical rows
+
+8. Snapshot/publication
+   immutable dataset snapshot და release gates
+
+9. API contract
+   pageId → dataset → projection → response
+
+10. Consumer/frontend
+    მხოლოდ საბოლოო API contract-ს იყენებს
+```
+
+სავალდებულო სამუშაო ჯაჭვია:
+
+```text
+Doctrine
+  → Meta-schema
+  → Physical schemas
+  → Contract
+  → Access artifact
+  → Object Storage
+  → Ingestion
+  → Canonical Data
+  → Snapshot
+  → API
+  → Consumer
+```
+
+### Session-start checklist
+
+- [ ] წაკითხულია `docs/reference/ENGINEERING-QUALITY-DOCTRINE.md`;
+- [ ] ნაპოვნია და წაკითხულია `docs/reference/CANONICAL-FULL-TREE.md`;
+- [ ] შემოწმებულია meta-schema და Control Plane-ის authority;
+- [ ] შემოწმებულია სამივე ფიზიკური database plane-ის schema/table/column/
+  relationship მდგომარეობა;
+- [ ] შემოწმებულია Object Storage bucket და artifact authority;
+- [ ] მხოლოდ ამის შემდეგ იწყება site contract/Access/page/API analysis;
+- [ ] თითოეული აღმოჩენა რეგისტრირდება AIR-ში და blocker fail-closed წესით
+  აჩერებს ქვედა ფენაზე გადასვლას.
+
+ამ წესის მიზანია სრული invisible line-ის შენარჩუნება, ზემდგომი იერარქიისგან
+ქვემდგომი არტეფაქტების კანონიკური წარმოშობა და ახალ სესიაში context loss-ის,
+დუბლირების ან არასწორი ქვემოდან-ზემოთ ცვლილების თავიდან აცილება.
