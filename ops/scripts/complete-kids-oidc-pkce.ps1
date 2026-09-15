@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
   [int]$Port = 18765,
-  [string]$IssuerBase = 'http://keycloak:8080',
+  [string]$IssuerBase = 'https://keycloak:8443',
   [string]$VerifierPath = "$env:TEMP\kids-pkce-verifier.txt",
   [string]$TokenPath = "$env:TEMP\kids-approved-test-token.txt"
 )

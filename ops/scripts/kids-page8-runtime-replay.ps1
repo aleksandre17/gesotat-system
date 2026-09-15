@@ -19,7 +19,7 @@ $paths = @(
   '/platform/contracts/KIDS_PORTAL_V1/pages?revision=8',
   '/platform/contracts/KIDS_PORTAL_V1/pages/8/query-capabilities?revision=8'
 )
-$body = @{ contractCode='KIDS_PORTAL_V1'; revision=8; pageId=8; projection='default'; select=@('id','title','path','category'); sort=@(@{field='id';direction='ASC'}); page=@{limit=5} } | ConvertTo-Json -Depth 8
+$body = @{ filters=@{}; sort='source_goal_id'; descending=$false; groupBy=@(); aggregation=$null; page=1; limit=5; select=@('source_goal_id','title_ka','title_en','path_ka','path_en','category_item_ref'); include=@(); cursor=$null; where=@{}; orderBy=@(); distinct=$false; includeLimits=@{} } | ConvertTo-Json -Depth 8
 $checks = @()
 foreach ($path in $paths) {
   $response = Invoke-WebRequest -Uri ($BaseUrl + $path) -Headers $headers -Method Get -TimeoutSec 30 -UseBasicParsing
