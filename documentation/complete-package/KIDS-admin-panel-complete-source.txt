@@ -1,0 +1,3011 @@
+KIDS მართვის პანელის სრული არქიტექტურული და იმპლემენტაციის სპეციფიკაცია
+ნორმატიული blueprint რომელიც ტოვებს მხოლოდ კოდის დაწერას
+საბაზისო კონტრაქტი  KIDS_PORTAL_V1 revision 7
+საბაზისო წყარო  samples/kids-children-portal-full-data.accdb
+საბაზისო შესრულებადი პაკეტი  samples/kids-portal-v1-canonical-r7.accdb
+სპეციფიკაციის თარიღი  2026-09-10  Asia Tbilisi
+სტატუსი  IMPLEMENTATION READY NORMATIVE BASELINE
+დოკუმენტის დაპირება
+შედეგი
+Authority
+პანელი არის კონტრაქტის, სემანტიკის, კლასიფიკატორის, პოლიტიკისა და publication გადაწყვეტილების ერთადერთი authority.
+Execution
+Access არის პანელის მიერ გამოშვებული კონტრაქტის data bearing distribution და ვერ ცვლის მის მნიშვნელობას.
+Completeness
+ქვემოთ გამოცხადებულია მოდულები, ეკრანები, workflow, state machine, API, authoritative ცხრილები, ყველა Access ცხრილი და ველი, generation/import წესები, უსაფრთხოება და Definition of Done.
+Non fabrication
+წყაროში დაუდასტურებელი მნიშვნელობა არ გამოიგონება. ის ინახება როგორც proposal და blocking gate ღიად რჩება.
+სარჩევი
+სარჩევი2
+ნორმატიული გადაწყვეტილება4
+საბაზისო მტკიცებულება და ინვენტარი4
+საერთაშორისო საფუძველი5
+სისტემური არქიტექტურა5
+Layer და dependency წესები6
+პანელის ინფორმაციული არქიტექტურა7
+ეკრანის უცვლელი UX წესები7
+როლები და პასუხისმგებლობათა გამიჯვნა7
+Lifecycle და state machine8
+Contract approval gate matrix8
+პანელის authoritative მონაცემთა მოდელი9
+Data Plane და Archive Plane ცხრილები19
+Access პაკეტის სრული physical dictionary21
+Access physical relations24
+ფიზიკური ცხრილების დანიშნულება, საზღვრები და UI-მომზადების კონტრაქტი24
+ყველა გამოცხადებული ცხრილის ინდივიდუალური კონტრაქტები25
+`__raw_document`-ის ნორმატიული კონტრაქტი29
+როგორ კონფიგურირდება UI contract metadata-ით29
+ახალი ფიზიკური ცხრილის დამატების სავალდებულო migration sequence30
+KIDS სტატისტიკური სემანტიკის სრული გადაწყვეტილება30
+Unit registry31
+DSD revision 231
+Quality და confidentiality32
+კლასიფიკატორების სრული მოდელი32
+Unknown value algorithm32
+Access template generation contract33
+Generator preconditions33
+Deterministic generation algorithm33
+Access type mapping34
+Forbidden content34
+Import execution specification34
+Request and idempotency34
+Execution stages34
+Failure semantics34
+Admin API contract35
+Canonical error codes36
+Security privacy and audit36
+Audit event minimum set36
+Observability and service levels37
+Testing strategy and acceptance37
+KIDS release acceptance assertions37
+Implementation backlog38
+Repository package map38
+d txt მოთხოვნების საბოლოო gap audit39
+Definition of Done39
+გადაწყვეტილებათა რეესტრი39
+ნორმატიული წყაროები40
+საბოლოო დასკვნა40
+სარჩეველი Word-ში იხსნება ავტომატური ველით და განახლდება Ctrl A შემდეგ F9 ბრძანებით.
+ნორმატიული გადაწყვეტილება
+შენი ძირითადი აზრი სწორია და აქ დაზუსტებულია: საიტის სრული კონტრაქტი ჯერ იქმნება და მტკიცდება პანელში; შემდეგ პანელი გამოსცემს ამ კონკრეტული immutable revision-ის ცარიელ Access პაკეტს; Access-ის ავტორი მხოლოდ გამოცხადებულ data rows-ს ავსებს; import engine ამოწმებს exact contract-ს და მხოლოდ ყველა blocking gate-ის გავლის შემდეგ აქვეყნებს snapshot-ს.
+წესი
+ნორმატიული მოთხოვნა
+შეცდომა რომელსაც გამორიცხავს
+ერთი authority
+MUST  კონტრაქტის source of truth არის Control Plane database და არა Access, JSON, UI state ან Java generator-ის hardcode.
+ორი განსხვავებული schema და სემანტიკის drift
+immutable revision
+MUST  APPROVED revision აღარ რედაქტირდება; ცვლილება ქმნის ახალ revision-ს და compatibility შეფასებას.
+ისტორიის გადაწერა და არარეპროდუცირებადი publish
+data only Access
+MUST NOT  Access შეიცავდეს credentials, target SQL names, arbitrary SQL, publication command ან დამოუკიდებელ approval-ს.
+privilege escalation და გარემოზე მიბმა
+no chart data ownership
+MUST  chart ებმის metric + dimensions + presentation specification-ს და არა ჩაშენებულ რიცხვებს.
+hardcoded სტატისტიკა
+raw boundary
+MUST  თავდაპირველი artifact ინახება უცვლელად object storage-ში; პაკეტში raw locator და checksum საკმარისია.
+raw JSON-ის გამეორება carrier table-ში
+fail closed
+MUST  გაურკვეველი classifier, unit, grain, relation ან confidentiality policy ბლოკავს publication-ს.
+ჩუმი არასწორი ინტერპრეტაცია
+ნახაზი 1  პასუხისმგებლობათა სიბრტყეები და authority boundary
+საბაზისო მტკიცებულება და ინვენტარი
+Blueprint ეყრდნობა უშუალოდ repository-ის migration-ებს 001–030, Java 17 Spring Boot კოდს, registry-driven Jackcess generator-სა და მიღებულ Access audit-ს. ძველი ბაზა არის მიგრაციის წყარო და არა სამიზნე schema.
+ობიექტი
+რაოდენობა
+კანონიკური როლი
+გადაწყვეტილება
+goals_titles
+17
+კლასიფიკატორის წყარო
+goal category scheme და alias-ები
+goals
+36
+არასტატისტიკური entity
+KIDS_GOAL
+files
+225
+რესურსის entity და შესაძლო statistical carrier
+KIDS_RESOURCE; 43 parseable carrier
+glossary
+178
+არასტატისტიკური entity
+KIDS_GLOSSARY_ENTRY
+ყველა raw locator
+456
+lineage
+__raw_document; ორიგინალი bytes უცვლელ artifact-ში
+resource subcategory assignment
+230
+many to many relation
+ცალკე assignment table
+statistical carrier
+43
+resource bound carrier
+payload_checksum; raw JSON არა
+statistical input cell
+880
+lossless source cell
+long form period × age × lexical value
+unit და metric
+10 / 43
+governed semantics
+ერთი explicit binding თითო carrier-ზე
+package contract
+22 tables
+16 metadata/data structures, 165 fields
+all declared indexes, 21 RI relations, 5 projection slots
+ძველი ცხრილი
+ძველი ველები
+რატომ არ რჩება საბოლოო physical model-ად
+goals_titles
+ID, category, title_geo, title_eng
+კოდი, ვერსია, label და authority ერთმანეთშია შერეული
+goals
+ID, category, title_geo, title_eng, path_geo, path_eng
+კლასიფიკაცია, multilingual text და locator ცალკე semantic roles უნდა იყოს
+files
+ID, category, sub_category, title_geo, title_eng, path_geo, path_eng, chartdata
+comma list და chart JSON არღვევს 1NF-ს და statistical meaning-ს მალავს
+glossary
+ID, lang, text
+language value domain და translation identity გამოცხადებული არ არის
+საერთაშორისო საფუძველი
+სტანდარტი
+რას იღებს სისტემა
+საზღვარი
+SDMX 3.1 და ISO 17369
+dataflow, DSD, dimension, codelist, measure, attribute, constraint და statistical exchange
+სტატისტიკურ ფენას; არა ყველა content table-ს
+ISO IEC 11179
+registry identity, data element, value domain, definition და stewardship
+metadata registry-ს; არა physical SQL engine-ს
+W3C DCAT 3
+dataset, distribution, data service, version, checksum, catalog discovery
+catalog/export metadata-ს
+W3C PROV O
+entity, activity, agent და derivation lineage
+artifact row transform release provenance-ს
+JSON Schema 2020 12
+machine readable validation, dialect და reusable schema
+mapping, policy და presentation JSON payload-ებს
+OpenAPI 3.2
+language neutral HTTP contract
+Admin და public API description-ს
+WCAG 2.2 AA
+keyboard, focus, target size, errors და accessible authentication
+პანელის UI acceptance-ს
+OWASP ASVS 5.0
+application security verification baseline
+L2 ყველა panel ფუნქციაზე; L3 secrets და publication-ზე
+OAuth 2.0 Security BCP RFC 9700
+authorization code with PKCE, exact redirects, least scope და sender constraints
+OIDC/OAuth authentication-ს
+NIST SP 800 218 SSDF
+secure development practices და supply chain evidence
+CI CD და release assurance-ს
+სისტემური არქიტექტურა
+სამიზნე არის მოდულური მონოლითი. ეს არჩევანი ინარჩუნებს ერთ ტრანზაქციას contract authoring-ისთვის, ამცირებს ოპერაციულ სირთულეს და bounded context-ებს ისე გამოყოფს, რომ მოგვიანებით მხოლოდ გაზომილი bottleneck-ის შემთხვევაში გახდეს შესაძლებელი ცალკე service-ად გატანა.
+ნახაზი 2  repository-ის შესაბამისი runtime არქიტექტურა
+bounded context
+ფლობს
+არ ფლობს
+public port
+Identity and Access
+role, permission, scope, session policy
+dataset semantics
+AuthorizationService
+Catalog
+product, dataset, version, field, key, relation
+observations
+CatalogCommandService და CatalogQueryService
+Site Contract
+site tree, routes, contract revision, gates
+runtime page content
+ContractLifecycleService
+Classification
+scheme, version, item, hierarchy, alias, proposal
+entity rows
+ClassificationService
+Statistics
+unit, dimension, measure, metric, DSD, binding
+chart pixels
+StatisticalSemanticsService
+Quality and Privacy
+quality rule, score, confidentiality rule
+raw source mutation
+PolicyEvaluationService
+Ingestion
+source, mapping, preview, jobs, checkpoints
+approval authority
+IngestionOrchestrator
+Package
+manifest projection, Access generation, signature
+business data creation
+PackageGenerationService
+Publication
+release, snapshot pointer, rollback, outbox
+contract editing
+PublicationService
+Experience
+table, chart, export, API projection
+fact values
+PresentationRegistry
+Audit
+append only events and decision evidence
+mutable business state
+AuditQueryService
+Layer და dependency წესები
+domain არ იმპორტავს Spring, SQL, Jackcess, HTTP ან UI კლასებს; ის შეიცავს aggregates, value objects, policies და state transitions-ს.
+application layer ახორციელებს use case-ს, authorization-ს, idempotency-ს და transaction boundary-ს.
+adapter in იღებს REST ან UI command-ს; adapter out წერს SQL Server-ში, object storage-ში ან Access-ში.
+CQRS გამოიყენება application boundary-ზე: command მოდელი იცავს invariants-ს, query მოდელი ემსახურება grid, graph და dashboard view-ებს; event sourcing არ გამოიყენება.
+ყველა cross-plane side effect იწერება transactional outbox-ში; მომხმარებლის request არ ელოდება გრძელ generator/import პროცესს.
+optimistic concurrency სავალდებულოა row_version ან ETag-ით ყველა editable aggregate-ზე.
+პანელის ინფორმაციული არქიტექტურა
+ნავიგაცია
+ეკრანი
+რა ჩანს
+დაშვებული მოქმედებები
+მიმოხილვა
+Dashboard
+ღია approvals, failed gates, active imports, release health, outbox lag
+filter by product; open task; acknowledge incident
+პროდუქტები
+Product list and details
+code, bilingual title, owner, sensitivity, lifecycle, active revision
+create draft; clone; assign owner; retire
+საიტის ხე
+Site contract tree
+node code, parent, kind, path, dataset, order, labels
+add move reorder; route collision check; preview
+კონტრაქტის revisions
+Revision workspace
+parent, compatibility, checksum, status, change set
+branch; diff; submit; approve; issue; supersede
+datasets
+Dataset catalog
+family, grain, retention, version, table binding
+create version; edit grain; bind source; impact view
+fields
+Schema editor
+ordinal, code, type, role, required, key, classifier, source mapping
+add reorder deprecate; validate; generate preview
+keys and relations
+Relation graph
+PK UX FK hierarchy lineage cardinality enforcement load order
+connect; edit; cycle test; orphan preview
+classifiers
+Scheme registry
+authority, versions, items, labels, dates, hierarchy
+import; compare; publish; retire
+alias proposals
+Proposal inbox
+raw code, normalized key, candidate, confidence, evidence
+accept; remap; reject; bulk decide
+statistics
+Dataflow and DSD builder
+components, roles, attachment, grain, constraints
+compose; lint; compare; submit
+metrics
+Metric registry
+definition, measure, unit, aggregation, dimensions, owner
+create; bind carrier; approve; deprecate
+quality
+Quality policy builder
+rule type, severity, expression, threshold, scope
+test on sample; approve; version
+confidentiality
+Privacy policy builder
+class, thresholds, action, audience, legal basis
+simulate; approve; version
+sources
+Source registry
+type, trust, endpoint metadata, secret reference, schedule
+test connection; rotate reference; disable
+mappings
+Mapping studio
+source locator and field to canonical field transforms
+map; validate; preview 100 rows; save revision
+generation
+Package generator
+revision, profile, job, checksum, signature, expiry
+generate; verify; download; revoke
+imports
+Import jobs
+artifact, checksum, progress, counts, issues, checkpoint
+preview; start; resume; cancel; quarantine; retry
+publication
+Release workspace
+members, gate report, approval evidence, target snapshot
+prepare; approve; publish; rollback
+presentation
+Tables charts exports APIs
+metric, dimensions, filters, format, accessibility
+preview; approve; publish; retire
+audit
+Audit explorer
+actor, action, before after hashes, correlation, timestamp
+filter; export signed evidence
+security
+Roles and scopes
+role, permission, product scope, validity
+grant; revoke; emergency access review
+operations
+Jobs outbox migrations
+lease, queue age, retries, migration checksum
+retry safe job; pause worker; inspect failure
+ეკრანის უცვლელი UX წესები
+ყველა რედაქტირების გვერდზე ჩანს product, contract revision, lifecycle state, unsaved changes და ETag.
+Save არ უდრის Approve-ს; approval ცალკე permission და ცალკე dialog-ია, სადაც change summary და gate report სავალდებულოა.
+საშიში მოქმედება იყენებს typed confirmation-ს მხოლოდ issue, publish, rollback, revoke და destructive retirement-ზე.
+validation error მიბმულია კონკრეტულ field/node/edge-ზე და აქვს machine code, ახსნა და remediation; მხოლოდ წითელი ფერი არასაკმარისია.
+graph editor-ს ყოველთვის აქვს ეკვივალენტური accessible table view; drag and drop-ს აქვს keyboard alternative.
+ყველა გრძელი job არის resumable და UI polling-ს ცვლის server sent events ან WebSocket progress; refresh არ კარგავს მდგომარეობას.
+როლები და პასუხისმგებლობათა გამიჯვნა
+როლი
+უფლებამოსილება
+აკრძალული კომბინაცია
+Platform Administrator
+identity, environment policy, emergency recovery
+ვერ ამტკიცებს საკუთარ semantic change-ს
+Product Owner
+scope, site tree, release business approval
+ვერ ცვლის security policy-ს
+Data Architect
+dataset, field, key, relation, compatibility
+ვერ აქვეყნებს საკუთარ revision-ს მარტო
+Classifier Steward
+scheme, version, item, alias, hierarchy
+ვერ ცვლის observation value-ს
+Statistical Steward
+metric, unit, aggregation, DSD, quality
+ვერ ცვლის raw artifact-ს
+Privacy Officer
+confidentiality, audience, suppression decision
+ვერ ამტკიცებს source mapping-ს
+Data Engineer
+source, mapping, import execution, remediation
+ვერ ამტკიცებს contract-ს ან publish-ს
+Publisher
+release execution and rollback
+ვერ ცვლის approved contract-ს
+Auditor
+read all metadata, evidence and history
+write აკრძალულია
+Viewer
+read permitted product metadata and jobs
+approval, generation და publish აკრძალულია
+ოთხთვალის წესი  author_user_id და approver_user_id MUST NOT იყოს ერთი მომხმარებელი CONTRACT_APPROVAL, CLASSIFIER_PUBLISH, SEMANTIC_APPROVAL, PRIVACY_APPROVAL და RELEASE_PUBLISH მოქმედებებზე. Emergency override მოითხოვს მიზეზს, ვადიან elevation-ს და შემდგომ დამოუკიდებელ review-ს.
+Lifecycle და state machine
+ნახაზი 3  კონტრაქტიდან შესრულებად პაკეტამდე
+aggregate
+დაშვებული გზა
+invariant
+Site contract revision
+DRAFT → IN_REVIEW → APPROVED → ISSUED → SUPERSEDED
+REJECTED აბრუნებს DRAFT-ში ახალი ცვლილების ნომრით; APPROVED immutable
+Dataset version
+DRAFT → IN_REVIEW → APPROVED → ACTIVE → DEPRECATED → RETIRED
+breaking change მხოლოდ ახალი version
+Classifier version
+DRAFT → IN_REVIEW → PUBLISHED → RETIRED
+published item delete აკრძალულია; successor mapping გამოიყენება
+Proposal
+OPEN → MATCHED or NEW_ITEM_REQUIRED → APPROVED or REJECTED
+OPEN proposal blocking-ია required field-ზე
+Metric semantic
+DRAFT → PROVISIONAL_APPROVED → APPROVED → DEPRECATED
+confidence ინახება; APPROVED-ს სჭირდება steward
+Package job
+QUEUED → GENERATING → VALIDATING → READY or FAILED or REVOKED
+READY artifact immutable; იგივე idempotency key იგივე შედეგს აბრუნებს
+Import batch
+RECEIVED → CATALOGED → VALIDATING → STAGING → SEMANTIC_VALIDATION → READY_TO_PUBLISH → PUBLISHED
+ნებისმიერი ეტაპიდან FAILED ან QUARANTINED; resume checkpoint-იდან
+Release
+DRAFT → READY → PUBLISHING → PUBLISHED → SUPERSEDED or ROLLED_BACK
+rollback ქმნის ახალ pointer event-ს; ძველ snapshot-ს არ ცვლის
+Contract approval gate matrix
+კოდი
+კატეგორია
+შემოწმება
+ეფექტი
+G01 EXACT_SCHEMA
+Structure
+Access table and field set, order, type, requiredness
+BLOCK
+G02 KEY_UNIQUENESS
+Integrity
+PK and declared UX uniqueness
+BLOCK
+G03 RELATION_RESOLUTION
+Integrity
+required relation has no orphan and load order is acyclic
+BLOCK
+G04 CLASSIFIERS_PUBLISHED
+Semantics
+required aliases resolve to exact published version
+BLOCK
+G05 STATISTICAL_SEMANTICS
+Semantics
+metric, unit, aggregation, DSD, status and policies complete
+BLOCK
+G06 RAW_LINEAGE
+Provenance
+artifact checksum and row locator cover every source-derived row
+BLOCK
+G07 ATOMIC_PUBLICATION
+Publication
+staging snapshot complete and rollback pointer valid
+BLOCK
+G08 ROUTE_UNIQUENESS
+Site
+sibling path segment and public route unique
+BLOCK
+G09 LOCALIZATION
+Content
+required Georgian label and language tag valid
+BLOCK
+G10 COMPATIBILITY
+Evolution
+schema diff classification accepted
+BLOCK
+G11 PRIVACY
+Confidentiality
+audience, small count and export rules evaluated
+BLOCK
+G12 ACCESSIBILITY
+Presentation
+table/chart alternative, label, contrast and keyboard checks
+BLOCK for public
+G13 PERFORMANCE_BUDGET
+Serving
+query plan and row/export limits within budget
+WARN then BLOCK at publish
+G14 SECURITY_EVIDENCE
+Security
+ASVS tests, dependency scan and signed build evidence
+BLOCK
+პანელის authoritative მონაცემთა მოდელი
+ქვემოთ მოცემული dictionary არის სამიზნე Control Plane schema. EXISTING ნიშნავს რომ ცხრილი უკვე გამოცხადებულია migration 001–028-ში; EXTEND ნიშნავს თავსებად დამატებას; NEW ნიშნავს პანელის სრულყოფილი შესრულებისთვის საჭირო ახალ migration-ს. `row_version` არის SQL Server rowversion და ყველა editable aggregate-ზე სავალდებულოა.
+ცხრილი
+სტატუსი
+დანიშნულება
+სვეტები და შეზღუდვები
+platform.data_product
+EXTEND
+მონაცემთა პროდუქტის root aggregate
+product_id BIGINT PK IDENTITYproduct_code NVARCHAR(120) UQ requiredpage_id BIGINT FK nullabletitle_ka NVARCHAR(255) requiredtitle_en NVARCHAR(255) nullabledescription_ka NVARCHAR(MAX) nullable NEWdescription_en NVARCHAR(MAX) nullable NEWowner_user_id BIGINT FK nullablelifecycle_status VARCHAR(24) requiredsensitivity VARCHAR(24) requiredactive_contract_revision_id BIGINT FK nullable NEWcreated_at DATETIME2 requiredupdated_at DATETIME2 requiredrow_version ROWVERSION NEW
+platform.dataset
+EXTEND
+ლოგიკური dataset identity
+dataset_id BIGINT PKproduct_id BIGINT FK requireddataset_code NVARCHAR(120) requireddataset_family VARCHAR(24) requiredbusiness_grain NVARCHAR(500) requiredretention_policy NVARCHAR(64) requiredlifecycle_status VARCHAR(24) requiredowner_user_id BIGINT FK nullable NEWdescription_ka NVARCHAR(MAX) nullable NEWdescription_en NVARCHAR(MAX) nullable NEWcreated_at DATETIME2 requiredrow_version ROWVERSION NEWUQ product_id + dataset_code
+platform.dataset_version
+EXTEND
+immutable schema version
+dataset_version_id BIGINT PKdataset_id BIGINT FK requiredversion INT requiredstatus VARCHAR(24) requiredcontract_checksum CHAR(64) nullable until approvalcompatibility_mode VARCHAR(32) NEWeffective_from DATETIME2 nullableeffective_to DATETIME2 nullableapproved_by_user_id BIGINT FK nullablecreated_at DATETIME2 requiredrow_version ROWVERSION NEWUQ dataset_id + version
+platform.attribute
+EXTEND
+field და ISO 11179 data element
+attribute_id BIGINT PKdataset_version_id BIGINT FK requiredattribute_code NVARCHAR(128) requiredlogical_type VARCHAR(24) requiredattribute_role VARCHAR(24) requiredcardinality VARCHAR(16) requiredrequired BIT requiredsearchable BIT requiredfilterable BIT requiredgroupable BIT requiredlabel_ka NVARCHAR(255) requiredlabel_en NVARCHAR(255) nullabledefinition_ka NVARCHAR(MAX) nullabledefinition_en NVARCHAR(MAX) nullableunit_code NVARCHAR(64) nullablejson_path NVARCHAR(512) nullableordinal INT required NEWdefault_value_json NVARCHAR(MAX) nullable NEWclassifier_version_id BIGINT FK nullable NEWdeprecated BIT required NEWrow_version ROWVERSION NEWUQ dataset_version_id + attribute_codeUQ dataset_version_id + ordinal
+platform.dataset_key
+NEW
+primary ან unique key declaration
+dataset_key_id BIGINT PKdataset_version_id BIGINT FK requiredkey_code NVARCHAR(128) requiredkey_type VARCHAR(16) required PK or UNIQUEnull_policy VARCHAR(24) requiredstatus VARCHAR(24) requiredUQ dataset_version_id + key_code
+platform.dataset_key_field
+NEW
+ordered key field
+dataset_key_id BIGINT FK requiredattribute_id BIGINT FK requiredkey_order INT requiredPK dataset_key_id + attribute_idUQ dataset_key_id + key_order
+platform.validation_rule
+EXTEND
+machine executable quality rule
+validation_rule_id BIGINT PKdataset_version_id BIGINT FK requiredrule_code NVARCHAR(128) requiredrule_type VARCHAR(32) requiredseverity VARCHAR(16) requiredexpression_json NVARCHAR(MAX) JSON requiredmessage_ka NVARCHAR(1000) NEWmessage_en NVARCHAR(1000) nullable NEWscope_json NVARCHAR(MAX) JSON NEWactive BIT requiredcreated_at DATETIME2 requiredrow_version ROWVERSION NEWUQ dataset_version_id + rule_code
+platform.relationship_type
+EXISTING
+კავშირის governed vocabulary
+relationship_type_id BIGINT PKcode NVARCHAR(64) UQ requiredcategory VARCHAR(32) requireddirectional BIT requiredtransitive BIT requiredtemporal BIT requireddescription NVARCHAR(1000) nullable
+platform.dataset_relationship
+EXTEND
+dataset version endpoints და enforcement
+relationship_id BIGINT PKfrom_dataset_version_id BIGINT FK requiredto_dataset_version_id BIGINT FK requiredrelationship_type_id BIGINT FK requiredsource_attribute_id BIGINT FK nullabletarget_attribute_id BIGINT FK nullablecardinality VARCHAR(24) requiredrequired BIT requiredenforcement_policy VARCHAR(24) requireddelete_policy VARCHAR(24) required NEWload_priority INT requiredstatus VARCHAR(24) required NEWrow_version ROWVERSION NEW
+platform.site_contract_revision
+EXTEND
+სრული საიტის immutable contract revision
+site_contract_revision_id BIGINT PKproduct_id BIGINT FK requiredcontract_code NVARCHAR(120) requiredrevision INT requiredparent_revision_id BIGINT self FK nullableschema_standard NVARCHAR(120) requiredcompatibility_mode VARCHAR(32) requiredstatus VARCHAR(24) requiredcontract_checksum CHAR(64) requiredcontract_document_json NVARCHAR(MAX) JSON requiredeffective_from DATETIME2 nullableapproved_by_user_id BIGINT FK nullableissued_at DATETIME2 nullable NEWcreated_at DATETIME2 requiredrow_version ROWVERSION NEWUQ contract_code + revision
+platform.site_contract_node
+EXTEND
+საიტის კანონიკური ხე და route
+node_id BIGINT PKsite_contract_revision_id BIGINT FK requirednode_code NVARCHAR(120) requiredparent_node_id BIGINT self FK nullablenode_kind VARCHAR(32) requireddataset_code NVARCHAR(120) nullablepath_segment NVARCHAR(255) requiredsort_order INT requiredrequired BIT requiredtitle_ka NVARCHAR(255) requiredtitle_en NVARCHAR(255) nullablevisibility_policy_code NVARCHAR(120) nullable NEWseo_json NVARCHAR(MAX) JSON nullable NEWUQ revision + node_codeUQ revision + parent_node_id + path_segment
+platform.site_contract_dataset
+EXISTING
+contract to dataset version and Access table binding
+contract_dataset_id BIGINT PKsite_contract_revision_id BIGINT FK requireddataset_version_id BIGINT FK requireddataset_code NVARCHAR(120) requiredaccess_table_name NVARCHAR(128) requireddata_family VARCHAR(24) requiredbusiness_grain NVARCHAR(500) requirednatural_key_expression NVARCHAR(1000) requiredrow_role VARCHAR(32) requiredload_order INT requiredrequired BIT requiredUQ revision + dataset_codeUQ revision + access_table_name
+platform.site_contract_field
+EXISTING
+contract field projection
+contract_field_id BIGINT PKcontract_dataset_id BIGINT FK requiredfield_name NVARCHAR(128) requiredlogical_type VARCHAR(24) requiredsemantic_role VARCHAR(32) requiredordinal INT requiredrequired BIT requiredkey_role VARCHAR(24) nullableclassifier_scheme_code NVARCHAR(120) nullablesource_expression NVARCHAR(1000) nullablenormalization_rule NVARCHAR(120) nullableUQ dataset + fieldUQ dataset + ordinal
+platform.site_contract_relation
+EXISTING
+contract relation projection
+contract_relation_id BIGINT PKsite_contract_revision_id BIGINT FK requiredrelation_code NVARCHAR(120) requiredfrom_dataset_code NVARCHAR(120) requiredfrom_field_name NVARCHAR(128) requiredto_dataset_code NVARCHAR(120) requiredto_field_name NVARCHAR(128) requiredrelation_kind VARCHAR(32) requiredcardinality VARCHAR(24) requiredrequired BIT requiredenforcement_policy VARCHAR(24) requiredload_priority INT requiredUQ revision + relation_code
+platform.site_contract_classifier
+EXISTING
+contract classifier policy
+contract_classifier_id BIGINT PKsite_contract_revision_id BIGINT FK requiredscheme_code NVARCHAR(120) requiredversion_policy VARCHAR(32) requiredauthority_mode VARCHAR(32) requiredunknown_value_policy VARCHAR(32) requiredpublication_policy VARCHAR(32) requiredUQ revision + scheme_code
+platform.site_contract_gate
+EXISTING
+blocking validation gate
+gate_id BIGINT PKsite_contract_revision_id BIGINT FK requiredgate_code NVARCHAR(120) requiredgate_type VARCHAR(32) requiredseverity VARCHAR(16) requiredblocking BIT requiredrule_json NVARCHAR(MAX) JSON requiredUQ revision + gate_code
+platform.classification_scheme
+EXTEND
+versioned value domain root
+scheme_id BIGINT PKscheme_code NVARCHAR(120) UQ requiredtitle_ka NVARCHAR(255) requiredtitle_en NVARCHAR(255) nullabledefinition_ka NVARCHAR(MAX) NEWdefinition_en NVARCHAR(MAX) nullable NEWstandard_reference NVARCHAR(255) nullableauthority_mode VARCHAR(32) required NEWowner_user_id BIGINT FK nullablecreated_at DATETIME2 requiredrow_version ROWVERSION NEW
+platform.classification_version
+EXTEND
+immutable codelist version
+classification_version_id BIGINT PKscheme_id BIGINT FK requiredversion NVARCHAR(64) requiredstatus VARCHAR(24) requiredvalid_from DATE nullablevalid_to DATE nullablechecksum CHAR(64) NEWapproved_by_user_id BIGINT FK nullable NEWrow_version ROWVERSION NEWUQ scheme_id + version
+platform.classification_item
+EXTEND
+versioned code and label
+classification_item_id BIGINT PKclassification_version_id BIGINT FK requiredcode NVARCHAR(128) requiredlabel_ka NVARCHAR(255) requiredlabel_en NVARCHAR(255) nullabledefinition_ka NVARCHAR(MAX) nullable NEWdefinition_en NVARCHAR(MAX) nullable NEWstatus VARCHAR(24) requiredsort_order INT nullablevalid_from DATE nullablevalid_to DATE nullablesuccessor_item_id BIGINT self FK nullable NEWUQ version + code
+platform.classification_hierarchy
+EXISTING
+parent child edge
+parent_item_id BIGINT FK requiredchild_item_id BIGINT FK requiredhierarchy_type VARCHAR(32) requiredvalid_from DATE nullablevalid_to DATE nullablePK parent + child + hierarchy_type
+platform.classification_alias
+EXTEND
+external raw code mapping
+alias_id BIGINT PKclassification_item_id BIGINT FK requiredexternal_system_code NVARCHAR(120) requiredexternal_code NVARCHAR(255) requirednormalized_code NVARCHAR(255) NEWnormalization_rule VARCHAR(120) NEWconfidence DECIMAL(5,4) NEWdecision_id BIGINT FK nullable NEWvalid_from DATE nullablevalid_to DATE nullableUQ external_system_code + external_code
+platform.classifier_proposal
+EXISTING
+unknown source value review queue
+proposal_id BIGINT PKscheme_id BIGINT FK requiredsource_system_id BIGINT FK requiredsource_value_raw NVARCHAR(1000) requiredsource_value_normalized NVARCHAR(1000) requiredsource_context_json NVARCHAR(MAX) JSON nullableproposed_item_id BIGINT FK nullablestatus VARCHAR(24) requiredresolution_note NVARCHAR(2000) nullablecreated_at DATETIME2 requiredresolved_at DATETIME2 nullableresolved_by_user_id BIGINT nullable
+platform.statistical_unit
+EXISTING
+unit scale and denominator
+unit_id BIGINT PKunit_code NVARCHAR(120) UQ requiredquantity_kind VARCHAR(24) requiredscale_factor DECIMAL(28,10) requireddenominator_text NVARCHAR(500) nullabletitle NVARCHAR(255) requiredstatus VARCHAR(24) required
+platform.dimension
+EXTEND
+statistical dimension concept
+dimension_id BIGINT PKdimension_code NVARCHAR(120) UQ requiredclassification_scheme_id BIGINT FK nullablevalue_type VARCHAR(24) requiredtitle_ka NVARCHAR(255) requiredtitle_en NVARCHAR(255) nullabledefinition_ka NVARCHAR(MAX) nullable NEWdefinition_en NVARCHAR(MAX) nullable NEWrole VARCHAR(24) required NEWstatus VARCHAR(24) required NEWrow_version ROWVERSION NEW
+platform.measure
+EXTEND
+measure concept
+measure_id BIGINT PKmeasure_code NVARCHAR(120) UQ requiredvalue_type VARCHAR(24) requiredunit_code NVARCHAR(64) nullabledecimal_precision INT nullableaggregation_default VARCHAR(24) requiredtitle_ka NVARCHAR(255) requiredtitle_en NVARCHAR(255) nullabledefinition_ka NVARCHAR(MAX) nullable NEWstatus VARCHAR(24) required NEW
+platform.metric
+EXTEND
+business indicator identity
+metric_id BIGINT PKmetric_code NVARCHAR(120) UQ requiredsource_dataset_id BIGINT FK requiredmeasure_id BIGINT FK requiredaggregation VARCHAR(24) requiredallowed_dimension_set_json NVARCHAR(MAX) JSON nullabledefinition_ka NVARCHAR(MAX) NEWdefinition_en NVARCHAR(MAX) nullable NEWowner_user_id BIGINT FK nullable NEWstatus VARCHAR(24) requiredrow_version ROWVERSION NEW
+platform.metric_alias
+EXISTING
+external indicator to metric mapping
+metric_alias_id BIGINT PKmetric_id BIGINT FK requiredexternal_system_code NVARCHAR(120) requiredexternal_code NVARCHAR(255) requiredvalid_from DATE nullablevalid_to DATE nullableUQ external system + external code
+platform.statistical_dataflow
+EXISTING
+SDMX compatible dataflow
+dataflow_id BIGINT PKproduct_id BIGINT FK requireddataflow_code NVARCHAR(120) requiredsource_dataset_id BIGINT FK requiredtitle_ka NVARCHAR(255) requiredtitle_en NVARCHAR(255) nullablestatus VARCHAR(24) requiredUQ product + dataflow_code
+platform.statistical_dsd
+EXISTING
+DSD immutable revision
+dsd_id BIGINT PKdataflow_id BIGINT FK requireddsd_code NVARCHAR(120) requiredrevision INT requiredobservation_grain NVARCHAR(1000) requiredstatus VARCHAR(24) requiredvalid_from DATE nullablevalid_to DATE nullableUQ dataflow + dsd_code + revision
+platform.statistical_component
+EXISTING
+dimension measure or attribute component
+component_id BIGINT PKdsd_id BIGINT FK requiredcomponent_code NVARCHAR(120) requiredcomponent_role VARCHAR(24) requiredcomponent_order INT requiredrequired BIT requireddimension_id BIGINT FK nullablemeasure_id BIGINT FK nullableclassification_version_id BIGINT FK nullableattachment_level VARCHAR(24) requiredsource_field NVARCHAR(128) nullablenormalized_field NVARCHAR(128) nullableconstraint_json NVARCHAR(MAX) JSON nullablestatus VARCHAR(24) requiredUQ dsd + component_codeUQ dsd + order
+platform.data_quality_policy
+EXTEND
+versioned quality policy
+quality_policy_id BIGINT PKpolicy_code NVARCHAR(120) requiredrevision INT required NEWstatus VARCHAR(24) requiredrules_json NVARCHAR(MAX) JSON requiredowner_user_id BIGINT FK nullable NEWapproved_by_user_id BIGINT FK nullable NEWchecksum CHAR(64) NEWUQ policy_code + revision NEW
+platform.confidentiality_policy
+EXTEND
+versioned confidentiality policy
+confidentiality_policy_id BIGINT PKpolicy_code NVARCHAR(120) requiredrevision INT required NEWstatus VARCHAR(24) requiredrules_json NVARCHAR(MAX) JSON requiredowner_user_id BIGINT FK nullable NEWapproved_by_user_id BIGINT FK nullable NEWchecksum CHAR(64) NEWUQ policy_code + revision NEW
+platform.metric_semantic_profile
+EXISTING
+metric inference and approval evidence
+metric_semantic_profile_id BIGINT PKmetric_id BIGINT FK UQ requiredsource_resource_external_key NVARCHAR(255) requiredunit_id BIGINT FK requiredinference_method VARCHAR(48) requiredinference_confidence DECIMAL(5,4) requiredinference_rationale NVARCHAR(1000) requiredapproved_basis NVARCHAR(255) requiredstatus VARCHAR(24) required
+platform.statistical_semantic_binding
+EXISTING
+carrier to complete semantics binding
+statistical_semantic_binding_id BIGINT PKdataflow_id BIGINT FK requiredcarrier_external_code NVARCHAR(255) requiredmetric_id BIGINT FK requiredunit_id BIGINT FK requiredaggregation VARCHAR(24) requiredobs_status VARCHAR(8) requiredconf_status VARCHAR(8) requiredquality_policy_id BIGINT FK requiredconfidentiality_policy_id BIGINT FK requiredstatus VARCHAR(24) requiredUQ dataflow + carrier
+platform.source_system
+EXISTING
+source authority registry
+source_system_id BIGINT PKsource_code NVARCHAR(120) UQ requiredsource_type VARCHAR(24) requiredtitle NVARCHAR(255) requiredtrust_level VARCHAR(24) requiredenabled BIT required
+platform.source_connection
+EXTEND
+connection metadata only
+source_connection_id BIGINT PKsource_system_id BIGINT FK requiredconnection_kind VARCHAR(32) requiredendpoint NVARCHAR(1024) requireddatabase_name NVARCHAR(255) nullableusername NVARCHAR(255) nullablesecret_reference NVARCHAR(255) requiredencryption_mode VARCHAR(32) requiredenabled BIT requiredlast_tested_at DATETIME2 nullable NEWlast_test_status VARCHAR(24) nullable NEWUQ source + endpoint + database
+platform.ingestion_contract
+EXTEND
+active contract pointer
+contract_id BIGINT PKcontract_code NVARCHAR(160) UQ requiredcontract_revision INT requiredsource_system_id BIGINT FK requireddataset_id BIGINT FK requiredformat_profile VARCHAR(48) requiredingestion_method VARCHAR(32) requiredraw_ingest_enabled BIT requiredauto_publish BIT required and false by defaultstatus VARCHAR(24) requiredrow_version ROWVERSION NEWUQ source_system + dataset
+platform.ingestion_contract_revision
+EXTEND
+immutable executable ingest revision
+ingestion_contract_revision_id BIGINT PKcontract_id BIGINT FK requiredrevision INT requiredformat_profile VARCHAR(48) requiredlifecycle_status VARCHAR(24) requiredcompatibility_mode VARCHAR(32) requiredsite_contract_revision_id BIGINT FK NEWchecksum CHAR(64) NEWcaptured_at DATETIME2 requiredUQ contract + revision
+platform.contract_source
+EXISTING
+active source mapping
+contract_source_id BIGINT PKcontract_id BIGINT FK requiredsource_locator NVARCHAR(1024) requiredsource_kind VARCHAR(32) requiredtarget_dataset_version_id BIGINT FK requiredsource_key_expression NVARCHAR(1024) nullablerow_role VARCHAR(32) requiredload_order INT requiredmapping_spec_json NVARCHAR(MAX) JSON requiredactive BIT requiredUQ contract + source_locator
+platform.contract_revision_source
+EXISTING
+immutable mapping snapshot
+contract_revision_source_id BIGINT PKingestion_contract_revision_id BIGINT FK requiredsource_locator NVARCHAR(1024) requiredsource_kind VARCHAR(32) requiredtarget_dataset_version_id BIGINT FK requiredsource_key_expression NVARCHAR(1024) nullablerow_role VARCHAR(32) requiredload_order INT requiredmapping_spec_json NVARCHAR(MAX) JSON requiredUQ revision + source_locator
+platform.schema_diff
+NEW
+compatibility and impact evidence
+schema_diff_id BIGINT PKfrom_revision_id BIGINT FK nullableto_revision_id BIGINT FK requireddiff_json NVARCHAR(MAX) JSON requiredcompatibility_class VARCHAR(32) requiredbreaking_reasons_json NVARCHAR(MAX) JSON requiredevaluated_by_version NVARCHAR(64) requiredcreated_at DATETIME2 required
+platform.package_generation_job
+NEW
+asynchronous Access build
+generation_job_id BIGINT PKsite_contract_revision_id BIGINT FK requiredformat_profile VARCHAR(48) requiredidempotency_key NVARCHAR(128) UQ requiredstatus VARCHAR(24) requiredrequested_by_user_id BIGINT FK requiredartifact_uri NVARCHAR(2048) nullableartifact_checksum CHAR(64) nullableartifact_signature NVARCHAR(MAX) nullablegenerator_version NVARCHAR(64) requirederror_json NVARCHAR(MAX) JSON nullablecreated_at DATETIME2 requiredstarted_at DATETIME2 nullablefinished_at DATETIME2 nullable
+platform.package_artifact
+NEW
+issued distribution registry
+package_artifact_id BIGINT PKgeneration_job_id BIGINT FK UQ requiredpackage_code NVARCHAR(120) requiredpackage_version NVARCHAR(64) requiredobject_uri NVARCHAR(2048) requiredchecksum CHAR(64) requiredbyte_size BIGINT requiredsignature_algorithm VARCHAR(32) requiredsignature_value NVARCHAR(MAX) requiredstatus VARCHAR(24) requiredexpires_at DATETIME2 nullablerevoked_at DATETIME2 nullableUQ package_code + package_version
+platform.approval_policy
+NEW
+approval route by object and risk
+approval_policy_id BIGINT PKpolicy_code NVARCHAR(120) UQ requiredobject_type VARCHAR(48) requiredrisk_level VARCHAR(24) requiredminimum_approvers INT requiredseparation_of_duties BIT requiredstatus VARCHAR(24) requiredrow_version ROWVERSION
+platform.approval_step
+NEW
+ordered required role
+approval_step_id BIGINT PKapproval_policy_id BIGINT FK requiredstep_order INT requiredrequired_role_code NVARCHAR(120) requireddecision_mode VARCHAR(24) requiredsla_hours INT nullableUQ policy + step_order
+platform.approval_instance
+NEW
+approval case bound to exact checksum
+approval_instance_id BIGINT PKapproval_policy_id BIGINT FK requiredobject_type VARCHAR(48) requiredobject_id BIGINT requiredobject_revision INT requiredobject_checksum CHAR(64) requiredstatus VARCHAR(24) requiredrequested_by_user_id BIGINT FK requiredrequested_at DATETIME2 requiredcompleted_at DATETIME2 nullable
+platform.approval_action
+NEW
+append only decision
+approval_action_id BIGINT PKapproval_instance_id BIGINT FK requiredstep_order INT requiredactor_user_id BIGINT FK requireddecision VARCHAR(24) requiredreason NVARCHAR(2000) requiredevidence_json NVARCHAR(MAX) JSON nullablesigned_at DATETIME2 requiredsignature_hash CHAR(64) required
+platform.decision_record
+NEW
+human or delegated semantic decision
+decision_id BIGINT PKdecision_code NVARCHAR(160) UQ requiredsubject_type VARCHAR(48) requiredsubject_code NVARCHAR(255) requireddecision_type VARCHAR(48) requireddecision_json NVARCHAR(MAX) JSON requiredbasis NVARCHAR(1000) requiredconfidence DECIMAL(5,4) nullabledecided_by_user_id BIGINT FK nullableauthority_basis NVARCHAR(255) requiredstatus VARCHAR(24) requireddecided_at DATETIME2 requiredsupersedes_decision_id BIGINT self FK nullable
+platform.release
+EXTEND
+publication aggregate
+release_id BIGINT PKproduct_id BIGINT FK requiredrelease_version INT requiredsite_contract_revision_id BIGINT FK NEWstatus VARCHAR(24) requiredpublished_at DATETIME2 nullablepublished_by_user_id BIGINT FK nullableprevious_release_id BIGINT self FK nullablegate_report_json NVARCHAR(MAX) JSON NEWrow_version ROWVERSION NEWUQ product + release_version
+platform.release_member
+NEW
+release to dataset snapshot membership
+release_member_id BIGINT PKrelease_id BIGINT FK requireddataset_version_id BIGINT FK requireddataset_snapshot_id BIGINT requiredrow_count BIGINT requiredchecksum CHAR(64) requiredUQ release + dataset_version
+platform.visualization_definition
+EXTEND
+chart presentation only
+visualization_id BIGINT PKproduct_id BIGINT FK requiredvisualization_code NVARCHAR(120) requiredmetric_id BIGINT FK requiredchart_type VARCHAR(32) requiredconfig_json NVARCHAR(MAX) JSON requiredaccessibility_json NVARCHAR(MAX) JSON required NEWrevision INT required NEWstatus VARCHAR(24) requiredrow_version ROWVERSION NEWUQ product + code + revision NEW
+platform.table_definition
+NEW
+published tabular projection
+table_definition_id BIGINT PKproduct_id BIGINT FK requiredtable_code NVARCHAR(120) requiredmetric_id BIGINT FK nullabledataset_version_id BIGINT FK requiredcolumns_json NVARCHAR(MAX) JSON requiredfilters_json NVARCHAR(MAX) JSON requiredsort_json NVARCHAR(MAX) JSON requiredpagination_json NVARCHAR(MAX) JSON requiredrevision INT requiredstatus VARCHAR(24) requiredUQ product + code + revision
+platform.export_definition
+NEW
+export policy and shape
+export_definition_id BIGINT PKproduct_id BIGINT FK requiredexport_code NVARCHAR(120) requiredsource_projection_code NVARCHAR(120) requiredformats_json NVARCHAR(MAX) JSON requiredrow_limit BIGINT requiredconfidentiality_policy_id BIGINT FK requiredrevision INT requiredstatus VARCHAR(24) requiredUQ product + code + revision
+platform.api_projection
+NEW
+public query contract
+api_projection_id BIGINT PKproduct_id BIGINT FK requiredprojection_code NVARCHAR(120) requiredroute_template NVARCHAR(500) requiredhttp_method VARCHAR(8) requireddataset_version_id BIGINT FK requiredquery_contract_json NVARCHAR(MAX) JSON requiredresponse_schema_json NVARCHAR(MAX) JSON requiredrate_limit_policy_code NVARCHAR(120) requiredrevision INT requiredstatus VARCHAR(24) requiredUQ product + projection_code + revisionUQ route + method + revision
+platform.outbox_event
+EXISTING
+reliable cross-plane notification
+event_id BIGINT PKaggregate_type VARCHAR(48) requiredaggregate_id BIGINT requiredevent_type VARCHAR(64) requiredpayload_json NVARCHAR(MAX) JSON requiredstatus VARCHAR(24) requiredattempts INT requiredavailable_at DATETIME2 requiredprocessed_at DATETIME2 nullablelast_error NVARCHAR(2000) nullablecreated_at DATETIME2 required
+platform.schema_migration
+EXISTING
+migration checksum ledger
+migration_id NVARCHAR(255) PKchecksum CHAR(64) requiredapplied_at DATETIME2 requiredapplied_by NVARCHAR(128) required
+platform.job_lease
+EXISTING
+single worker lease
+job_name NVARCHAR(128) PKlease_owner NVARCHAR(128) requiredlease_until DATETIME2 requiredupdated_at DATETIME2 required
+audit.audit_event
+NEW
+tamper evident append only audit
+audit_event_id BIGINT PKoccurred_at DATETIME2 requiredactor_user_id BIGINT nullableactor_type VARCHAR(24) requiredaction_code NVARCHAR(120) requiredobject_type VARCHAR(48) requiredobject_id NVARCHAR(255) requiredobject_revision INT nullablebefore_hash CHAR(64) nullableafter_hash CHAR(64) nullablecorrelation_id UNIQUEIDENTIFIER requiredrequest_id UNIQUEIDENTIFIER requiredip_hash CHAR(64) nullabledetails_json NVARCHAR(MAX) JSON requiredprevious_event_hash CHAR(64) nullableevent_hash CHAR(64) required
+iam.role
+NEW
+role registry
+role_id BIGINT PKrole_code NVARCHAR(120) UQ requiredtitle_ka NVARCHAR(255) requiredtitle_en NVARCHAR(255) nullablesystem_role BIT requiredstatus VARCHAR(24) required
+iam.permission
+NEW
+atomic capability registry
+permission_id BIGINT PKpermission_code NVARCHAR(160) UQ requiredresource_type VARCHAR(64) requiredaction VARCHAR(32) requiredrisk_level VARCHAR(24) required
+iam.role_permission
+NEW
+role permission grant
+role_id BIGINT FK requiredpermission_id BIGINT FK requiredPK role_id + permission_id
+iam.user_role_scope
+NEW
+time bounded scoped role
+user_role_scope_id BIGINT PKuser_id BIGINT FK requiredrole_id BIGINT FK requiredproduct_id BIGINT FK nullable means globalvalid_from DATETIME2 requiredvalid_to DATETIME2 nullablegranted_by_user_id BIGINT FK requiredgrant_reason NVARCHAR(1000) requiredstatus VARCHAR(24) requiredUQ user + role + product + valid_from
+Data Plane და Archive Plane ცხრილები
+ცხრილი
+grain
+სვეტები
+ingest.batch
+ერთი import request
+batch_id PKcontract_idproduct_idstatuschecksumrequested_by_user_idstarted_atfinished_atcreated_at
+ingest.artifact
+უცვლელი uploaded object
+artifact_id PKbatch_id FKoriginal_nameformatobject_urichecksumbyte_sizereceived_atquarantine_uri nullable
+ingest.dataset_load
+ერთი source to dataset load
+dataset_load_id PKbatch_id FKdataset_version_idsource_namesource_row_countaccepted_countrejected_countstatus
+ingest.staged_row
+lossless staging row
+staged_row_id PKdataset_load_id FKsource_row_numbersource_keyraw_payload_jsonpayload_hashvalidation_statuserror_json
+ingest.validation_issue
+row level issue
+issue_id PKstaged_row_id FKrule_codeseveritymessagedetails_jsoncreated_at
+ingest.load_checkpoint
+resumable cursor
+dataset_load_id PKlast_source_row_numberstatusupdated_at
+publication.snapshot
+immutable product publication
+snapshot_id PKproduct_idrelease_id UQstatuspublished_atprevious_snapshot_idcreated_at
+publication.dataset_snapshot
+immutable loaded dataset
+dataset_snapshot_id PKdataset_load_id UQ FKdataset_version_idstatusrow_countchecksumcreated_at
+publication.snapshot_member
+snapshot membership
+snapshot_id + dataset_version_id PKdataset_snapshot_idrow_countchecksum
+raw.source_record
+immutable raw row representation
+source_record_id PKdataset_snapshot_idartifact_id FKsource_row_numbersource_keypayload_jsonpayload_hashextracted_atvalid_fromvalid_to
+entity.entity_record
+canonical nonstatistical entity
+entity_id PKdataset_snapshot_idexternal_keyrecord_typetitlepayload_jsonpayload_hashsource_record_id FKvalid_fromvalid_tois_current
+entity.localized_text
+localized content
+entity_id + field_code + language_tag PKtext_valuesource_record_id FK
+entity.resource_locator
+URI or file locator
+entity_id + locator_kind + language_tag PKlocatorsource_record_id FK
+entity.entity_link
+typed entity relation
+link_id PKfrom_entity_id FKrelationship_type_idto_entity_id FKordinalvalid_fromvalid_tosource_record_id
+entity.entity_classification
+entity classifier assignment
+entity_id + attribute_id + item_id + valid_from PKvalid_tosource_record_id
+statistics.series
+metric and dimension signature
+series_id PKdataset_snapshot_idmetric_idseries_key_hashunit_codestatussource_record_idUQ snapshot + metric + signature
+statistics.observation
+typed statistical fact
+observation_id PKseries_id FKperiod_startperiod_endobservation_statusnumeric_valuetext_valueboolean_valuesource_record_id FKvalid_fromvalid_tois_currentexactly one value column CHECK required
+statistics.observation_dimension
+dimension coordinate
+observation_id + dimension_id PKclassification_item_id nullablescalar_code nullableexactly one representation CHECK required
+statistics.observation_attribute
+observation metadata
+observation_id + attribute_code PKvalue_json
+reference.classification_item_snapshot
+release frozen classifier
+snapshot_id + classification_item_id PKscheme_version_idcodelabel_kalabel_enparent_item_idstatus
+serving.metric_cache
+rebuildable aggregate cache
+cache_id PKsnapshot_id FKmetric_iddimension_signatureperiod_startperiod_endaggregate_valuerefreshed_atUQ snapshot + metric + signature + period
+archive.snapshot
+retained publication archive
+archive_snapshot_id PKproduct_idoriginal_snapshot_idarchived_atpurge_afterchecksumstatusUQ product + original_snapshot
+archive.record
+archived source record
+archive_record_id PKarchive_snapshot_id FKdataset_version_idoriginal_source_record_idrecord_kindsource_keypayload_jsonpayload_hashUQ archive + original record
+archive.artifact_reference
+archived object reference
+archive_artifact_id PKarchive_snapshot_id FKobject_urichecksumoriginal_nameUQ archive + object_uri
+მნიშვნელოვანი გაუმჯობესება  current schema-ზე უნდა დაემატოს CHECK constraints exactly one observation value, exactly one dimension representation, JSON validity, legal lifecycle values და nonnegative row counts. ეს არის additive migration და კონტრაქტებს არ არღვევს.
+Access პაკეტის სრული physical dictionary
+ეს არის revision 7-ის 22 physical table-ის ზუსტი ჩამონათვალი. ყველა ცხრილის სახელი არის namespace-prefix-ით: `__gs_*`, `__cl_*`, `__stat_*`, `__raw_*` ან domain-ის `kids_*`; prefix-ის გარეშე ახალი physical table აკრძალულია. Generator ქმნის primary/unique/secondary indexes-ს, 21 relation-ს და ავსებს contract metadata rows-ს (`__gs_package`, datasets, fields, keys, relations, structure index, classifiers, units); domain data table-ები ცარიელ template-ში მხოლოდ სტრუქტურით იქმნება და შემავსებელი ამატებს rows-ს. `__raw_document` locator-ია და არ შეიცავს raw JSON-ს.
+ცხრილი
+ოჯახი
+grain
+ყველა სვეტი და key
+__gs_package
+metadata
+package manifest singleton
+product_code TEXTcontract_code TEXTcontract_revision TEXTpackage_code TEXT PKpackage_version TEXTload_mode TEXTsource_system TEXTartifact_profile TEXT
+__gs_dataset
+metadata
+declared dataset
+dataset_code TEXT PKaccess_table_name TEXTdata_family TEXTbusiness_grain TEXT
+__gs_structure_index
+metadata
+namespace and structure registry index
+structure_code TEXT PKnamespace_code TEXTstructure_kind TEXTdata_class TEXTgrain MEMOauthority_mode TEXTlifecycle_policy TEXTlifecycle_status TEXTrevision LONGchecksum TEXT nullable
+__gs_field
+metadata
+ordered field declaration
+dataset_code TEXT PK partfield_name TEXT PK partlogical_type TEXTsemantic_role TEXTrequired TEXT boolean lexical
+__gs_key
+metadata
+primary/unique/secondary index declaration
+dataset_code TEXT PK partfield_name TEXTkey_role TEXT PK part (PRIMARY/UNIQUE/declared index code)key_order TEXT PK part
+__gs_relation
+metadata
+relation declaration
+relationship_code TEXT PKfrom_dataset_code TEXTfrom_field TEXTto_dataset_code TEXTto_field TEXTcardinality TEXTrequired TEXT
+__gs_projection
+metadata
+entity relation statistical projection
+projection_code TEXT PKdataset_code TEXTprojection_family TEXTmapping_json MEMOapproval_state TEXT
+__cl_scheme
+reference
+classifier scheme
+scheme_code TEXT PKauthority_mode TEXTtitle MEMOstandard_reference TEXT
+__cl_version
+reference
+classifier version
+version_ref TEXT PKscheme_code TEXT FKversion_code TEXTlifecycle_state TEXTvalid_from TEXTvalid_to TEXT nullableUX scheme_code + version_code
+__cl_item
+reference
+versioned classifier item
+item_ref TEXT PKversion_ref TEXT FKitem_code TEXTlabel_ka MEMO nullablelabel_en MEMO nullablelifecycle_state TEXTUX version_ref + item_code
+__cl_alias
+reference
+source value alias
+alias_ref TEXT PKitem_ref TEXT FKsource_system TEXTsource_code_raw MEMOlookup_code_normalized MEMOnormalization_rule TEXTlifecycle_state TEXT
+__cl_hierarchy
+reference
+classifier tree edge
+version_ref TEXT FKparent_item_ref TEXT FK nullablechild_item_ref TEXT PK FKordinal LONG
+__stat_unit
+reference
+governed unit
+unit_code TEXT PKquantity_kind TEXTscale_factor DOUBLEdenominator_text MEMO nullabletitle MEMO
+__stat_metric
+reference
+one governed metric per carrier resource
+metric_code TEXT PKsource_resource_id TEXT FKtitle_ka MEMO nullabletitle_en MEMO nullablemeasure_component_code TEXTunit_code TEXT FKaggregation TEXTlifecycle_state TEXTinference_confidence DOUBLEinference_rationale MEMOUX source_resource_id
+__raw_document
+raw locator
+one immutable source-artifact envelope and locator
+source_row_key TEXT PKsource_table TEXTsource_primary_key TEXTextract_sequence LONGsource_system TEXTsource_feed TEXT nullabledocument_identity TEXToriginal_filename MEMO nullablemime_type TEXT nullablebyte_size LONG nullablechecksum TEXTreceived_at DATETIMEsource_uri MEMO nullableingestion_batch TEXTprovenance MEMOretention_policy TEXTconfidentiality_class TEXTpayload_reference MEMOencryption_reference TEXT nullableparser_status TEXTvalidation_status TEXTsupersedes_source_row_key TEXT nullableUX source_table + source_primary_key
+__ent_kids_goal
+entity
+one KIDS goal
+source_goal_id TEXT PKcategory_item_ref TEXT FKtitle_ka MEMO nullabletitle_en MEMO nullablepath_ka MEMO nullablepath_en MEMO nullablesource_row_key TEXT FKoperation TEXT
+__ent_kids_resource
+entity
+one KIDS resource
+source_resource_id TEXT PKcategory_item_ref TEXT FKtitle_ka MEMO nullabletitle_en MEMO nullablepath_ka MEMO nullablepath_en MEMO nullablesource_row_key TEXT FKoperation TEXT
+__rel_kids_resource_subcategory_assignment
+relation
+one source subcategory token
+assignment_key TEXT PKsource_resource_id TEXT FKsubcategory_item_ref TEXT FKsource_token_raw MEMOordinal LONGsource_row_key TEXT FKoperation TEXTUX resource + ordinal
+__ent_kids_glossary_entry
+entity
+one independent glossary entry
+source_glossary_id TEXT PKlanguage_item_ref TEXT FKlanguage_raw MEMOentry_text MEMOsource_row_key TEXT FKoperation TEXT
+__raw_kids_statistical_carrier
+raw locator
+one parseable chart carrier per resource
+carrier_code TEXT PKsource_resource_id TEXT FKpayload_checksum TEXTparse_status TEXTsource_row_key TEXT FKoperation TEXTUX source_resource_idpayload_raw forbidden
+__stat_kids_statistical_input
+statistical input
+one parsed source cell
+input_key TEXT PKcarrier_code TEXT FKcell_ordinal LONGperiod_raw MEMOperiod_normalized TEXT nullabledimension_key_raw MEMOage_group_item_ref TEXT FKvalue_lexical MEMOvalue_decimal DOUBLE nullablejson_path MEMOsource_encoding TEXTsource_row_key TEXT FKoperation TEXTUX carrier + cell_ordinal
+__stat_kids_statistical_semantic_binding
+relation
+one complete semantic binding per carrier
+carrier_code TEXT PK FKmetric_code TEXT FKunit_code TEXT FKaggregation TEXTobs_status TEXTconf_status TEXTquality_policy_code TEXTconfidentiality_policy_code TEXTinference_method TEXToperation TEXT
+Access physical relations
+relation
+child field
+parent field
+cardinality
+FK_cl_version_scheme
+__cl_version.scheme_code
+__cl_scheme.scheme_code
+many to one
+FK_cl_item_version
+__cl_item.version_ref
+__cl_version.version_ref
+many to one
+FK_cl_alias_item
+__cl_alias.item_ref
+__cl_item.item_ref
+many to one
+FK_goal_category
+__ent_kids_goal.category_item_ref
+__cl_item.item_ref
+many to one
+FK_resource_category
+__ent_kids_resource.category_item_ref
+__cl_item.item_ref
+many to one
+FK_sub_resource
+assignment.source_resource_id
+__ent_kids_resource.source_resource_id
+many to one
+FK_sub_item
+assignment.subcategory_item_ref
+__cl_item.item_ref
+many to one
+FK_glossary_language
+glossary.language_item_ref
+__cl_item.item_ref
+many to one
+FK_carrier_resource
+carrier.source_resource_id
+__ent_kids_resource.source_resource_id
+one to one
+FK_input_carrier
+input.carrier_code
+carrier.carrier_code
+many to one
+FK_metric_resource
+metric.source_resource_id
+__ent_kids_resource.source_resource_id
+one to one
+FK_metric_unit
+metric.unit_code
+__stat_unit.unit_code
+many to one
+FK_semantic_carrier
+binding.carrier_code
+carrier.carrier_code
+one to one
+FK_semantic_metric
+binding.metric_code
+__stat_metric.metric_code
+many to one
+FK_semantic_unit
+binding.unit_code
+__stat_unit.unit_code
+many to one
+FK_goal_raw
+__ent_kids_goal.source_row_key
+__raw_document.source_row_key
+many to one
+FK_resource_raw
+__ent_kids_resource.source_row_key
+__raw_document.source_row_key
+many to one
+FK_sub_raw
+assignment.source_row_key
+__raw_document.source_row_key
+many to one
+FK_glossary_raw
+glossary.source_row_key
+__raw_document.source_row_key
+many to one
+FK_carrier_raw
+carrier.source_row_key
+__raw_document.source_row_key
+many to one
+FK_input_raw
+input.source_row_key
+__raw_document.source_row_key
+many to one
+ფიზიკური ცხრილების დანიშნულება, საზღვრები და UI-მომზადების კონტრაქტი
+ეს თავი არის ნორმატიული. ცხრილის სახელი თავისთავად საკმარისი არ არის: თითოეულ ფიზიკურ ცხრილს აქვს ზუსტი grain, პასუხისმგებლობა, authoritative სტატუსი, დაშვებული/აკრძალული შინაარსი, lifecycle, lineage, quality და confidentiality policy. UI არ იგონებს ამ წესებს; UI კონფიგურირდება მხოლოდ ამ contract metadata-დან.
+პანელის control database-ში აღწერილი ცხრილები არის contract registry-ის ფიზიკური ჩანაწერები. approved revision-ის შემდეგ generator ამ ჩანაწერებს მატერიალიზებს Access-ის ფიზიკურ ცხრილებად. Access-ში ფიზიკური ცხრილი ვერ იარსებებს, თუ იგი contract registry-ში არ არის გამოცხადებული, versioned და approved.
+კონტრაქტული ველი
+მნიშვნელობა
+წესი
+table_id / structure_id
+უნიკალური identity
+MUST; immutable identity
+namespace_code
+GS, CL, STAT, RAW, ENT, REF, SERV, ARCH, AUDIT, SYS ან domain
+MUST; controlled vocabulary
+structure_kind
+CONTRACT, CLASSIFICATION, STATISTICAL_DSD, OBSERVATION, ENTITY, EVENT, DOCUMENT, RAW_RECORD, PROJECTION და სხვ.
+MUST; versioned vocabulary
+grain
+ერთი row რას წარმოადგენს
+MUST; natural key-სთან თანხვედრაში
+authority_mode
+AUTHORITATIVE, DERIVED, RAW_EVIDENCE, CACHE
+MUST; determines write authority
+allowed_content / forbidden_content
+დაშვებული და აკრძალული მნიშვნელობები
+MUST; validation and import gate
+lifecycle_policy
+append-only, mutable, immutable, rebuildable, archival
+MUST
+lineage_policy
+რომელი source/artifact/row უნდა მიებას
+MUST for source-derived rows
+quality_policy / confidentiality_policy
+ხარისხი და disclosure control
+MUST for published data
+ui_capabilities
+view, create, edit, approve, import, export, publish
+MUST; generated UI configuration
+contract_revision / schema_hash
+რომელ immutable revision-ს ეკუთვნის
+MUST; prevents drift
+namespace
+ინახავს
+არ ინახავს
+authority/lifecycle
+UI capability
+__gs_*
+კონტრაქტი, schema, keys, relations, package და approvals
+business rows, raw payload, სტატისტიკური observation
+authoritative, versioned
+contract editor; approve/review; no direct data entry
+__cl_*
+კონტროლირებადი კოდები, ვერსიები, aliases, hierarchy
+თავისუფალი ტექსტი, დაუდასტურებელი raw value
+authoritative reference
+browse/search; propose; approve; retire
+__stat_*
+DSD, dimensions, measures, metrics, units, observations
+document payload, entity profile, parser trace
+authoritative statistical contract/fact
+filter, dimension select, chart/table config, export
+__raw_*
+წყაროს უცვლელი artifact, record, locator და provenance
+გაწმენდილი business value, public serving row
+RAW_EVIDENCE append-only
+read-only evidence; import/reprocess; no manual edit
+__ent_* / kids_*
+canonical entity, domain content, typed relationships
+raw file bytes, metric semantics unless explicitly linked
+authoritative domain or derived by declared mapping
+form/grid/detail; controlled edit; approval if required
+__ref_*
+არასტატისტიკური reference data
+uncontrolled labels and arbitrary source payload
+versioned reference
+lookup/select/filter; controlled maintenance
+__serv_*
+published read model/cache
+source-of-truth edits
+DERIVED/REBUILDABLE
+read-only public/admin view; refresh/rebuild
+__arch_*
+retained historical release and artifact references
+current mutable state
+immutable archive
+read-only historical browsing/export
+__audit_* / __sys_*
+audit, jobs, leases, checksums, errors
+domain facts or user content
+append-only/system
+read-only audit/operations
+ყველა გამოცხადებული ცხრილის ინდივიდუალური კონტრაქტები
+ზემოთ მოცემული namespace matrix-ის გარდა, ქვემოთ თითოეული გამოცხადებული physical/logical table იღებს ინდივიდუალურ კონტრაქტს. ეს არის generator-ის, importer-ის, backend-ისა და UI metadata compiler-ის ერთიანი წყარო. თუ ახალი table დაემატა, ამ ცხრილშიც უნდა დაემატოს მისი contract row იმავე migration-ში.
+table
+plane
+grain/purpose
+ინახავს
+არ ინახავს
+authority/lifecycle
+UI/backend use
+platform.data_product
+Control Plane
+მონაცემთა პროდუქტის root aggregate
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.dataset
+Control Plane
+ლოგიკური dataset identity
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.dataset_version
+Control Plane
+immutable schema version
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.attribute
+Control Plane
+field და ISO 11179 data element
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.dataset_key
+Control Plane
+primary ან unique key declaration
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.dataset_key_field
+Control Plane
+ordered key field
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.validation_rule
+Control Plane
+machine executable quality rule
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.relationship_type
+Control Plane
+კავშირის governed vocabulary
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.dataset_relationship
+Control Plane
+dataset version endpoints და enforcement
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.site_contract_revision
+Control Plane
+სრული საიტის immutable contract revision
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.site_contract_node
+Control Plane
+საიტის კანონიკური ხე და route
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.site_contract_dataset
+Control Plane
+contract to dataset version and Access table binding
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.site_contract_field
+Control Plane
+contract field projection
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.site_contract_relation
+Control Plane
+contract relation projection
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.site_contract_classifier
+Control Plane
+contract classifier policy
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.site_contract_gate
+Control Plane
+blocking validation gate
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.classification_scheme
+Control Plane
+versioned value domain root
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.classification_version
+Control Plane
+immutable codelist version
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.classification_item
+Control Plane
+versioned code and label
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.classification_hierarchy
+Control Plane
+parent child edge
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.classification_alias
+Control Plane
+external raw code mapping
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.classifier_proposal
+Control Plane
+unknown source value review queue
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.statistical_unit
+Control Plane
+unit scale and denominator
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.dimension
+Control Plane
+statistical dimension concept
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.measure
+Control Plane
+measure concept
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.metric
+Control Plane
+business indicator identity
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.metric_alias
+Control Plane
+external indicator to metric mapping
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.statistical_dataflow
+Control Plane
+SDMX compatible dataflow
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.statistical_dsd
+Control Plane
+DSD immutable revision
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.statistical_component
+Control Plane
+dimension measure or attribute component
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.data_quality_policy
+Control Plane
+versioned quality policy
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.confidentiality_policy
+Control Plane
+versioned confidentiality policy
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.metric_semantic_profile
+Control Plane
+metric inference and approval evidence
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.statistical_semantic_binding
+Control Plane
+carrier to complete semantics binding
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.source_system
+Control Plane
+source authority registry
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.source_connection
+Control Plane
+connection metadata only
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.ingestion_contract
+Control Plane
+active contract pointer
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.ingestion_contract_revision
+Control Plane
+immutable executable ingest revision
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.contract_source
+Control Plane
+active source mapping
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.contract_revision_source
+Control Plane
+immutable mapping snapshot
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.schema_diff
+Control Plane
+compatibility and impact evidence
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.package_generation_job
+Control Plane
+asynchronous Access build
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.package_artifact
+Control Plane
+issued distribution registry
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.approval_policy
+Control Plane
+approval route by object and risk
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.approval_step
+Control Plane
+ordered required role
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.approval_instance
+Control Plane
+approval case bound to exact checksum
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.approval_action
+Control Plane
+append only decision
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.decision_record
+Control Plane
+human or delegated semantic decision
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.release
+Control Plane
+publication aggregate
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.release_member
+Control Plane
+release to dataset snapshot membership
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.visualization_definition
+Control Plane
+chart presentation only
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.table_definition
+Control Plane
+published tabular projection
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.export_definition
+Control Plane
+export policy and shape
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.api_projection
+Control Plane
+public query contract
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.outbox_event
+Control Plane
+reliable cross-plane notification
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.schema_migration
+Control Plane
+migration checksum ledger
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+platform.job_lease
+Control Plane
+single worker lease
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+audit.audit_event
+Control Plane
+tamper evident append only audit
+audit, job, lease, checksum or runtime control
+business content and source facts
+SYSTEM; append-only or controlled runtime
+operations/audit read-only
+iam.role
+Control Plane
+role registry
+declared contract structure
+undeclared or unrelated data
+as declared by contract registry
+capabilities from contract metadata
+iam.permission
+Control Plane
+atomic capability registry
+declared contract structure
+undeclared or unrelated data
+as declared by contract registry
+capabilities from contract metadata
+iam.role_permission
+Control Plane
+role permission grant
+declared contract structure
+undeclared or unrelated data
+as declared by contract registry
+capabilities from contract metadata
+iam.user_role_scope
+Control Plane
+time bounded scoped role
+declared contract structure
+undeclared or unrelated data
+as declared by contract registry
+capabilities from contract metadata
+ingest.batch
+Data/Archive Plane
+ერთი import request
+declared contract structure
+undeclared or unrelated data
+as declared by contract registry
+capabilities from contract metadata
+ingest.artifact
+Data/Archive Plane
+უცვლელი uploaded object
+immutable source evidence, staging or provenance
+clean business rows or public projection
+RAW_EVIDENCE/append-only; reprocess by new batch
+read-only evidence, import, reprocess
+ingest.dataset_load
+Data/Archive Plane
+ერთი source to dataset load
+declared contract structure
+undeclared or unrelated data
+as declared by contract registry
+capabilities from contract metadata
+ingest.staged_row
+Data/Archive Plane
+lossless staging row
+immutable source evidence, staging or provenance
+clean business rows or public projection
+RAW_EVIDENCE/append-only; reprocess by new batch
+read-only evidence, import, reprocess
+ingest.validation_issue
+Data/Archive Plane
+row level issue
+declared contract structure
+undeclared or unrelated data
+as declared by contract registry
+capabilities from contract metadata
+ingest.load_checkpoint
+Data/Archive Plane
+resumable cursor
+declared contract structure
+undeclared or unrelated data
+as declared by contract registry
+capabilities from contract metadata
+publication.snapshot
+Data/Archive Plane
+immutable product publication
+declared contract structure
+undeclared or unrelated data
+as declared by contract registry
+capabilities from contract metadata
+publication.dataset_snapshot
+Data/Archive Plane
+immutable loaded dataset
+declared contract structure
+undeclared or unrelated data
+as declared by contract registry
+capabilities from contract metadata
+publication.snapshot_member
+Data/Archive Plane
+snapshot membership
+declared contract structure
+undeclared or unrelated data
+as declared by contract registry
+capabilities from contract metadata
+raw.source_record
+Data/Archive Plane
+immutable raw row representation
+immutable source evidence, staging or provenance
+clean business rows or public projection
+RAW_EVIDENCE/append-only; reprocess by new batch
+read-only evidence, import, reprocess
+entity.entity_record
+Data/Archive Plane
+canonical nonstatistical entity
+canonical/domain entity, content or typed relation
+raw bytes and unbound statistical semantics
+DOMAIN authoritative or declared DERIVED
+grid/detail/form; controlled edit
+entity.localized_text
+Data/Archive Plane
+localized content
+canonical/domain entity, content or typed relation
+raw bytes and unbound statistical semantics
+DOMAIN authoritative or declared DERIVED
+grid/detail/form; controlled edit
+entity.resource_locator
+Data/Archive Plane
+URI or file locator
+canonical/domain entity, content or typed relation
+raw bytes and unbound statistical semantics
+DOMAIN authoritative or declared DERIVED
+grid/detail/form; controlled edit
+entity.entity_link
+Data/Archive Plane
+typed entity relation
+canonical/domain entity, content or typed relation
+raw bytes and unbound statistical semantics
+DOMAIN authoritative or declared DERIVED
+grid/detail/form; controlled edit
+entity.entity_classification
+Data/Archive Plane
+entity classifier assignment
+canonical/domain entity, content or typed relation
+raw bytes and unbound statistical semantics
+DOMAIN authoritative or declared DERIVED
+grid/detail/form; controlled edit
+statistics.series
+Data/Archive Plane
+metric and dimension signature
+statistical structure, semantics or observation
+raw documents and unrelated domain entities
+AUTHORITATIVE or declared DERIVED; revisioned
+dimension/filter/chart/table/export
+statistics.observation
+Data/Archive Plane
+typed statistical fact
+statistical structure, semantics or observation
+raw documents and unrelated domain entities
+AUTHORITATIVE or declared DERIVED; revisioned
+dimension/filter/chart/table/export
+statistics.observation_dimension
+Data/Archive Plane
+dimension coordinate
+statistical structure, semantics or observation
+raw documents and unrelated domain entities
+AUTHORITATIVE or declared DERIVED; revisioned
+dimension/filter/chart/table/export
+statistics.observation_attribute
+Data/Archive Plane
+observation metadata
+statistical structure, semantics or observation
+raw documents and unrelated domain entities
+AUTHORITATIVE or declared DERIVED; revisioned
+dimension/filter/chart/table/export
+reference.classification_item_snapshot
+Data/Archive Plane
+release frozen classifier
+release-frozen non-statistical reference
+uncontrolled labels and raw payload
+VERSIONED reference
+lookup/select/filter
+serving.metric_cache
+Data/Archive Plane
+rebuildable aggregate cache
+published projection/cache or retained history
+authoritative edits and new source truth
+DERIVED rebuildable or IMMUTABLE archive
+read-only browse/export/rebuild
+archive.snapshot
+Data/Archive Plane
+retained publication archive
+published projection/cache or retained history
+authoritative edits and new source truth
+DERIVED rebuildable or IMMUTABLE archive
+read-only browse/export/rebuild
+archive.record
+Data/Archive Plane
+archived source record
+published projection/cache or retained history
+authoritative edits and new source truth
+DERIVED rebuildable or IMMUTABLE archive
+read-only browse/export/rebuild
+archive.artifact_reference
+Data/Archive Plane
+archived object reference
+immutable source evidence, staging or provenance
+clean business rows or public projection
+RAW_EVIDENCE/append-only; reprocess by new batch
+read-only evidence, import, reprocess
+__gs_package
+Access metadata
+package manifest singleton
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+__gs_dataset
+Access metadata
+declared dataset
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+__gs_structure_index
+Access metadata
+namespace and structure registry index
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+__gs_field
+Access metadata
+ordered field declaration
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+__gs_key
+Access metadata
+primary/unique/secondary index declaration
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+__gs_relation
+Access metadata
+relation declaration
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+__gs_projection
+Access metadata
+entity relation statistical projection
+contract/schema/governance metadata
+business rows, raw payload, final observations
+AUTHORITATIVE; versioned/immutable revision
+admin metadata; review/approve/diff
+__cl_scheme
+Access reference
+classifier scheme
+controlled vocabulary/classification data
+unresolved free text or source artifact
+AUTHORITATIVE; versioned reference
+lookup, propose, approve, retire
+__cl_version
+Access reference
+classifier version
+controlled vocabulary/classification data
+unresolved free text or source artifact
+AUTHORITATIVE; versioned reference
+lookup, propose, approve, retire
+__cl_item
+Access reference
+versioned classifier item
+controlled vocabulary/classification data
+unresolved free text or source artifact
+AUTHORITATIVE; versioned reference
+lookup, propose, approve, retire
+__cl_alias
+Access reference
+source value alias
+controlled vocabulary/classification data
+unresolved free text or source artifact
+AUTHORITATIVE; versioned reference
+lookup, propose, approve, retire
+__cl_hierarchy
+Access reference
+classifier tree edge
+controlled vocabulary/classification data
+unresolved free text or source artifact
+AUTHORITATIVE; versioned reference
+lookup, propose, approve, retire
+__stat_unit
+Access reference
+governed unit
+statistical structure, semantics or observation
+raw documents and unrelated domain entities
+AUTHORITATIVE or declared DERIVED; revisioned
+dimension/filter/chart/table/export
+__stat_metric
+Access reference
+one governed metric per carrier resource
+statistical structure, semantics or observation
+raw documents and unrelated domain entities
+AUTHORITATIVE or declared DERIVED; revisioned
+dimension/filter/chart/table/export
+__raw_document
+Access raw locator
+one immutable source-artifact envelope and locator
+immutable source evidence, staging or provenance
+clean business rows or public projection
+RAW_EVIDENCE/append-only; reprocess by new batch
+read-only evidence, import, reprocess
+__ent_kids_goal
+Access entity
+one KIDS goal
+canonical/domain entity, content or typed relation
+raw bytes and unbound statistical semantics
+DOMAIN authoritative or declared DERIVED
+grid/detail/form; controlled edit
+__ent_kids_resource
+Access entity
+one KIDS resource
+canonical/domain entity, content or typed relation
+raw bytes and unbound statistical semantics
+DOMAIN authoritative or declared DERIVED
+grid/detail/form; controlled edit
+__rel_kids_resource_subcategory_assignment
+Access relation
+one source subcategory token
+declared contract structure
+undeclared or unrelated data
+as declared by contract registry
+capabilities from contract metadata
+__ent_kids_glossary_entry
+Access entity
+one independent glossary entry
+canonical/domain entity, content or typed relation
+raw bytes and unbound statistical semantics
+DOMAIN authoritative or declared DERIVED
+grid/detail/form; controlled edit
+__raw_kids_statistical_carrier
+Access raw locator
+one parseable chart carrier per resource
+statistical structure, semantics or observation
+raw documents and unrelated domain entities
+AUTHORITATIVE or declared DERIVED; revisioned
+dimension/filter/chart/table/export
+__stat_kids_statistical_input
+Access statistical input
+one parsed source cell
+statistical structure, semantics or observation
+raw documents and unrelated domain entities
+AUTHORITATIVE or declared DERIVED; revisioned
+dimension/filter/chart/table/export
+__stat_kids_statistical_semantic_binding
+Access relation
+one complete semantic binding per carrier
+statistical structure, semantics or observation
+raw documents and unrelated domain entities
+AUTHORITATIVE or declared DERIVED; revisioned
+dimension/filter/chart/table/export
+`__raw_document`-ის ნორმატიული კონტრაქტი
+`__raw_document` არის უცვლელი წყარო-არტეფაქტის envelope/locator და არა უნივერსალური raw business table. ერთი row წარმოადგენს ერთ მიღებულ source artifact-ს ან მის canonical locator-ს. იგი ინახავს source system-ს, source feed-ს, file/document identity-ს, original name-ს, MIME type-ს, byte size-ს, checksum-ს, received time-ს, source URI/path-ს, ingestion batch-ს, provenance-ს, retention-ს, confidentiality-ს, storage/payload reference-ს, encryption reference-ს, parser/validation status-ს და supersession metadata-ს.
+`__raw_document`-ში MUST NOT ჩაიწეროს გაწმენდილი `kids_*` entity, საბოლოო `__stat_*` observation, metric/unit/aggregation-ის დამტკიცებული მნიშვნელობა, classifier item, serving projection ან ხელით შეცვლილი ბიზნეს-ლოგიკა. Original payload ინახება immutable object storage-ში ან სხვა კონტრაქტულ artifact store-ში; Access-ში ინახება მხოლოდ locator/identity/lineage envelope. Structured source-ისთვის გამოიყენება `__raw_source`, `__raw_document_part`, `__raw_record` და საჭიროებისას `__raw_record_field`.
+როგორ კონფიგურირდება UI contract metadata-ით
+UI surface
+authoritative metadata
+ავტომატურად განისაზღვრება
+list/grid
+dataset/table definition + field capabilities
+visible fields, labels, sort/filter, pagination, export
+detail/form
+field definition + relation + classifier binding
+control type, requiredness, options, help, validation, read/write
+statistical explorer
+DSD + dimension + measure + policy
+dimension selectors, period, unit, aggregation, chart/table mode
+approval screen
+approval policy/step/decision
+review evidence, diff, approve/reject, reason, four-eyes
+raw evidence viewer
+raw artifact + lineage
+read-only source, checksum, locator, parsed rows, reprocess
+relations view
+key/relation definitions
+linked records, cardinality, orphan/error state
+package/import view
+job, artifact, gate and issue metadata
+progress, errors, retry, checksum, download/revoke
+ახალი ფიზიკური ცხრილის დამატების სავალდებულო migration sequence
+1.  შეიქმნას ახალი migration, რომელიც ამატებს structure/table/field metadata-ს `__gs_*` registry-ში; Access-ში პირდაპირი CREATE TABLE დაუშვებელია.
+2.  დარეგისტრირდეს namespace, structure_kind, grain, authority_mode, lifecycle, allowed/forbidden content და UI capabilities.
+3.  დარეგისტრირდეს ყველა field, type, nullability, default, ordinal, key, index და relation.
+4.  დაემატოს lineage, quality, confidentiality, retention და mapping policy.
+5.  დაემატოს contract revision, schema diff და compatibility classification.
+6.  გაიაროს completeness, key, relation, classifier, statistical, privacy და security gates.
+7.  მოხდეს approval და immutable revision-ის გამოცემა.
+8.  Access generator-მა ამ revision-იდან შექმნას შესაბამისი physical table, metadata და constraints.
+9.  import engine-მა შეავსოს მხოლოდ declared mapping-ით; ყოველი row მიებას source/lineage-ს.
+10.  გამოქვეყნება მოხდეს მხოლოდ ყველა blocking gate-ის გავლის შემდეგ; generated UI configuration იკითხოს იგივე contract metadata-დან.
+ამ sequence-ის შედეგად UI ვერ შექმნის ან შეცვლის კონტრაქტს. UI მხოლოდ გამოაჩენს და შეასრულებს უკვე approved contract-ს: fields, forms, relations, classifiers, validation, approval, import და publication behavior კონტრაქტიდან მოდის.
+KIDS სტატისტიკური სემანტიკის სრული გადაწყვეტილება
+ნახაზი 4  structure meaning fact presentation გამიჯვნა
+resource
+metric code
+unit
+aggregation
+confidence
+162
+KIDS_ABORTIONS_COUNT
+COUNT_EVENT
+NONE
+0.99
+163
+KIDS_MALIGNANT_NEOPLASM_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+164
+KIDS_SEXUALLY_TRANSMITTED_DISEASE_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+165
+KIDS_DIABETES_MELLITUS_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+166
+KIDS_RESPIRATORY_TUBERCULOSIS_CASES
+COUNT_CASE
+NONE
+0.98
+167
+KIDS_TUBERCULOUS_MENINGITIS_CASES
+COUNT_CASE
+NONE
+0.98
+168
+KIDS_MUSCULOSKELETAL_TUBERCULOSIS_CASES
+COUNT_CASE
+NONE
+0.98
+169
+KIDS_INFECTIOUS_PARASITIC_DISEASE_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+170
+KIDS_BLOOD_DISEASE_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+171
+KIDS_ENDOCRINE_METABOLIC_DISEASE_NEW_CASES
+COUNT_CASE
+NONE
+0.98
+172
+KIDS_MENTAL_BEHAVIOURAL_DISORDER_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+173
+KIDS_NERVOUS_SYSTEM_DISEASE_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+174
+KIDS_EYE_ADNEXA_DISEASE_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+175
+KIDS_EAR_MASTOID_DISEASE_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+176
+KIDS_CIRCULATORY_DISEASE_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+177
+KIDS_RESPIRATORY_DISEASE_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+178
+KIDS_DIGESTIVE_DISEASE_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+179
+KIDS_SKIN_SUBCUTANEOUS_DISEASE_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+180
+KIDS_MUSCULOSKELETAL_DISEASE_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+181
+KIDS_UROGENITAL_DISEASE_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+183
+KIDS_CONGENITAL_MALFORMATION_NEW_CASES
+COUNT_CASE
+NONE
+0.99
+297
+KIDS_DISABILITY_SOCIAL_PACKAGE_RECIPIENTS
+PERSON
+NONE
+0.98
+299
+KIDS_SURVIVOR_SOCIAL_PACKAGE_RECIPIENTS
+PERSON
+NONE
+0.95
+301
+KIDS_SUBSISTENCE_ALLOWANCE_BENEFICIARIES
+PERSON
+NONE
+0.99
+303
+KIDS_PLANNED_OUTPATIENT_REGISTERED_PERSONS
+PERSON
+NONE
+0.99
+305
+KIDS_CHRONIC_MEDICINE_PROGRAM_BENEFICIARIES
+PERSON
+NONE
+0.99
+306
+KIDS_ADOPTED_CHILDREN
+PERSON
+NONE
+0.99
+308
+KIDS_CHILDREN_GRANTED_ADOPTION_STATUS
+PERSON
+NONE
+0.96
+310
+KIDS_INTERNALLY_DISPLACED_PERSONS
+PERSON
+NONE
+0.99
+373
+KIDS_LABOUR_FORCE_POPULATION
+THOUSAND_PERSONS
+NONE
+0.85
+385
+KIDS_RESIDENT_VISITORS_MONTHLY_AVERAGE
+THOUSAND_PERSONS
+NONE
+0.99
+386
+KIDS_DOMESTIC_VISITS_MONTHLY_AVERAGE
+THOUSAND_VISITS
+NONE
+0.99
+387
+KIDS_AVERAGE_NIGHTS_PER_VISIT
+AVERAGE_NIGHTS
+NONE
+0.99
+404
+KIDS_MATERNAL_MORTALITY_RATIO
+PER_100000_LIVE_BIRTHS
+NONE
+0.99
+407
+KIDS_HIV_INCIDENCE_RATE
+PER_1000_UNINFECTED_POPULATION
+NONE
+0.99
+409
+KIDS_ANAEMIA_PREVALENCE
+PERCENT
+NONE
+0.95
+417
+KIDS_SUICIDES_COUNT
+COUNT_EVENT
+NONE
+0.99
+418
+KIDS_SUICIDE_MORTALITY_RATE
+PER_100000_POPULATION
+NONE
+0.97
+438
+KIDS_DAILY_INTERNET_USE_SHARE
+PERCENT
+NONE
+0.99
+439
+KIDS_RECENT_COMPUTER_USE_SHARE
+PERCENT
+NONE
+0.99
+440
+KIDS_MOBILE_PHONE_USE_SHARE
+PERCENT
+NONE
+0.99
+451
+KIDS_LITERACY_RATE
+PERCENT
+NONE
+0.99
+452
+KIDS_EARLY_EDUCATION_LEAVERS_RATE
+PERCENT
+NONE
+0.97
+Unit registry
+unit
+quantity
+scale
+denominator
+validation
+COUNT_EVENT
+EVENT
+1
+none
+finite nonnegative integer expected
+COUNT_CASE
+CASE
+1
+none
+finite nonnegative integer expected
+PERSON
+PERSON
+1
+none
+finite nonnegative integer expected
+THOUSAND_PERSONS
+PERSON
+1000
+none
+finite nonnegative decimal
+THOUSAND_VISITS
+VISIT
+1000
+none
+finite nonnegative decimal
+AVERAGE_NIGHTS
+NIGHT
+1
+per visit
+finite nonnegative decimal
+PER_100000_LIVE_BIRTHS
+RATIO
+1
+100000 live births
+finite nonnegative decimal
+PER_1000_UNINFECTED_POPULATION
+RATIO
+1
+1000 uninfected population
+finite nonnegative decimal
+PER_100000_POPULATION
+RATIO
+1
+100000 population
+finite nonnegative decimal
+PERCENT
+RATIO
+0.01
+100 population
+0 through 100 inclusive
+Aggregation ყველა 43 metric-ზე არის NONE. მიზეზი არა ტექნიკური შეზღუდვა, არამედ overlap-იანი age bands-ია: 0–17, 15–24, 15–29 და სხვები ერთმანეთის დამატებით double count-ს იწვევენ. SUM ან AVG დასაშვები გახდება მხოლოდ ახალი DSD revision-ით, ურთიერთგამომრიცხავი dimension values-ით ან steward-approved formula-ით.
+DSD revision 2
+order
+component
+role
+attachment
+source or binding
+rule
+1
+TIME_PERIOD
+DIMENSION
+OBSERVATION
+period_raw and period_normalized
+four digit year required
+2
+AGE_GROUP
+DIMENSION
+OBSERVATION
+dimension_key_raw and age_group_item_ref
+published alias required
+3
+OBS_VALUE
+PRIMARY_MEASURE
+OBSERVATION
+value_lexical and value_decimal
+numeric finite and unit range
+4
+UNIT_MULT
+ATTRIBUTE
+SERIES
+unit scale_factor
+derived from unit registry
+5
+UNIT_MEASURE
+ATTRIBUTE
+SERIES
+unit_code
+binding required
+6
+DECIMALS
+ATTRIBUTE
+SERIES
+measure precision
+contract controlled
+7
+AGG_METHOD
+ATTRIBUTE
+SERIES
+aggregation
+NONE
+8
+OBS_STATUS
+ATTRIBUTE
+OBSERVATION
+obs_status
+A default
+9
+CONF_STATUS
+ATTRIBUTE
+OBSERVATION
+conf_status
+F default
+10
+CARRIER_ID
+ATTRIBUTE
+SERIES
+carrier_code
+lineage required
+11
+CELL_KEY
+ATTRIBUTE
+OBSERVATION
+input_key
+unique
+12
+SOURCE_PATH
+ATTRIBUTE
+OBSERVATION
+json_path
+replay evidence
+Quality და confidentiality
+პოლიტიკა
+სავალდებულო წესები
+შედეგი
+KIDS_AGGREGATE_QUALITY_V1
+period required and YYYY; published age alias; numeric finite minimum zero; percent 0–100; integer expected for count; unique carrier × period × age; source lineage; cross-age aggregation forbidden
+rule failure rejects cell or blocks release according to severity; no silent coercion
+KIDS_PUBLIC_AGGREGATE_V1
+PUBLIC_AGGREGATE; no microdata; no direct identifier; preserve source publication; smallCountThreshold 5; action FLAG_FOR_REVIEW_NO_AUTOMATIC_REWRITE; default CONF_STATUS F
+low counts are flagged, never silently suppressed or changed; privacy officer decides any new policy revision
+კლასიფიკატორების სრული მოდელი
+scheme
+source values
+panel policy
+publication condition
+KIDS_GOAL_CATEGORY
+1 through 17 from goals_titles
+versioned source scheme; optional steward crosswalk to official SDG codelist; original labels retained
+all 36 goal and 225 resource category aliases resolve
+LANGUAGE
+ka, en, ena
+ka and en map to BCP 47 language items; ena remains explicit proposal until decision; no silent correction
+all glossary rows resolve; ena decision recorded
+KIDS_RESOURCE_SUBCATEGORY
+1, 2, 3, 4 encoded singly or comma separated
+split trim preserve raw token; items may display code fallback but invented semantic label is forbidden
+authoritative labels or explicit source-code-only approval
+AGE_GROUP
+0-5, 0-12, 0-17, 3-17, 13-17, 15-17, 15-24, 15-29
+trim alias lookup only; raw key retained; range inclusivity recorded in item definition
+every statistical cell resolves to exact published version
+Unknown value algorithm
+1.  Store source_value_raw unchanged and compute normalized lookup key only with the scheme-approved normalization rule.
+2.  Resolve exact alias within source system and validity interval; fuzzy match can only suggest, never auto-approve.
+3.  If unresolved, create one deduplicated OPEN proposal with source context and candidate confidence.
+4.  Required field remains unresolved and blocks semantic publication; raw ingestion may continue if raw_ingest_enabled is true.
+5.  Steward accepts existing item, creates a new item in a new draft version, or rejects with a reason.
+6.  Decision creates an immutable alias and decision record; revalidation resumes from checkpoint.
+Access template generation contract
+ნახაზი 5  exact revision generation validation publication
+Generator preconditions
+site_contract_revision.status = APPROVED და approval instance complete; checksum ხელახლა ემთხვევა canonical serialization-ს.
+ყველა referenced dataset version, classifier version, DSD, metric, unit, quality და confidentiality policy არის APPROVED ან PUBLISHED.
+relation graph acyclic-ია load_order-ის მიხედვით; ყველა field type map-დება Access type-ზე lossless წესით.
+არც ერთი table/field/relation/access_table_name არ არის reserved, დუბლირებული ან Access-ის ლიმიტებთან შეუთავსებელი.
+generation request შეიცავს idempotency key-ს და caller-ს აქვს PACKAGE_GENERATE კონკრეტულ product scope-ზე.
+Deterministic generation algorithm
+1.  BEGIN repeatable-read transaction; load exact approved revision and all child registries; canonical-sort by dataset load_order, field ordinal, relation code and classifier code.
+2.  Serialize canonical manifest using UTF-8, stable property order and no insignificant whitespace; compute SHA-256; compare stored contract_checksum.
+3.  Create a new temporary ACCDB. Never overwrite an existing target. Create six __gs metadata tables first.
+4.  Create classifier and statistical reference tables, then raw locator, entity, relation and statistical input tables in declared load order.
+5.  Create physical primary keys and unique indexes; then create all declared relationships with referential integrity.
+6.  Populate only governed metadata/reference snapshots. For an empty template, leave source-derived entity, relation, locator and observation rows empty.
+7.  Run independent reader validation: exact tables, columns, types, PK/UX/FK, metadata counts, checksum, no forbidden field, zero unexpected data rows.
+8.  Close file, compute artifact SHA-256, sign metadata, upload immutable object, create package_artifact and mark job READY in one application transaction with outbox event.
+9.  On any error close handles, retain diagnostic log, mark FAILED and never expose the partial file as downloadable.
+Access type mapping
+logical type
+Access type
+validation
+SQL canonical target
+CODE
+TEXT
+length and allowed pattern
+NVARCHAR bounded
+TEXT
+MEMO
+Unicode and max business length
+NVARCHAR MAX
+INTEGER
+LONG
+32-bit range in package
+BIGINT or INT per contract
+DECIMAL
+DOUBLE in r7
+lexical value also retained; no financial use
+DECIMAL 28 10
+BOOLEAN
+YESNO
+true false lexical accepted
+BIT
+DATE
+TEXT in r7 reference metadata
+ISO 8601 exact
+DATE or DATETIME2
+URI
+MEMO
+absolute or product-relative URI policy
+NVARCHAR 2048
+JSON
+MEMO
+JSON Schema validation
+NVARCHAR MAX with ISJSON CHECK
+Forbidden content
+password, token, connection string, secret value ან target environment hostname
+arbitrary SQL, DDL, stored procedure name ან executable script
+database surrogate IDs; მხოლოდ stable codes და external keys
+publication instruction, role grant ან approval assertion generated outside panel
+chart-owned numeric arrays ან carrier.payload_raw duplicate
+undeclared table, field, relationship, formula ან classifier item
+Import execution specification
+Request and idempotency
+POST /admin/api/v1/importsIdempotency-Key: <uuid>Content-Type: multipart/form-dataartifact=<accdb>contractCode=KIDS_PORTAL_V1contractRevision=7expectedArtifactChecksum=<sha256>
+იგივე actor + endpoint + idempotency key + request hash აბრუნებს იმავე batch-ს. იგივე key განსხვავებული request hash-ით არის 409 IDEMPOTENCY_KEY_REUSED. checksum mismatch არის 422 ARTIFACT_CHECKSUM_MISMATCH.
+Execution stages
+#
+ეტაპი
+ზუსტი მოქმედება
+output
+1
+Receive
+stream to quarantine object; size limit; malware scan; SHA-256; never trust filename
+artifact registered
+2
+Catalog
+read tables columns indexes relations without business writes
+catalog snapshot
+3
+Contract resolve
+resolve code + revision + checksum; historical revision accepted only against its own bindings
+resolved immutable contract
+4
+Structural validate
+exact table and field set, type, order, required, PK UX FK
+gate report G01 G03
+5
+Stage
+load chunks in declared order; raw lexical values retained; checkpoint after committed chunk
+staged rows
+6
+Semantic validate
+classifiers, metric unit DSD aggregation quality confidentiality lineage
+issues and proposals
+7
+Materialize
+write canonical entities relations series observations in one dataset snapshot
+prepared dataset snapshots
+8
+Release prepare
+freeze classifier snapshots; calculate counts and checksums; run all gates
+READY release
+9
+Publish
+atomic active snapshot pointer switch and outbox event
+PUBLISHED
+10
+Archive
+retention copy of superseded snapshot and artifact reference
+reproducible rollback
+Failure semantics
+კლასი
+HTTP or job result
+retry
+მოქმედება
+STRUCTURAL
+422 FAILED
+არა იმავე artifact-ზე
+reject; show exact table field diff
+UNKNOWN_CLASSIFIER
+202 REVIEW_REQUIRED
+proposal resolution შემდეგ
+retain raw and staged rows; block publish
+ROW_QUALITY
+PARTIAL or FAILED by policy
+after corrected artifact
+issue per row; no silent correction
+PRIVACY
+REVIEW_REQUIRED
+privacy decision შემდეგ
+block public release
+TRANSIENT_STORAGE
+503 RETRYABLE
+exponential backoff with jitter
+resume same checkpoint
+WORKER_CRASH
+RUNNING lease expires
+yes
+new worker acquires lease and resumes
+CONTRACT_CHANGED
+409
+new preview
+pinned revision means never auto-upgrade
+MALWARE_OR_CORRUPT
+QUARANTINED
+no
+restricted object and security event
+Admin API contract
+ყველა endpoint არის `/admin/api/v1`; JSON იყენებს camelCase-ს; IDs opaque string-ად გადაეცემა browser-ს; დრო UTC ISO 8601-ია; mutating request მოითხოვს If-Match ETag-ს და Idempotency-Key-ს იქ, სადაც ოპერაცია შეიძლება განმეორდეს. Error body არის RFC 9457 Problem Details-compatible და შეიცავს code, title, detail, instance, correlationId და violations.
+მოდული
+method
+path
+semantics
+Products
+GET POST
+/products
+list or create product draft
+Products
+GET PATCH
+/products/{productCode}
+details or optimistic update
+Contracts
+POST
+/products/{code}/contract-revisions
+branch new draft from parent
+Contracts
+GET PATCH
+/contract-revisions/{id}
+read or edit draft
+Contracts
+GET
+/contract-revisions/{id}/diff
+canonical diff and compatibility
+Contracts
+POST
+/contract-revisions/{id}:submit
+freeze checksum and request review
+Contracts
+POST
+/contract-revisions/{id}:approve
+record independent approval
+Contracts
+POST
+/contract-revisions/{id}:issue
+make immutable executable revision
+Site tree
+GET PUT
+/contract-revisions/{id}/nodes
+read or replace validated tree
+Datasets
+GET POST
+/contract-revisions/{id}/datasets
+list or add binding
+Fields
+GET PUT
+/contract-datasets/{id}/fields
+ordered field editor
+Relations
+GET PUT
+/contract-revisions/{id}/relations
+relation graph editor
+Gates
+GET PUT
+/contract-revisions/{id}/gates
+gate policy editor
+Classifiers
+GET POST
+/classification-schemes
+list or create
+Classifiers
+POST
+/classification-schemes/{code}/versions
+new draft version
+Classifiers
+PUT
+/classification-versions/{id}/items
+bulk item upsert with ETag
+Classifiers
+PUT
+/classification-versions/{id}/hierarchy
+replace acyclic hierarchy
+Classifiers
+POST
+/classification-versions/{id}:publish
+approve and publish
+Proposals
+GET
+/classifier-proposals
+filter review inbox
+Proposals
+POST
+/classifier-proposals/{id}:resolve
+accept remap create or reject
+Statistics
+GET POST
+/dataflows
+list or create
+Statistics
+POST
+/dataflows/{code}/dsd-revisions
+create DSD draft
+Statistics
+PUT
+/dsd-revisions/{id}/components
+ordered components
+Metrics
+GET POST
+/metrics
+list or create
+Metrics
+PATCH
+/metrics/{code}
+edit draft semantics
+Metrics
+POST
+/metrics/{code}:approve
+approve exact checksum
+Semantics
+PUT
+/dataflows/{code}/bindings/{carrier}
+complete metric unit policy binding
+Policies
+GET POST
+/quality-policies
+versioned quality policies
+Policies
+GET POST
+/confidentiality-policies
+versioned privacy policies
+Policies
+POST
+/policies/{type}/{id}:simulate
+run on sample without state change
+Sources
+GET POST
+/source-systems
+source registry
+Sources
+POST
+/source-connections/{id}:test
+test via secret reference
+Mappings
+GET PUT
+/ingestion-contracts/{id}/sources
+source mapping editor
+Mappings
+POST
+/ingestion-contracts/{id}:preview
+read-only 100 row preview
+Packages
+POST
+/contract-revisions/{id}/package-jobs
+generate exact Access
+Packages
+GET
+/package-jobs/{id}
+job status and issues
+Packages
+GET
+/package-artifacts/{id}/download
+short-lived authorized download
+Packages
+POST
+/package-artifacts/{id}:revoke
+revoke distribution
+Imports
+POST
+/imports
+upload and create idempotent batch
+Imports
+GET
+/imports/{id}
+progress counts and status
+Imports
+GET
+/imports/{id}/issues
+paged issues
+Imports
+POST
+/imports/{id}:resume
+resume checkpoint
+Imports
+POST
+/imports/{id}:cancel
+cooperative cancellation
+Imports
+POST
+/imports/{id}:quarantine
+security or governance hold
+Releases
+POST
+/releases
+prepare release
+Releases
+GET
+/releases/{id}/gate-report
+complete evidence
+Releases
+POST
+/releases/{id}:approve
+independent approval
+Releases
+POST
+/releases/{id}:publish
+atomic switch
+Releases
+POST
+/releases/{id}:rollback
+new pointer event
+Experience
+GET POST
+/visualizations
+versioned chart definitions
+Experience
+GET POST
+/table-definitions
+versioned table definitions
+Experience
+GET POST
+/export-definitions
+versioned export definitions
+Experience
+GET POST
+/api-projections
+versioned public endpoints
+Experience
+POST
+/presentations/{type}/{id}:preview
+render against snapshot
+Approvals
+GET
+/approval-tasks
+current user inbox
+Approvals
+POST
+/approval-instances/{id}:decide
+approve or reject with evidence
+Audit
+GET
+/audit-events
+immutable filtered trail
+Operations
+GET
+/operations/health
+workers outbox storage migration health
+Operations
+POST
+/outbox-events/{id}:retry
+safe explicit retry
+Canonical error codes
+code
+HTTP
+meaning
+CONTRACT_REVISION_NOT_FOUND
+404
+code and revision unknown
+CONTRACT_CHECKSUM_MISMATCH
+409
+stored document changed or wrong artifact
+CONTRACT_IMMUTABLE
+409
+attempt to edit approved or issued revision
+ETAG_MISMATCH
+412
+concurrent edit
+APPROVER_NOT_INDEPENDENT
+403
+four eyes violation
+GATE_FAILED
+422
+one or more blocking gates
+SCHEMA_TABLE_UNEXPECTED
+422
+undeclared Access table
+SCHEMA_FIELD_MISSING
+422
+required field absent
+SCHEMA_TYPE_MISMATCH
+422
+lossy incompatible type
+RELATION_ORPHAN
+422
+required FK unresolved
+CLASSIFIER_UNRESOLVED
+202
+proposal created and review needed
+METRIC_BINDING_INCOMPLETE
+422
+metric unit aggregation or policy missing
+OBSERVATION_GRAIN_DUPLICATE
+422
+duplicate carrier period age
+PRIVACY_REVIEW_REQUIRED
+202
+policy blocks public release
+IDEMPOTENCY_KEY_REUSED
+409
+same key different request
+ARTIFACT_QUARANTINED
+422
+malware corrupt or forbidden content
+PUBLICATION_POINTER_CONFLICT
+409
+another release won optimistic lock
+JOB_LEASE_LOST
+503
+worker must stop and retry safely
+Security privacy and audit
+სფერო
+ნორმატიული კონტროლი
+Authentication
+OIDC authorization code with PKCE; exact redirect URIs; MFA for privileged users; no implicit grant; short sessions and step-up for publish.
+Authorization
+deny by default RBAC plus product scope; permission checked in application service and query filter; UI hiding alone never authorizes.
+Secrets
+only secret_reference in SQL; secret value fetched at execution and never returned, logged or placed in Access.
+Uploads
+streamed size limits, extension plus magic-byte validation, malware scan, isolated parser worker, decompression limits, random object key.
+Injection
+no Access-supplied SQL; parameterized SQL only; JSON expressions interpreted by allow-listed DSL; HTML Markdown sanitized.
+Data protection
+TLS in transit; storage encryption; public aggregate default; PII forbidden in KIDS template; configurable retention and legal hold.
+Audit
+append-only hash-chained event; before and after hash, actor, scope, correlation, decision evidence; audit viewer read-only.
+Supply chain
+pinned dependency versions, SBOM, signed build, SAST SCA secret scan, migration checksum, reproducible Access generator version.
+Verification
+OWASP ASVS 5.0 L2 baseline; L3 controls for identity, secret, approval and publication boundaries.
+Audit event minimum set
+PRODUCT_CREATED, CONTRACT_BRANCHED, CONTRACT_CHANGED, CONTRACT_SUBMITTED, CONTRACT_APPROVED, CONTRACT_ISSUED
+CLASSIFIER_ITEM_CHANGED, ALIAS_RESOLVED, CLASSIFIER_VERSION_PUBLISHED
+METRIC_CHANGED, SEMANTIC_BINDING_APPROVED, QUALITY_POLICY_APPROVED, CONFIDENTIALITY_POLICY_APPROVED
+PACKAGE_GENERATED, PACKAGE_DOWNLOADED, PACKAGE_REVOKED, ARTIFACT_RECEIVED, ARTIFACT_QUARANTINED
+IMPORT_STARTED, IMPORT_RESUMED, IMPORT_FAILED, GATE_EVALUATED, RELEASE_APPROVED, RELEASE_PUBLISHED, RELEASE_ROLLED_BACK
+ROLE_GRANTED, ROLE_REVOKED, EMERGENCY_ACCESS_USED, SECRET_REFERENCE_TESTED, OUTBOX_RETRIED
+Observability and service levels
+signal
+metric or trace
+target and alert
+API
+request count latency error by route and outcome
+p95 query 500 ms; command acceptance 1000 ms; alert 5xx above 1 percent 5 min
+Generator
+queue age duration file size validation failures
+p95 under 120 s for KIDS template; queue age alert 5 min
+Import
+rows per second accepted rejected checkpoint age
+progress heartbeat 30 s; stalled alert 2 min
+Outbox
+pending oldest age retries dead letters
+oldest under 60 s; alert 5 min; dead letter immediate
+Publication
+gate duration pointer conflicts rollback time
+atomic switch under 5 s; rollback RTO under 15 min
+Quality
+rule failures by dataset field carrier
+no blocking issue in published release
+Security
+denied actions auth failures quarantine events
+privileged anomaly immediate
+Storage
+object checksum mismatch capacity archive lag
+checksum mismatch immediate; 30 day capacity forecast
+Trace propagation  HTTP request → application command → SQL transaction → outbox event → worker job → object storage → publication pointer იზიარებს ერთ correlation_id-ს. Log structured JSON-ია და არ შეიცავს source payload-ს, token-ს ან secret-ს.
+Testing strategy and acceptance
+ტესტის ფენა
+სავალდებულო coverage
+release gate
+Domain unit
+state transitions, compatibility classification, grain, relation, classifier and semantic invariants
+all deterministic tests pass
+Contract tests
+OpenAPI request response, Problem Details, JSON Schema fixtures
+no undocumented endpoint or field
+Migration
+fresh install plus upgrade 001 through target; checksum drift rejection; rollback rehearsal
+both paths pass on SQL Server
+Access golden
+empty generated template exact 21 tables, 104 fields, 15 keys, 21 RI relations; no data rows
+byte difference allowed only with identical semantic manifest and valid checksum
+KIDS round trip
+source → generated package → import → canonical → export; 456 locators, 36 goals, 225 resources, 230 assignments, 178 glossary, 43 carriers, 880 cells
+counts, keys, lexical values and lineage equal
+Property based
+random valid invalid contracts, relation graphs, codelists and observation values
+no invariant bypass or parser crash
+Security
+ASVS, authorization matrix, upload fuzzing, archive bomb and malicious JSON
+no high or critical finding
+Accessibility
+automated axe plus keyboard and screen reader manual suite
+WCAG 2.2 AA; zero critical issue
+Performance
+10x KIDS volume, concurrent preview and publish, outbox recovery
+published budgets met without data loss
+Disaster recovery
+database restore, object restore, outbox replay, release rollback
+RPO 15 min and RTO 4 h platform; release rollback 15 min
+KIDS release acceptance assertions
+A01  The source Access file is opened read-only and its SHA-256 is captured before parsing.
+A02  The generator refuses to overwrite an existing output path.
+A03  No payload_raw or chartdata column exists in kids_statistical_carrier.
+A04  Each source-derived row resolves to one __raw_document locator and immutable artifact checksum.
+A05  All 43 carriers have one metric, unit, aggregation, quality and confidentiality binding.
+A06  All 880 cells preserve period_raw, dimension_key_raw, value_lexical, json_path and source encoding.
+A07  All Access relations are both declared in __gs_relation and physically enforced.
+A08  Auto publish is false; publication requires full gate report and independent approval.
+A09  Historical revisions remain resolvable against their own immutable contract_revision_source bindings.
+A10  Published snapshot mutation fails; rollback only changes the active pointer.
+Implementation backlog
+ქვემოთ რიგი dependency order-ია და არა სურვილების სია. ყოველი tranche მთავრდება deployable vertical slice-ით.
+tranche
+შესრულება
+exit criterion
+0 Baseline hardening
+align Spring Boot plugin and BOM to one supported version; remove duplicate POI versions; add migration and dependency lock checks
+clean reproducible build and current tests green
+1 Governance kernel
+new IAM approval decision audit tables; rowversion; domain state machines; authorization ports
+contract draft can be independently approved with immutable evidence
+2 Contract studio
+product site tree dataset field key relation gate screens and APIs; schema diff
+revision can be authored linted diffed approved issued
+3 Classification studio
+scheme version item hierarchy alias proposal UX and APIs
+unknown values create resolvable proposals; published versions immutable
+4 Statistical studio
+unit dimension measure metric DSD component semantic quality privacy editors
+all 43 KIDS carriers visible and binding-complete
+5 Package service
+manifest compiler Jackcess generator independent validator signature artifact registry
+empty r7 Access produced from DB contract with no Java hardcoded schema
+6 Import orchestration
+upload quarantine catalog exact validation chunk staging checkpoint resume semantic materialization
+filled package imports idempotently and failures resume
+7 Publication
+release members gate report approval atomic pointer outbox rollback archive
+KIDS snapshot publishes and rolls back reproducibly
+8 Experience registry
+table chart export API projections plus public serving adapters
+site reads only published contract-driven projections
+9 Operational assurance
+telemetry dashboards alerts backup restore DR security and accessibility evidence
+production readiness review signed
+Repository package map
+core/src/main/java/org/base/core/platform/  identity  governance  catalog  contract  classification  statistics  quality  privacy  ingestion  packagegen  publication  presentation  auditapi/src/main/java/org/base/api/  controller/admin/v1  application  adapter/in  adapter/outweb/src/main/java/org/base/web/admin/  security  bff  viewmodelweb/src/main/resources/templates/admin/  dashboard  products  contracts  classifiers  statistics  sources  packages  imports  releases  audit  operationscore/src/main/resources/db/platform/  024_panel_governance_kernel.sql  025_panel_contract_completeness.sql  026_panel_generation_publication.sql
+თუ SPA მოგვიანებით გახდება საჭირო, ის უნდა იყოს Experience adapter და არა domain-ის მეორე implementation. პირველ production release-ში server-rendered Thymeleaf + მცირე progressive enhancement შეესაბამება არსებულ stack-ს, ამცირებს supply-chain-ს და WCAG-ის კონტროლს; relation graph შეიძლება იზოლირებულ web component-ად დაემატოს accessible table fallback-ით.
+d txt მოთხოვნების საბოლოო gap audit
+ეს audit პირდაპირ ადარებს d.txt-ის ყველა სავალდებულო ბლოკს repository-ის registry-ს, migration-ებს, generator-სა და ამ blueprint-ს. UI განზრახ გამოტოვებულია, მაგრამ UI-სთვის საჭირო metadata, validation, API და workflow კონტრაქტები შედის.
+d.txt block
+result
+evidence and boundary
+Control Plane authority and immutable revision
+PASS
+platform contract registry; approved revision gate; Access has no authoring authority
+Namespace and structure identity
+PASS
+GS, CL, STAT, RAW, ENT, REF, SERV, ARCH, AUDIT, SYS and KIDS plus __gs_structure_index
+Prefix canon
+PASS
+__gs_*, __cl_*, __stat_*, __raw_* and kids_* domain prefix; unprefixed new physical tables are forbidden
+Raw envelope
+PASS
+__raw_document has the complete 22-field immutable envelope; payload remains an external artifact reference
+Keys, indexes and relations
+PASS
+registry-defined primary/secondary indexes and relation cardinality are materialized deterministically
+Classifiers and statistical semantics
+PASS
+scheme/version/item/alias/hierarchy, unit, metric and semantic binding contracts are relational
+Panel backend and API
+PASS
+governance, mapping, ingestion, validation, package, publication, audit and observability endpoints are specified
+Old Access import
+PASS
+inventory, mapping, quarantine, row issues, checkpoint, retry, idempotency and post-import gates are specified
+UI
+EXCLUDED BY REQUEST
+only declarative metadata and API capabilities are delivered; no UI is built
+Definition of Done
+სფერო
+დასრულების პირობა
+Contract authority
+ერთი approved revision-იდან deterministic-ად გენერირდება manifest, Access, OpenAPI fragments და UI navigation projection.
+No hardcode
+dataset, field, relation, metric, unit, classifier, gate და presentation definition აღარ არის Java ან template hardcode; seed migration შეიძლება შეიცავდეს metadata-ს, observation value-ს არასდროს.
+Completeness
+UI-დან ივსება ამ დოკუმენტში გამოცხადებული ყველა required field; API და DB invariant ერთსა და იმავე domain policy-ს იყენებს.
+Safety
+separation of duties, deny by default authorization, immutable approval and signed artifact მუშაობს integration test-ით.
+Access
+empty template exact schema-ით იქმნება; შემავსებელს არ შეუძლია კონტრაქტის შეცვლა; filled package exact validator-ს გადის.
+Statistics
+43 of 43 binding complete; 880 of 880 cell lineage complete; aggregation NONE enforced; policy simulation evidence retained.
+Publication
+all gates PASS; atomic snapshot switch; no partial public state; tested rollback.
+Operations
+metrics logs traces alerts backup restore runbook and ownership available.
+Quality
+unit integration contract round-trip security accessibility performance and DR suites green.
+Documentation
+OpenAPI, data dictionary, state diagrams and decision register generated from the same contract revision.
+საბოლოო წითელი ხაზი  თუ პანელს შეუძლია ისეთი Access-ის გენერაცია, რომლის schema ან semantics მონაცემთა ბაზაში approved revision-ის სახით არ არსებობს, იმპლემენტაცია დასრულებული არ არის. თუ Access-ის შემვსებს შეუძლია schema-ს, classifier authority-ს, metric/unit-ს ან publication-ს თვითონ შეცვლა, იმპლემენტაცია არასწორია.
+გადაწყვეტილებათა რეესტრი
+ID
+თემა
+არჩევანი
+მიზეზი
+ADR 001
+Control Plane authority
+პანელი ქმნის და ამტკიცებს; Access ასრულებს
+prevents split brain contract
+ADR 002
+Modular monolith
+bounded contexts ერთ deployable Spring application-ში
+correct complexity for current scale
+ADR 003
+No event sourcing
+append-only audit plus current relational state
+auditability without replay complexity
+ADR 004
+Transactional outbox
+cross-plane side effects asynchronously
+recoverable delivery without distributed transaction
+ADR 005
+Immutable revisions
+approved objects never updated
+reproducibility and rollback
+ADR 006
+Raw artifact authority
+original Access bytes in object storage
+no duplicated raw JSON
+ADR 007
+SDMX statistical core
+dataflow DSD dimensions measure attributes
+interoperable statistical meaning
+ADR 008
+JSON only for extensible specs
+core identity and relations remain relational
+queryability plus controlled flexibility
+ADR 009
+Human approval for ambiguity
+fuzzy inference creates proposal only
+no fabricated semantics
+ADR 010
+Presentation separated from data
+chart table export API definitions bind semantic layer
+no hardcoded visual data
+ნორმატიული წყაროები
+წყარო
+მისამართი
+გამოყენება
+SDMX 3.1 Technical Specifications
+https://sdmx.org/standards-2/
+2025 release; statistical information model and exchange
+W3C DCAT 3 Recommendation
+https://www.w3.org/TR/vocab-dcat-3/
+catalog, dataset, distribution, version and service metadata
+W3C PROV O Recommendation
+https://www.w3.org/TR/prov-o/
+provenance entities activities agents and derivation
+JSON Schema Draft 2020 12
+https://json-schema.org/draft/2020-12
+machine-readable JSON validation
+OpenAPI Specification
+https://spec.openapis.org/oas/latest.html
+current HTTP API contract; target 3.2
+WCAG 2.2
+https://www.w3.org/TR/WCAG22/
+AA accessibility target
+OWASP ASVS 5.0
+https://owasp.org/www-project-application-security-verification-standard/
+security verification baseline
+RFC 9700
+https://www.rfc-editor.org/rfc/rfc9700.html
+OAuth 2.0 security best current practice
+NIST SP 800 218
+https://csrc.nist.gov/pubs/sp/800/218/final
+secure software development framework
+Repository contract
+core/src/main/resources/db/platform/022_kids_complete_site_contract.sql
+KIDS revision 6 structural foundation
+Repository structure registry
+core/src/main/resources/db/platform/024_contract_structure_registry_and_ui_metadata.sql; 025_contract_registry_system_fields.sql; 026_contract_registry_keys_and_relations.sql; 027_contract_registry_approval_state.sql; 028_contract_index_registry.sql; 029_complete_structure_and_raw_contract.sql; 030_raw_document_envelope_fields.sql
+namespace, structure, physical table boundary, field, key, index, relation, prefix and raw-envelope registry
+Registry-driven generator
+ops/scripts/java/ContractRegistryAccessPackageGenerator.java
+empty Access package generated only from approved contract table/field/key/relation registry and populated with declared metadata
+Repository semantics
+core/src/main/resources/db/platform/023_kids_inferred_statistical_semantics.sql
+KIDS revision 7 metric unit policy decisions
+Repository generator
+ops/scripts/java/KidsPortalCanonicalAccessPackageGenerator.java
+current exact r7 Access implementation evidence
+საბოლოო დასკვნა
+ეს blueprint კეტავს მთავარ არქიტექტურულ თავისუფლებებს, რომლებმაც აქამდე შეიძლებოდა deviation გამოეწვია: authority, boundary, schema, lifecycle, approval, Access contract, statistical semantics, classifier resolution, ingestion, publication, security და acceptance. დარჩენილი სამუშაო არის ამ გამოცხადებული კონტრაქტის იმპლემენტაცია migration-ებად, domain/application code-ად, UI-დ და automated test-ებად — არა ახალი არქიტექტურის მოფიქრება.

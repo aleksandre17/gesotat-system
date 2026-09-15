@@ -1,0 +1,38 @@
+{
+  "realm": "geostat",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "rememberMe": false,
+  "verifyEmail": true,
+  "resetPasswordAllowed": false,
+  "roles": {"realm": [
+    {"name":"contract.read","description":"Read approved contract metadata"},
+    {"name":"contract.write","description":"Create or edit contract drafts"},
+    {"name":"ingest.execute","description":"Execute governed ingestion"},
+    {"name":"quality.approve","description":"Approve quality and semantic gates"},
+    {"name":"publish.execute","description":"Publish an approved snapshot"},
+    {"name":"raw.read","description":"Read permitted raw evidence"},
+    {"name":"admin","description":"Platform administration"}
+  ]},
+  "clients": [{
+    "clientId": "geostat-api", "name": "GEOSOTAT API resource server",
+    "enabled": true, "protocol": "openid-connect", "bearerOnly": true,
+    "publicClient": false, "standardFlowEnabled": false,
+    "directAccessGrantsEnabled": false, "serviceAccountsEnabled": false,
+    "clientAuthenticatorType": "client-secret",
+    "defaultClientScopes": ["profile", "email", "roles", "web-origins"]
+  }],
+  "clientScopes": [{
+    "name": "tenant", "protocol": "openid-connect",
+    "attributes": {"include.in.token.scope":"true"},
+    "protocolMappers": [{
+      "name": "tenant_id", "protocol": "openid-connect",
+      "protocolMapper": "oidc-usermodel-attribute-mapper", "consentRequired": false,
+      "config": {"userinfo.token.claim":"true", "user.attribute":"tenant_id",
+        "id.token.claim":"true", "access.token.claim":"true",
+        "claim.name":"tenant_id", "jsonType.label":"String"}
+    }]
+  }],
+  "defaultDefaultClientScopes": ["profile", "email", "roles", "web-origins", "tenant"]
+}

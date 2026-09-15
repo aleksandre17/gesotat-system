@@ -1,0 +1,6 @@
+{
+  "schema": "geostat.host-roster.v1",
+  "roles": [],
+  "source": "host-only-unassigned",
+  "status": "EMPTY_UNTIL_ASSIGNED"
+}

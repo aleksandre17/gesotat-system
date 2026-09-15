@@ -1,0 +1,35 @@
+rootProject.name = 'gesotat-system'
+
+// Core is always included - shared foundation
+include 'core'
+
+// Backend is the single Gradle build boundary. The web application remains
+// physically under frontend, but is registered explicitly as a project so
+// there is one canonical dependency graph and no filesystem links.
+include ':web'
+project(':web').projectDir = file('../frontend/web')
+
+// Dynamically include backend modules from activeModules property.
+// Override: gradlew build -PactiveModules=api or -PactiveModules=api,mobile
+String modules = settings.hasProperty('activeModules')
+        ? settings.getProperty('activeModules')
+        : rootDir.listFiles()
+                .findAll { it.isDirectory() && new File(it, 'build.gradle').exists() && !(it.name in ['core', 'web']) }
+                .collect { it.name }
+                .sort()
+                .join(',')
+
+String[] active = modules.tokenize(',').collect { it.trim().toLowerCase() }
+
+active.each { String mod ->
+    if (file(mod).exists() && mod != 'web') {
+        include(":${mod}")
+        println "  ✓ Module included: ${mod}"
+    } else {
+        println "  ✗ Module not found: ${mod} (skipped)"
+    }
+}
+
+println "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+println "  Active modules: core, ${active.join(', ')}"
+println "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

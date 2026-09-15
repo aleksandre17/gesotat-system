@@ -1,0 +1,16 @@
+## Copy to a developer-owned external configuration location.
+## Never place credentials under src/main/resources or commit this file as application-local.yml.
+spring:
+  datasource:
+    primary:
+      jdbc-url: jdbc:sqlserver://localhost:1433;databaseName=geostat-control;encrypt=true;trustServerCertificate=true
+      username: ${DB_PRIMARY_USER}
+      password: ${DB_PRIMARY_PASS}
+    secondary:
+      jdbc-url: jdbc:sqlserver://localhost:1433;databaseName=geostat-secondary;encrypt=true;trustServerCertificate=true
+      username: ${DB_SECONDARY_USER}
+      password: ${DB_SECONDARY_PASS}
+jwt:
+  secret: ${JWT_SECRET}
+mobile:
+  enabled: false

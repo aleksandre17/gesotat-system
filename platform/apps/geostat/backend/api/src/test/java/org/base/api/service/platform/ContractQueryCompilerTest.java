@@ -1,0 +1,19 @@
+package org.base.api.service.platform;
+import org.junit.jupiter.api.Test;
+import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
+class ContractQueryCompilerTest {
+ @Test void compilesOnlyDeclaredFields(){var x=ContractQueryCompiler.compile(Map.of("code","A"),Set.of("code"),"code",false);assertEquals(" WHERE [code]=?",x.whereSql());assertEquals(List.of("A"),x.parameters());}
+ @Test void compilesDeclarativeOperators(){var x=ContractQueryCompiler.compile(Map.of("value",Map.of("op","BETWEEN","value",List.of(1,9))),Set.of("value"),null,false);assertEquals(" WHERE [value] BETWEEN ? AND ?",x.whereSql());assertEquals(List.of(1,9),x.parameters());}
+ @Test void compilesInAndContains(){var x=ContractQueryCompiler.compile(Map.of("code",Map.of("op","IN","value",List.of("A","B")),"title",Map.of("op","CONTAINS","value","kid")),Set.of("code","title"),null,false);assertTrue(x.whereSql().contains("[code] IN (?,?)"));assertTrue(x.whereSql().contains("[title] LIKE ?"));assertEquals(3,x.parameters().size());assertTrue(x.parameters().containsAll(List.of("A","B","%kid%")));}
+ @Test void acceptsSafeDimensionPath(){var x=ContractQueryCompiler.compile(Map.of("dimension.AGE_GROUP","0-17"),Set.of("dimension.AGE_GROUP"),null,false);assertEquals(" WHERE [dimension.AGE_GROUP]=?",x.whereSql());}
+ @Test void compilesNestedAndOrWhere(){var x=ContractQueryCompiler.compileWhere(Map.of("or",List.of(Map.of("code","A"),Map.of("code",Map.of("op","EQ","value","B")))),Set.of("code"));assertTrue(x.whereSql().contains("OR"));assertEquals(List.of("A","B"),x.parameters());}
+ @Test void compilesRelationPredicateSafely(){var x=ContractQueryCompiler.compileWhere(Map.of("relation",Map.of("name","children","where",Map.of("code",Map.of("op","EQ","value","A")))),Set.of("code"));assertTrue(x.whereSql().contains("1=1"));assertEquals(List.of("A"),x.parameters());}
+ @Test void rejectsUndeclaredIdentifier(){assertThrows(IllegalArgumentException.class,()->ContractQueryCompiler.compile(Map.of("x];DROP TABLE t--","A"),Set.of("code"),null,false));}
+ @Test void relationJoinIsGeneric(){List<Map<String,Object>> p=List.of(new HashMap<>(Map.of("id",1)));List<Map<String,Object>> c=List.of(new HashMap<>(Map.of("pid",1,"v","x")));var x=(List<?>)ContractRelationGraphExecutor.attach(p,"children",c,"id","pid",true).get(0).get("children");assertEquals("x",((Map<?,?>)x.get(0)).get("v"));}
+ @Test void detectsRelationCycles(){var g=new HashMap<String,List<String>>();g.put("a",List.of("b"));g.put("b",List.of("a"));assertThrows(IllegalArgumentException.class,()->ContractRelationGraphExecutor.assertAcyclic(g));}
+ @Test void serializerHonoursProjection(){List<Map<String,Object>> rows=List.of(new HashMap<>(Map.of("a",1,"b",2)));assertEquals(Set.of("a"),ContractResponseSerializer.select(rows,List.of("a")).get(0).keySet());}
+ @Test void includeHonoursNestedRoots(){List<Map<String,Object>> rows=List.of(new HashMap<>(Map.of("seriesId",1,"raw",Map.of("x",2),"classifiers",List.of())));var x=ContractIncludeSerializer.apply(rows,List.of("raw"));assertTrue(x.get(0).containsKey("raw"));assertFalse(x.get(0).containsKey("classifiers"));}
+ @Test void includeProjectsNestedPath(){List<Map<String,Object>> rows=List.of(new HashMap<>(Map.of("seriesId",1,"observations",List.of(Map.of("numericValue",3,"secret",9)))));var x=ContractIncludeSerializer.apply(rows,List.of("observations.numericValue"));var o=(Map<?,?>)((List<?>)x.get(0).get("observations")).get(0);assertEquals(3,o.get("numericValue"));assertFalse(o.containsKey("secret"));}
+ @Test void aggregationPlannerIsFamilyNeutral(){List<Map<String,Object>> rows=List.of(new HashMap<>(Map.of("g","a","v",2)),new HashMap<>(Map.of("g","a","v",3)));assertEquals("5",ContractAggregationPlanner.aggregate(rows,List.of("g"),"v","SUM").get(0).get("aggregate_value").toString());}
+}

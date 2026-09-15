@@ -1,0 +1,33 @@
+Configuration on demand is an incubating feature.
+  ? Module included: api
+  ? Module included: mobile
+??????????????????????????????????
+  Active modules: core, api, mobile
+??????????????????????????????????
+> Task :mobile:processResources UP-TO-DATE
+> Task :api:processResources UP-TO-DATE
+> Task :api:processTestResources NO-SOURCE
+> Task :core:compileJava UP-TO-DATE
+> Task :core:processResources UP-TO-DATE
+> Task :core:classes UP-TO-DATE
+> Task :core:jar UP-TO-DATE
+> Task :mobile:compileJava UP-TO-DATE
+> Task :mobile:classes UP-TO-DATE
+> Task :mobile:jar UP-TO-DATE
+
+> Task :api:compileJava
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :api:classes
+> Task :api:compileTestJava
+> Task :api:testClasses
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+> Task :api:test
+
+[Incubating] Problems report is available at: file:///C:/Users/Test-User/Desktop/gesotat-system/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 19s
+10 actionable tasks: 3 executed, 7 up-to-date

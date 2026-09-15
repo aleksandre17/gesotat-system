@@ -1,0 +1,139 @@
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: never
+  metrics:
+    tags:
+      application: ${spring.application.name:api}
+      service: geostat-platform-api
+      environment: ${SPRING_PROFILES_ACTIVE:default}
+  otlp:
+    metrics:
+      export:
+        enabled: ${OTEL_METRICS_ENABLED:false}
+        url: ${OTEL_METRICS_ENDPOINT:http://localhost:4318/v1/metrics}
+        step: ${OTEL_METRICS_STEP:60s}
+
+security:
+  type: api
+
+spring:
+  config:
+    import: optional:classpath:application-local.yml
+  web:
+    resources:
+      static-locations: classpath:/static/
+  mvc:
+    static-path-pattern: /static/**
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: ${PLATFORM_MAX_ACCESS_ARTIFACT_BYTES:1073741824}
+      max-request-size: ${PLATFORM_MAX_ACCESS_ARTIFACT_BYTES:1073741824}
+      file-size-threshold: 0B
+      location: /app/uploads
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: api
+  data:
+    redis:
+      url: ${PLATFORM_RATE_LIMIT_REDIS_URL:redis://localhost:6379}
+  datasource:
+    primary:
+      jdbc-url: ${DB_PRIMARY_URL}
+      username: ${DB_PRIMARY_USER}
+      password: ${DB_PRIMARY_PASS}
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    secondary:
+      jdbc-url: ${DB_SECONDARY_URL}
+      username: ${DB_SECONDARY_USER}
+      password: ${DB_SECONDARY_PASS}
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    data-plane:
+      jdbc-url: ${DB_DATA_URL}
+      username: ${DB_DATA_USER}
+      password: ${DB_DATA_PASS}
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    archive-plane:
+      jdbc-url: ${DB_ARCHIVE_URL}
+      username: ${DB_ARCHIVE_USER}
+      password: ${DB_ARCHIVE_PASS}
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Schema is owned by ordered migrations; runtime must never mutate it implicitly.
+      ddl-auto: ${JPA_DDL_AUTO:validate}
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 1000
+          batch_versioned_data: true
+        order_updates: true
+        order_inserts: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  issuer: ${JWT_ISSUER:geostat-api}
+  audience: ${JWT_AUDIENCE:geostat-platform}
+  expiration: ${JWT_EXPIRATION:86400000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:86400000}
+
+logging:
+  level:
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
+
+storage:
+  export-dir: api/storage/access_exports
+  s3:
+    endpoint: ${STORAGE_ENDPOINT:}
+    access-key: ${STORAGE_ACCESS_KEY:}
+    secret-key: ${STORAGE_SECRET_KEY:}
+    ingest-bucket: ${STORAGE_BUCKET_INGEST:geostat-ingest}
+    quarantine-bucket: ${STORAGE_BUCKET_QUARANTINE:geostat-quarantine}
+    archive-bucket: ${STORAGE_BUCKET_ARCHIVE:geostat-archive}
+    export-bucket: ${STORAGE_BUCKET_EXPORT:geostat-export}
+
+platform:
+  provider:
+    discovery:
+      enabled: ${PLATFORM_PROVIDER_DISCOVERY_ENABLED:false}
+  query:
+    max-export-bytes: ${PLATFORM_QUERY_MAX_EXPORT_BYTES:52428800}
+    max-request-bytes: ${PLATFORM_QUERY_MAX_REQUEST_BYTES:262144}
+    cost:
+      max: ${PLATFORM_QUERY_COST_MAX:5000}
+  ingest:
+    max-artifact-bytes: ${PLATFORM_MAX_ACCESS_ARTIFACT_BYTES:1073741824}
+  cors:
+    allowed-origins: ${PLATFORM_CORS_ALLOWED_ORIGINS:http://localhost:5173}
+    allowed-origin-patterns: ${PLATFORM_CORS_ALLOWED_ORIGIN_PATTERNS:}
+  cursor-signing-secret: ${PLATFORM_CURSOR_SIGNING_SECRET:change-me-in-production}
+  schema-migration:
+    enabled: ${PLATFORM_SCHEMA_MIGRATION_ENABLED:true}
+  import:
+    schedule:
+      cron: ${PLATFORM_IMPORT_CRON:0 0 3 1 * *}
+  archive:
+    purge:
+      cron: ${PLATFORM_ARCHIVE_PURGE_CRON:0 30 3 * * *}
+  serving-cache:
+    enabled: ${PLATFORM_SERVING_CACHE_ENABLED:false}
+    fixed-delay-ms: ${PLATFORM_SERVING_CACHE_FIXED_DELAY_MS:60000}
+  rate-limit:
+    requests-per-window: ${PLATFORM_RATE_LIMIT_REQUESTS:120}
+    window-ms: ${PLATFORM_RATE_LIMIT_WINDOW_MS:60000}
+    max-client-keys: ${PLATFORM_RATE_LIMIT_MAX_CLIENT_KEYS:10000}
+    redis:
+      enabled: ${PLATFORM_RATE_LIMIT_REDIS_ENABLED:false}
+      url: ${PLATFORM_RATE_LIMIT_REDIS_URL:}
+      key-prefix: ${PLATFORM_RATE_LIMIT_REDIS_KEY_PREFIX:geostat:rate-limit}

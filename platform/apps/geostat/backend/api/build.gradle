@@ -1,0 +1,157 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    implementation project(':core')
+
+    // Include mobile module if it's in the active build (skip with -PincludeMobile=no)
+    if (findProject(':mobile') != null && findProperty('includeMobile') != 'n') {
+        implementation project(':mobile')
+    }
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate6'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-otlp'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.hibernate.orm:hibernate-core:6.4.4.Final'
+
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+
+    implementation 'mysql:mysql-connector-java:8.0.33'
+
+
+    // https://mvnrepository.com/artifact/com.healthmarketscience.jackcess/jackcess
+    implementation("com.healthmarketscience.jackcess:jackcess:4.0.7") {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'org.springframework.security:spring-security-test'
+    testRuntimeOnly 'com.h2database:h2:2.2.224'
+
+
+    // Apache POI - one pinned version for deterministic XLS/XLSX parsing
+    implementation 'org.apache.poi:poi:5.4.0'
+    implementation 'org.apache.poi:poi-ooxml:5.4.0'
+
+    // Apache Commons CSV - CSV-ის ჩასაწერად
+    implementation 'org.apache.commons:commons-csv:1.10.0'
+    implementation 'io.minio:minio:9.0.1'
+
+    // Interoperability toolchain: pinned Apache Avro/Parquet runtime for the
+    // contract-governed Parquet codec (schema is generated from the response
+    // contract; no caller-supplied schema or filesystem path is accepted).
+    implementation 'org.apache.avro:avro:1.11.3'
+    implementation 'org.apache.parquet:parquet-avro:1.14.3'
+    implementation 'org.apache.hadoop:hadoop-common:3.3.6'
+    implementation 'org.apache.hadoop:hadoop-mapreduce-client-core:3.3.6'
+}
+configurations.configureEach { exclude group: 'org.slf4j', module: 'slf4j-reload4j' }
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-parameters'
+    options.fork = true
+    options.incremental = true
+}
+
+test {
+    useJUnitPlatform()
+    workingDir rootProject.projectDir
+    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+    minHeapSize = "256m"
+    maxHeapSize = "1g"
+}
+
+// Dependency convergence can expose duplicate service-library entries in the
+// executable archive (for example JAXB providers).  The boot archive is a
+// deterministic deployment artifact; duplicate resource entries must not make
+// reproducible packaging fail.
+tasks.named('bootJar') {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+// Canonical KIDS package is generated outside the application source set so it
+// remains an explicit, repeatable artifact build step rather than runtime API code.
+sourceSets {
+    kidsCanonicalTool {
+        // Tooling is owned by the repository ops/scripts layer; keep it out of
+        // the API runtime source set while making Gradle tasks reproducible.
+        java.srcDir '../../../../../ops/scripts/java'
+        java.include 'KidsPortalCanonicalAccessPackageGenerator.java'
+        java.include 'KidsPortalProductionAccessAudit.java'
+        java.include 'KidsStatisticalSemanticProfiler.java'
+        java.include 'ContractRegistryAccessPackageGenerator.java'
+        compileClasspath += sourceSets.main.runtimeClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+}
+
+tasks.register('profileKidsStatisticalSemantics', JavaExec) {
+    group = 'geostat'
+    description = 'Print read-only evidence for KIDS carrier metric/unit/aggregation inference'
+    dependsOn tasks.named('compileKidsCanonicalToolJava')
+    classpath = sourceSets.kidsCanonicalTool.runtimeClasspath
+    mainClass = 'KidsStatisticalSemanticProfiler'
+    args '../../../../../samples/kids-children-portal-full-data.accdb'
+}
+
+tasks.register('auditKidsCanonicalAccess', JavaExec) {
+    group = 'geostat'
+    description = 'Read-only structural and row-count audit of the production KIDS Access artifact'
+    dependsOn tasks.named('compileKidsCanonicalToolJava')
+    classpath = sourceSets.kidsCanonicalTool.runtimeClasspath
+    mainClass = 'KidsPortalProductionAccessAudit'
+    args (project.findProperty('kidsAccessFile') ?: 'kids-portal-v1-canonical-r8-final.accdb')
+}
+
+tasks.register('generateKidsCanonicalAccess', JavaExec) {
+    group = 'geostat'
+    description = 'Generate the canonical KIDS Access package from the read-only legacy export'
+    dependsOn tasks.named('compileKidsCanonicalToolJava')
+    classpath = sourceSets.kidsCanonicalTool.runtimeClasspath
+    mainClass = 'KidsPortalCanonicalAccessPackageGenerator'
+    args (project.findProperty('kidsOutput') ?: 'kids-portal-v1-canonical-r8-final.accdb'),
+          (project.findProperty('kidsSource') ?: '../../../../../samples/kids-children-portal-full-data.accdb')
+}
+
+tasks.register('generateContractRegistryAccess', JavaExec) {
+    group = 'geostat'
+    description = 'Generate an empty Access package from the approved Control Plane contract registry'
+    dependsOn tasks.named('compileKidsCanonicalToolJava')
+    classpath = sourceSets.kidsCanonicalTool.runtimeClasspath
+    mainClass = 'ContractRegistryAccessPackageGenerator'
+    doFirst {
+        def host = project.findProperty('contractHost') ?: System.getenv('CONTRACT_DB_HOST')
+        def db = project.findProperty('contractDatabase') ?: System.getenv('CONTRACT_DB_NAME')
+        def user = project.findProperty('contractUser') ?: System.getenv('CONTRACT_DB_USER')
+        def pass = project.findProperty('contractPassword') ?: System.getenv('CONTRACT_DB_PASSWORD')
+        def revision = project.findProperty('contractRevision') ?: '7'
+        def output = project.findProperty('contractOutput') ?: '../artifacts/kids-contract-generated.accdb'
+        if ([host,db,user,pass].any { it == null || it.toString().isBlank() }) throw new GradleException('Provide -PcontractHost -PcontractDatabase -PcontractUser -PcontractPassword')
+        args host, db, user, pass, revision.toString(), output
+    }
+}

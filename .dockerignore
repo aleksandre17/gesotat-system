@@ -30,8 +30,8 @@ docker-compose*.yml
 *.xlsx
 *.xls
 storage/access_exports/data/
-api/src/main/storage/input/
-api/storage/
+platform/apps/geostat/backend/api/src/main/storage/input/
+platform/apps/geostat/backend/api/storage/
 
 # ── Docs ─────────────────────────────────────────────────────
 README.md

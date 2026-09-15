@@ -391,7 +391,7 @@ Both `api` and `mobile` modules include production-ready Dockerfiles with **mult
 
 ```
 gesotat-system/
-├── docker-compose.prod.yml     # Production compose
+├── ops/compose/projects/geostat/docker-compose.prod.yml     # Production compose
 ├── .env.prod                   # Production environment (credentials)
 ├── .env.example                # Environment template
 ├── .dockerignore               # Build context exclusions
@@ -426,19 +426,19 @@ gesotat-system/
 
 ```bash
 # Start both api + mobile
-docker-compose -f docker-compose.dev.yml up --build
+docker-compose -f ops/compose/projects/geostat/docker-compose.dev.yml up --build
 
 # Start only mobile
-docker-compose -f docker-compose.dev.yml up --build mobile
+docker-compose -f ops/compose/projects/geostat/docker-compose.dev.yml up --build mobile
 
 # Start only api
-docker-compose -f docker-compose.dev.yml up --build api
+docker-compose -f ops/compose/projects/geostat/docker-compose.dev.yml up --build api
 
 # View logs
-docker-compose -f docker-compose.dev.yml logs -f mobile
+docker-compose -f ops/compose/projects/geostat/docker-compose.dev.yml logs -f mobile
 
 # Stop everything
-docker-compose -f docker-compose.dev.yml down -v
+docker-compose -f ops/compose/projects/geostat/docker-compose.dev.yml down -v
 ```
 
 > **Dev mode** connects to the host database via `host.docker.internal`, uses debug logging, and allocates moderate memory (512M–1G).
@@ -628,7 +628,7 @@ scripts\deploy.bat [service]
 
 ```
 /home/administrator/geostat/
-├── docker-compose.prod.yml
+├── ops/compose/projects/geostat/docker-compose.prod.yml
 ├── .env.prod
 ├── manage.sh                   ← service manager
 ├── logs/
@@ -654,7 +654,7 @@ All scripts are in the `scripts/` directory. Only **3 files** — no redundancy.
 | `scripts/manage.bat` | Service management via SSH | Windows (local → server) |
 | `scripts/manage.sh` | Service management directly | Linux (server) |
 
-> **Dynamic:** სერვისები ავტომატურად აღმოჩენილია `docker-compose.prod.yml`-იდან.  
+> **Dynamic:** სერვისები ავტომატურად აღმოჩენილია `ops/compose/projects/geostat/docker-compose.prod.yml`-იდან.
 > ახალი სერვისი compose-ში რომ დაემატება, სკრიპტებში კოდის შეცვლა არ ჭირდება.
 
 ### `deploy.bat` — Build & Deploy
@@ -819,3 +819,8 @@ org.base.api        — API/Admin module
   <sub>National Statistics Office of Georgia — GeoStat System &copy; 2024–2026</sub>
 </p>
 
+
+
+ეს არიდ ფრონიტს პროექტი, ამ პატფორმისთვის
+
+C:\Users\Test-User\WebstormProjects\geostat-system-app

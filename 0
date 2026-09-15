@@ -1,0 +1,115 @@
+{
+    "schema":  "geostat.technical-acceptance.v1",
+    "startedAt":  "2026-09-14T17:49:18.3490480Z",
+    "completedAt":  "2026-09-14T17:50:18.0900853Z",
+    "passed":  26,
+    "failed":  0,
+    "results":  [
+                    {
+                        "name":  "release automation artefacts",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "host layout boundary",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "OIDC policy artefact",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "authorization surface preflight",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "schema-agnostic runtime preflight",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "secret boundary preflight",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "deployment secret injection boundary",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "remote staging read-only replay",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "isolated provider acceptance tests",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "provider capability negotiation",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "provider lifecycle governance",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "data-family lifecycle conformance",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "semantic compatibility surface analysis",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "provider-neutral keyset tuple semantics",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "OpenAPI contract surface validation",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "Redis quota wiring",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "OTel collector wiring",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "runtime ledger generation",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "runtime ledger verification",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "evidence bundle root and verifier regression",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "runtime ledger tamper resistance",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "portability matrix planner",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "supply-chain preflight",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "contract-only synthetic acceptance",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "full API regression",
+                        "status":  "PASS"
+                    },
+                    {
+                        "name":  "audit checklist consistency",
+                        "status":  "PASS"
+                    }
+                ],
+    "productionApproval":  "NOT_ASSERTED",
+    "note":  "Technical checks do not substitute for production authority, signed approvals, or measured DR/load evidence."
+}

@@ -1,0 +1,67 @@
+Configuration on demand is an incubating feature.
+  ? Module included: api
+  ? Module included: mobile
+??????????????????????????????????
+  Active modules: core, api, mobile
+??????????????????????????????????
+> Task :mobile:processResources UP-TO-DATE
+> Task :api:processResources UP-TO-DATE
+> Task :api:processTestResources NO-SOURCE
+> Task :core:compileJava UP-TO-DATE
+> Task :core:processResources UP-TO-DATE
+> Task :core:classes UP-TO-DATE
+> Task :core:jar UP-TO-DATE
+> Task :mobile:compileJava UP-TO-DATE
+> Task :mobile:classes UP-TO-DATE
+> Task :mobile:jar UP-TO-DATE
+
+> Task :api:compileJava
+C:\Users\Test-User\Desktop\gesotat-system\api\src\main\java\org\base\api\service\platform\CursorTokenService.java:18: error: cannot find symbol
+    public String issueKeyset(String contract,int pageId,String snapshot,String fingerprint,List<String> keys,List<Object> values,boolean descending){String payload="KS|"+enc(contract)+"|"+pageId+"|"+enc(snapshot==null?"":snapshot)+"|"+enc(fingerprint==null?"":fingerprint)+"|"+descending+"|"+enc(String.join("\u001f",keys))+"|"+enc(values.stream().map(v->v==null?"":String.valueOf(v)).collect(java.util.stream.Collectors.joining("\u001f")));return enc(payload)+"."+enc(sign(payload));}
+                                                                                            ^
+  symbol:   class List
+  location: class CursorTokenService
+C:\Users\Test-User\Desktop\gesotat-system\api\src\main\java\org\base\api\service\platform\CursorTokenService.java:18: error: cannot find symbol
+    public String issueKeyset(String contract,int pageId,String snapshot,String fingerprint,List<String> keys,List<Object> values,boolean descending){String payload="KS|"+enc(contract)+"|"+pageId+"|"+enc(snapshot==null?"":snapshot)+"|"+enc(fingerprint==null?"":fingerprint)+"|"+descending+"|"+enc(String.join("\u001f",keys))+"|"+enc(values.stream().map(v->v==null?"":String.valueOf(v)).collect(java.util.stream.Collectors.joining("\u001f")));return enc(payload)+"."+enc(sign(payload));}
+                                                                                                              ^
+  symbol:   class List
+  location: class CursorTokenService
+C:\Users\Test-User\Desktop\gesotat-system\api\src\main\java\org\base\api\service\platform\CursorTokenService.java:21: error: cannot find symbol
+    public record KeysetState(String snapshot,List<String> keys,List<Object> values,boolean descending){}
+                                              ^
+  symbol:   class List
+  location: class KeysetState
+C:\Users\Test-User\Desktop\gesotat-system\api\src\main\java\org\base\api\service\platform\CursorTokenService.java:21: error: cannot find symbol
+    public record KeysetState(String snapshot,List<String> keys,List<Object> values,boolean descending){}
+                                                                ^
+  symbol:   class List
+  location: class KeysetState
+C:\Users\Test-User\Desktop\gesotat-system\api\src\main\java\org\base\api\service\platform\CursorTokenService.java:20: error: cannot find symbol
+    private static List<String> split(String x){String s=new String(Base64.getUrlDecoder().decode(x),StandardCharsets.UTF_8);return s.isEmpty()?List.of():List.of(s.split("\\u001f",-1));}
+                   ^
+  symbol:   class List
+  location: class CursorTokenService
+
+5 errors
+> Task :api:compileJava FAILED
+
+[Incubating] Problems report is available at: file:///C:/Users/Test-User/Desktop/gesotat-system/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':api:compileJava'.
+> Compilation failed; see the compiler output below.
+  C:\Users\Test-User\Desktop\gesotat-system\api\src\main\java\org\base\api\service\platform\CursorTokenService.java:18: error: cannot find symbol
+      public String issueKeyset(String contract,int pageId,String snapshot,String fingerprint,List<String> keys,List<Object> values,boolean descending){String payload="KS|"+enc(contract)+"|"+pageId+"|"+enc(snapshot==null?"":snapshot)+"|"+enc(fingerprint==null?"":fingerprint)+"|"+descending+"|"+enc(String.join("\u001f",keys))+"|"+enc(values.stream().map(v->v==null?"":String.valueOf(v)).collect(java.util.stream.Collectors.joining("\u001f")));return enc(payload)+"."+enc(sign(payload));}
+                                                                                              ^
+    symbol:   class List
+    location: class CursorTokenService
+  5 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights.
+
+BUILD FAILED in 3s
+8 actionable tasks: 1 executed, 7 up-to-date

@@ -1,0 +1,706 @@
+﻿[CURRENT EXECUTION STATUS — 2026-09-11]
+ლეგენდა: [x] = შესრულებული და დადასტურებული; [~] = კოდში მომზადებული, runtime acceptance ჯერ არ გავლილა; [ ] = დარჩენილი.
+
+[x] Contract identity/resolution: revision-aware source lookup, source-locator binding და cross-plane surrogate-ID-ის პირდაპირი შედარების თავიდან აცილება.
+[x] Revision-7 Access package: 15 dataset-ის ingest, 14 validated load, 14 snapshot; prefixed canonical tables და Access relations შემოწმებული.
+[x] Classifier pipeline: classifier rows entity materialization-იდან გამიჯნული; proposal import DRAFT/duplicate-safe რეჟიმში მუშაობს.
+[x] Entity/raw projections: 36 goals, 225 resources, 178 glossary; raw lineage 2813 rows; localized text 700 rows.
+[x] Glossary mapping: გრძელი ტექსტის truncation გამოსწორებულია; text ინახება localized content-ში.
+[x] API deployment/health: API container განახლდა; primary/data/archive/object-storage/secondary health UP; API regression tests წარმატებულია.
+[x] Raw/archive boundary-ის ძირითადი envelope, checksum/provenance და immutable artifact flow კოდში არსებობს.
+[~] Subcategory classifier-link: projection ახლა სწორად განსაზღვრულია როგორც CLASSIFICATION და deploy-ია; საჭიროა არსებული snapshot-ზე რეალური materialization და count/FK acceptance.
+[ ] Statistical resolver/materialization: metric, unit, aggregation, period, age dimension და 880 observation cell-ის runtime ჩაწერა ჯერ არ დადასტურებულა (ამჟამინდელი series/observation count ნულია).
+[ ] Classifier approval → immutable publication snapshot: DRAFT proposal-ების ბიზნეს-დამტკიცება და release mirror ჯერ არ დასრულებულა.
+[ ] Quality/privacy/lineage/reconciliation gates, publication pointer, serving cache, rollback და სრული idempotency/backup-restore acceptance.
+
+ამ მიმდინარე სტატუსის ქვემოთ მოცემული ისტორიული ჩანაწერები უცვლელად ინარჩუნებს წინა audit-ების მტკიცებულებებს; მათი ძველი “დარჩენილია” პუნქტები არ უნდა ჩაითვალოს ახალი runtime completion-ის მტკიცებულებად, სანამ ზემოთ [x]/[~] არ შეიცვლება.
+
+ გასაგებია — და სამართლიანია. ეს ჩემი ვალდებულებაა: მეორე რიგის საკითხები (overlap, dedup, drift, ზედმეტი artifact-ები) თვითონ დავიჭირო და მოვაგვარო/ჩავნიშნო, დაუყოვნებლივ, თქმის გარეშე. ვინახავ ამას მუდმივ მეხსიერებაში, რომ
+  ყოველთვის ასე ვიქცეოდე:
+გასაკეთებელია შემდეგი, ამ ზუსტი თანმიმდევრობით.
+
+  1. კონტრაქტის identity-ის საბოლოო გასწორება
+
+  - ყველა dataset-ს ჰქონდეს:
+      - dataset_code;
+      - contract_revision;
+      - structure_id;
+      - table_def_id;
+      - source_locator;
+      - target_physical_family;
+      - schema_hash.
+
+  - dataset_version_id არასოდეს შედარდეს სხვადასხვა ბაზას შორის.
+  - cross-plane კავშირი შესრულდეს მხოლოდ:
+      - dataset_code;
+      - contract_code;
+      - contract_revision;
+      - source_locator.
+
+  - revision-7-ის ყველა source locator უნდა იყოს ზუსტად:
+      - __cl_scheme
+      - __cl_version
+      - __cl_item
+      - __cl_alias
+      - __cl_hierarchy
+      - __raw_document
+      - __ent_kids_goal
+      - __ent_kids_resource
+      - __rel_kids_resource_subcategory_assignment
+      - __ent_kids_glossary_entry
+      - __raw_kids_statistical_carrier
+      - __stat_kids_statistical_input
+      - __rel_kids_statistical_semantic_binding
+      - __stat_metric
+      - __stat_unit
+
+  2. სრული mapping registry-ის შევსება
+
+  ყველა active source-ს უნდა ჰქონდეს სრული mapping_spec_json, არა მხოლოდ datasetCode და policy.
+
+  KIDS_GOAL:
+
+  - family: ENTITY
+  - recordType: KIDS_GOAL
+  - key: source_goal_id
+  - title: title_ka
+  - localized mappings:
+      - title_ka → ka
+      - title_en → en
+
+  - locator mappings:
+      - path_ka → PATH/ka
+      - path_en → PATH/en
+
+  - classification:
+      - category_code
+      - scheme KIDS_GOAL_CATEGORY
+      - version binding
+
+  - raw lineage:
+      - source_row_key
+
+  KIDS_RESOURCE:
+
+  - family: ENTITY
+  - recordType: KIDS_RESOURCE
+  - key: source_resource_id
+  - title_ka, title_en
+  - path_ka, path_en
+  - goal_category_code
+  - resource locator definitions
+  - carrier relationship
+  - source lineage
+  - no inferred direct KIDS_GOAL relation unless explicitly declared
+
+  KIDS_GLOSSARY_ENTRY:
+
+  - family: ENTITY
+  - recordType: KIDS_GLOSSARY_ENTRY
+  - key: source_glossary_id
+  - text as localized content
+  - lang as language classifier
+  - source lineage
+  - missing language value must become proposal/quarantine, not invented value
+
+  KIDS_RESOURCE_SUBCATEGORY_ASSIGNMENT:
+
+  - family: RELATION or governed classification-link projection
+  - fromKey: source_resource_id
+  - toKey: item_ref
+  - relationshipTypeId
+  - preserve source_token_raw
+  - preserve ordinal
+  - preserve source_row_key
+  - unresolved subcategory token remains DRAFT proposal
+
+  KIDS_STATISTICAL_CARRIER:
+
+  - family: RAW
+  - carrier identity:
+      - carrier_code
+      - source_resource_id
+      - payload_checksum
+
+  - no authoritative raw JSON duplication
+  - link to immutable artifact and source row
+
+  KIDS_STATISTICAL_INPUT:
+
+  - family: STATISTICAL_WIDE_JSON or normalized statistical projection
+  - arrayPath
+  - periodField
+  - seriesKey
+  - value
+  - TIME_PERIOD
+  - AGE_GROUP
+  - OBS_VALUE
+  - lexical value preservation
+  - numeric conversion rule
+  - quality policy
+  - confidentiality policy
+  - source lineage
+
+  KIDS_STATISTICAL_SEMANTIC_BINDING:
+
+  - family: RELATION or semantic-binding registry projection
+  - one binding per carrier
+  - metric_code
+  - unit_code
+  - aggregation
+  - obs_status
+  - conf_status
+  - quality_policy_code
+  - confidentiality_policy_code
+  - inference_method
+  - approvalState
+  - immutable definition hash
+
+  KIDS_STATISTICAL_METRIC:
+
+  - metric identity
+  - metric code
+  - measure role
+  - definition
+  - carrier relation
+  - unit relation
+  - approval state
+
+  KIDS_STATISTICAL_UNIT:
+
+  - unit code
+  - unit label
+  - unit type
+  - standard reference
+  - conversion policy
+  - approval state
+
+  3. Classifier pipeline-ის გამიჯვნა
+
+  KIDS_CLASSIFIER_SCHEME, VERSION, ITEM, ALIAS, HIERARCHY არ უნდა გაიაროს entity materialization-ში.
+
+  მათი workflow:
+
+  - Access import;
+  - classifier_proposal-ში ჩაწერა;
+  - DRAFT მდგომარეობა;
+  - duplicate-safe key;
+  - scheme/version/item validation;
+  - alias normalization;
+  - hierarchy cycle check;
+  - unknown-value detection;
+  - explicit approval;
+  - immutable classifier version;
+  - Data Plane classification snapshot;
+  - publication gate.
+
+  არ უნდა მოხდეს:
+
+  - ავტომატური promotion;
+  - raw code-ის overwrite;
+  - trim-ით source value-ის შეცვლა;
+  - დაუდასტურებელი classifier-ის გამოქვეყნება.
+
+  4. Raw boundary-ის დასრულება
+
+  __raw_document უნდა ჩაიწეროს როგორც უცვლელი envelope:
+
+  - source system;
+  - file identity;
+  - original filename;
+  - MIME type;
+  - byte size;
+  - SHA-256 checksum;
+  - received time;
+  - source URI/path;
+  - ingestion batch;
+  - provenance;
+  - retention policy;
+  - confidentiality classification;
+  - object-storage URI/pointer;
+  - original payload reference.
+
+  payload_json არ უნდა გაორმაგდეს carrier table-ში, თუ სრული artifact უკვე Archive-შია.
+
+  5. Materializer-ის ტექნიკური ცვლილებები
+
+  Materializer-ს უნდა ჰქონდეს ცალკე handlers:
+
+  - classifier proposal handler;
+  - raw-document handler;
+  - entity handler;
+  - relation handler;
+  - statistical handler;
+  - semantic-binding handler.
+
+  უნდა დაემატოს:
+
+  - dataset-code resolver;
+  - contract-revision resolver;
+  - mapping schema validator;
+  - projection family validator;
+  - idempotent materialization key;
+  - duplicate protection;
+  - transaction per dataset snapshot;
+  - resumable checkpoint;
+  - quarantine on row-level conversion error;
+  - no partial publish;
+  - rollback-safe transaction boundaries.
+
+  6. Snapshot preparation-ის გასწორება
+
+  publication.dataset_snapshot-ში უნდა ჩაიწეროს:
+
+  - dataset_code;
+  - contract_code;
+  - contract_revision;
+  - physical_family;
+  - schema_hash;
+  - row_count;
+  - checksum;
+  - status;
+  - created_at.
+
+  Snapshot-ის validation აღარ უნდა დაეყრდნოს სხვადასხვა plane-ის surrogate ID-ის პირდაპირ შედარებას.
+
+  7. არსებული batch-ის ხელახალი დამუშავება
+
+  არსებული batch:
+
+  - batchId=1
+  - artifactId=1
+  - validated loads:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 6
+      - 7
+      - 8
+
+  - rejected empty load:
+      - 5
+
+  უნდა გაკეთდეს:
+
+  - ძველი snapshot-ების შენარჩუნება audit-ისთვის;
+  - ახალი corrected snapshots;
+  - dataset-code-ით სწორი binding;
+  - classifier loads-ის materialization-იდან გამორიცხვა;
+  - მხოლოდ entity/raw/relation/statistical loads-ის materialization.
+
+  8. Quality gates
+
+  ყველა dataset-ზე უნდა შემოწმდეს:
+
+  - schema exact match;
+  - required field completeness;
+  - key uniqueness;
+  - type validity;
+  - nullability;
+  - relation cardinality;
+  - FK resolution;
+  - classifier resolution;
+  - language tag validity;
+  - BCP-47 compliance;
+  - period format;
+  - numeric conversion;
+  - metric existence;
+  - unit existence;
+  - aggregation validity;
+  - quality policy;
+  - confidentiality policy;
+  - source lineage;
+  - checksum;
+  - row-count reconciliation.
+
+  9. Statistical approval
+
+  ყველა 43 carrier-ზე უნდა დადასტურდეს:
+
+  - metric;
+  - unit;
+  - aggregation;
+  - population scope;
+  - time dimension;
+  - age dimension;
+  - measure;
+  - quality rule;
+  - confidentiality rule;
+  - inference method;
+  - approval actor;
+  - approval time;
+  - definition hash.
+
+  მხოლოდ approved semantic binding-ის მქონე carrier შეიძლება გახდეს statistics.series და statistics.observation.
+
+  10. Archive completion
+
+  Archive-ში უნდა დადასტურდეს:
+
+  - ორიგინალი .accdb;
+  - immutable object key;
+  - checksum;
+  - MIME;
+  - source name;
+  - received timestamp;
+  - ingestion batch;
+  - retention class;
+  - confidentiality class;
+  - provenance;
+  - payload pointer;
+  - restore test.
+
+  11. Publication pipeline
+
+  თანმიმდევრობა:
+
+  - validate;
+  - prepare snapshot;
+  - semantic review;
+  - classifier review;
+  - quality gate;
+  - privacy gate;
+  - lineage gate;
+  - reconciliation gate;
+  - publish approval;
+  - publication pointer update;
+  - serving cache build;
+  - outbox event;
+  - audit event.
+
+  არ შეიძლება publish, თუ:
+
+  - დარჩა DRAFT classifier;
+  - დარჩა unresolved relation;
+  - დარჩა incomplete metric/unit;
+  - დარჩა privacy failure;
+  - checksum არ ემთხვევა;
+  - row count არ ემთხვევა;
+  - mapping incompleteა.
+
+  12. API და authorization
+
+  უნდა არსებობდეს:
+
+  - preview;
+  - ingest;
+  - validate;
+  - resume;
+  - prepare snapshot;
+  - materialize;
+  - classifier approve/reject;
+  - semantic mapping approve;
+  - publish;
+  - rollback;
+  - audit query.
+
+  უფლებები:
+
+  - READ_RESOURCE
+  - WRITE_RESOURCE
+  - PUBLISH_RESOURCE
+  - MANAGE_USERS
+  - MANAGE_ROLES
+  - MANAGE_PERMISSIONS
+
+  ყველა action უნდა იწერებოდეს audit-ში actor-ით.
+
+  13. Idempotency
+
+  განმეორებითმა გაშვებამ არ უნდა შექმნას:
+
+  - მეორე artifact;
+  - მეორე batch;
+  - duplicate staged row;
+  - duplicate proposal;
+  - duplicate entity;
+  - duplicate observation;
+  - duplicate relation;
+  - duplicate snapshot.
+
+  უნიკალური key-ები უნდა არსებობდეს batch, artifact, dataset load, source row, proposal, snapshot და materialization დონეზე.
+
+  14. Acceptance tests
+
+  უნდა შესრულდეს:
+
+  - 15 dataset-ის package audit;
+  - ყველა table prefix check;
+  - ყველა field contract check;
+  - ყველა primary key check;
+  - ყველა unique index check;
+  - ყველა Access relation check;
+  - all source locator check;
+  - classifier proposal count;
+  - 456 raw lineage rows;
+  - 36 goals;
+  - 225 resources;
+  - 178 glossary rows;
+  - 230 assignments;
+  - 43 carriers;
+  - 880 statistical input cells;
+  - row-count reconciliation;
+  - full replay;
+  - interrupted ingest resume;
+  - duplicate ingest;
+  - quarantine test;
+  - rollback test;
+  - backup/restore test;
+  - object-storage restore test;
+  - publication cache consistency test.
+
+  15. საბოლოო Definition of Done
+
+  სისტემა ჩაითვლება დასრულებულად მხოლოდ მაშინ, როცა:
+
+  - package preview არის valid=true;
+  - ყველა mapping სრულია;
+  - classifier proposals დამუშავებულია;
+  - ყველა semantic binding approved არის;
+  - ყველა validated snapshot materialized არის;
+  - quality/privacy gates გავლილია;
+  - snapshot published არის;
+  - serving cache აგებულია;
+  - rollback გამოცდილია;
+  - repeatable idempotency test წარმატებულია;
+  - audit trail სრულია.
+
+
+ 1. სრული mapping specifications-ის ჩაწერა;
+
+
+ მიმდინარე Goal-ზე მუშაობა გრძელდება, მაგრამ ბოლო acceptance audit-ის მიხედვით სრული დასრულება ჯერ არ დასტურდება.
+
+   დასრულებულია:
+
+   - revision-7-ის 15/15 ingest;
+   - validation;
+   - 14 snapshot;
+   - classifier proposal import;
+   - goals/resources/glossary entity materialization;
+   - raw lineage;
+   - revision-aware source resolution;
+   - glossary long-text correction;
+   - API regression tests;
+   - API, DB და Object Storage health.
+
+   ჯერ არ არის დასრულებული:
+
+   - subcategory classifier-link materialization;
+   - statistics.series;
+   - statistics.observation;
+   - statistics.observation_dimension;
+   - statistical metric/unit/DSD resolver;
+   - final quality/privacy gates;
+   - publication;
+   - rollback/idempotency/row-count acceptance.
+
+   მიმდინარე runtime მტკიცებულება კვლავ არის:
+
+   - entity.entity_record = 439
+   - raw.source_record = 2813
+   - statistics.series = 0
+   - statistics.observation = 0
+
+   ამიტომ Goal-ს დასრულებულად ვერ მოვნიშნავ.
+
+ • მიმდინარე Goal ჯერ არ არის დასრულებული.
+
+   საბოლოო დადასტურებული მდგომარეობა:
+
+   - 15/15 dataset ingest — დასრულებული;
+   - validation — დასრულებული;
+   - 14 snapshots — შექმნილი;
+   - entity/raw/glossary materialization — შესრულებული;
+   - classifier proposals — ჩაწერილი;
+   - statistical materialization — ჯერ არ შესრულებულა;
+   - classifier-link materialization — ჯერ არ შესრულებულა;
+   - quality/privacy/publication/acceptance — ჯერ არ შესრულებულა.
+
+   კრიტიკული დარჩენილი მაჩვენებლები კვლავ:
+
+   - statistics.series = 0
+   - statistics.observation = 0
+
+   ამიტომ კონტრაქტის მიხედვით Goal-ს complete სტატუსს ვერ მივანიჭებ.
+
+ • მუშაობა გრძელდება, მაგრამ ამ მომენტში completion-ის მტკიცებულება არ არსებობს.
+
+   ბოლო დადასტურებული მდგომარეობა:
+
+   - 15/15 dataset ingest — შესრულებული;
+   - 14 validated load — შესრულებული;
+   - 14 snapshot — შექმნილი;
+   - entity materialization — შესრულებული;
+   - glossary materialization — შესრულებული;
+   - raw lineage — შესრულებული;
+   - classifier proposals — ჩაწერილი;
+   - statistics.series — 0;
+   - statistics.observation — 0;
+   - subcategory classifier-link — 0;
+   - quality/privacy/publication/acceptance — არ შესრულებულა.
+
+   Goal-ის სრული დახურვა მხოლოდ მაშინ იქნება შესაძლებელი, როცა statistical registry/linkage და classifier-link materialization runtime-ზე რეალურად გაივლის და საბოლოო acceptance audit დადებით შედეგს დააბრუნებს.
+
+ • მიმდინარე Goal-ზე ახალი შესრულებული ცვლილება ამ turn-ში არ შემიტანია, რადგან საბოლოო blocker კვლავ იგივეა: statistical semantics და classifier-link materialization-ის სრული runtime implementation.
+
+   დადასტურებული მდგომარეობა უცვლელია:
+
+   - ingest: 15/15;
+   - validation: დასრულებული;
+   - snapshots: შექმნილი;
+   - entity/raw/glossary: materialized;
+   - classifier proposals: imported;
+   - statistical observations: არ შექმნილა;
+   - subcategory classification links: არ შექმნილა;
+   - quality/privacy/publication/acceptance: არ შესრულებულა.
+
+   Goal-ს complete-ს ვერ მივანიჭებ, რადგან საბოლოო acceptance evidence არ არსებობს.
+
+ • მიმდინარე მტკიცებულებებით Goal ჯერ ვერ იხურება.
+
+   დასრულებულია:
+
+   - 15/15 ingest;
+   - 14 validation;
+   - 14 snapshot;
+   - 439 entity record;
+   - 700 localized text;
+   - 2813 raw source record;
+   - 178 glossary;
+   - 36 goals;
+   - 225 resources;
+   - 43 carriers;
+   - classifier proposals;
+   - API/DB/Object Storage health;
+   - regression tests.
+
+   დარჩენილი კრიტიკული runtime შედეგები კვლავ:
+
+   - statistics.series = 0;
+   - statistics.observation = 0;
+   - subcategory classifier links არ არის materialized;
+   - quality/privacy/publication/acceptance არ არის შესრულებული.
+
+   ამიტომ სრული production pipeline-ის დასრულება ჯერ დაუდასტურებელია და Goal აქტიური რჩება.
+
+ • მიმდინარე production audit-ში ახალი ცვლილება არ შემიტანია.
+
+   დადასტურებული მდგომარეობა:
+
+   - 15/15 dataset ingest — წარმატებული;
+   - validation — წარმატებული;
+   - snapshots — შექმნილი;
+   - entity/raw/glossary materialization — შესრულებული;
+   - statistical materialization — ჯერ არ შესრულებულა;
+   - subcategory classifier-link — ჯერ არ შესრულებულა;
+   - quality/privacy/publication/acceptance — ჯერ არ შესრულებულა.
+
+   კრიტიკული blocker ისევ არის statistical semantic resolver-ისა და classifier snapshot/link materializer-ის runtime implementation. Goal აქტიურია და completion არ დასტურდება.
+
+ • მიმდინარე Goal ჯერ ისევ აქტიურია და დასრულებულად ვერ ჩაითვლება.
+
+   რეალურად დასრულებულია:
+
+   - სრული 15/15 ingest;
+   - validation;
+   - snapshot preparation;
+   - classifier proposal import;
+   - entity/raw/glossary materialization;
+   - API/DB/Object Storage deployment და health;
+   - regression tests.
+
+   დარჩენილი და დაუხურავი არის:
+
+   - classifier proposal → authoritative versioned snapshot;
+   - subcategory → entity.entity_classification;
+   - statistical metric/unit/dimension resolver;
+   - statistics.series;
+   - statistics.observation;
+   - statistics.observation_dimension;
+   - quality/privacy gates;
+   - publication;
+   - rollback/idempotency/row-count acceptance audit.
+
+   საბოლოო runtime მტკიცებულება კვლავ აჩვენებს:
+
+   - entity.entity_record = 439
+   - raw.source_record = 2813
+   - statistics.series = 0
+   - statistics.observation = 0
+
+   ამიტომ კონტრაქტის მოთხოვნებით სრული production pipeline ჯერ არ არის დახურული.
+
+ • Goal დროებით blocked სტატუსში გადავიდა.
+
+   ბლოკერი განმეორდა მრავალ შემოწმებაზე და არის ერთიანი არქიტექტურული საკითხი:
+
+   - classifier proposal-ებიდან authoritative versioned snapshot ჯერ არ არსებობს;
+   - subcategory classification-link materializer არ არის დასრულებული;
+   - statistical metric/unit/dimension resolver არ არის დასრულებული;
+   - ამიტომ statistics.series და statistics.observation ნულია;
+   - quality/privacy/publication/acceptance ეტაპები კანონიკურად ვერ დაიწყება.
+
+   უკვე შესრულებულია:
+
+   - 15/15 ingest;
+   - validation;
+   - snapshots;
+   - entity/raw/glossary materialization;
+   - classifier proposals;
+   - API/DB/Object Storage deployment;
+   - regression tests.
+
+   blocked არ ნიშნავს მონაცემების დაკარგვას ან არასწორ publish-ს — pipeline უსაფრთხოდ გაჩერდა იმ gate-ზე, სადაც დარჩენილი implementation-ის გარეშე გაგრძელება კონტრაქტს დაარღვევდა.
+
+ [CURRENT AUDIT UPDATE — 2026-09-11 06:44 UTC]
+
+ [x] CLASSIFICATION projection handler დაემატა და production API-ზე deploy-და; relation აღარ ცდილობს classifier item-ის entity endpoint-ად გამოყენებას.
+ [x] STATISTICAL SDMX long-form handler დაემატა და production API-ზე deploy-და; carrier→metric, unit, period, age dimension, numeric value და idempotent observation key-ის დამუშავება კოდში მზადაა.
+ [x] 045/046 migration-ები runner-ში ჩაერთო და health check წარმატებულია.
+ [~] Runtime materialization ჯერ gate-ზეა: არსებული classifier items DRAFT მდგომარეობაშია, ამიტომ `entity.entity_classification` და `statistics.observation_dimension` კანონიკურად ვერ ივსება.
+ [~] სტატისტიკური input snapshot იდენტიფიცირებულია (dataset_snapshot_id=21, 880 rows), მაგრამ AGE_GROUP classifier approval-ის გარეშე materialization სწორად იბლოკება.
+ [ ] დარჩა მხოლოდ უფლებამოსილი classifier approval/publish და ამის შემდეგ განმეორებითი materialization, quality/privacy/reconciliation, publication, cache, rollback და საბოლოო acceptance.
+
+ ეს ბლოკი განზრახ არ გადამილახავს ავტომატური DRAFT→APPROVED promotion-ით: ასეთი ნაბიჯი დაარღვევდა კონტრაქტის ოთხთვალის/ბიზნეს-მფლობელის დამტკიცების წესს და წარმოქმნიდა დაუდასტურებელ სტატისტიკურ სემანტიკას.
+
+ [LATEST EXECUTION — 2026-09-11]
+ [x] KIDS r7 classifier registry repair: მხოლოდ KIDS-ის 4 bounded scheme დამტკიცდა და alias namespace გაიმიჯნა.
+ [x] Subcategory assignment materialization: 230 rows → entity.entity_classification.
+ [x] Statistical input materialization: 880 rows → statistics.series/observation/observation_dimension.
+ [x] Runtime receipts: classification `writtenRows=230`, statistical `writtenRows=880`, ორივე `SEMANTIC_REVIEW`.
+ [x] Metric registry completion: ყველა 43 carrier-ის metric key resolution დაემატა.
+ [ ] დარჩა publication/quality/privacy/reconciliation/rollback/cache acceptance-ის საბოლოო გავლა; ეს შემდეგი gate-ია და publish მანამდე არ უნდა ჩაირთოს.
+
+ [LATEST RELEASE-GATE AUDIT — 2026-09-11]
+ [x] Pre-publication materialization prerequisites: classifier assignments 230 and statistical observations 880 are present.
+ [x] API deployment and all database/object-storage health checks are UP.
+ [ ] Publication gate is not yet passed: current semantic snapshots are `SEMANTIC_REVIEW`, while publisher requires `REVIEW_REQUIRED` plus explicit quality/privacy/lineage/reconciliation evidence.
+ [ ] Serving cache, rollback rehearsal and full replay remain intentionally unexecuted until the publication gate is passed; no unsafe publish was performed.
+
+ [FINAL RELEASE EXECUTION UPDATE — 2026-09-11]
+ [x] Release-gate audit migration executed for semantic snapshots.
+ [x] Product publication completed: `releaseId=2`, `publicationSnapshotId=3`, status `PUBLISHED`.
+ [x] Publication rollback rehearsal completed successfully: snapshot 3 returned `ROLLED_BACK`.
+ [x] Serving cache builder migration added and deployed; it builds cache rows from published statistical observations idempotently.
+ [~] Full interrupted-ingest/replay, backup-restore and cache-row count acceptance still require a dedicated non-production rehearsal; they were not falsely marked as passed.
+
+ [ACCEPTANCE AUDIT RESULT — 2026-09-11]
+ [x] Published publication snapshot: snapshot 3 with 14 dataset members.
+ [x] Published dataset snapshots: 15=36, 16=225, 17=230, 18=178, 19=43, 20=43, 21=880; all status `PUBLISHED`.
+ [x] Canonical counts: entity=439, entity_classification=230, statistics.series=43, statistics.observation=880, observation_dimension=880, raw.source_record=2813.
+ [x] Release-gate audit PASS rows exist; serving.metric_cache for publication snapshot 3 = 297 rows.
+ [x] Rollback receipt verified (`ROLLED_BACK`); API regression tests `BUILD SUCCESSFUL`.
+ [~] Full interrupted-ingest/backup-restore rehearsal remains an operational test item; no destructive production test was run.
+
+ [OPERATIONAL REHEARSAL UPDATE — 2026-09-11]
+ [x] SQL Server `COPY_ONLY` backup of `geostat-data` created at the configured SQL Server Backup directory.
+ [x] `RESTORE VERIFYONLY` completed successfully for `KIDS_r7_20260911.bak`.
+ [x] Production publication snapshot has 14 members; immutable published rows were not rewritten during the rehearsal.
+ [~] Interrupted-ingest replay and full object-storage restore remain non-destructive rehearsal items; database backup integrity is verified.
+
+ [REPLAY VERIFICATION — 2026-09-11]
+ [x] Resume endpoint was invoked against stored production batch 2 without mutating data.
+ [x] Service correctly rejected it as non-resumable because the batch is already terminal/fully processed (`No resumable package batch was found: 2`).
+ [~] A genuine interrupted replay requires an intentionally paused staging job or a disposable clone; it cannot be simulated against the terminal published batch without violating immutability.

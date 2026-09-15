@@ -1,0 +1,18 @@
+{
+  "schema": "geostat.product-project-registry.v1",
+  "projects": [
+    {
+      "projectId": "geostat",
+      "productRoot": "platform/apps/geostat",
+      "configRoot": "ops/config/projects/geostat",
+      "runtimeRoot": "ops/runtime/projects/geostat",
+      "status": "ACTIVE"
+    }
+  ],
+  "rules": {
+    "oneProductRootPerProject": true,
+    "oneConfigRootPerProject": true,
+    "oneRuntimeRootPerProject": true,
+    "crossProjectSourceImports": false
+  }
+}

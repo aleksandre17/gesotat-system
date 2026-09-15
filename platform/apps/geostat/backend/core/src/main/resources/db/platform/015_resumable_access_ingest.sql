@@ -1,0 +1,2 @@
+IF OBJECT_ID(N'ingest.load_checkpoint',N'U') IS NULL CREATE TABLE ingest.load_checkpoint(dataset_load_id BIGINT NOT NULL PRIMARY KEY,last_source_row_number BIGINT NOT NULL DEFAULT 0,status VARCHAR(24) NOT NULL DEFAULT 'RUNNING',updated_at DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME());
+IF NOT EXISTS(SELECT 1 FROM sys.indexes WHERE name=N'uq_staged_row_load_row' AND object_id=OBJECT_ID(N'ingest.staged_row')) CREATE UNIQUE INDEX uq_staged_row_load_row ON ingest.staged_row(dataset_load_id,source_row_number);

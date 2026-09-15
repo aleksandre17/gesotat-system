@@ -1,0 +1,11 @@
+## External developer override only; never copy into src/main/resources.
+spring:
+  datasource:
+    primary:
+      jdbc-url: ${DB_PRIMARY_URL}
+      username: ${DB_PRIMARY_USER}
+      password: ${DB_PRIMARY_PASS}
+    secondary:
+      jdbc-url: ${DB_SECONDARY_URL}
+      username: ${DB_SECONDARY_USER}
+      password: ${DB_SECONDARY_PASS}

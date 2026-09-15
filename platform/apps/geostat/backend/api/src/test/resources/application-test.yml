@@ -1,0 +1,5 @@
+# Test-only import target.  It intentionally contains no credentials or
+# external endpoints; all datasource values are supplied by ApiApplicationTests.
+spring:
+  config:
+    import: []

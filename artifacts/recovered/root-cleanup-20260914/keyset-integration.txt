@@ -1,0 +1,49 @@
+Configuration on demand is an incubating feature.
+  ? Module included: api
+  ? Module included: mobile
+??????????????????????????????????
+  Active modules: core, api, mobile
+??????????????????????????????????
+> Task :mobile:processResources UP-TO-DATE
+> Task :api:processResources UP-TO-DATE
+> Task :api:processTestResources NO-SOURCE
+> Task :core:compileJava UP-TO-DATE
+> Task :core:processResources UP-TO-DATE
+> Task :core:classes UP-TO-DATE
+> Task :core:jar UP-TO-DATE
+> Task :mobile:compileJava UP-TO-DATE
+> Task :mobile:classes UP-TO-DATE
+> Task :mobile:jar UP-TO-DATE
+
+> Task :api:compileJava
+C:\Users\Test-User\Desktop\gesotat-system\api\src\main\java\org\base\api\controller\ContractQueryController.java:34: error: incompatible types: List<CAP#1> cannot be converted to List<Object>
+ private void addNextKeyset(Map<String,Object> body,String contract,int pageId,String fp,List<String> keys,boolean desc){Object data=body.get("data");if(data instanceof List<?> list&&!list.isEmpty()&&list.get(list.size()-1) instanceof Map<?,?> m){List<Object> vals=keys.stream().map(m::get).toList();body.put("nextCursor",cursors.issueKeyset(contract,pageId,String.valueOf(body.get("contractRevision")),fp,keys,vals,desc));}}
+                                                                                                                                                                                                                                                                                                         ^
+  where CAP#1 is a fresh type-variable:
+    CAP#1 extends Object from capture of ?
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+1 error
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':api:compileJava'.
+> Compilation failed; see the compiler output below.
+  C:\Users\Test-User\Desktop\gesotat-system\api\src\main\java\org\base\api\controller\ContractQueryController.java:34: error: incompatible types: List<CAP#1> cannot be converted to List<Object>
+
+> Task :api:compileJava FAILED
+
+[Incubating] Problems report is available at: file:///C:/Users/Test-User/Desktop/gesotat-system/build/reports/problems/problems-report.html
+   private void addNextKeyset(Map<String,Object> body,String contract,int pageId,String fp,List<String> keys,boolean desc){Object data=body.get("data");if(data instanceof List<?> list&&!list.isEmpty()&&list.get(list.size()-1) instanceof Map<?,?> m){List<Object> vals=keys.stream().map(m::get).toList();body.put("nextCursor",cursors.issueKeyset(contract,pageId,String.valueOf(body.get("contractRevision")),fp,keys,vals,desc));}}
+                                                                                                                                                                                                                                                                                                           ^
+    where CAP#1 is a fresh type-variable:
+      CAP#1 extends Object from capture of ?
+  1 error
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights.
+
+BUILD FAILED in 4s
+8 actionable tasks: 1 executed, 7 up-to-date

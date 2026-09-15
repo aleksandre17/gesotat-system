@@ -1,0 +1,22 @@
+Configuration on demand is an incubating feature.
+  ? Module included: api
+  ? Module included: mobile
+??????????????????????????????????
+  Active modules: core, api, mobile
+??????????????????????????????????
+> Task :mobile:processResources UP-TO-DATE
+> Task :api:processResources UP-TO-DATE
+> Task :core:compileJava UP-TO-DATE
+> Task :core:processResources UP-TO-DATE
+> Task :core:classes UP-TO-DATE
+> Task :core:jar UP-TO-DATE
+> Task :mobile:compileJava UP-TO-DATE
+> Task :mobile:classes UP-TO-DATE
+> Task :mobile:jar UP-TO-DATE
+> Task :api:compileJava UP-TO-DATE
+> Task :api:classes UP-TO-DATE
+> Task :api:resolveMainClassName
+> Task :api:bootJar
+
+BUILD SUCCESSFUL in 2s
+10 actionable tasks: 2 executed, 8 up-to-date

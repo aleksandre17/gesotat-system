@@ -1,0 +1,20 @@
+[
+  {
+    "name": "additive-surface",
+    "from": {"metric":"COUNT","unit":"PERSON","dimensions":["TIME"],"responseFields":["observations"]},
+    "to": {"metric":"COUNT","unit":"PERSON","dimensions":["TIME","AGE"],"responseFields":["observations","metadata"]},
+    "expected": "BACKWARD_COMPATIBLE"
+  },
+  {
+    "name": "metric-change",
+    "from": {"metric":"COUNT","unit":"PERSON","aggregation":"SUM"},
+    "to": {"metric":"RATE","unit":"PERSON","aggregation":"SUM"},
+    "expected": "BREAKING"
+  },
+  {
+    "name": "projection-removal",
+    "from": {"projection":{"fields":{"value":"DECIMAL","unit":"CODE"}}},
+    "to": {"projection":{"fields":{"value":"DECIMAL"}}},
+    "expected": "BREAKING"
+  }
+]

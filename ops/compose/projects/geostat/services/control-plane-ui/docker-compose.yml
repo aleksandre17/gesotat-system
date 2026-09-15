@@ -1,0 +1,7 @@
+services:
+  geostat-system-app:
+    image: geostat-system-app
+    container_name: geostat-system-app
+    build:
+      context: ../../../../../../platform/apps/geostat/frontend/geostat-system-app
+      dockerfile: src/Dockerfile

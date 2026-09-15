@@ -1,0 +1,32 @@
+{
+  "schema": "geostat.host-project.v1",
+  "host": "gesotat-system",
+  "projectId": "geostat",
+  "isolation": {
+    "environmentNamespace": "geostat",
+    "runtimeNamespace": "geostat",
+    "networkNamespace": "geostat-net",
+    "databaseBoundary": "project-scoped"
+  },
+  "upstream": "../../agent-framework",
+  "kitMount": ".agents/kit",
+  "platform": {
+    "backend": ["platform/apps/geostat/backend/core", "platform/apps/geostat/backend/api", "platform/apps/geostat/backend/mobile"],
+    "frontend": ["platform/apps/geostat/frontend/geostat-system-app", "platform/apps/geostat/frontend/web"]
+  },
+  "operations": {
+    "infra": ["ops/infra"],
+    "cli": ["ops/cli"],
+    "scripts": ["ops/scripts"],
+    "compose": ["ops/compose/projects/geostat"],
+    "config": ["ops/config/schema", "ops/config/projects/geostat"],
+    "runbook": ["ops/runbook"],
+    "runtime": ["ops/runtime/projects/geostat"]
+  },
+  "status": "PHYSICAL_RELOCATED",
+  "relocationPolicy": "physical-canonical-layout-no-links-or-duplicate-source-boundaries",
+  "directoryBlueprint": "docs/reference/canonical-directory-blueprint.md",
+  "canonicalTree": "docs/reference/CANONICAL-FULL-TREE.md",
+  "canonicalTreeDesign": "docs/reference/CANONICAL-FULL-TREE-DESIGN.md",
+  "enforcement": "ops/cli/validation/host-layout-check.ps1"
+}

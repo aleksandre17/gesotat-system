@@ -1,0 +1,77 @@
+# ============================================================
+#  GeoStat System — Development Docker Compose
+# ============================================================
+#  Usage:
+#    docker-compose -f ops/compose/projects/geostat/docker-compose.dev.yml up --build
+#    docker-compose -f ops/compose/projects/geostat/docker-compose.dev.yml up --build api
+#    docker-compose -f ops/compose/projects/geostat/docker-compose.dev.yml up --build mobile
+#    docker-compose -f ops/compose/projects/geostat/docker-compose.dev.yml down -v
+# ============================================================
+
+services:
+
+  api:
+    build:
+      context: ../../../../platform/apps/geostat/backend/api
+      dockerfile: Dockerfile
+    container_name: geostat-api-dev
+    env_file: ${GEOSTAT_ENV_FILE:-../../../../ops/config/projects/geostat/shared/runtime/local.env}
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      JAVA_TOOL_OPTIONS: >-
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=75.0
+        -Xms256m -Xmx1g
+    volumes:
+      - api-storage:/app/storage
+      - api-uploads:/app/uploads
+    networks:
+      - geostat-net
+    restart: unless-stopped
+
+  mobile:
+    build:
+      context: ../../../../platform/apps/geostat/backend/mobile
+      dockerfile: Dockerfile
+    container_name: geostat-mobile-dev
+    env_file: ${GEOSTAT_ENV_FILE:-../../../../ops/config/projects/geostat/shared/runtime/local.env}
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SERVER_PORT: "8082"
+      JAVA_TOOL_OPTIONS: >-
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=75.0
+        -Xms128m -Xmx512m
+    networks:
+      - geostat-net
+    restart: unless-stopped
+
+  minio:
+    image: ${MINIO_IMAGE:-minio/minio:RELEASE.2025-09-07T16-13-09Z}
+    container_name: geostat-minio-dev
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY}
+    ports:
+      - "${STORAGE_PORT:-9000}:9000"
+      - "${STORAGE_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio-data:/data
+    networks:
+      - geostat-net
+    restart: unless-stopped
+
+volumes:
+  api-storage:
+  api-uploads:
+  minio-data:
+
+networks:
+  geostat-net:
+    driver: bridge
+

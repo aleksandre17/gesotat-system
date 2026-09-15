@@ -1,0 +1,7 @@
+{
+  "schema": "geostat.host-profile.v1",
+  "host": "gesotat-system",
+  "layers": {"L4": "project", "L5": "delivery", "L6": "generated", "L7": "runtime"},
+  "uiIncluded": false,
+  "relocationStatus": "SCAFFOLD_ONLY"
+}

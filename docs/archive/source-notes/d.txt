@@ -1,0 +1,701 @@
+იმუშავე როგორც მკაცრი ინსტრუქციის შემსრულებელი backend/data/platform იმპლემენტერი. არ მოიფიქრო ახალი არქიტექტურა, არ გაამარტივო მოთხოვნა და არ გამოტოვო არცერთი პუნქტი.
+
+  UI საერთოდ არ ააწყო. UI არის ერთადერთი გამონაკლისი. UI-სთვის საჭირო ყველა backend metadata, API, validation, workflow და configuration აუცილებლად უნდა განხორციელდეს.
+
+  მთავარი მიზანი:
+
+  1. სრული KIDS კონტრაქტი შეიქმნას მონაცემთა ბაზაში პირდაპირი SQL-მიგრაციებით.
+  2. ეს კონტრაქტი გახდეს canonical, versioned და immutable.
+  3. სრული backend განხორციელდეს ამ კონტრაქტის სამართავად.
+  4. დამტკიცებული კონტრაქტიდან ავტომატურად შეიქმნას ახალი, ცარიელი Access ფაილი.
+  5. Access მხოლოდ კონტრაქტის execution/data package იყოს და არ შეიცავდეს დამოუკიდებელ ბიზნეს-ლოგიკას.
+  6. ძველი Access-ის მონაცემები ჩაიტვირთოს მხოლოდ კონტრაქტული mapping-ითა და validation-ით.
+
+  მთავარი არქიტექტურული წესი:
+
+  Control Plane ქმნის და ამტკიცებს კონტრაქტს.
+  Access Generator ამ კონტრაქტიდან ქმნის Access-ს.
+  Access ვერ ქმნის, ვერ ცვლის და ვერ ამტკიცებს კონტრაქტს.
+  არც ერთი ფიზიკური Access table არ შეიძლება არსებობდეს contract registry-ში გამოცხადების, versioning-ისა და approval-ის გარეშე.
+
+  აუცილებლად შეისწავლე:
+
+  1. C:\Users\Test-User\Desktop\gesotat-system\artifacts\KIDS-admin-panel-complete-architecture-and-implementation-specification.docx
+
+  2. C:\Users\Test-User\Desktop\gesotat-system\samples\kids-children-portal-full-data.accdb
+
+  3. repository-ის ყველა:
+  - source file;
+  - SQL migration;
+  - classifier;
+  - JSON;
+  - Access generator;
+  - test;
+  - existing contract;
+  - existing documentation.
+
+  DOCX არის მთავარი ნორმატიული წყარო. ძველი Access მხოლოდ მონაცემთა, წყაროებისა და mapping-ის წყაროა; ის არ არის საბოლოო schema authority.
+
+  I. Control Plane contract registry
+
+  პირდაპირი SQL-მიგრაციებით შექმენი/გააფართოვე სრული contract registry.
+
+  აუცილებლად მოიცავი:
+
+  - contract;
+  - contract revision;
+  - product;
+  - dataset;
+  - dataset version;
+  - namespace;
+  - structure;
+  - structure index;
+  - table definition;
+  - field definition;
+  - logical type;
+  - physical type;
+  - nullability;
+  - default;
+  - precision/scale;
+  - ordinal;
+  - dimensions;
+  - measures;
+  - facts;
+  - primary keys;
+  - alternate keys;
+  - unique keys;
+  - indexes;
+  - foreign keys;
+  - relations;
+  - relation type;
+  - cardinality;
+  - delete/update policy;
+  - classifiers;
+  - classifier schemes;
+  - classifier versions;
+  - classifier items;
+  - aliases;
+  - hierarchies;
+  - statistical carriers;
+  - metrics;
+  - units;
+  - aggregations;
+  - statistical DSD;
+  - DSD components;
+  - observations;
+  - quality policies;
+  - confidentiality policies;
+  - privacy/disclosure rules;
+  - lineage;
+  - source systems;
+  - source connections;
+  - source documents;
+  - raw mappings;
+  - transformations;
+  - validation rules;
+  - import contracts;
+  - export definitions;
+  - API projections;
+  - package definitions;
+  - package artifacts;
+  - generation jobs;
+  - approvals;
+  - approval steps;
+  - approval instances;
+  - approval actions;
+  - decisions;
+  - releases;
+  - release members;
+  - audit events;
+  - roles;
+  - permissions;
+  - scopes;
+  - schema diffs;
+  - compatibility rules;
+  - lifecycle states.
+
+  ყველა ობიექტს უნდა ჰქონდეს სწორი identity, version, status, checksum, timestamps და საჭირო audit/lineage.
+
+  II. Namespace და structure framework
+
+  გამოიყენე მკაფიო namespace-ები:
+
+  - `GS` — governance, contract, schema, package;
+  - `CL` — classifiers and controlled vocabularies;
+  - `STAT` — statistical DSD, metrics, units, observations;
+  - `RAW` — source artifacts, documents, records and provenance;
+  - `ENT` — canonical entities;
+  - `REF` — ordinary reference data;
+  - `SERV` — serving projections/read models;
+  - `ARCH` — historical archive;
+  - `AUDIT` — audit and decisions;
+  - `SYS` — technical/runtime metadata;
+  - domain namespace — მაგალითად KIDS business tables;
+  - `EXT:<domain>` — approved extensions.
+
+  ყველა სტრუქტურა დარეგისტრირდეს `__gs_structure_index`-ში.
+
+  `structure_kind`-ის controlled vocabulary-ში მოიცავი:
+
+  - CONTRACT;
+  - CLASSIFICATION;
+  - REFERENCE;
+  - STATISTICAL_DSD;
+  - STATISTICAL_OBSERVATION;
+  - ENTITY;
+  - EVENT;
+  - DOCUMENT;
+  - RAW_PAYLOAD;
+  - RAW_RECORD;
+  - PROJECTION;
+  - ARCHIVE;
+  - AUDIT;
+  - EXTENSION.
+
+  SDMX გამოიყენე მხოლოდ სტატისტიკური structure-ის exchange/metadata standard-ად. ის არ უნდა გახდეს ყველა table-ის namespace.
+
+  III. თითოეული ცხრილის სრული ინდივიდუალური კონტრაქტი
+
+  ყველა panel, data, archive და Access table-ს უნდა ჰქონდეს ცალკე აღწერა:
+
+  - table name;
+  - namespace;
+  - structure kind;
+  - grain;
+  - სრული დანიშნულება;
+  - authoritative/derived/raw/cache სტატუსი;
+  - lifecycle;
+  - append-only/mutable/immutable წესები;
+  - allowed content;
+  - forbidden content;
+  - ყველა field და მისი მნიშვნელობა;
+  - primary key;
+  - alternate/unique keys;
+  - foreign keys;
+  - indexes;
+  - relations;
+  - cardinality;
+  - lineage requirement;
+  - source requirement;
+  - quality rules;
+  - confidentiality rules;
+  - retention;
+  - import behavior;
+  - export behavior;
+  - Access generation behavior;
+  - backend behavior;
+  - UI capability metadata.
+
+  არ შექმნა მხოლოდ table names-ის სია. ყველა table-ს ჰქონდეს ზუსტი საზღვრები.
+
+  IV. Raw layer
+
+  `__raw_document` გამოიყენე მხოლოდ immutable source artifact envelope/locator-ად.
+
+  აუცილებლად აღწერე და განახორციელე:
+
+  - source system;
+  - source feed;
+  - document/file identity;
+  - original filename;
+  - MIME type;
+  - byte size;
+  - checksum;
+  - received time;
+  - source URI/path;
+  - ingestion batch;
+  - provenance;
+  - retention;
+  - confidentiality;
+  - storage/payload reference;
+  - encryption reference;
+  - parser status;
+  - validation status;
+  - supersession metadata.
+
+  `__raw_document`-ში არ ჩაწერო:
+
+  - საბოლოო `kids_*` entity;
+  - `__stat_*` observation;
+  - approved metric/unit/aggregation;
+  - classifier item;
+  - serving projection;
+  - გაწმენდილი business value;
+  - დამოუკიდებელი ბიზნეს-ლოგიკა.
+
+  საჭიროების შემთხვევაში შექმენი და დაარეგისტრირე:
+
+  - `__raw_source`;
+  - `__raw_document_part`;
+  - `__raw_record`;
+  - `__raw_record_field`;
+  - ingestion batch;
+  - artifact;
+  - staging row;
+  - validation issue;
+  - checkpoint.
+
+  V. Static, entity, reference და statistical separation
+
+  არ აურიო ერთმანეთში:
+
+  - raw source;
+  - canonical entity;
+  - ordinary reference;
+  - classifier;
+  - statistical metric;
+  - statistical observation;
+  - serving projection;
+  - archive;
+  - audit.
+
+  მაგალითად:
+
+  - `kids_goal` ინახავს goal entity-ს;
+  - `kids_resource` ინახავს resource entity-ს;
+  - `__cl_*` ინახავს controlled classifications;
+  - `__stat_*` ინახავს statistical definitions/observations;
+  - `__raw_*` ინახავს source evidence-ს;
+  - `__serv_*` არის derived serving model;
+  - `__audit_*` არის audit, არა business data.
+
+  VI. Statistical semantics
+
+  სრულად გამოავლინე და კონტრაქტში ჩაწერე ყველა:
+
+  - statistical carrier;
+  - metric;
+  - unit;
+  - aggregation;
+  - dimension;
+  - age group;
+  - time period;
+  - numerator;
+  - denominator;
+  - population basis;
+  - missing value semantics;
+  - quality flags;
+  - confidentiality/suppression;
+  - source lineage;
+  - inference method;
+  - confidence;
+  - approval state.
+
+  არც ერთი carrier/metric/unit/aggregation არ დატოვო დაუშვებელ hardcoded JSON-ად.
+
+  VII. Panel backend
+
+  UI-ის გარეშე სრულად განახორციელე:
+
+  - domain model;
+  - repositories;
+  - services;
+  - transactions;
+  - REST API;
+  - DTOs;
+  - validation;
+  - authorization;
+  - role/permission/scope checks;
+  - contract lifecycle;
+  - draft/review/approved/rejected/published/retired states;
+  - optimistic locking;
+  - idempotency;
+  - schema diff;
+  - compatibility checks;
+  - classifier CRUD/proposal/approval;
+  - relation management;
+  - statistical semantic management;
+  - quality/privacy policy management;
+  - source and lineage management;
+  - mapping management;
+  - package generation;
+  - package artifact registry;
+  - import orchestration;
+  - publication gates;
+  - audit logging;
+  - error codes;
+  - pagination/filtering/sorting;
+  - API versioning;
+  - OpenAPI contract;
+  - observability;
+  - metrics;
+  - retry and failure handling.
+
+  UI არ ააწყო, მაგრამ UI-სთვის ყველა metadata და API operation მზად უნდა იყოს.
+
+  VIII. Workflow და state machines
+
+  განახორციელე და დაავალიდირე state transition-ები:
+
+  - contract;
+  - dataset;
+  - classifier;
+  - proposal;
+  - metric semantics;
+  - package generation job;
+  - import batch;
+  - release;
+  - approval.
+
+  არ დაუშვა უკანონო transition.
+  ყოველი transition ჩაიწეროს audit event-სა და decision record-ში.
+  Approval უნდა აკმაყოფილებდეს separation of duties/four-eyes წესს.
+
+  IX. Validation და blocking gates
+
+  დაამატე blocking validation:
+
+  - schema completeness;
+  - table/field parity;
+  - type compatibility;
+  - nullability;
+  - key uniqueness;
+  - relation resolution;
+  - orphan detection;
+  - classifier validity;
+  - statistical semantic completeness;
+  - metric/unit/aggregation validity;
+  - source lineage;
+  - quality thresholds;
+  - confidentiality/privacy;
+  - localization;
+  - compatibility;
+  - route uniqueness;
+  - package checksum;
+  - publication atomicity;
+  - security;
+  - performance;
+  - reproducibility.
+
+  Blocking error-ის შემთხვევაში package/release არ გამოქვეყნდეს.
+
+  X. Access generator
+
+  Generator-მა:
+
+  1. მიიღოს მხოლოდ approved contract revision;
+  2. კონტრაქტი წაიკითხოს Control Database-იდან;
+  3. არ გამოიყენოს hardcoded final schema;
+  4. არ დააკოპიროს ძველი Access schema;
+  5. შექმნას ახალი ცარიელი Access package;
+  6. შექმნას ყველა declared table;
+  7. შექმნას ყველა field სწორი type/ordinal/nullability-ით;
+  8. შექმნას keys/indexes/relations;
+  9. შექმნას namespaces და metadata;
+  10. შექმნას classifiers;
+  11. შექმნას statistical structures;
+  12. შექმნას raw/entity/reference/serving structures;
+  13. დაამატოს constraints;
+  14. ჩაწეროს contract revision/checksum/generator version;
+  15. უარი თქვას undeclared table/field/relation-ზე;
+  16. შექმნას deterministic/reproducible output.
+
+  XI. Old Access import
+
+  განახორციელე:
+
+  - source inventory;
+  - static/statistical classification;
+  - table/field mapping;
+  - datatype conversion;
+  - normalization;
+  - duplicate detection;
+  - null handling;
+  - invalid value reporting;
+  - classifier resolution;
+  - relation resolution;
+  - lineage;
+  - import batch;
+  - row-level errors;
+  - quarantine;
+  - retry;
+  - checkpoint;
+  - atomic commit;
+  - post-import validation.
+
+  ძველი Access-ის მონაცემები არ ჩაიტვირთოს ბრმად.
+
+  XII. Security and audit
+
+  განახორციელე:
+
+  - RBAC;
+  - permissions;
+  - scopes;
+  - separation of duties;
+  - approval authorization;
+  - append-only audit;
+  - checksum/tamper detection;
+  - secure file handling;
+  - secret references;
+  - injection protection;
+  - safe errors;
+  - privacy/disclosure controls;
+  - signed/reproducible artifacts.
+
+  XIII. Tests
+
+  დაამატე და გაუშვი:
+
+  - unit tests;
+  - repository tests;
+  - migration tests;
+  - integration tests;
+  - API tests;
+  - contract completeness tests;
+  - schema parity tests;
+  - relation tests;
+  - classifier tests;
+  - statistical semantics tests;
+  - privacy tests;
+  - Access generation tests;
+  - import tests;
+  - invalid input tests;
+  - state transition tests;
+  - idempotency tests;
+  - regression tests;
+  - reproducibility tests.
+
+  დაამტკიცე, რომ ერთი contract revision-იდან ხელახლა გენერირებული Access-ის schema იდენტურია.
+
+  XIV. შესრულების სავალდებულო რიგი
+
+  1. შეისწავლე ყველა source.
+  2. შექმენი სრული checklist ყველა table/field/relation/metric/rule-ისთვის.
+  3. შეასრულე SQL migrations.
+  4. გაუშვი migrations.
+  5. დაავალიდირე Control Plane contract registry.
+  6. განახორციელე backend services/API/workflows.
+  7. შექმენი contract export და schema diff.
+  8. შექმენი Access generator.
+  9. დააგენერირე ახალი ცარიელი Access.
+  10. შეადარე Access contract-ს ავტომატურად.
+  11. შეასრულე old Access mapping/import validation.
+  12. გაუშვი build და ყველა test.
+  13. მხოლოდ შემოწმებული შედეგი ჩააბარე.
+
+  XV. აკრძალვები
+
+  - არ ააწყო UI;
+  - არ მოიგონო ახალი ბიზნეს-წესი;
+  - არ გაამარტივო კონტრაქტი;
+  - არ გამოტოვო table/field/relation;
+  - არ დაამატო Access-ში დაურეგისტრირებელი table;
+  - არ დაამატო hardcoded schema;
+  - არ დატოვო სტატისტიკური სემანტიკა დაუმტკიცებელ JSON-ად;
+  - არ ჩაწერო raw source საბოლოო business table-ში;
+  - არ შეცვალო approved contract revision;
+  - არ დამალო წინააღმდეგობა;
+  - არ დააბრუნო მხოლოდ გეგმა ან ახსნა.
+
+  თუ ტექნიკური პრობლემა შეგხვდა, თვითონ გადაჭერი არსებული კონტრაქტის ფარგლებში. თუ DOCX-სა და კოდს შორის რეალური ბიზნეს-წინააღმდეგობა აღმოჩნდა, არ გამოიგონო გამოსავალი: დააფიქსირე ზუსტი ფაილი, ცხრილი, ველი, მიზეზი და გავლენა.
+
+
+  XVI. ჩაბარების კრიტერიუმები
+
+    სამუშაო დასრულებულია მხოლოდ მაშინ, როცა:
+
+    - სრული contract registry არსებობს;
+    - ყველა migration შესრულებულია;
+    - backend build წარმატებულია;
+    - ყველა test გადის;
+    - contract validation წარმატებულია;
+    - schema diff-ში დაუმტკიცებელი ცვლილება არ არის;
+    - Access package გენერირებულია;
+    - Access-ის tables/fields/types/keys/indexes/relations სრულად ემთხვევა კონტრაქტს;
+    - ყველა migration;
+    - contract revision ID;
+    - backend API-ების სია;
+    - generated Access-ის სრული ბილიკი;
+    - Access checksum;
+    - schema/contract validation report;
+    - mapping/import report;
+    - test/build შედეგები;
+    - დარჩენილი blocker-ები, თუ არსებობს.
+
+    მხოლოდ UI არ უნდა განხორციელდეს. UI-ს გარდა ყველა contract, schema, metadata, table boundary, migration, backend, API, workflow, validation, security, audit, import, generation და testing ნაწილი სრულად უნდა იყოს დასრულებული.
+
+
+    მიმდინარე Goal-ზე მუშაობა გრძელდება, მაგრამ ბოლო acceptance audit-ის მიხედვით სრული დასრულება ჯერ არ დასტურდება.
+
+      დასრულებულია:
+
+      - revision-7-ის 15/15 ingest;
+      - validation;
+      - 14 snapshot;
+      - classifier proposal import;
+      - goals/resources/glossary entity materialization;
+      - raw lineage;
+      - revision-aware source resolution;
+      - glossary long-text correction;
+      - API regression tests;
+      - API, DB და Object Storage health.
+
+      ჯერ არ არის დასრულებული:
+
+      - subcategory classifier-link materialization;
+      - statistics.series;
+      - statistics.observation;
+      - statistics.observation_dimension;
+      - statistical metric/unit/DSD resolver;
+      - final quality/privacy gates;
+      - publication;
+      - rollback/idempotency/row-count acceptance.
+
+      მიმდინარე runtime მტკიცებულება კვლავ არის:
+
+      - entity.entity_record = 439
+      - raw.source_record = 2813
+      - statistics.series = 0
+      - statistics.observation = 0
+
+      ამიტომ Goal-ს დასრულებულად ვერ მოვნიშნავ.
+
+    • მიმდინარე Goal ჯერ არ არის დასრულებული.
+
+      საბოლოო დადასტურებული მდგომარეობა:
+
+      - 15/15 dataset ingest — დასრულებული;
+      - validation — დასრულებული;
+      - 14 snapshots — შექმნილი;
+      - entity/raw/glossary materialization — შესრულებული;
+      - classifier proposals — ჩაწერილი;
+      - statistical materialization — ჯერ არ შესრულებულა;
+      - classifier-link materialization — ჯერ არ შესრულებულა;
+      - quality/privacy/publication/acceptance — ჯერ არ შესრულებულა.
+
+      კრიტიკული დარჩენილი მაჩვენებლები კვლავ:
+
+      - statistics.series = 0
+      - statistics.observation = 0
+
+      ამიტომ კონტრაქტის მიხედვით Goal-ს complete სტატუსს ვერ მივანიჭებ.
+
+    • მუშაობა გრძელდება, მაგრამ ამ მომენტში completion-ის მტკიცებულება არ არსებობს.
+
+      ბოლო დადასტურებული მდგომარეობა:
+
+      - 15/15 dataset ingest — შესრულებული;
+      - 14 validated load — შესრულებული;
+      - 14 snapshot — შექმნილი;
+      - entity materialization — შესრულებული;
+      - glossary materialization — შესრულებული;
+      - raw lineage — შესრულებული;
+      - classifier proposals — ჩაწერილი;
+      - statistics.series — 0;
+      - statistics.observation — 0;
+      - subcategory classifier-link — 0;
+      - quality/privacy/publication/acceptance — არ შესრულებულა.
+
+      Goal-ის სრული დახურვა მხოლოდ მაშინ იქნება შესაძლებელი, როცა statistical registry/linkage და classifier-link materialization runtime-ზე რეალურად გაივლის და საბოლოო acceptance audit დადებით შედეგს დააბრუნებს.
+
+    • მიმდინარე Goal-ზე ახალი შესრულებული ცვლილება ამ turn-ში არ შემიტანია, რადგან საბოლოო blocker კვლავ იგივეა: statistical semantics და classifier-link materialization-ის სრული runtime implementation.
+
+      დადასტურებული მდგომარეობა უცვლელია:
+
+      - ingest: 15/15;
+      - validation: დასრულებული;
+      - snapshots: შექმნილი;
+      - entity/raw/glossary: materialized;
+      - classifier proposals: imported;
+      - statistical observations: არ შექმნილა;
+      - subcategory classification links: არ შექმნილა;
+      - quality/privacy/publication/acceptance: არ შესრულებულა.
+
+      Goal-ს complete-ს ვერ მივანიჭებ, რადგან საბოლოო acceptance evidence არ არსებობს.
+
+    • მიმდინარე მტკიცებულებებით Goal ჯერ ვერ იხურება.
+
+      დასრულებულია:
+
+      - 15/15 ingest;
+      - 14 validation;
+      - 14 snapshot;
+      - 439 entity record;
+      - 700 localized text;
+      - 2813 raw source record;
+      - 178 glossary;
+      - 36 goals;
+      - 225 resources;
+      - 43 carriers;
+      - classifier proposals;
+      - API/DB/Object Storage health;
+      - regression tests.
+
+      დარჩენილი კრიტიკული runtime შედეგები კვლავ:
+
+      - statistics.series = 0;
+      - statistics.observation = 0;
+      - subcategory classifier links არ არის materialized;
+      - quality/privacy/publication/acceptance არ არის შესრულებული.
+
+      ამიტომ სრული production pipeline-ის დასრულება ჯერ დაუდასტურებელია და Goal აქტიური რჩება.
+
+    • მიმდინარე production audit-ში ახალი ცვლილება არ შემიტანია.
+
+      დადასტურებული მდგომარეობა:
+
+      - 15/15 dataset ingest — წარმატებული;
+      - validation — წარმატებული;
+      - snapshots — შექმნილი;
+      - entity/raw/glossary materialization — შესრულებული;
+      - statistical materialization — ჯერ არ შესრულებულა;
+      - subcategory classifier-link — ჯერ არ შესრულებულა;
+      - quality/privacy/publication/acceptance — ჯერ არ შესრულებულა.
+
+      კრიტიკული blocker ისევ არის statistical semantic resolver-ისა და classifier snapshot/link materializer-ის runtime implementation. Goal აქტიურია და completion არ დასტურდება.
+
+    • მიმდინარე Goal ჯერ ისევ აქტიურია და დასრულებულად ვერ ჩაითვლება.
+
+      რეალურად დასრულებულია:
+
+      - სრული 15/15 ingest;
+      - validation;
+      - snapshot preparation;
+      - classifier proposal import;
+      - entity/raw/glossary materialization;
+      - API/DB/Object Storage deployment და health;
+      - regression tests.
+
+      დარჩენილი და დაუხურავი არის:
+
+      - classifier proposal → authoritative versioned snapshot;
+      - subcategory → entity.entity_classification;
+      - statistical metric/unit/dimension resolver;
+      - statistics.series;
+      - statistics.observation;
+      - statistics.observation_dimension;
+      - quality/privacy gates;
+      - publication;
+      - rollback/idempotency/row-count acceptance audit.
+
+      საბოლოო runtime მტკიცებულება კვლავ აჩვენებს:
+
+      - entity.entity_record = 439
+      - raw.source_record = 2813
+      - statistics.series = 0
+      - statistics.observation = 0
+
+      ამიტომ კონტრაქტის მოთხოვნებით სრული production pipeline ჯერ არ არის დახურული.
+
+    • Goal დროებით blocked სტატუსში გადავიდა.
+
+      ბლოკერი განმეორდა მრავალ შემოწმებაზე და არის ერთიანი არქიტექტურული საკითხი:
+
+      - classifier proposal-ებიდან authoritative versioned snapshot ჯერ არ არსებობს;
+      - subcategory classification-link materializer არ არის დასრულებული;
+      - statistical metric/unit/dimension resolver არ არის დასრულებული;
+      - ამიტომ statistics.series და statistics.observation ნულია;
+      - quality/privacy/publication/acceptance ეტაპები კანონიკურად ვერ დაიწყება.
+
+      უკვე შესრულებულია:
+
+      - 15/15 ingest;
+      - validation;
+      - snapshots;
+      - entity/raw/glossary materialization;
+      - classifier proposals;
+      - API/DB/Object Storage deployment;
+      - regression tests.
+
+      blocked არ ნიშნავს მონაცემების დაკარგვას ან არასწორ publish-ს — pipeline უსაფრთხოდ გაჩერდა იმ gate-ზე, სადაც დარჩენილი implementation-ის გარეშე გაგრძელება კონტრაქტს დაარღვევდა.

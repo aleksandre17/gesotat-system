@@ -1,0 +1,12 @@
+# Explicit security overlay. It is never implicit: operators opt in with
+# `docker compose -f docker-compose.prod.yml -f docker-compose.secure.yml up`.
+services:
+  api:
+    environment:
+      PLATFORM_OIDC_ENABLED: ${PLATFORM_OIDC_ENABLED:?PLATFORM_OIDC_ENABLED=true is required in secure mode}
+      OIDC_ISSUER_URL: ${OIDC_ISSUER_URL:?OIDC_ISSUER_URL is required in secure mode}
+      OIDC_AUDIENCE: ${OIDC_AUDIENCE:?OIDC_AUDIENCE is required in secure mode}
+      PLATFORM_RATE_LIMIT_REDIS_ENABLED: ${PLATFORM_RATE_LIMIT_REDIS_ENABLED:?PLATFORM_RATE_LIMIT_REDIS_ENABLED=true is required in secure mode}
+      PLATFORM_RATE_LIMIT_REDIS_URL: ${PLATFORM_RATE_LIMIT_REDIS_URL:?PLATFORM_RATE_LIMIT_REDIS_URL is required in secure mode}
+      OTEL_METRICS_ENABLED: ${OTEL_METRICS_ENABLED:?OTEL_METRICS_ENABLED=true is required in secure mode}
+      OTEL_METRICS_ENDPOINT: ${OTEL_METRICS_ENDPOINT:?OTEL_METRICS_ENDPOINT is required in secure mode}

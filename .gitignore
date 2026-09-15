@@ -127,7 +127,7 @@ deploy-tmp/
 # ──────────────────────────────────────────────────────────────────────────────
 *.env
 .env.*
-!.env.example
+!ops/config/templates/*.env.example
 scripts/deploy.conf
 !scripts/deploy.conf.example
 application-local.yml
@@ -179,4 +179,13 @@ docker-compose.override.yml
 **/reports/
 jacoco/
 *.exec
+
+# Codex/local build evidence (keep canonical source under docs/ and scripts/)
+/build-*.txt
+/compile-*.txt
+/keyset-*.txt
+/test-*.txt
+/audit-r8-check.txt
+/codex-session-*.md
+/chartjson.dat
 

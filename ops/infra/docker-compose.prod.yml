@@ -1,0 +1,17 @@
+services:
+  minio:
+    image: ${MINIO_IMAGE:-minio/minio:RELEASE.2025-09-07T16-13-09Z}
+    container_name: geostat-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${STORAGE_ACCESS_KEY:?STORAGE_ACCESS_KEY is required}
+      MINIO_ROOT_PASSWORD: ${STORAGE_SECRET_KEY:?STORAGE_SECRET_KEY is required}
+    volumes:
+      - minio-data:/data
+    networks: [geostat-net]
+    restart: always
+volumes:
+  minio-data:
+networks:
+  geostat-net:
+    external: true

@@ -1,0 +1,53 @@
+Configuration on demand is an incubating feature.
+  ? Module included: api
+  ? Module included: mobile
+??????????????????????????????????
+  Active modules: core, api, mobile
+??????????????????????????????????
+> Task :mobile:processResources UP-TO-DATE
+> Task :api:processResources UP-TO-DATE
+> Task :api:processKidsCanonicalToolResources NO-SOURCE
+> Task :core:compileJava UP-TO-DATE
+> Task :core:processResources UP-TO-DATE
+> Task :core:classes UP-TO-DATE
+> Task :core:jar UP-TO-DATE
+> Task :mobile:compileJava UP-TO-DATE
+> Task :mobile:classes UP-TO-DATE
+> Task :mobile:jar UP-TO-DATE
+> Task :api:compileJava UP-TO-DATE
+> Task :api:classes UP-TO-DATE
+> Task :api:compileKidsCanonicalToolJava UP-TO-DATE
+> Task :api:kidsCanonicalToolClasses UP-TO-DATE
+
+> Task :api:auditKidsCanonicalAccess
+artifact=C:\Users\Test-User\Desktop\gesotat-system\api\kids-portal-v1-canonical-r8-final.accdb
+bytes=2920448
+__gs_package: rows=1, columns=8, indexes=1, primaryKey=true
+__gs_page: rows=6, columns=12, indexes=1, primaryKey=true
+__gs_dataset: rows=15, columns=4, indexes=1, primaryKey=true
+__gs_field: rows=122, columns=5, indexes=1, primaryKey=true
+__gs_key: rows=17, columns=4, indexes=1, primaryKey=true
+__gs_relation: rows=21, columns=7, indexes=1, primaryKey=true
+__gs_projection: rows=6, columns=5, indexes=1, primaryKey=true
+__gs_metadata_schema: rows=2, columns=5, indexes=1, primaryKey=true
+__gs_metadata: rows=267, columns=12, indexes=1, primaryKey=true
+__cl_scheme: rows=4, columns=4, indexes=2, primaryKey=true
+__cl_version: rows=4, columns=6, indexes=4, primaryKey=true
+__cl_item: rows=36, columns=6, indexes=8, primaryKey=true
+__cl_alias: rows=36, columns=7, indexes=2, primaryKey=true
+__cl_hierarchy: rows=0, columns=4, indexes=1, primaryKey=true
+__raw_document: rows=456, columns=22, indexes=8, primaryKey=true
+__stat_unit: rows=10, columns=5, indexes=3, primaryKey=true
+__stat_metric: rows=43, columns=10, indexes=5, primaryKey=true
+__ent_kids_goal: rows=36, columns=8, indexes=3, primaryKey=true
+__ent_kids_resource: rows=225, columns=8, indexes=6, primaryKey=true
+__rel_kids_resource_subcategory_assignment: rows=230, columns=7, indexes=5, primaryKey=true
+__ent_kids_glossary_entry: rows=178, columns=6, indexes=3, primaryKey=true
+__raw_kids_statistical_carrier: rows=43, columns=6, indexes=6, primaryKey=true
+__stat_kids_statistical_input: rows=880, columns=13, indexes=4, primaryKey=true
+__rel_kids_statistical_semantic_binding: rows=43, columns=10, indexes=4, primaryKey=true
+physicalRelationships=21
+status=PRODUCTION_ACCEPTED
+
+BUILD SUCCESSFUL in 2s
+10 actionable tasks: 1 executed, 9 up-to-date
