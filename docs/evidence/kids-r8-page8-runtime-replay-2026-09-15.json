@@ -1,0 +1,14 @@
+{
+  "status": "RUNTIME_REPLAY_PASS",
+  "contractCode": "KIDS_PORTAL_V1",
+  "revision": 8,
+  "pageId": 8,
+  "checks": [
+    { "path": "/platform/contracts/KIDS_PORTAL_V1/revisions/8/introspection", "status": 200, "passed": true },
+    { "path": "/platform/contracts/KIDS_PORTAL_V1/pages?revision=8", "status": 200, "passed": true },
+    { "path": "/platform/contracts/KIDS_PORTAL_V1/pages/8/query-capabilities?revision=8", "status": 200, "passed": true },
+    { "path": "/platform/contracts/KIDS_PORTAL_V1/pages/8/query", "status": 200, "passed": true }
+  ],
+  "anonymousBypass": false,
+  "notes": "OIDC-authenticated replay against the deployed geostat API; temporary bootstrap authentication was disabled before the replay."
+}
