@@ -222,6 +222,22 @@ mapper, `006` drift evidence) იმავე ფორმით ემატე
 
 ## 6. ოპერაციული წესი
 
+### AIR-2026-009 — Legacy request path replacement
+
+- **სტატუსი:** `DISCOVERED` / **priority:** `P1`
+- **აღმოჩენა:** KIDS frontend-ის `Goals`, `SectionDataPage` და `GlossaryModal`
+  ჯერ კიდევ პირდაპირ იყენებენ legacy `/api/goals`, `/api/files` და
+  `/api/glossary` fetch-ებს; canonical `platformRequestClient` და contract
+  request cases უკვე არსებობს, მაგრამ ამ სამ execution path-ში არ არის მიბმული.
+- **გაუმჯობესება:** ერთი governed client, page capability preflight, OIDC,
+  contract revision, typed response normalization და server-side pagination;
+  legacy URL reconstruction და chart JSON parsing უნდა გაქრეს.
+- **Acceptance:** სამივე request-ის canonical replay, normalized parity,
+  unauthorized/timeout/abort negatives, ETag/correlation evidence და no-legacy
+  production build check.
+- **დამოკიდებულება:** page 8/9/10/11 approved projection და frontend runtime
+  auth configuration.
+
 ახალი აღმოჩენა პირველად იწერება AIR-ში, შემდეგ იქმნება card/ADR/implementation
 task. Chat message, issue ან commit message შეიძლება იყოს ბმული, მაგრამ AIR არის
 canonical status. კვირეული review ამოწმებს stale `DISCOVERED/DEFERRED` ჩანაწერებს,
