@@ -1107,3 +1107,21 @@ and deployment authority remain the final activation gates.
 - [ ] External provider workload, SQL Server/MySQL workload matrix, live
   production authority and steward approval remain `NOT_ASSERTED`; local test
   success is not promoted to production evidence.
+
+### Continuous execution replay — 2026-09-16
+
+- [x] Contract/schema and adapter/API regression chain completed: `:api:test`
+  is `BUILD SUCCESSFUL`.
+- [x] KIDS data reconciliation chain completed: goals parity, glossary parity,
+  statistical shadow parity (`880/880`) and resource scope reconciliation all
+  report PASS.
+- [x] Documentation consistency, runtime-ledger generation, host-layout and
+  schema-agnostic preflights report PASS (`278 verified / 10 open`).
+- [x] Secure production overlay and deployment-secret injection boundaries
+  report PASS without exposing or inventing credentials.
+- [x] Duplicate migration sequence defect fixed: canonical storage binding is
+  migration `085`; runtime ledger now contains unique ordered IDs.
+- [ ] Local Docker engine is unavailable in this workstation; Docker/staging
+  execution is therefore represented by validated Compose/overlay contracts,
+  not falsely reported as a container run. Remote production activation still
+  requires operator authority and external evidence.
