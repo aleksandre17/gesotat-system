@@ -1,0 +1,16 @@
+{
+  "schema": "geostat.kids.relation-include-acceptance.v1",
+  "recordedAt": "2026-09-15",
+  "contract": { "code": "KIDS_PORTAL_V1", "revision": 8 },
+  "authentication": "OIDC",
+  "cases": [
+    { "pageId": 8, "status": 200, "returned": 2, "includes": ["GOAL_CATEGORY", "GOAL_RAW_LINEAGE"] },
+    { "pageId": 9, "status": 200, "returned": 2, "includes": ["RESOURCE_CATEGORY", "SUBCATEGORY_FOR_RESOURCE", "METRIC_FOR_RESOURCE", "CARRIER_FOR_RESOURCE", "RESOURCE_RAW_LINEAGE"] },
+    { "pageId": 10, "status": 200, "returned": 2, "includes": ["GLOSSARY_LANGUAGE", "GLOSSARY_RAW_LINEAGE"] },
+    { "pageId": 11, "status": 200, "returned": 2, "includes": ["INPUT_FOR_CARRIER", "INPUT_RAW_LINEAGE"] }
+  ],
+  "relationResolution": "CONTRACT_INCLUDE_NAMES_ACCEPTED",
+  "fanout": "BOUNDED_BY_REQUEST_LIMIT",
+  "status": "TECHNICAL_ACCEPTANCE_PASS",
+  "publication": "BLOCKED_PENDING_EXTERNAL_STEWARD_APPROVAL"
+}
