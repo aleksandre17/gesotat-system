@@ -125,3 +125,125 @@ inventory.json
 
 ამის დასრულების შემდეგ frontend-ის არსებული `public/files` სტრუქტურა აღარ იქნება
 runtime authority და მისი უსაფრთხოდ retirement შესაძლებელი გახდება.
+
+## ფაილის ატვირთვა და 1000-row lineage
+
+### ატვირთვის პროცესი
+
+```text
+ფაილი
+  → SHA-256 checksum
+  → malware/type/size validation
+  → private Object Storage
+  → ingest.artifact
+  → Access/resource identity
+  → canonical snapshot
+  → publication
+  → signed download URL
+```
+
+ფაილის ბაიტები Access-ში არ ინახება.
+
+### Access-ში ფაილის identity
+
+რესურსის ცხრილია `__ent_kids_resource`. მისი კანონიკური ფორმაა:
+
+```json
+{
+  "source_resource_id": "resource|128",
+  "category_item_ref": "KIDS_GOAL_CATEGORY|3",
+  "title_ka": "მოსახლეობის რიცხოვნობა ასაკისა და სქესის მიხედვით",
+  "title_en": "Population by age and sex",
+  "path_ka": "object://geostat-ingest/kids/r8/resources/a1b2...xlsx",
+  "path_en": "object://geostat-ingest/kids/r8/resources/a1b2...xlsx",
+  "source_row_key": "files|128",
+  "operation": "UPSERT"
+}
+```
+
+`source_resource_id` არის ფაილის/resource-ის სტაბილური identity.
+
+### Raw lineage
+
+`__raw_document` ინახავს artifact-ის lineage-ს და არა ბიზნეს-ცხრილის დუბლირებულ
+მონაცემს:
+
+```json
+{
+  "source_row_key": "files|128",
+  "original_filename": "population-by-age.xlsx",
+  "mime_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "byte_size": 482913,
+  "checksum": "a1b2...",
+  "source_uri": "s3://geostat-ingest/kids/r8/resources/a1b2....xlsx",
+  "payload_reference": "s3://geostat-ingest/kids/r8/resources/a1b2....xlsx",
+  "ingestion_batch": "kids-r8",
+  "parser_status": "PARSED",
+  "validation_status": "VALID"
+}
+```
+
+### ერთი ფაილი და 1000 row
+
+თუ ერთი Excel ფაილი შეიცავს 1000 observation row-ს:
+
+```text
+ერთი ფაილი
+  → ერთი resource entity
+  → ერთი artifact identity
+  → 1000 raw/source row
+  → 1000 typed canonical row
+```
+
+ფაილი 1000-ჯერ არ მეორდება. ყველა row მიუთითებს იმავე artifact identity-ზე და
+საკუთარ `source_row_number/source_key`-ზე:
+
+```json
+{
+  "resourceId": "resource|128",
+  "artifact": {
+    "artifactId": 44,
+    "objectUri": "s3://geostat-ingest/kids/r8/resources/a1b2.xlsx",
+    "sha256": "a1b2..."
+  },
+  "rows": [
+    {
+      "sourceRowNumber": 1,
+      "sourceKey": "files|128|row|1",
+      "observationId": "obs|128|1"
+    },
+    {
+      "sourceRowNumber": 2,
+      "sourceKey": "files|128|row|2",
+      "observationId": "obs|128|2"
+    }
+  ]
+}
+```
+
+### საბოლოო კავშირი
+
+```text
+KIDS_RESOURCE
+  source_resource_id
+      ↓
+entity.entity_record
+  entity_id
+      ↓
+entity.resource_locator
+  object_uri + checksum + access_policy
+      ↓
+publication.dataset_snapshot
+  dataset_snapshot_id
+      ↓
+statistics.series / statistics.observation
+  source_record_id + dataset_snapshot_id
+      ↓
+API response
+  resource metadata + observations + governed download
+```
+
+ეს მოდელი უზრუნველყოფს ერთი ფაილის მრავალ row-ზე მიბმას, ზუსტ lineage-ს,
+checksum integrity-ს, immutable snapshot-ს, idempotent re-upload-ს, duplicate
+detection-სა და rollback-ს. API აბრუნებს მხოლოდ კონტრაქტით დამტკიცებულ metadata-ს,
+typed data-სა და დროებით signed URL-ს.
