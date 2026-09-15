@@ -21,5 +21,13 @@
     "classification": "FILTERED_LEGACY_SUBSET_CANDIDATE",
     "stableKeyProof": "PENDING"
   },
+  "accessArtifactAudit": {
+    "status": "PRODUCTION_ACCEPTED",
+    "artifact": "samples/kids-portal-v1-canonical-r8-column-audit.accdb",
+    "resourceRows": 225,
+    "resourcePrimaryKey": "source_resource_id",
+    "declaredRelations": 21,
+    "command": ":api:auditKidsCanonicalAccess"
+  },
   "notes": "Canonical resource response is contract-projected; legacy payload names are not used as the serving schema."
 }
