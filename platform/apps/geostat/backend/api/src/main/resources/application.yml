@@ -46,6 +46,7 @@ spring:
   data:
     redis:
       url: ${PLATFORM_RATE_LIMIT_REDIS_URL:redis://localhost:6379}
+      password: ${REDIS_PASSWORD:}
   datasource:
     primary:
       jdbc-url: ${DB_PRIMARY_URL}
