@@ -111,7 +111,7 @@ contract authoring/approval
 
 ### C-07 Query/keyset hardening
 
-- [-] HMAC cursor scope, tuple last-seen values, query fingerprint, snapshot binding და lexicographic predicate;
+- [-] HMAC cursor scope, tuple last-seen values, query fingerprint და lexicographic predicate; **snapshot binding implementation closed**: contract revision → `site_contract_dataset.dataset_version_id` → immutable `publication.dataset_snapshot` (approved lifecycle states) → canonical `entity.entity_record`/`statistics.series` rows. Production traversal evidence remains under the release/evidence gate.
 - [x] ascending/descending tuple და identifier-safety regression tests;
 - [-] null/order direction-ის ერთიანი კონტრაქტული metadata (`StableSortSpec`) და provider-neutral forward/backward tuple comparator დაემატა (`KeysetTupleComparator`); SQL predicate integration remains;
 - [-] stable sort/index requirement contract-ში გამოხატულია (`requiredIndexCode`); runtime index introspection/enforcement remains;
