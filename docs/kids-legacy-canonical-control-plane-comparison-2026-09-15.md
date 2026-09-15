@@ -77,7 +77,7 @@ Legacy `chartdata` embeds statistical values inside a file payload. R8 separates
 
 `carrier (43) → semantic binding (43) → typed statistical input cells (880)`
 
-The Control Plane declares dimensions, measure, unit, aggregation, filters and response shape. Therefore the canonical API can return structured `series/observations/dimensions/lineage` without exposing `chartdata` parsing to the consumer.
+The Control Plane declares dimensions, measure, unit, aggregation, filters and response shape. Therefore the canonical API can return structured `series/observations/dimensions/lineage` without exposing `chartdata` parsing to the consumer. A read-only shadow audit (`auditKidsStatisticalShadowParity`) now proves **880 legacy numeric cells ↔ 880 canonical typed inputs**, across **43 carrier/resource keys**, with `missing=0`, `extra=0`, `countMismatch=0` (`STATISTICAL_SHADOW_PARITY_PASS`).
 
 ## 5. Control Plane request contract
 
@@ -101,8 +101,8 @@ Capabilities response is the executable boundary: it tells the client which fiel
 | Goal cardinality | legacy 36; Access 36 | **PASS** | normalized field parity test |
 | Resource cardinality | legacy 159 (categories 1–4); canonical 225 | **PARTIAL — scope delta identified** | stable source-key diff and explicit category-scope report; do not force count equality |
 | Glossary cardinality | legacy/canonical stable-key audit 178 ↔ 178 | **PASS** | retain normalized parity evidence and verify live response lineage/privacy |
-| Statistical carrier identity | legacy category-1 files 43; Access carriers 43 | **CANDIDATE PASS** | compare stable IDs and carrier metadata |
-| Statistical values | legacy embedded `chartdata`; Access 880 typed cells | **OPEN** | shadow projection parity by carrier/period/dimension |
+| Statistical carrier identity | legacy scoped carriers 43; Access carriers 43 | **PASS** | stable carrier/resource key and carrier registry parity |
+| Statistical values | legacy embedded `chartdata`; Access 880 typed cells | **PASS (shadow parity)** | retain repeatable carrier/period/dimension audit and complete protected API response diff |
 | Relations | legacy endpoints expose no explicit graph; Access declares 21 relations | **PASS structurally** | API cross-family execution acceptance |
 | Lineage | absent from legacy response; present in raw/entity/statistical contract | **PASS structurally** | verify response lineage policy and redaction |
 | Response shape | legacy arrays; Control Plane contract-shaped envelopes | **MIGRATION REQUIRED** | canonical adapter + shadow comparison |
@@ -110,10 +110,22 @@ Capabilities response is the executable boundary: it tells the client which fiel
 
 ## 7. დასკვნა
 
-R8 Access და Control Plane უკვე აღწერს უფრო მდიდარ, typed და relation-aware მოდელს, ვიდრე legacy API. Goal-ისთვის პირდაპირი parity დადასტურებულია; resource, glossary და statistical payload-ებისთვის რაოდენობრივი სხვაობები საჭიროებს source-key reconciliation-სა და shadow projection-ს. ეს განსხვავებები არ უნდა “გასწორდეს” მონაცემის ხელოვნური წაშლით ან KIDS-specific branch-ით.
+R8 Access და Control Plane უკვე აღწერს უფრო მდიდარ, typed და relation-aware მოდელს, ვიდრე legacy API. Goal-ისთვის პირდაპირი parity დადასტურებულია, glossary და statistical payload-ის shadow parity-ც PASS-ია. Resource-ის 66-რიანი სხვაობა კვლავ scope-delta-დ არის კლასიფიცირებული და არ უნდა “გასწორდეს” მონაცემის ხელოვნური წაშლით ან KIDS-specific branch-ით.
 
 **ამ დოკუმენტის სტატუსი: `OBSERVED → READY_FOR_AGREEMENT`.**  
-შემდეგი შეთანხმებული ნაბიჯი არის მხოლოდ delta-classification: ჯერ resource/glossary/source-key parity, შემდეგ statistical shadow projection. UI wiring და legacy endpoint retirement ამ შედარების დამტკიცებამდე არ იცვლება.
+შემდეგი შეთანხმებული ნაბიჯი არის resource source-key delta-classification და დაცული API response shadow diff. UI wiring და legacy endpoint retirement ამ შედარების დამტკიცებამდე არ იცვლება.
+
+### 8.7 Statistics / pageId 11 — shadow parity closure
+
+- [x] canonical carrier registry-ის 43 key შეზღუდავს შედარების scope-ს და გამორიცხავს დაუკავშირებელ legacy payload-ს.
+- [x] `chartdata`-ის literal-escaped JSON უსაფრთხოდ გაიშიფრა მხოლოდ read-only audit-ში; source semantics არ შეცვლილა.
+- [x] carrier → resource stable key, period, dimension და numeric measure grain შედარდა.
+- [x] legacy numeric cells `880` = canonical `statistics.observation` inputs `880`.
+- [x] `missing=0`, `extra=0`, `countMismatch=0`; audit status `STATISTICAL_SHADOW_PARITY_PASS`.
+- [x] განმეორებადი task: `:api:auditKidsStatisticalShadowParity`.
+- [ ] protected live response shadow diff და steward/publication approval — ეს არის production authority gate, არა semantic parity defect.
+
+**pageId 11-ის სტატუსი: `TECHNICAL PARITY PASS — LIVE AUTHORITY/RESPONSE GATE OPEN`.**
 
 ## 8. ნაბიჯ-ნაბიჯ განხილვა — ქეისი 1: Goals / pageId 8
 

@@ -49,6 +49,18 @@
     "period, dimension, carrier and raw row lineage remain separate contract fields."
   ],
   "relations": ["INPUT_FOR_CARRIER", "INPUT_RAW_LINEAGE"],
+  "shadowParity": {
+    "audit": "auditKidsStatisticalShadowParity",
+    "legacyArtifact": "samples/kids-children-portal-full-data.accdb",
+    "canonicalArtifact": "samples/kids-portal-v1-canonical-r8-column-audit.accdb",
+    "legacyNumericCells": 880,
+    "canonicalInputRows": 880,
+    "resourceKeys": 43,
+    "missing": 0,
+    "extra": 0,
+    "countMismatch": 0,
+    "status": "STATISTICAL_SHADOW_PARITY_PASS"
+  },
   "status": "TECHNICAL_REPLAY_PASS",
   "publication": "BLOCKED_PENDING_QUALITY_PRIVACY_RECONCILIATION_AND_STEWARD_APPROVAL"
 }

@@ -106,6 +106,7 @@ sourceSets {
         java.include 'KidsStatisticalSemanticProfiler.java'
         java.include 'KidsGoalsParityAudit.java'
         java.include 'KidsGlossaryParityAudit.java'
+        java.include 'KidsStatisticalShadowParityAudit.java'
         java.include 'KidsGoalsCapabilityAudit.java'
         java.include 'ContractRegistryAccessPackageGenerator.java'
         compileClasspath += sourceSets.main.runtimeClasspath
@@ -148,6 +149,16 @@ tasks.register('auditKidsGlossaryParity', JavaExec) {
     classpath = sourceSets.kidsCanonicalTool.runtimeClasspath
     mainClass = 'KidsGlossaryParityAudit'
     args '../../../../../samples/kids-children-portal-full-data.accdb',
+         (project.findProperty('kidsAccessFile') ?: 'kids-portal-v1-canonical-r8-final.accdb')
+}
+
+tasks.register('auditKidsStatisticalShadowParity', JavaExec) {
+    group = 'geostat'
+    description = 'Read-only legacy chartdata vs canonical typed-observation shadow parity audit for KIDS page 11'
+    dependsOn tasks.named('compileKidsCanonicalToolJava')
+    classpath = sourceSets.kidsCanonicalTool.runtimeClasspath
+    mainClass = 'KidsStatisticalShadowParityAudit'
+    args (project.findProperty('kidsSourceFile') ?: '../../../../../samples/kids-children-portal-full-data.accdb'),
          (project.findProperty('kidsAccessFile') ?: 'kids-portal-v1-canonical-r8-final.accdb')
 }
 
