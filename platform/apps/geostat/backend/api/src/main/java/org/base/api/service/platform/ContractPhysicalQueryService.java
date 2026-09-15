@@ -13,30 +13,33 @@ public class ContractPhysicalQueryService {
  private final JdbcTemplate control; private final JdbcTemplate data;
  public ContractPhysicalQueryService(@Qualifier("primaryJdbcTemplate") JdbcTemplate control,@Qualifier("dataPlaneJdbcTemplate") JdbcTemplate data){this.control=control;this.data=data;}
  public List<Map<String,Object>> rows(long revisionId,String datasetCode,int page,int limit,Map<String,Object> filters,String sort,boolean desc){
-   Map<String,Object> t=control.queryForMap("SELECT TOP 1 t.physical_table_name,t.storage_plane,t.table_definition_id FROM platform.contract_table_definition t JOIN platform.contract_structure s ON s.structure_id=t.structure_id WHERE s.lifecycle_status IN ('APPROVED','ACTIVE') AND t.lifecycle_status IN ('APPROVED','ACTIVE') AND (t.logical_table_code=? OR t.access_table_name=?) AND EXISTS (SELECT 1 FROM platform.site_contract_dataset d WHERE d.site_contract_revision_id=? AND (d.dataset_code=t.logical_table_code OR d.dataset_code=t.access_table_name)) ORDER BY t.revision DESC",datasetCode,datasetCode,revisionId);
+   Map<String,Object> t=control.queryForMap("SELECT TOP 1 t.physical_table_name,t.storage_plane,t.table_definition_id,t.table_role FROM platform.contract_table_definition t JOIN platform.contract_structure s ON s.structure_id=t.structure_id WHERE s.lifecycle_status IN ('APPROVED','ACTIVE') AND t.lifecycle_status IN ('APPROVED','ACTIVE') AND (t.logical_table_code=? OR t.access_table_name=?) AND EXISTS (SELECT 1 FROM platform.site_contract_dataset d WHERE d.site_contract_revision_id=? AND (d.dataset_code=t.logical_table_code OR d.dataset_code=t.access_table_name)) ORDER BY t.revision DESC",datasetCode,datasetCode,revisionId);
    if(!"DATA".equalsIgnoreCase(String.valueOf(t.get("storage_plane")))) throw new IllegalArgumentException("Only data-plane contract tables are queryable");
-   String table=identifier(String.valueOf(t.get("physical_table_name")));
+   boolean canonicalEntity="ENTITY".equalsIgnoreCase(String.valueOf(t.get("table_role")));
+   String table=canonicalEntity ? "(SELECT er.payload_json,er.entity_id,er.external_key,er.title,er.source_record_id FROM entity.entity_record er WHERE er.record_type=? AND er.is_current=1)" : identifier(String.valueOf(t.get("physical_table_name")));
    List<String> fields=control.query("SELECT field_name FROM platform.contract_field_definition WHERE table_definition_id=? AND lifecycle_status IN ('APPROVED','ACTIVE') ORDER BY ordinal",(r,n)->r.getString(1),t.get("table_definition_id"));
    if(fields.isEmpty()) throw new IllegalArgumentException("Contract table has no approved fields: "+datasetCode);
    Set<String> allowed=new HashSet<>(fields); var compiled=ContractQueryCompiler.compile(filters,allowed,sort,desc);
-   String select=fields.stream().map(x->"["+identifier(x)+"]").collect(java.util.stream.Collectors.joining(","));
+   String select=canonicalEntity ? fields.stream().map(x->"JSON_VALUE(payload_json,'$."+identifier(x)+"') AS ["+identifier(x)+"]").collect(java.util.stream.Collectors.joining(",")) : fields.stream().map(x->"["+identifier(x)+"]").collect(java.util.stream.Collectors.joining(","));
    // SQL Server requires ORDER BY whenever OFFSET/FETCH is used.  A plain
    // contract read may intentionally omit a sort; use a deterministic,
    // provider-neutral no-order expression rather than emitting invalid SQL.
    String order = compiled.orderSql().isBlank() ? " ORDER BY (SELECT NULL)" : compiled.orderSql();
    String sql="SELECT "+select+" FROM "+table+compiled.whereSql()+order+" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
-   List<Object> p=new ArrayList<>(compiled.parameters()); p.add((Math.max(1,page)-1)*Math.min(Math.max(1,limit),1000));p.add(Math.min(Math.max(1,limit),1000));
+   List<Object> p=new ArrayList<>(); if(canonicalEntity)p.add(datasetCode); p.addAll(compiled.parameters()); p.add((Math.max(1,page)-1)*Math.min(Math.max(1,limit),1000));p.add(Math.min(Math.max(1,limit),1000));
    return data.query(sql,(rs,n)->{Map<String,Object>x=new LinkedHashMap<>();for(int i=1;i<=fields.size();i++)x.put(fields.get(i-1),rs.getObject(i));return x;},p.toArray());
  }
 
  /** Count rows using the same contract table and declared filter surface. */
  public long count(long revisionId, String datasetCode, Map<String,Object> filters) {
-   Map<String,Object> t=control.queryForMap("SELECT TOP 1 t.physical_table_name,t.storage_plane,t.table_definition_id FROM platform.contract_table_definition t JOIN platform.contract_structure s ON s.structure_id=t.structure_id WHERE s.lifecycle_status IN ('APPROVED','ACTIVE') AND t.lifecycle_status IN ('APPROVED','ACTIVE') AND (t.logical_table_code=? OR t.access_table_name=?) AND EXISTS (SELECT 1 FROM platform.site_contract_dataset d WHERE d.site_contract_revision_id=? AND (d.dataset_code=t.logical_table_code OR d.dataset_code=t.access_table_name)) ORDER BY t.revision DESC",datasetCode,datasetCode,revisionId);
+   Map<String,Object> t=control.queryForMap("SELECT TOP 1 t.physical_table_name,t.storage_plane,t.table_definition_id,t.table_role FROM platform.contract_table_definition t JOIN platform.contract_structure s ON s.structure_id=t.structure_id WHERE s.lifecycle_status IN ('APPROVED','ACTIVE') AND t.lifecycle_status IN ('APPROVED','ACTIVE') AND (t.logical_table_code=? OR t.access_table_name=?) AND EXISTS (SELECT 1 FROM platform.site_contract_dataset d WHERE d.site_contract_revision_id=? AND (d.dataset_code=t.logical_table_code OR d.dataset_code=t.access_table_name)) ORDER BY t.revision DESC",datasetCode,datasetCode,revisionId);
    if(!"DATA".equalsIgnoreCase(String.valueOf(t.get("storage_plane")))) throw new IllegalArgumentException("Only data-plane contract tables are queryable");
-   String table=identifier(String.valueOf(t.get("physical_table_name")));
+   boolean canonicalEntity="ENTITY".equalsIgnoreCase(String.valueOf(t.get("table_role")));
+   String table=canonicalEntity ? "(SELECT er.payload_json,er.entity_id,er.external_key,er.title,er.source_record_id FROM entity.entity_record er WHERE er.record_type=? AND er.is_current=1)" : identifier(String.valueOf(t.get("physical_table_name")));
    List<String> fields=control.query("SELECT field_name FROM platform.contract_field_definition WHERE table_definition_id=? AND lifecycle_status IN ('APPROVED','ACTIVE') ORDER BY ordinal",(r,n)->r.getString(1),t.get("table_definition_id"));
    var compiled=ContractQueryCompiler.compile(filters==null?Map.of():filters,new HashSet<>(fields),null,false);
-   Long value=data.queryForObject("SELECT COUNT_BIG(*) FROM "+table+compiled.whereSql(),Long.class,compiled.parameters().toArray());
+   List<Object> params=new ArrayList<>(); if(canonicalEntity)params.add(datasetCode); params.addAll(compiled.parameters());
+   Long value=data.queryForObject("SELECT COUNT_BIG(*) FROM "+table+compiled.whereSql(),Long.class,params.toArray());
    return value==null?0L:value;
  }
  public List<Map<String,Object>> rowsWithRelations(long revisionId,String datasetCode,int page,int limit,Map<String,Object> filters,String sort,boolean desc){
