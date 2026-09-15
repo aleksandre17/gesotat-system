@@ -73,6 +73,18 @@ written: `IMAGE_REVISION` must come from an approved immutable release, and
 missing production secrets must be supplied through the operator's secret
 management process before the API container can be recreated.
 
+### 2026-09-15 clean-release image build
+
+The repository was committed as clean release candidate
+`18d156cfe936b0f4cd59d9e7c9305c47fb269ace`; strict release-gate replay is
+PASS with zero working-tree entries. The remote API image was rebuilt from the
+uploaded clean-release artifact and its OCI provenance was verified:
+`sha256:ff35b3b755793a699d9cbd055e4c899d8652e6574da5eb40f0146a01abc75733`,
+`org.opencontainers.image.revision=18d156cfe936b0f4cd59d9e7c9305c47fb269ace`.
+The running container still references the prior digest and was not recreated;
+signed tag/deploy authority and final runtime configuration remain required
+before activation.
+
 ### 2026-09-15 one-time Grafana secret repair
 
 Because the operator authorized a one-time repair, a random 32-byte
