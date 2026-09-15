@@ -1086,3 +1086,24 @@ The remote API image rebuilt with that revision has digest
 `sha256:c9d04c28958a0fb1d7125e380c90905aa029a7ff5d1f6d5b1ef1b69b6f1fce03`
 and matching OCI labels. The live container has not been recreated; signed tag
 and deployment authority remain the final activation gates.
+
+### Technical closure replay — 2026-09-16
+
+- [x] C-01 lifecycle/checksum/approval orchestration regression replayed with
+  `ContractLifecycle*`, `ContractCompatibility*` and checksum tests; `:api:test`
+  completed successfully.
+- [x] C-02 provider capability discovery, health supervisor and lifecycle
+  regression replayed; deterministic priority/failover and no-candidate
+  fail-closed behavior remain covered.
+- [x] C-08 persisted semantic golden corpus and contract compatibility fixtures
+  replayed; scalar, collection, nested projection and response-schema cases
+  passed with machine-readable approval guidance.
+- [x] C-10 SDK/export/streaming registry and codec regression replayed;
+  JSON/CSV/NDJSON, SDMX-JSON/XML, Parquet, ZIP and bounded streaming tests
+  passed in the API suite.
+- [x] KIDS page 9 source-key scope reconciliation and page 11 statistical shadow
+  parity are recorded as immutable evidence (`missing=0`, `extra=0` within
+  declared scope, and `880/880` typed statistical cells).
+- [ ] External provider workload, SQL Server/MySQL workload matrix, live
+  production authority and steward approval remain `NOT_ASSERTED`; local test
+  success is not promoted to production evidence.
