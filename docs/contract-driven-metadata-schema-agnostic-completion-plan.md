@@ -1078,3 +1078,11 @@ only because the isolated infra env lacked that key. The original file was
 backed up, permissions were restricted to `0600`, the value was not emitted or
 recorded, and isolated infra Compose validation now passes. `IMAGE_REVISION`
 remains unset until an approved immutable release commit/tag is selected.
+
+### Clean-candidate provenance — 2026-09-15
+
+The clean release candidate is `e6e00419dca3e3717187a68f3b81bb183240953e`.
+The remote API image rebuilt with that revision has digest
+`sha256:80f4fbbbbe7e503bd9e5769968dd5cdf3fd9d50465c8a31afa4bafa987f52434`
+and matching OCI labels. The live container has not been recreated; signed tag
+and deployment authority remain the final activation gates.
