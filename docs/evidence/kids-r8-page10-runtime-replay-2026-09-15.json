@@ -41,6 +41,9 @@
     "writtenRows": 178,
     "status": "SEMANTIC_REVIEW",
     "dataPlaneTable": "__ent_kids_glossary_entry",
+    "mode": "contract-declared compatibility projection",
+    "productionCanonical": false,
+    "followUp": "Replace direct site-specific physical projection with a generic entity-family adapter or generated contract projection before production approval.",
     "naturalKey": "source_glossary_id",
     "keyCount": 178,
     "missingRequiredEntryText": 0
