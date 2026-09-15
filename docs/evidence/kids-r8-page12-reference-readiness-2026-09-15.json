@@ -1,0 +1,18 @@
+{
+  "schema": "geostat.kids.page-reference-readiness.v1",
+  "recordedAt": "2026-09-15",
+  "site": "kids",
+  "contract": { "code": "KIDS_PORTAL_V1", "revision": 8 },
+  "page": { "pageId": 12, "nodeCode": "KIDS_CLASSIFIERS", "datasetCode": "KIDS_CLASSIFIER_ITEM" },
+  "capabilities": "DISCOVERED",
+  "technicalStatus": "BLOCKED_BY_REFERENCE_ADAPTER",
+  "reason": "The governed page declares item_ref/version_ref/item_code/labels, while the current Data Plane reference snapshot is classification_item_snapshot with internal numeric identities. Directly relabeling it would violate contract-first schema mapping.",
+  "preservedAuthority": "reference.classification_item_snapshot",
+  "requiredClosure": [
+    "contract-declared reference projection adapter",
+    "version-aware item_ref mapping",
+    "classifier publication-state filter",
+    "read-only API replay and relation acceptance"
+  ],
+  "publication": "BLOCKED_PENDING_REFERENCE_ADAPTER_AND_STEWARD_APPROVAL"
+}
