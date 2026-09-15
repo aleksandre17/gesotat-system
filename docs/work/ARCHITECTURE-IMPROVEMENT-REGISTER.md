@@ -222,9 +222,9 @@ mapper, `006` drift evidence) იმავე ფორმით ემატე
 
 ## 6. ოპერაციული წესი
 
-### AIR-2026-009 — Legacy request path replacement
+### AIR-2026-009 — Legacy request path replacement (deferred)
 
-- **სტატუსი:** `DISCOVERED` / **priority:** `P1`
+- **სტატუსი:** `DEFERRED` / **priority:** `P1`
 - **აღმოჩენა:** KIDS frontend-ის `Goals`, `SectionDataPage` და `GlossaryModal`
   ჯერ კიდევ პირდაპირ იყენებენ legacy `/api/goals`, `/api/files` და
   `/api/glossary` fetch-ებს; canonical `platformRequestClient` და contract
@@ -237,6 +237,9 @@ mapper, `006` drift evidence) იმავე ფორმით ემატე
   production build check.
 - **დამოკიდებულება:** page 8/9/10/11 approved projection და frontend runtime
   auth configuration.
+- **მიმდინარე scope:** frontend implementation შეგნებულად არ შედის მიმდინარე
+  page/API conformance სამუშაოში; იგი დაიწყება მხოლოდ ყველა page-ის semantic
+  mapping, response parity და contract acceptance-ის დასრულების შემდეგ.
 
 ახალი აღმოჩენა პირველად იწერება AIR-ში, შემდეგ იქმნება card/ADR/implementation
 task. Chat message, issue ან commit message შეიძლება იყოს ბმული, მაგრამ AIR არის
