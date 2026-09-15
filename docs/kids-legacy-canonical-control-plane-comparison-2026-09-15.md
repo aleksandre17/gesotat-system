@@ -65,7 +65,7 @@ Legacy `ID/category/title_geo/title_eng/path_*` becomes a typed entity with loca
 
 Legacy `category` and `sub_category` are transport fields. In R8 they are resolved through declared relations/classifier aliases; `__rel_kids_resource_subcategory_assignment` preserves many-to-many assignments. `chartdata` is retained as raw lineage and is interpreted only by an approved statistical projection. It is not a free-form serving schema.
 
-Observed legacy rows: **159** across categories 1–4. R8 canonical resources: **225**, assignments: **230**. The page-9 runtime query is now snapshot-bound through `dataset_version_id → publication.dataset_snapshot_id → entity.entity_record`; the 159/225 difference remains a **reconciliation item**, not a safe one-to-one assertion. Required next check: compare stable source identifiers and classify each delta as duplicate, additional governed resource, filtered legacy subset, or unresolved mapping.
+Observed legacy rows: **159** across categories 1–4. R8 canonical resources: **225**, assignments: **230**. The page-9 runtime query is now snapshot-bound through `dataset_version_id → publication.dataset_snapshot_id → entity.entity_record`. Because the legacy request only exposes categories 1–4, the 66-row delta is currently classified as **filtered legacy subset candidate** (scope mismatch), not as duplicate or deletion. Stable-key reconciliation remains required before final closure; no count is artificially normalized.
 
 ### Glossary (page 10)
 
@@ -99,7 +99,7 @@ Capabilities response is the executable boundary: it tells the client which fiel
 |---|---|---|---|
 | Contract/page registry | Access `__gs_page`, `__gs_dataset`, `__gs_field`, `__gs_projection`; Control Plane revision 8 | **OBSERVED/PASS** | verify live introspection payload against artifact checksum |
 | Goal cardinality | legacy 36; Access 36 | **PASS** | normalized field parity test |
-| Resource cardinality | legacy 159; Access 225 | **OPEN** | source-key delta classification; do not force count equality |
+| Resource cardinality | legacy 159 (categories 1–4); canonical 225 | **PARTIAL — scope delta identified** | stable source-key diff and explicit category-scope report; do not force count equality |
 | Glossary cardinality | legacy 177; Access 178 | **OPEN** | locate one-row delta and language normalization decision |
 | Statistical carrier identity | legacy category-1 files 43; Access carriers 43 | **CANDIDATE PASS** | compare stable IDs and carrier metadata |
 | Statistical values | legacy embedded `chartdata`; Access 880 typed cells | **OPEN** | shadow projection parity by carrier/period/dimension |

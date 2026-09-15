@@ -13,5 +13,13 @@
   "oidc": true,
   "anonymousBypass": false,
   "relations": ["RESOURCE_CATEGORY", "SUBCATEGORY_FOR_RESOURCE", "METRIC_FOR_RESOURCE", "CARRIER_FOR_RESOURCE", "RESOURCE_RAW_LINEAGE"],
+  "reconciliation": {
+    "legacyScope": "categories 1-4",
+    "legacyRows": 159,
+    "canonicalRows": 225,
+    "delta": 66,
+    "classification": "FILTERED_LEGACY_SUBSET_CANDIDATE",
+    "stableKeyProof": "PENDING"
+  },
   "notes": "Canonical resource response is contract-projected; legacy payload names are not used as the serving schema."
 }
