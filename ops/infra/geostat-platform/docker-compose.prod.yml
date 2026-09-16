@@ -42,6 +42,15 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
+  tempo:
+    image: grafana/tempo:3.0.3
+    container_name: geostat-tempo
+    command: ["-config.file=/etc/tempo/tempo.yml"]
+    volumes:
+      - ./tempo.yml:/etc/tempo/tempo.yml:ro
+      - geostat-tempo-data:/var/tempo
+    networks: [geostat-net]
+    restart: always
   grafana:
     image: grafana/grafana:12.1.1
     container_name: geostat-grafana
@@ -55,6 +64,7 @@ services:
     restart: always
     depends_on:
       prometheus: {condition: service_healthy}
+      tempo: {condition: service_started}
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
       interval: 15s
@@ -103,6 +113,8 @@ volumes:
     name: infra_geostat-keycloak-db-data
   geostat-prometheus-data:
     name: infra_geostat-prometheus-data
+  geostat-tempo-data:
+    name: infra_geostat-tempo-data
   geostat-grafana-data:
     name: infra_geostat-grafana-data
   geostat-otel-data:

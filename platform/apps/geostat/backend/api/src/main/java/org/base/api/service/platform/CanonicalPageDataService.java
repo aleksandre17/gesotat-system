@@ -67,6 +67,13 @@ public class CanonicalPageDataService {
         Map<String,Object> out=new LinkedHashMap<>();out.put("pageId",pageId);out.put("contractCode",contractCode);out.put("contractRevision",meta.get("revision"));out.put("datasetCode",meta.get("dataset_code"));out.put("data",rows);out.put("groupBy",request.groupBy());out.put("aggregation",request.aggregation()==null?"COUNT":request.aggregation());contractPolicy.requireGoverned(rid);out.put("governanceGates",contractPolicy.gates(rid));if(meta.get("response_projection_code")!=null){String p=String.valueOf(meta.get("response_projection_code"));projections.apply(out,p,rid);projections.applyRows(out,p,rid);}return out;
     }
 
+    /** Expands only relation codes already validated by the page's persisted contract plan. */
+    @SuppressWarnings("unchecked")
+    public List<Map<String,Object>> include(String contractCode,int pageId,List<Map<String,Object>> rows,List<String> includeCodes){
+        Map<String,Object> meta=pageMetadata(contractCode,pageId); long rid=revisionId(meta);
+        return physical.rowsWithIncludes(rid,String.valueOf(meta.get("dataset_code")),rows,includeCodes);
+    }
+
     private Map<String,Object> pageMetadata(String contractCode,int pageId){return control.queryForMap("SELECT TOP 1 r.contract_code,r.revision,n.node_code,n.node_kind,n.dataset_code,d.data_family,n.path_segment,b.response_projection_code FROM platform.contract_page_binding b JOIN platform.site_contract_revision r ON r.site_contract_revision_id=b.site_contract_revision_id JOIN platform.site_contract_node n ON n.node_id=b.node_id LEFT JOIN platform.site_contract_dataset d ON d.site_contract_revision_id=r.site_contract_revision_id AND d.dataset_code=n.dataset_code WHERE r.contract_code=? AND b.runtime_page_id=? AND b.status='ACTIVE' AND r.status='APPROVED' ORDER BY r.revision DESC",contractCode,pageId);}
     private long revisionId(Map<String,Object> meta){Number id=(Number)control.query("SELECT TOP 1 site_contract_revision_id FROM platform.site_contract_revision WHERE contract_code=? AND revision=?",r->r.next()?r.getLong(1):null,meta.get("contract_code"),meta.get("revision"));if(id==null)throw new IllegalStateException("Approved contract revision is unavailable");return id.longValue();}
 }

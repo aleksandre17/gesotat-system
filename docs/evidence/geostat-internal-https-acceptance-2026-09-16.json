@@ -1,0 +1,26 @@
+{
+  "evidenceType": "internal-production-https-boundary-acceptance",
+  "project": "geostat",
+  "boundary": "internal-network",
+  "observedAt": "2026-09-16T00:00:00+04:00",
+  "scope": {
+    "kidsRefactoring": "not-touched",
+    "otherProjects": "not-touched"
+  },
+  "checks": {
+    "ui_https": { "status": 200, "result": "PASS" },
+    "oidc_discovery_https": { "status": 200, "result": "PASS", "issuer": "https://auth.geostat.internal/realms/geostat" },
+    "oidc_jwks_https": { "status": 200, "algorithm": "RSA", "result": "PASS" },
+    "api_unauthorized_without_token": { "status": 401, "result": "PASS" },
+    "edge_health": { "status": "healthy", "result": "PASS" },
+    "api_health": { "status": "healthy", "result": "PASS" },
+    "keycloak_runtime": { "status": "running", "result": "PASS" }
+  },
+  "certificate": {
+    "mode": "self-signed-internal",
+    "san": ["192.168.1.199", "geostat.internal", "api.geostat.internal", "auth.geostat.internal"],
+    "productionAuthority": "internal-network-only"
+  },
+  "overall": "PASS_FOR_INTERNAL_HTTPS_BOUNDARY",
+  "notClaimed": ["public-ca-production", "external-dns-authority", "KIDS-protected-query-acceptance-with-live-user-token"]
+}

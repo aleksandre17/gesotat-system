@@ -2,18 +2,23 @@ receivers:
   otlp:
     protocols:
       grpc:
+        endpoint: 0.0.0.0:4317
       http:
+        endpoint: 0.0.0.0:4318
 processors:
   batch:
 exporters:
-  debug:
-    verbosity: basic
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
     sending_queue:
       storage: file_storage
+      queue_size: 1000
+    retry_on_failure:
+      max_elapsed_time: 10m
   prometheus:
     endpoint: 0.0.0.0:9464
-    sending_queue:
-      storage: file_storage
 extensions:
   health_check:
     endpoint: 0.0.0.0:13133
@@ -25,8 +30,8 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [debug]
+      exporters: [otlp/tempo]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [debug, prometheus]
+      exporters: [prometheus]

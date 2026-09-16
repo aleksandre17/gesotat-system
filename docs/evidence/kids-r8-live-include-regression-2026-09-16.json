@@ -1,0 +1,70 @@
+{
+  "evidenceType": "kids-r8-live-include-regression",
+  "observedAt": "2026-09-16",
+  "contract": {
+    "code": "KIDS_PORTAL_V1",
+    "revision": 8
+  },
+  "runtimeObservation": {
+    "environment": "internal-https-geostat",
+    "pageId": 11,
+    "datasetCode": "KIDS_STATISTICAL_INPUT",
+    "httpStatus": 200,
+    "totalRows": 1760,
+    "declaredIncludes": [
+      "INPUT_FOR_CARRIER",
+      "INPUT_RAW_LINEAGE"
+    ],
+    "observedDefect": "include serializer treated relation codes as root field projection and returned empty row objects"
+  },
+  "sourceResolution": {
+    "rootProjectionPreserved": true,
+    "requestedRelationsLoadedFromRevisionBoundMetadata": true,
+    "relationExpansionBound": "at most 1000 child rows per requested relation; fail closed above bound",
+    "cardinalityHandling": "MANY_TO_ONE and ONE_TO_ONE return singular child; ONE_TO_MANY and MANY_TO_MANY return collections",
+    "kidsRefactoring": "not-performed",
+    "tlsVerification": "enabled"
+  },
+  "verification": {
+    "apiTestSuite": "PASS",
+    "apiTestCount": 116,
+    "targetedRelationProjectionAcceptance": "PASS",
+    "targetedIncludeSerializerRegression": "PASS",
+    "gitDiffCheck": "PASS",
+    "liveRecreatedImageReplay": "PENDING_RELEASE_GATE"
+  },
+  "candidateImage": {
+    "tag": "api-api:candidate-include-fix-g4f365b7-dirty",
+    "imageId": "sha256:f54960a094b198db57d0bb51c2dfbc196919c8afb38e90bb54984d44a66c3e89",
+    "embeddedJarSha256": "0b7eb2636b9c8bfe85ce69619554b51de2dc056e3d87d0e31aacf514e5a5d886",
+    "revisionLabel": "geostat-v1.0.2-oidc-rs256-53-g4f365b7-dirty",
+    "builtOn": "internal-linux-docker-host",
+    "activeContainerChanged": false,
+    "activeContainerImageBeforeAndAfter": "sha256:c5b71209c8ce15b05e3d3754a6fef2bd799c081147babc4f788c962791e036a1"
+  },
+  "deploymentGate": {
+    "releaseGate": "FAIL",
+    "dirtyEntries": 14,
+    "dirtyDiagnosticOnly": "PASS_WITH_AllowDirty",
+    "productionEvidenceReadiness": "NOT_READY_FOR_PRODUCTION",
+    "unassertedProductionEvidence": [
+      "signed release authority",
+      "tenant ABAC negative suite",
+      "independent SQL provider acceptance",
+      "Redis HA/failover/fairness",
+      "durable telemetry and alert firing",
+      "approved RPO/RTO and backup/DR replay",
+      "approved resilience test window and signed results"
+    ],
+    "activeComposeProject": "api",
+    "activeComposeFile": "/home/administrator/geostat/backend/api/docker-compose.prod.yml",
+    "activeImageRevision": "geostat-v1.0.2-oidc-staging-tls",
+    "activeContainerHealth": "healthy",
+    "deployScriptBypassed": false
+  },
+  "releaseState": {
+    "productionImageChanged": false,
+    "reason": "The source tree is not yet a clean signed release; live production activation must follow the repository release invariant.",
+    "overall": "SOURCE_FIX_VERIFIED_LIVE_ACTIVATION_PENDING"
+  }
+}

@@ -29,8 +29,12 @@ public class ContractQueryController {
    if(request.aggregation()!=null || !request.groupBy().isEmpty()) return respond(pages.aggregate(contractCode,pageId,request),ifNoneMatch,queryCost);
    Map<String,Object> result=pages.read(contractCode,pageId,p,l,
       text(request.filters(),"metricCode"),text(request.filters(),"carrierCode"),text(request.filters(),"periodFrom"),text(request.filters(),"periodTo"),text(request.filters(),"ageGroup"),request.filters(),request.where());
-   if(!request.select().isEmpty()) result.put("data",ContractResponseSerializer.select((List<Map<String,Object>>)result.get("data"),request.select()));
-   if(!request.include().isEmpty()) result.put("data",ContractIncludeSerializer.apply((List<Map<String,Object>>)result.get("data"),request.include()));
+   if(!request.include().isEmpty()) result.put("data",pages.include(contractCode,pageId,(List<Map<String,Object>>)result.get("data"),request.include()));
+   if(!request.select().isEmpty()) {
+     List<String> projection=new ArrayList<>(request.select()); projection.addAll(request.include());
+     result.put("data",ContractResponseSerializer.select((List<Map<String,Object>>)result.get("data"),projection));
+   }
+   if(!request.include().isEmpty()) result.put("data",ContractIncludeSerializer.applyRelations((List<Map<String,Object>>)result.get("data"),request.include()));
    if(request.distinct()) result.put("data",ContractResponseSerializer.distinct((List<Map<String,Object>>)result.get("data")));
    if(!request.includeLimits().isEmpty()) result.put("data",ContractIncludeSerializer.limit((List<Map<String,Object>>)result.get("data"),request.includeLimits()));
    if(!keysetKeys.isEmpty() && request.sort()!=null && !request.sort().isBlank()) addNextKeyset(result,contractCode,pageId,fingerprint,keysetKeys,request.descending());

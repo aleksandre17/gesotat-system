@@ -54,6 +54,27 @@ public class ContractPhysicalQueryService {
    List<Map<String,Object>> roots=rows(revisionId,datasetCode,page,limit,filters,sort,desc);
    return expand(roots, revisionId, datasetCode, new HashSet<>(), 0);
  }
+ /** Loads only explicitly requested, revision-bound relation edges with a fail-closed fan-out cap. */
+ public List<Map<String,Object>> rowsWithIncludes(long revisionId,String datasetCode,List<Map<String,Object>> roots,List<String> includeCodes){
+   List<Map<String,Object>> result=roots==null?List.of():roots;
+   if(result.isEmpty()||includeCodes==null||includeCodes.isEmpty())return result;
+   for(String code:includeCodes){
+     Map<String,Object> edge=control.query("SELECT TOP 1 from_field_name,to_dataset_code,to_field_name,cardinality FROM platform.site_contract_relation WHERE site_contract_revision_id=? AND relation_code=? AND from_dataset_code=?",(rs,n)->m("fromField",rs.getString(1),"toDataset",rs.getString(2),"toField",rs.getString(3),"cardinality",rs.getString(4)),revisionId,code,datasetCode).stream().findFirst().orElseThrow(()->new IllegalArgumentException("Include relation is not declared for dataset: "+code));
+     String fromField=String.valueOf(edge.get("fromField")), toDataset=String.valueOf(edge.get("toDataset")), toField=String.valueOf(edge.get("toField"));
+     Set<Object> keys=new LinkedHashSet<>(); for(Map<String,Object> root:result){Object key=root.get(fromField);if(key!=null)keys.add(key);}
+     List<Map<String,Object>> children=List.of();
+     if(!keys.isEmpty()){
+       if(keys.size()>2000)throw new IllegalArgumentException("Include relation exceeds the bounded join-key budget: "+code);
+       Map<String,Object> childFilter=Map.of(toField,Map.of("op","IN","value",keys));
+       long matching=count(revisionId,toDataset,childFilter);
+       if(matching>1000)throw new IllegalArgumentException("Include relation exceeds the 1000-row expansion budget: "+code);
+       children=rows(revisionId,toDataset,1,(int)Math.max(1,matching),childFilter,toField,false);
+     }
+     result=ContractRelationGraphExecutor.attach(result,code,children,fromField,toField,hasManyChildren(String.valueOf(edge.get("cardinality"))));
+   }
+   return result;
+ }
+ private static boolean hasManyChildren(String cardinality){return "ONE_TO_MANY".equalsIgnoreCase(cardinality)||"MANY_TO_MANY".equalsIgnoreCase(cardinality);}
  public List<Map<String,Object>> rowsWithRelationsWhere(long revisionId,String datasetCode,int page,int limit,Map<String,Object> where,String sort,boolean desc){
    if (containsRelation(where)) {
      List<Map<String,Object>> all=rowsWithRelations(revisionId,datasetCode,1,1000,Map.of(),sort,desc);
@@ -111,7 +132,7 @@ public class ContractPhysicalQueryService {
      // an include must never create an unbounded fan-out query.
      List<Map<String,Object>> childRows=rows(revisionId,child,1,1000,Map.of(),null,false);
      childRows=expand(childRows,revisionId,child,new HashSet<>(path),depth+1);
-     parents=ContractRelationGraphExecutor.attach(parents,String.valueOf(rel.get("code")),childRows,String.valueOf(rel.get("fromField")),String.valueOf(rel.get("toField")),String.valueOf(rel.get("cardinality")).contains("MANY"));
+     parents=ContractRelationGraphExecutor.attach(parents,String.valueOf(rel.get("code")),childRows,String.valueOf(rel.get("fromField")),String.valueOf(rel.get("toField")),hasManyChildren(String.valueOf(rel.get("cardinality"))));
    } return parents;
  }
  private Long datasetVersion(long revisionId,String datasetCode){

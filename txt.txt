@@ -1,0 +1,1898 @@
+ სადა რის ჩენი object storage? როგირ არის მისი სტრუტრუა და როგორ უაკვშრდება სწორედ დანრჩენ ლერებს და როგორ მოდის ბოლოს ფრინტზე?
+
+
+  ჩვენი Object Storage არის geostat-ის იზოლირებული MinIO/S3 სისტემა.
+
+  განთავსება:
+
+  Linux server: 192.168.1.199
+  Project: /home/administrator/geostat
+  Infra: /home/administrator/geostat/backend/infra/geostat-platform
+  Container: geostat-minio
+  Network: geostat-net
+
+  ბუკეტების სტრუქტურა:
+
+  geostat-ingest/
+    kids/r8/resources/
+      <sha256>.xlsx
+      <sha256>.xls
+      inventory.json
+
+  geostat-quarantine/
+    rejected/...
+
+  geostat-archive/
+    snapshots/<snapshot-id>/...
+
+  geostat-export/
+    operations/<operation-id>/...
+
+  სრული კავშირი ასეთია:
+
+  KIDS source files
+    ↓
+  Object Storage: immutable bytes + SHA-256
+    ↓
+  ingest.artifact
+    artifact_id, object_uri, checksum, byte_size
+    ↓
+  raw.source_record
+    source_key, artifact_id, payload_hash, snapshot_id
+    ↓
+  Control Plane
+    contract revision
+    dataset version
+    storage binding
+    publication policy
+    ↓
+  publication.dataset_snapshot
+    immutable snapshot + status + checksum
+    ↓
+  entity.entity_record
+  entity.resource_locator
+  entity.entity_classification
+    ↓
+  API contract projection
+    ↓
+  signed download URL
+    ↓
+  Frontend
+
+  ფაილის metadata-სა და ბაიტების გაყოფა განზრახულია:
+
+  - Object Storage-ში არის თვითონ Excel-ის ბაიტები;
+  - Data Plane-ში არის resource identity და typed metadata;
+  - entity.resource_locator ინახავს URI-ს, MIME type-ს, checksum-სა და access policy-ს;
+  - Control Plane წყვეტს, შეიძლება თუ არა resource-ის გამოქვეყნება;
+  - API არ აბრუნებს ფიზიკურ storage path-ს;
+  - API აბრუნებს მხოლოდ კონტრაქტით დაშვებულ metadata-ს და დროებით signed URL-ს;
+  - Frontend პირდაპირ MinIO-ს ან /files/... path-ს არ უნდა მიმართავდეს.
+
+  ამჟამად შესრულებულია:
+
+  - 719 KIDS ფაილის inventory;
+  - 532 უნიკალური object-ის ingest bucket-ში ატვირთვა;
+  - checksum-based deduplication;
+  - inventory.json-ის შენახვა;
+  - frontend-ის static ფაილები ჯერ არ წაშლილა.
+
+  დარჩენილი დამაკავშირებელი ნაბიჯია:
+
+  inventory.json
+    → KIDS_RESOURCE.source_resource_id/source_row_key
+    → entity.resource_locator
+    → dataset_snapshot
+    → API signed download
+
+  ამის დასრულების შემდეგ frontend-ის არსებული public/files სტრუქტურა აღარ იქნება runtime authority და მისი უსაფრთხოდ retirement შესაძლებელი გახდება.
+
+
+  ეს ხე შეინახე სწორ ადგილზე
+
+
+• Ran Get-ChildItem docs/reference -File | Select-Object Name
+  └
+    Name
+    … +5 lines (ctrl + t to view transcript)
+    ENGINEERING-QUALITY-DOCTRINE.md
+
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+• ამ canonical storage flow-ს ვინახავ docs/reference-ში, როგორც არქიტექტურის მუდმივ reference-ს, რათა მომავალში ყველა onboarding და API/resource ცვლილება ამავე ჯაჭვს დაეყრდნოს.
+
+• Added docs\reference\CANONICAL-OBJECT-STORAGE-FLOW.md (+82 -0)
+     1 +# Canonical Object Storage Flow
+     2 +
+     3 +## Authority and location
+     4 +
+     5 +```text
+     6 +Linux server: 192.168.1.199
+     7 +Project: /home/administrator/geostat
+     8 +Infra: /home/administrator/geostat/backend/infra/geostat-platform
+     9 +Container: geostat-minio
+    10 +Network: geostat-net
+    11 +```
+    12 +
+    13 +## Bucket tree
+    14 +
+    15 +```text
+    16 +geostat-ingest/
+    17 +  kids/r8/resources/
+    18 +    <sha256>.xlsx
+    19 +    <sha256>.xls
+    20 +    inventory.json
+    21 +
+    22 +geostat-quarantine/
+    23 +  rejected/...
+    24 +
+    25 +geostat-archive/
+    26 +  snapshots/<snapshot-id>/...
+    27 +
+    28 +geostat-export/
+    29 +  operations/<operation-id>/...
+    30 +```
+    31 +
+    32 +## Canonical layer chain
+    33 +
+    34 +```text
+    35 +KIDS source files
+    36 +  ↓
+    37 +Object Storage: immutable bytes + SHA-256
+    38 +  ↓
+    39 +ingest.artifact
+    40 +  artifact_id, object_uri, checksum, byte_size
+    41 +  ↓
+    42 +raw.source_record
+    43 +  source_key, artifact_id, payload_hash, snapshot_id
+    44 +  ↓
+    45 +Control Plane
+    46 +  contract revision → dataset version → storage binding → publication policy
+    47 +  ↓
+    48 +publication.dataset_snapshot
+    49 +  immutable snapshot + status + checksum
+    50 +  ↓
+    51 +entity.entity_record
+    52 +entity.resource_locator
+    53 +entity.entity_classification
+    54 +  ↓
+    55 +API contract projection
+    56 +  ↓
+    57 +short-lived signed download URL
+    58 +  ↓
+    59 +Frontend
+    60 +```
+    61 +
+    62 +## Boundary rules
+    63 +
+    64 +- Object Storage is the sole authority for original file bytes.
+    65 +- Data Plane stores identity, typed metadata, locator, checksum and lineage;
+    66 +  it does not duplicate source binaries.
+    67 +- Control Plane owns contract, dataset version, publication status and policy.
+    68 +- Archive Plane owns retention, legal hold and rollback history.
+    69 +- API exposes only contract-approved metadata and signed URLs.
+    70 +- Frontend never reconstructs physical paths and never reads MinIO directly.
+    71 +- Object names are checksum-addressed; original paths remain in `inventory.json`.
+    72 +- A resource becomes downloadable only after locator, checksum, snapshot and
+    73 +  publication reconciliation pass.
+    74 +
+    75 +## KIDS staging state
+    76 +
+    77 +- 719 source files discovered;
+    78 +- 532 unique SHA-256 payload objects staged in `geostat-ingest`;
+    79 +- `inventory.json` preserves every original path and object mapping;
+    80 +- DB locator binding and final published signed-download projection are the next
+    81 +  governed step;
+    82 +- frontend static files remain unchanged until that binding reaches `VERIFIED`.
+
+• Ran git add docs/reference/CANONICAL-OBJECT-STORAGE-FLOW.md; git commit -m "Document canonical object storage flow"
+  └ warning: in the working copy of 'docs/reference/CANONICAL-OBJECT-STORAGE-FLOW.md', LF will be replaced by CRLF the next time Git touches it
+    [master f6b8e6b] Document canonical object storage flow
+     1 file changed, 82 insertions(+)
+     create mode 100644 docs/reference/CANONICAL-OBJECT-STORAGE-FLOW.md
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  შენახულია სწორ canonical ადგილზე:
+
+  /C:/Users/Test-User/Desktop/gesotat-system/docs/reference/CANONICAL-OBJECT-STORAGE-FLOW.md
+
+  დოკუმენტი აღწერს:
+
+  - Object Storage-ის მდებარეობას;
+  - bucket tree-ს;
+  - ყველა layer-ის კავშირს;
+  - DB locator-ს;
+  - snapshot/publication flow-ს;
+  - API → signed URL → frontend მიწოდებას;
+  - KIDS-ის მიმდინარე staging მდგომარეობას.
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  იდნეტურად შიენახე როგორც წეღან დაბეჭდე ისე სრულად
+
+
+• Edited docs\reference\CANONICAL-OBJECT-STORAGE-FLOW.md (+45 -0)
+     82  - frontend static files remain unchanged until that binding reaches `VERIFIED`.
+     83 +
+     84 +## სრული განმარტება
+     85 +
+     86 +ჩვენი Object Storage არის geostat-ის იზოლირებული MinIO/S3 სისტემა.
+     87 +
+     88 +განთავსება:
+     89 +
+     90 +```text
+     91 +Linux server: 192.168.1.199
+     92 +Project: /home/administrator/geostat
+     93 +Infra: /home/administrator/geostat/backend/infra/geostat-platform
+     94 +Container: geostat-minio
+     95 +Network: geostat-net
+     96 +```
+     97 +
+     98 +ფაილის metadata-სა და ბაიტების გაყოფა განზრახულია:
+     99 +
+    100 +- Object Storage-ში არის თვითონ Excel-ის ბაიტები;
+    101 +- Data Plane-ში არის resource identity და typed metadata;
+    102 +- `entity.resource_locator` ინახავს URI-ს, MIME type-ს, checksum-სა და access policy-ს;
+    103 +- Control Plane წყვეტს, შეიძლება თუ არა resource-ის გამოქვეყნება;
+    104 +- API არ აბრუნებს ფიზიკურ storage path-ს;
+    105 +- API აბრუნებს მხოლოდ კონტრაქტით დაშვებულ metadata-ს და დროებით signed URL-ს;
+    106 +- Frontend პირდაპირ MinIO-ს ან `/files/...` path-ს არ უნდა მიმართავდეს.
+    107 +
+    108 +ამჟამად შესრულებულია:
+    109 +
+    110 +- 719 KIDS ფაილის inventory;
+    111 +- 532 უნიკალური object-ის ingest bucket-ში ატვირთვა;
+    112 +- checksum-based deduplication;
+    113 +- `inventory.json`-ის შენახვა;
+    114 +- frontend-ის static ფაილები ჯერ არ წაშლილა.
+    115 +
+    116 +დარჩენილი დამაკავშირებელი ნაბიჯია:
+    117 +
+    118 +```text
+    119 +inventory.json
+    120 +  → KIDS_RESOURCE.source_resource_id/source_row_key
+    121 +  → entity.resource_locator
+    122 +  → dataset_snapshot
+    123 +  → API signed download
+    124 +```
+    125 +
+    126 +ამის დასრულების შემდეგ frontend-ის არსებული `public/files` სტრუქტურა აღარ იქნება
+    127 +runtime authority და მისი უსაფრთხოდ retirement შესაძლებელი გახდება.
+
+• Ran git add docs/reference/CANONICAL-OBJECT-STORAGE-FLOW.md; git commit -m "Expand canonical storage reference with full walkthrough"
+  └ warning: in the working copy of 'docs/reference/CANONICAL-OBJECT-STORAGE-FLOW.md', LF will be replaced by CRLF the next time Git touches it
+    [master 1975b0d] Expand canonical storage reference with full walkthrough
+     1 file changed, 45 insertions(+)
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+• შენახვა განახლდა სრულად, ზუსტად წინა აღწერილი ფორმით:
+
+  /C:/Users/Test-User/Desktop/gesotat-system/docs/reference/CANONICAL-OBJECT-STORAGE-FLOW.md
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  როგორ მოხდება ატივრთვა ფაიელბის? ან აქსესი სფაილში რომელ ცხრილში ქინება ფაიელბის იდენტობა და კადვშირი იმასტან სადაც უნდაგმოვდეს? ან როგორ ავტივრთავთ ისე რომ 1000 ბით როვზე იყოს მიბმული და ამვე დროს ისყო ასმრტივი
+
+
+  ფაილი უნდა აიტვირთოს როგორც ცალკე immutable artifact, ხოლო Access-ში ინახებოდეს მისი identity და კავშირი.
+
+  ### 1. ატვირთვის პროცესი
+
+  ფაილი
+    → SHA-256 checksum
+    → malware/type/size validation
+    → private Object Storage
+    → ingest.artifact
+    → Access/resource identity
+    → canonical snapshot
+    → publication
+    → signed download URL
+
+  ფაილის ბაიტები Access-ში არ ინახება.
+
+  ### 2. Access-ში ფაილის identity
+
+  რესურსის ცხრილი:
+
+  __ent_kids_resource
+
+  მაგალითი:
+
+  {
+    "source_resource_id": "resource|128",
+    "category_item_ref": "KIDS_GOAL_CATEGORY|3",
+    "title_ka": "მოსახლეობის რიცხოვნობა ასაკისა და სქესის მიხედვით",
+    "title_en": "Population by age and sex",
+    "path_ka": "object://geostat-ingest/kids/r8/resources/a1b2...xlsx",
+    "path_en": "object://geostat-ingest/kids/r8/resources/a1b2...xlsx",
+    "source_row_key": "files|128",
+    "operation": "UPSERT"
+  }
+
+  source_resource_id არის ფაილის/resource-ის სტაბილური identity.
+
+  ### 3. Raw lineage
+
+  __raw_document
+
+  აქ ინახება:
+
+  {
+    "source_row_key": "files|128",
+    "original_filename": "population-by-age.xlsx",
+    "mime_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "byte_size": 482913,
+    "checksum": "a1b2...",
+    "source_uri": "s3://geostat-ingest/kids/r8/resources/a1b2....xlsx",
+    "payload_reference": "s3://geostat-ingest/kids/r8/resources/a1b2....xlsx",
+    "ingestion_batch": "kids-r8",
+    "parser_status": "PARSED",
+    "validation_status": "VALID"
+  }
+
+  აქ არის artifact-ის lineage და არა ბიზნეს-ცხრილის დუბლირებული მონაცემი.
+
+  ### 4. როგორ ებმება 1000 row-ს
+
+  თუ ერთი Excel ფაილი შეიცავს 1000 observation row-ს:
+
+  ერთი ფაილი
+    → ერთი resource entity
+    → ერთი artifact identity
+    → 1000 raw/source row
+    → 1000 typed canonical row
+
+  კავშირი იქნება:
+
+  resource.source_resource_id
+          ↓
+  carrier.source_resource_id
+          ↓
+  raw.source_record.artifact_id
+          ↓
+  statistics.observation.source_record_id
+
+  ანუ ერთი ფაილი არ მეორდება 1000-ჯერ. ყველა 1000 row მიუთითებს იმავე artifact identity-ზე და საკუთარ source_row_number/source_key-ზე.
+
+  მაგალითად:
+
+  {
+    "resourceId": "resource|128",
+    "artifact": {
+      "artifactId": 44,
+      "objectUri": "s3://geostat-ingest/kids/r8/resources/a1b2.xlsx",
+      "sha256": "a1b2..."
+    },
+    "rows": [
+      {
+        "sourceRowNumber": 1,
+        "sourceKey": "files|128|row|1",
+        "observationId": "obs|128|1"
+      },
+      {
+        "sourceRowNumber": 2,
+        "sourceKey": "files|128|row|2",
+        "observationId": "obs|128|2"
+      }
+    ]
+  }
+
+  ### 5. რა არის საბოლოო კავშირი
+
+  KIDS_RESOURCE
+    source_resource_id
+        ↓
+  entity.entity_record
+    entity_id
+        ↓
+  entity.resource_locator
+    object_uri + checksum + access_policy
+        ↓
+  publication.dataset_snapshot
+    dataset_snapshot_id
+        ↓
+  statistics.series / statistics.observation
+    source_record_id + dataset_snapshot_id
+        ↓
+  API response
+    resource metadata + observations + governed download
+
+  ეს იძლევა:
+
+  - ერთი ფაილის მრავალ row-ზე მიბმას;
+  - თითოეული row-ის ზუსტ lineage-ს;
+  - checksum-ით artifact integrity-ს;
+  - snapshot-ის immutable საზღვარს;
+  - idempotent re-upload-ს;
+  - duplicate detection-ს;
+  - rollback-ს;
+  - ფაილის და მისი 1000 row-ის ერთიან, მაგრამ არადუბლირებულ კავშირს;
+  - საბოლოოდ API-დან მხოლოდ კონტრაქტით დამტკიცებული resource metadata-ს, typed data-ს და დროებით signed URL-ს.
+
+
+  შენახე  ეს იდენტუარდ
+
+
+• ამ სრულ ატვირთვისა და 1000-row lineage flow-ს იმავე canonical storage reference-ში ვინახავ, რომ ფაილის identity, Access კავშირი, artifact და საბოლოო API მიწოდება ერთ დოკუმენტში იყოს.
+
+• Edited docs\reference\CANONICAL-OBJECT-STORAGE-FLOW.md (+122 -0)
+    127  runtime authority და მისი უსაფრთხოდ retirement შესაძლებელი გახდება.
+    128 +
+    129 +## ფაილის ატვირთვა და 1000-row lineage
+    130 +
+    131 +### ატვირთვის პროცესი
+    132 +
+    133 +```text
+    134 +ფაილი
+    135 +  → SHA-256 checksum
+    136 +  → malware/type/size validation
+    137 +  → private Object Storage
+    138 +  → ingest.artifact
+    139 +  → Access/resource identity
+    140 +  → canonical snapshot
+    141 +  → publication
+    142 +  → signed download URL
+    143 +```
+    144 +
+    145 +ფაილის ბაიტები Access-ში არ ინახება.
+    146 +
+    147 +### Access-ში ფაილის identity
+    148 +
+    149 +რესურსის ცხრილია `__ent_kids_resource`. მისი კანონიკური ფორმაა:
+    150 +
+    151 +```json
+    152 +{
+    153 +  "source_resource_id": "resource|128",
+    154 +  "category_item_ref": "KIDS_GOAL_CATEGORY|3",
+    155 +  "title_ka": "მოსახლეობის რიცხოვნობა ასაკისა და სქესის მიხედვით",
+    156 +  "title_en": "Population by age and sex",
+    157 +  "path_ka": "object://geostat-ingest/kids/r8/resources/a1b2...xlsx",
+    158 +  "path_en": "object://geostat-ingest/kids/r8/resources/a1b2...xlsx",
+    159 +  "source_row_key": "files|128",
+    160 +  "operation": "UPSERT"
+    161 +}
+    162 +```
+    163 +
+    164 +`source_resource_id` არის ფაილის/resource-ის სტაბილური identity.
+    165 +
+    166 +### Raw lineage
+    167 +
+    168 +`__raw_document` ინახავს artifact-ის lineage-ს და არა ბიზნეს-ცხრილის დუბლირებულ
+    169 +მონაცემს:
+    170 +
+    171 +```json
+    172 +{
+    173 +  "source_row_key": "files|128",
+    174 +  "original_filename": "population-by-age.xlsx",
+    175 +  "mime_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    176 +  "byte_size": 482913,
+    177 +  "checksum": "a1b2...",
+    178 +  "source_uri": "s3://geostat-ingest/kids/r8/resources/a1b2....xlsx",
+    179 +  "payload_reference": "s3://geostat-ingest/kids/r8/resources/a1b2....xlsx",
+    180 +  "ingestion_batch": "kids-r8",
+    181 +  "parser_status": "PARSED",
+    182 +  "validation_status": "VALID"
+    183 +}
+    184 +```
+    185 +
+    186 +### ერთი ფაილი და 1000 row
+    187 +
+    188 +თუ ერთი Excel ფაილი შეიცავს 1000 observation row-ს:
+    189 +
+    190 +```text
+    191 +ერთი ფაილი
+    192 +  → ერთი resource entity
+    193 +  → ერთი artifact identity
+    194 +  → 1000 raw/source row
+    195 +  → 1000 typed canonical row
+    196 +```
+    197 +
+    198 +ფაილი 1000-ჯერ არ მეორდება. ყველა row მიუთითებს იმავე artifact identity-ზე და
+    199 +საკუთარ `source_row_number/source_key`-ზე:
+    200 +
+    201 +```json
+    202 +{
+    203 +  "resourceId": "resource|128",
+    204 +  "artifact": {
+    205 +    "artifactId": 44,
+    206 +    "objectUri": "s3://geostat-ingest/kids/r8/resources/a1b2.xlsx",
+    207 +    "sha256": "a1b2..."
+    208 +  },
+    209 +  "rows": [
+    210 +    {
+    211 +      "sourceRowNumber": 1,
+    212 +      "sourceKey": "files|128|row|1",
+    213 +      "observationId": "obs|128|1"
+    214 +    },
+    215 +    {
+    216 +      "sourceRowNumber": 2,
+    217 +      "sourceKey": "files|128|row|2",
+    218 +      "observationId": "obs|128|2"
+    219 +    }
+    220 +  ]
+    221 +}
+    222 +```
+    223 +
+    224 +### საბოლოო კავშირი
+    225 +
+    226 +```text
+    227 +KIDS_RESOURCE
+    228 +  source_resource_id
+    229 +      ↓
+    230 +entity.entity_record
+    231 +  entity_id
+    232 +      ↓
+    233 +entity.resource_locator
+    234 +  object_uri + checksum + access_policy
+    235 +      ↓
+    236 +publication.dataset_snapshot
+    237 +  dataset_snapshot_id
+    238 +      ↓
+    239 +statistics.series / statistics.observation
+    240 +  source_record_id + dataset_snapshot_id
+    241 +      ↓
+    242 +API response
+    243 +  resource metadata + observations + governed download
+    244 +```
+    245 +
+    246 +ეს მოდელი უზრუნველყოფს ერთი ფაილის მრავალ row-ზე მიბმას, ზუსტ lineage-ს,
+    247 +checksum integrity-ს, immutable snapshot-ს, idempotent re-upload-ს, duplicate
+    248 +detection-სა და rollback-ს. API აბრუნებს მხოლოდ კონტრაქტით დამტკიცებულ metadata-ს,
+    249 +typed data-სა და დროებით signed URL-ს.
+
+• Ran git add docs/reference/CANONICAL-OBJECT-STORAGE-FLOW.md; git commit -m "Document artifact identity and row lineage"
+  └ warning: in the working copy of 'docs/reference/CANONICAL-OBJECT-STORAGE-FLOW.md', LF will be replaced by CRLF the next time Git touches it
+    [master 8b8765d] Document artifact identity and row lineage
+     1 file changed, 122 insertions(+)
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+• იდენტურად და სრულად შეინახა:
+
+  /C:/Users/Test-User/Desktop/gesotat-system/docs/reference/CANONICAL-OBJECT-STORAGE-FLOW.md
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  მაგრამ, მაქვს 100 როვი, თულში რამდნიმე ფაილი, ვტივრთავ აქსეს სადაც უნდა მეწროს კავშირები ან რას რა ეუთNის. თან ამავე დროს მჭირდება ფიზურად ატვირთული ფაიელბიც, მერე ამ 1000 როვზე 1500 ფაილის სხელბვის ხსელთ მიბმა?
+
+
+  დიახ, ამისთვის საჭიროა ორი ცალკე რამ:
+
+  1. Access-ში — მხოლოდ ფაილებისა და row-ების identity/kავშირები;
+  2. Object Storage-ში — თვითონ 1,500 ფაილის ბაიტები.
+
+  ფაილები Access-ში არ იტვირთება.
+
+  სწორი სტრუქტურაა:
+
+  100 source rows
+    ↓
+  Access semantic package
+    ├── row identity
+    ├── file identity
+    ├── row ↔ file relation
+    └── locator/checksum metadata
+         ↓
+  Object Storage
+    ├── file-001.xlsx
+    ├── file-002.pdf
+    ├── file-003.csv
+    └── ... 1,500 immutable objects
+         ↓
+  Canonical Data Plane
+         ↓
+  API response
+
+  ### Access-ში საჭირო ცხრილები
+
+  ფაილის identity:
+
+  __raw_document
+
+  მაგალითი:
+
+  {
+    "source_row_key": "file|1500",
+    "original_filename": "report-2026.xlsx",
+    "source_uri": "s3://geostat-ingest/project/r8/sha256.xlsx",
+    "checksum": "sha256...",
+    "mime_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "byte_size": 482913
+  }
+
+  ძირითადი row:
+
+  __ent_<dataset>
+
+  მაგალითი:
+
+  {
+    "source_entity_id": "row|1001",
+    "source_row_key": "source|1001",
+    "title": "Dataset record 1001"
+  }
+
+  row-სა და ფაილს შორის კავშირი:
+
+  __rel_entity_artifact
+
+  {
+    "relation_key": "row|1001|file|1500",
+    "entity_source_row_key": "source|1001",
+    "artifact_source_row_key": "file|1500",
+    "role_code": "SUPPORTING_DOCUMENT",
+    "ordinal": 1,
+    "is_primary": true
+  }
+
+  ეს relation უნდა იყოს generic contract dataset — არა KIDS-specific ცხრილი.
+
+  ### რა შემთხვევებს ფარავს
+
+  ერთი row → ერთი ფაილი:
+
+  row 1001 → file 1500
+
+  ერთი row → რამდენიმე ფაილი:
+
+  row 1001 → file 1500
+  row 1001 → file 1501
+  row 1001 → file 1502
+
+  რამდენიმე row → ერთი ფაილი:
+
+  row 1001 → file 2000
+  row 1002 → file 2000
+  row 1003 → file 2000
+
+  1000 row → 1500 ფაილი:
+
+  1000 entity rows
+  1500 artifact identities
+  N relation rows
+
+  ფაილის identity არ მეორდება თითოეულ კავშირში. relation მხოლოდ reference-ს ინახავს.
+
+  ### საბოლოო canonical კავშირი
+
+  source row
+    → Access entity identity
+    → generic row-artifact relation
+    → raw.document/artifact identity
+    → object_uri + checksum
+    → entity.resource_locator
+    → dataset_snapshot_id
+    → API projection
+    → signed download URL
+
+  API-ში პასუხი შეიძლება იყოს:
+
+  {
+    "id": "row|1001",
+    "title": "Dataset record 1001",
+    "attachments": [
+      {
+        "artifactId": "file|1500",
+        "name": "report-2026.xlsx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "sizeBytes": 482913,
+        "checksum": "sha256...",
+        "download": {
+          "mode": "SIGNED_URL",
+          "expiresInSeconds": 300
+        }
+      }
+    ]
+  }
+
+  ატვირთვის სწორი თანმიმდევრობაა:
+
+  1. Access package-ის structural validation
+  2. ყველა ფაილის checksum და MIME/size validation
+  3. Object Storage-ში immutable upload
+  4. artifact manifest-ის შექმნა
+  5. row-artifact relation-ის validation
+  6. orphan/missing/duplicate/FK checks
+  7. canonical materialization
+  8. immutable snapshot preparation
+  9. publication
+  10. signed download serving
+
+  ამით ერთ Access-ში შეიძლება გქონდეს 100 row, 1,500 ფაილი და მათი სრული კავშირები, ისე რომ Access არ გადაიქცეს ფაილების საცავად და არც ერთი ფაილი ან row არ დუბლირდეს.
+
+
+  მაგრამ, ეს ხმ რთული არის შეასარულებლად? უფრმო მარივად როგორიშეიძ₾ება იგივე შედეგი მივიღთ მაგრამ ასე არ ვიწვალოთ?
+
+
+  შესრულება რთული არ უნდა იყოს მომხმარებლისთვის — სირთულე სისტემამ უნდა დამალოს.
+
+  უმარტივესი პროფესიული ვარიანტია ერთი პაკეტის ატვირთვა:
+
+  upload-package/
+    data.accdb
+    files/
+      report-001.xlsx
+      report-002.pdf
+      ...
+    manifest.json   // ავტომატურად გენერირდება ან optional
+
+  მომხმარებელი აკეთებს მხოლოდ:
+
+  1. ირჩევს data.accdb-ს და files/ საქაღალდეს
+  2. აჭერს Upload
+  3. სისტემა ავტომატურად:
+     - ითვლის checksum-ს;
+     - ტვირთავს ფაილებს Object Storage-ში;
+     - კითხულობს Access-ის row-ებს;
+     - ქმნის file identity-ს;
+     - პოულობს row ↔ file კავშირებს;
+     - ამოწმებს duplicate/orphan/missing შემთხვევებს;
+     - ქმნის canonical snapshot-ს.
+
+  კავშირის ყველაზე მარტივი წესი:
+
+  row.external_key == file.manifest.row_key
+
+  მაგალითად:
+
+  {
+    "rowKey": "1001",
+    "files": [
+      "1001-report.xlsx",
+      "1001-attachment.pdf"
+    ]
+  }
+
+  ან ავტომატური manifest:
+
+  {
+    "files": [
+      {
+        "path": "files/1001-report.xlsx",
+        "rowKeys": ["1001"]
+      },
+      {
+        "path": "files/1002-report.xlsx",
+        "rowKeys": ["1002"]
+      }
+    ]
+  }
+
+  სისტემის შიდა შედეგი იგივე რჩება:
+
+  Access row
+    → generic relation
+    → Object Storage object
+    → checksum
+    → snapshot
+    → API signed URL
+
+  - არ ავსებს 1,500 ცალკე relation ჩანაწერს;
+  - არ წერს SQL-ს;
+  - არ უთითებს bucket/object path-ს;
+  - არ მართავს checksum-ს;
+  - არ ქმნის ხელით artifact_id-ებს;
+  - ერთჯერადად ტვირთავს პაკეტს.
+
+  თუ კავშირი ვერ დადგინდა, სისტემა არ გამოიცნობს ჩუმად — შექმნის QUARANTINED/NEEDS_REVIEW ჩანაწერს მხოლოდ გაურკვეველი ფაილებისთვის. ამით მარტივი onboarding მიიღება, მაგრამ canonical ხარისხი, lineage და უსაფრთხოება არ მცირდება.
+
+
+› მომწონს, მოდი დახვეწე კიდევ მეტად შედი თანამდერვე მოდერნ არიტეტურბში, შედი და მოიძე ყველზე კარგი გზა, ყვლეზე სერთასორისო, არპბირეუბლი, უმღლსეი კონცეფცბი, სტანდრტები, სტრუტები, მერტოდგეიბი, პტენბი, აიტერუბი და შემომთავზე ყველზე
+  ძლერი ფუქქცდნინალით და მავ დროს მარტივი და ეფეტური გზა
+
+
+• ვაუმჯობესებ ამ მოდელს საერთაშორისო პრაქტიკებთან შედარებით — პაკეტური ingest, manifest, DCAT/DataCite lineage, W3C PROV, checksum/idempotency და quarantine წესებით — ისე, რომ მომხმარებლისთვის ერთი მარტივი upload დარჩეს.
+
+• Searching the web
+
+• Searched the web for W3C DCAT 3 distribution checksum data service official recommendation ...
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  ყველაზე ძლიერი და მარტივი გზა არის Manifest-Driven Data Package Upload — მომხმარებლისთვის ერთი პაკეტი, სისტემისთვის მკაცრად კონტროლირებადი მრავალფენიანი ingest.
+
+  ეს ეყრდნობა:
+
+  - Frictionless Data Package-ს — descriptor/manifest აღწერს ყველა რესურსს და მის metadata-ს;
+  - W3C DCAT 3-ს — dataset, distribution, service, checksum და version;
+  - W3C PROV-ს — Entity → Activity → Agent provenance chain;
+  - S3/MinIO immutable object storage-ს;
+  - idempotent, checksum-addressed upload-ს.
+
+  Frictionless Data Package (https://specs.frictionlessdata.io/data-package/) manifest-ს იყენებს პაკეტში შემავალი ფაილებისა და მათი აღწერების სამართავად. DCAT 3 (https://www.w3.org/TR/vocab-dcat-3/) სტანდარტიზებს
+  dataset/distribution/service მოდელს, ხოლო W3C PROV (https://www.w3.org/TR/prov-primer/) აღწერს მონაცემის წარმოშობას Entity–Activity–Agent კავშირით.
+
+  ## მომხმარებლისთვის
+
+  მომხმარებელი ტვირთავს მხოლოდ ერთ პაკეტს:
+
+  dataset-package.zip
+    ├── data.accdb
+    ├── files/
+    │   ├── report-001.xlsx
+    │   ├── report-002.pdf
+    │   └── ...
+    └── manifest.json        // სურვილისამებრ; შეიძლება ავტომატურად შეიქმნას
+
+  ან კიდევ უფრო მარტივად:
+
+  Upload package
+    → Validate
+    → Preview
+    → Confirm
+
+  მომხმარებელი არ უთითებს:
+
+  - bucket-ს;
+  - object key-ს;
+  - checksum-ს;
+  - artifact ID-ს;
+  - relation ID-ს;
+  - SQL-ს;
+  - Access table mapping-ს ხელით.
+
+  ## ავტომატური manifest
+
+  თუ manifest.json არ არსებობს, სისტემა ქმნის მას ფაილებისა და Access-ის identity-ებიდან:
+
+  {
+    "packageCode": "KIDS_RESOURCE_PACKAGE",
+    "contractCode": "KIDS_PORTAL_V1",
+    "contractRevision": 8,
+    "files": [
+      {
+        "path": "files/report-001.xlsx",
+        "sha256": "a1b2...",
+        "bytes": 482913,
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "rowKeys": ["row|1001", "row|1002"]
+      }
+    ]
+  }
+
+  კავშირის პრიორიტეტი:
+
+  1. explicit manifest rowKey
+  2. Access declared source key
+  3. declared filename/key pattern
+  4. registered locator rule
+  5. ambiguous → quarantine
+
+  filename-ით მიბმა მხოლოდ დამხმარე fallback-ია; საბოლოო identity ყოველთვის stable key + checksum-ით დგინდება.
+
+  ## სისტემის შიდა pipeline
+
+  Package upload
+    ↓
+  Package manifest creation
+    ↓
+  Contract/revision resolution
+    ↓
+  Access structural validation
+    ↓
+  File type/size/malware validation
+    ↓
+  SHA-256 calculation
+    ↓
+  Immutable Object Storage upload
+    ↓
+  Artifact registry
+    ↓
+  Row ↔ artifact relation resolution
+    ↓
+  Orphan/duplicate/missing/FK checks
+    ↓
+  Raw lineage registration
+    ↓
+  Canonical entity/statistical materialization
+    ↓
+  Dataset snapshot
+    ↓
+  Quality/privacy/semantic gates
+    ↓
+  Publication
+    ↓
+  API signed download URLs
+
+  ## მონაცემთა მოდელი
+
+  ingest.package
+    ერთი ატვირთული პაკეტი
+
+  ingest.artifact
+    ერთი ფიზიკური ფაილი/object
+
+  raw.source_record
+    ერთი source row artifact lineage-ით
+
+  entity.entity_record
+    ერთი canonical business row
+
+  entity.resource_locator
+    ერთი ან რამდენიმე governed file locator
+
+  entity.entity_link
+    row ↔ row ან row ↔ artifact კავშირი
+
+  publication.dataset_snapshot
+    immutable published state
+
+  თუ 1000 row-ს 1500 ფაილი აქვს:
+
+  1 package
+  1000 entity rows
+  1500 artifact identities
+  N generic relation rows
+  1500 immutable objects
+
+  ფაილი არ დუბლირდება. relation მხოლოდ reference-ს ინახავს.
+
+  ## ყველაზე მარტივი relation convention
+
+  {
+    "rowKey": "row|1001",
+    "attachments": [
+      "files/report-001.xlsx",
+      "files/report-001.pdf"
+    ]
+  }
+
+  სისტემა ავტომატურად გარდაქმნის:
+
+  row|1001
+    → entity.entity_record
+    → entity.resource_locator
+    → artifact_id
+    → s3://.../sha256.xlsx
+
+  თუ ერთი ფაილი ბევრ row-ს ეკუთვნის:
+
+  {
+    "file": "files/annual-report.xlsx",
+    "rowKeys": ["row|1001", "row|1002", "row|1003"]
+  }
+
+  ## უსაფრთხო და idempotent ქცევა
+
+  იგივე პაკეტის ხელახლა ატვირთვა:
+
+  same package checksum
+    → same package identity
+    → same artifact identity
+    → no duplicate object
+    → no duplicate relation
+    → same result
+
+  შეცვლილი ფაილი:
+
+  same logical file name
+  different checksum
+    → new immutable artifact version
+    → old version preserved
+    → new snapshot candidate
+    → compatibility/review gate
+
+  გაურკვეველი კავშირი:
+
+  {
+    "status": "QUARANTINED",
+    "reason": "AMBIGUOUS_ROW_BINDING",
+    "candidates": ["row|1001", "row|1002"],
+    "requiresReview": true
+  }
+
+  სისტემა არასდროს გამოიცნობს ჩუმად.
+
+  ## API-ს საბოლოო პასუხი
+
+  {
+    "id": "row|1001",
+    "title": "Dataset record 1001",
+    "attachments": [
+      {
+        "artifactId": "artifact|1500",
+        "name": "report-001.xlsx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "sizeBytes": 482913,
+        "sha256": "a1b2...",
+        "snapshotId": 13,
+        "download": {
+          "mode": "SIGNED_URL",
+          "expiresInSeconds": 300
+        }
+      }
+    ],
+    "lineage": {
+      "sourceRowKey": "source|1001",
+      "artifactId": "artifact|1500",
+      "datasetSnapshotId": 13
+    }
+  }
+
+  ## საუკეთესო საბოლოო ფორმულა
+
+  ერთი პაკეტი მომხმარებლისთვის
+    +
+  ავტომატური manifest
+    +
+  checksum-addressed Object Storage
+    +
+  generic row-artifact relation
+    +
+  contract-driven validation
+    +
+  immutable snapshot
+    +
+  signed API download
+
+  ამ გზით UX მარტივია, მაგრამ არქიტექტურული ხარისხი არ მცირდება: Access მხოლოდ contract/identity/relations-ს გადასცემს, Object Storage ფლობს bytes-ს, Data Plane ფლობს typed metadata-ს, Control Plane მართავს წესებს, ხოლო API
+  აბრუნებს მხოლოდ approved projection-სა და signed download-ს.
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  ამ სიემაში რისი გაკეთება მიუწევს მომხრებეის? რა ცხირებში მუწევსჩანწერის გაკეთება? როგორ განისზრებაროვზე ფაილის მიბმა და როამდნი ფაიელი და რამდი კვაშირების?
+
+
+• მომხმარებელმა ხელით უნდა შეავსოს მხოლოდ ბიზნეს-კავშირი; ტექნიკურ ნაწილს სისტემა ქმნის.
+
+  ## მომხმარებლის მინიმალური სამუშაო
+
+  Access პაკეტში საჭიროა:
+
+  ### 1. ძირითადი row-ები
+
+  __ent_<dataset>
+
+  მაგალითი:
+
+  {
+    "source_entity_id": "row|1001",
+    "name": "Record 1001"
+  }
+
+  სავალდებულოა ერთი სტაბილური key:
+
+  source_entity_id
+
+  ### 2. ფაილების აღწერა
+
+  __raw_document
+
+  მომხმარებელი უთითებს მხოლოდ:
+
+  {
+    "source_row_key": "file|1500",
+    "original_filename": "report-001.xlsx",
+    "source_primary_key": "report-001"
+  }
+
+  სისტემა თვითონ ამატებს:
+
+  - checksum-ს;
+  - byte size-ს;
+  - MIME type-ს;
+  - Object Storage URI-ს;
+  - artifact ID-ს;
+  - upload timestamp-ს;
+  - parser/validation status-ს.
+
+  ### 3. row ↔ file კავშირები
+
+  რეკომენდებული generic relation:
+
+  __rel_entity_artifact
+
+  მომხმარებელი ავსებს:
+
+  {
+    "relation_key": "row|1001|file|1500",
+    "entity_source_row_key": "row|1001",
+    "artifact_source_row_key": "file|1500",
+    "role_code": "SUPPORTING_DOCUMENT",
+    "is_primary": true,
+    "ordinal": 1
+  }
+
+  ეს არის ერთადერთი ცხრილი, სადაც განისაზღვრება კონკრეტულად რომელი ფაილი რომელ row-ს ეკუთვნის.
+
+  ## რამდენი ფაილი შეიძლება ჰქონდეს ერთ row-ს?
+
+  შეზღუდული რაოდენობა არ არის:
+
+  ერთი row → ერთი ფაილი
+  ერთი row → რამდენიმე ფაილი
+  ერთი ფაილი → რამდენიმე row
+
+  მაგალითად:
+
+  row|1001 → file|1500
+  row|1001 → file|1501
+  row|1001 → file|1502
+
+  ეს ნიშნავს, რომ row 1001-ს სამი attachment აქვს.
+
+  ## რამდენი relation row არის საჭირო?
+
+  relation row-ების რაოდენობა არის რეალური კავშირების რაოდენობა.
+
+  მაგალითად:
+
+  1000 business row
+  1500 physical file
+
+  არ ნიშნავს ავტომატურად 1,500 relation-ს.
+
+  - თუ თითო row-ს ერთი ფაილი აქვს → 1000 relation;
+  - თუ ზოგ row-ს რამდენიმე ფაილი აქვს → relation count მეტი იქნება;
+  - თუ ერთი ფაილი რამდენიმე row-ს ეკუთვნის → თითო კავშირი ცალკე relation row-ია.
+
+  ფორმულა:
+
+  relation_count = რეალურად არსებული row ↔ file კავშირების რაოდენობა
+
+  ## ყველაზე მარტივი რეჟიმი
+
+  მომხმარებელი შეიძლება საერთოდ არ შეეხოს relation ცხრილს და ატვირთოს:
+
+  dataset-package.zip
+    ├── data.accdb
+    └── files/
+        ├── row-1001-report.xlsx
+        ├── row-1001-photo.pdf
+        └── row-1002-report.xlsx
+
+  სისტემა filename/key წესით შექმნის:
+
+  row-1001-report.xlsx → row|1001
+  row-1001-photo.pdf   → row|1001
+  row-1002-report.xlsx → row|1002
+
+  უფრო საიმედო ვარიანტია manifest:
+
+  {
+    "attachments": [
+      {
+        "file": "files/row-1001-report.xlsx",
+        "rowKeys": ["row|1001"]
+      },
+      {
+        "file": "files/annual-report.xlsx",
+        "rowKeys": ["row|1001", "row|1002", "row|1003"]
+      }
+    ]
+  }
+
+  ## მომხმარებელი რას არ ავსებს
+
+  მომხმარებელს არ უნდა დასჭირდეს:
+
+  - artifact_id;
+  - object_uri;
+  - bucket/object path;
+  - checksum;
+  - signed URL;
+  - dataset_snapshot_id;
+  - SQL;
+  - ხელით generated relation IDs.
+
+  ეს ავტომატურად იქმნება:
+
+  filename/manifest
+    → artifact identity
+    → checksum
+    → Object Storage object
+    → relation validation
+    → canonical locator
+    → snapshot
+    → API signed URL
+
+  ამრიგად, მომხმარებლისთვის პრაქტიკულად საჭიროა მხოლოდ:
+
+  1. ძირითადი row-ის stable key
+  2. ფაილი
+  3. row-სა და ფაილს შორის კავშირი
+
+  ყველა დანარჩენი სისტემამ უნდა შექმნას, შეამოწმოს და დააკავშიროს.
+
+
+  არის რამე კდიევ რაც ამ საეკთს ეხება და არ დასმულა?
+
+
+  დიახ — რამდენიმე კრიტიკული საკითხი ჯერ ცალკე უნდა განისაზღვროს:
+
+  ### Identity და კავშირი
+
+  - რა არის row-ის immutable business key?
+  - რა არის ფაილის logical identity?
+  - შეიძლება თუ არა ერთი logical file-ის ახალი version?
+  - როგორ განვასხვავებთ duplicate-სა და ახალ version-ს?
+  - ერთი row-ს რამდენი primary/supporting/derived ფაილი შეიძლება ჰქონდეს?
+  - შეიძლება თუ არა ერთი ფაილის მრავალ row-ზე მიბმა?
+  - როგორ აღინიშნება is_primary და ordinal?
+  - რა ხდება orphan ან ambiguous mapping-ის დროს?
+
+  ### ფაილის lifecycle
+
+  RECEIVED
+  → VALIDATING
+  → ACCEPTED
+  → QUARANTINED
+  → SNAPSHOT_MEMBER
+  → PUBLISHED
+  → SUPERSEDED
+  → RETIRED
+
+  დასადგენია:
+
+  - რომელი სტატუსი აძლევს API-ში გამოჩენის უფლებას;
+  - როგორ ხდება version supersede;
+  - როგორ ბრუნდება წინა ფაილზე rollback-ისას;
+  - შეიძლება თუ არა published artifact-ის წაშლა.
+
+  ### Integrity და validation
+
+  - SHA-256 checksum;
+  - MIME/type validation;
+  - file-size limit;
+  - malware scanning;
+  - encrypted/corrupted file handling;
+  - archive bomb და path traversal protection;
+  - checksum-ის ხელახალი verification download-ისას;
+  - row-count და file-count reconciliation.
+
+  ### Upload reliability
+
+  - resumable/multipart upload;
+  - retry და idempotency key;
+  - partial upload cleanup;
+  - network failure recovery;
+  - duplicate re-upload-ის ქცევა;
+  - ერთ პაკეტში 1000 row/1500 file-ის transaction boundary;
+  - რა ხდება, თუ 1500 ფაილიდან 3 ვერ აიტვირთა.
+
+  ### Contract და snapshot
+
+  - ფაილის კავშირი contract revision-თან;
+  - dataset version;
+  - immutable snapshot;
+  - snapshot-ში მხოლოდ სრულად validated artifact-ები შედის;
+  - partial package არ უნდა გამოქვეყნდეს;
+  - Access artifact, object manifest და DB rows ერთ revision-ზე უნდა იდგეს.
+
+  ### Security და privacy
+
+  - ვინ ხედავს artifact-ს;
+  - ვინ ხედავს metadata-ს;
+  - tenant/site/product isolation;
+  - field-level და file-level policy;
+  - signed URL-ის ვადა;
+  - URL-ის ერთჯერადობა ან download limit;
+  - sensitive file-ის redaction/quarantine;
+  - audit trail: ვინ ატვირთა, ვინ ნახა, ვინ ჩამოტვირთა.
+
+  ### Retention და archive
+
+  - retention policy;
+  - legal hold;
+  - archive copy;
+  - superseded version retention;
+  - purge authorization;
+  - disaster recovery restore;
+  - object-lock/versioning policy.
+
+  ### API behavior
+
+  - metadata response და file download ცალკე endpoint-ებია;
+  - API არ აბრუნებს raw storage path-ს;
+  - 404, 403, 409, 410, 422 შემთხვევების მკაფიო semantics;
+  - pagination attachments-ზე;
+  - per-include limits;
+  - ETag და conditional download;
+  - content negotiation;
+  - download audit event.
+
+  ### ოპერაციული კონტროლი
+
+  - orphan-object scanner;
+  - orphan-row scanner;
+  - missing-object scanner;
+  - checksum drift detector;
+  - stale upload cleanup;
+  - storage quota;
+  - metrics/traces/log correlation;
+  - alerting failed upload/reconciliation-ზე.
+
+  ყველაზე მნიშვნელოვანი დამატებითი კითხვა არის:
+
+  > თუ მონაცემი სწორია, მაგრამ ფაილი აკლია, ან ფაილი სწორია, მაგრამ row-სთან კავშირი გაურკვეველია — სისტემა გამოაქვეყნებს, ნაწილობრივ გამოაქვეყნებს თუ მთლიან პაკეტს quarantine-ში გადაიყვანს?
+
+  ჩვენი cardinal წესით სწორი პასუხია:
+
+  ambiguous or incomplete binding
+  → fail-closed
+  → quarantine
+  → explicit issue
+  → no publication
+
+  ეს კითხვები უნდა გახდეს generic Artifact Attachment Contract-ის ნაწილი, რათა იგივე მოდელი იმუშაოს KIDS-ის, სხვა site-ის, სხვა provider-ისა და ნებისმიერი ფაილური data-product-ისთვის.
+
+
+› შეგიძ₾ია ყველა დასმულ კითხვაზე, ახლა რაც ჩმაოვლე, სათითოდ ყველზე სწორი, ყვლეაზე ძლიერი გრამტიაკით, არქიტეტურით, სტანდრტებით, სოუშებით, პრეინიპებით უპასუხო, ისე რომ არა დარჩეს არფერი კთხვა დაშექმნე ერთი ფაილი, სრუყიფლი, რაც კი
+  გარეთ ამ სეკთზე ყვლეკფრი რომ შევიდეს და მხოლოდ იპმეტიება რომ დარჩეს
+
+
+  ვქმნი ერთ canonical დოკუმენტს — Artifact Attachment Contract — სადაც ამ თემის ყველა კითხვა იქნება პასუხგაცემული: identity, relation, upload, lifecycle, integrity, snapshot, security, API, retention, failure policy და ოპერაციული
+  კონტროლები. მიზანია ამ საკითხზე მხოლოდ implementation დარჩეს.
+
+• Added docs\reference\ARTIFACT-ATTACHMENT-CONTRACT.md (+461 -0)
+      1 +# Artifact Attachment Contract
+      2 +
+      3 +**სტატუსი:** CANONICAL DESIGN / IMPLEMENTATION BASELINE
+      4 +**Scope:** ნებისმიერი site/provider/data-product; KIDS არის მხოლოდ conformance case.
+      5 +**მიზანი:** ფიზიკური ფაილების, source row-ების, canonical entity-ების,
+      6 +statistical observations-ებისა და API distribution-ის ერთიანი, აგნოსტიკური,
+      7 +დამტკიცებადი და მარტივად გამოსაყენებელი მოდელი.
+      8 +
+      9 +ეს კონტრაქტი ეფუძნება immutable object storage-ს, contract-first metadata-ს,
+     10 +W3C PROV provenance-ს, W3C DCAT 3 distribution semantics-ს და Frictionless
+     11 +Data Package manifest-ის პრინციპებს.
+     12 +
+     13 +## 1. ძირითადი პრინციპი
+     14 +
+     15 +მომხმარებელი ტვირთავს ერთ პაკეტს; პლატფორმა ავტომატურად ქმნის identity-ს,
+     16 +checksum-ს, artifact registry-ს, row↔artifact relations-ს, snapshot-სა და
+     17 +governed download-ს. მომხმარებელი არ წერს SQL-ს, bucket path-ს ან ტექნიკურ ID-ს.
+     18 +
+     19 +```text
+     20 +package
+     21 +  → manifest
+     22 +  → contract/revision validation
+     23 +  → immutable object upload
+     24 +  → artifact identity
+     25 +  → row↔artifact relation
+     26 +  → canonical locator
+     27 +  → snapshot
+     28 +  → publication
+     29 +  → signed API download
+     30 +```
+     31 +
+     32 +## 2. მომხმარებლის პაკეტი
+     33 +
+     34 +```text
+     35 +dataset-package.zip
+     36 +  ├── data.accdb | data.xlsx | data.csv
+     37 +  ├── files/
+     38 +  │   ├── report-001.xlsx
+     39 +  │   ├── report-001.pdf
+     40 +  │   └── ...
+     41 +  └── manifest.json       # optional; system can generate it
+     42 +```
+     43 +
+     44 +თუ manifest არ არსებობს, სისტემა იყენებს contract-declared key rules-ს და ქმნის
+     45 +manifest-ს preview ეტაპზე. ნებისმიერი ambiguous match გადადის quarantine-ში.
+     46 +
+     47 +## 3. Identity model
+     48 +
+     49 +### 3.1 Row identity
+     50 +
+     51 +ყოველ business row-ს MUST ჰქონდეს stable, source-owned key:
+     52 +
+     53 +```text
+     54 +entity_source_key = source-system | dataset | natural-key
+     55 +```
+     56 +
+     57 +Surrogate database ID არის შიდა ტექნიკური მნიშვნელობა და არასდროს არის source
+     58 +identity-ის შემცვლელი.
+     59 +
+     60 +### 3.2 Artifact identity
+     61 +
+     62 +ერთი ფიზიკური ფაილი არის ერთი artifact entity. მისი content identity არის:
+     63 +
+     64 +```text
+     65 +artifact_content_id = SHA-256(bytes)
+     66 +```
+     67 +
+     68 +Logical identity (მაგ. `annual-report-2026`) და content identity ერთმანეთისგან
+     69 +გამიჯნულია. იგივე logical file-ის შეცვლილი content ქმნის ახალ immutable version-ს.
+     70 +
+     71 +### 3.3 Relation identity
+     72 +
+     73 +ერთი row↔file კავშირი არის ერთი relation edge:
+     74 +
+     75 +```text
+     76 +relation_key = entity_source_key | artifact_source_key | role | ordinal
+     77 +```
+     78 +
+     79 +Relation count არის რეალური edges-ის რაოდენობა და არა row-count × file-count.
+     80 +
+     81 +## 4. Access package-ის მინიმალური სტრუქტურა
+     82 +
+     83 +### 4.1 Entity dataset
+     84 +
+     85 +```text
+     86 +__ent_<dataset>
+     87 +```
+     88 +
+     89 +```json
+     90 +{
+     91 +  "source_entity_id": "row|1001",
+     92 +  "source_row_key": "source|1001",
+     93 +  "title": "Record 1001",
+     94 +  "operation": "UPSERT"
+     95 +}
+     96 +```
+     97 +
+     98 +### 4.2 Artifact envelope
+     99 +
+    100 +```text
+    101 +__raw_document
+    102 +```
+    103 +
+    104 +მომხმარებელი აწვდის მხოლოდ source identity-სა და original filename-ს. სისტემა
+    105 +ითვლის/ავსებს checksum-ს, MIME-ს, ზომას, URI-ს, artifact ID-ს, parser state-სა
+    106 +და validation state-ს.
+    107 +
+    108 +```json
+    109 +{
+    110 +  "source_row_key": "file|1500",
+    111 +  "original_filename": "report-001.xlsx",
+    112 +  "source_primary_key": "report-001"
+    113 +}
+    114 +```
+    115 +
+    116 +### 4.3 Generic attachment relation
+    117 +
+    118 +```text
+    119 +__rel_entity_artifact
+    120 +```
+    121 +
+    122 +```json
+    123 +{
+    124 +  "relation_key": "row|1001|file|1500|SUPPORTING_DOCUMENT|1",
+    125 +  "entity_source_row_key": "row|1001",
+    126 +  "artifact_source_row_key": "file|1500",
+    127 +  "role_code": "SUPPORTING_DOCUMENT",
+    128 +  "is_primary": true,
+    129 +  "ordinal": 1,
+    130 +  "operation": "UPSERT"
+    131 +}
+    132 +```
+    133 +
+    134 +ეს არის generic relation და არა KIDS-specific workaround. მისი contract-ში
+    135 +უნდა იყოს გამოცხადებული cardinality, allowed roles, ordering და lifecycle.
+    136 +
+    137 +## 5. Cardinality და attachment semantics
+    138 +
+    139 +დაშვებულია ყველა კომბინაცია:
+    140 +
+    141 +```text
+    142 +ერთი row → ერთი file
+    143 +ერთი row → ბევრი file
+    144 +ბევრი row → ერთი file
+    145 +ბევრი row → ბევრი file
+    146 +```
+    147 +
+    148 +მაგალითი:
+    149 +
+    150 +```json
+    151 +{
+    152 +  "rowKey": "row|1001",
+    153 +  "attachments": [
+    154 +    {"artifactKey": "file|1500", "role": "PRIMARY", "ordinal": 1},
+    155 +    {"artifactKey": "file|1501", "role": "SUPPORTING_DOCUMENT", "ordinal": 2}
+    156 +  ]
+    157 +}
+    158 +```
+    159 +
+    160 +1000 row-ისა და 1500 file-ის შემთხვევაში იქმნება 1500 artifact identity და
+    161 +მხოლოდ რეალური კავშირების რაოდენობის relation rows. ერთი artifact relation-ში
+    162 +არ კოპირდება.
+    163 +
+    164 +## 6. Matching policy
+    165 +
+    166 +კავშირის დადგენის პრიორიტეტია:
+    167 +
+    168 +```text
+    169 +1. explicit manifest rowKeys
+    170 +2. Access-ის declared source key
+    171 +3. contract-registered filename/key pattern
+    172 +4. registered locator rule
+    173 +5. ambiguous → QUARANTINED
+    174 +```
+    175 +
+    176 +filename-only match არასდროს არის საბოლოო authority, თუ ერთზე მეტი candidate
+    177 +არსებობს. Missing, orphan, duplicate და ambiguous შემთხვევები ცალკე issue-ებად
+    178 +იქმნება.
+    179 +
+    180 +## 7. Upload protocol
+    181 +
+    182 +```text
+    183 +RECEIVE
+    184 +  → package checksum
+    185 +  → contract/revision resolution
+    186 +  → Access structural validation
+    187 +  → file type/size/malware validation
+    188 +  → SHA-256 streaming calculation
+    189 +  → multipart/resumable object upload
+    190 +  → artifact manifest persistence
+    191 +  → row↔artifact resolution
+    192 +  → FK/duplicate/orphan reconciliation
+    193 +  → canonical materialization
+    194 +  → immutable snapshot
+    195 +  → quality/privacy/semantic gates
+    196 +  → publication
+    197 +```
+    198 +
+    199 +ყველა ეტაპი არის idempotent. Retry იგივე package checksum-ით არ ქმნის duplicate
+    200 +artifact-ს ან relation-ს.
+    201 +
+    202 +## 8. Object Storage model
+    203 +
+    204 +Object Storage არის bytes-ის sole authority:
+    205 +
+    206 +```text
+    207 +geostat-ingest/
+    208 +  <site>/<contract>/<revision>/incoming/<sha256>.<ext>
+    209 +
+    210 +geostat-quarantine/
+    211 +  <site>/<contract>/<revision>/<issue-id>/<sha256>.<ext>
+    212 +
+    213 +geostat-archive/
+    214 +  <site>/<contract>/<revision>/<snapshot-id>/<sha256>.<ext>
+    215 +
+    216 +geostat-export/
+    217 +  <operation-id>/<sha256>.<ext>
+    218 +```
+    219 +
+    220 +Object key არ ეფუძნება დაუმუშავებელ user filename-ს. Original filename ინახება
+    221 +metadata-ში; key არის checksum-addressed და path-safe.
+    222 +
+    223 +## 9. Database canonical model
+    224 +
+    225 +```text
+    226 +ingest.package
+    227 +  package_id, contract_revision_id, package_checksum, status
+    228 +
+    229 +ingest.artifact
+    230 +  artifact_id, package_id, object_uri, checksum, byte_size, mime_type, status
+    231 +
+    232 +raw.source_record
+    233 +  source_record_id, artifact_id, source_row_number, source_key, payload_hash
+    234 +
+    235 +entity.entity_record
+    236 +  entity_id, dataset_snapshot_id, record_type, external_key, payload_json
+    237 +
+    238 +entity.resource_locator
+    239 +  locator_id, entity_id, artifact_id/object_uri, checksum, mime_type,
+    240 +  access_policy_code, is_primary, valid_from, valid_to
+    241 +
+    242 +entity.entity_link
+    243 +  link_id, from_entity_id, to_artifact_id/to_entity_id, relation_code,
+    244 +  role_code, ordinal, validity
+    245 +
+    246 +publication.dataset_snapshot
+    247 +  dataset_snapshot_id, dataset_version_id, status, checksum, row_count
+    248 +```
+    249 +
+    250 +`entity.resource_locator` გამოიყენება მაშინ, როდესაც attachment entity-ის
+    251 +resource locator-ია. მრავალმხრივი ან domain-specific კავშირი გამოიყენებს generic
+    252 +`entity.entity_link`/contract-declared relation dataset-ს.
+    253 +
+    254 +## 10. Lifecycle
+    255 +
+    256 +```text
+    257 +RECEIVED
+    258 +  → VALIDATING
+    259 +  → ACCEPTED
+    260 +  → QUARANTINED | REJECTED
+    261 +  → SNAPSHOT_CANDIDATE
+    262 +  → PUBLISHED
+    263 +  → SUPERSEDED
+    264 +  → RETIRED
+    265 +```
+    266 +
+    267 +Published artifact არ იშლება ჩვეულებრივი ოპერაციით. Supersede ქმნის ახალ
+    268 +immutable version-ს; rollback აბრუნებს წინა snapshot pointer-ს.
+    269 +
+    270 +## 11. Integrity და quality პასუხები
+    271 +
+    272 +სისტემა ავტომატურად პასუხობს:
+    273 +
+    274 +- checksum ემთხვევა თუ არა object-ს;
+    275 +- MIME/type სწორია თუ არა extension-თან;
+    276 +- ზომა ლიმიტშია თუ არა;
+    277 +- malware/zip-bomb/path-traversal რისკი არსებობს თუ არა;
+    278 +- duplicate content არის თუ არა;
+    279 +- ყველა relation target არსებობს თუ არა;
+    280 +- orphan artifact/row არსებობს თუ არა;
+    281 +- row-count, file-count და checksum reconciliation ემთხვევა თუ არა;
+    282 +- artifact snapshot-ის წევრია თუ არა;
+    283 +- published object ხელმისაწვდომია თუ არა.
+    284 +
+    285 +## 12. Partial failure policy
+    286 +
+    287 +თუ 1500 ფაილიდან რომელიმე ვერ აიტვირთა ან relation გაურკვეველია:
+    288 +
+    289 +```text
+    290 +package status = QUARANTINED | FAILED
+    291 +publication = BLOCKED
+    292 +valid partial rows = not publicly served
+    293 +issue = explicit, reproducible and retryable
+    294 +```
+    295 +
+    296 +Partial publication დასაშვებია მხოლოდ მაშინ, თუ contract-ში წინასწარ არის
+    297 +გამოცხადებული `partialPublicationPolicy` და steward-ს აქვს დამტკიცებული rule.
+    298 +
+    299 +## 13. Snapshot binding
+    300 +
+    301 +საბოლოო identity chain არის:
+    302 +
+    303 +```text
+    304 +contract revision
+    305 +  → dataset version
+    306 +  → immutable dataset snapshot
+    307 +  → artifact membership
+    308 +  → canonical entity/statistical rows
+    309 +  → locator/relation
+    310 +  → API projection
+    311 +```
+    312 +
+    313 +ერთი snapshot-ის შიგნით row და artifact version არ იცვლება. ახალი ფაილი ან
+    314 +შეცვლილი checksum ქმნის ახალ snapshot candidate-ს.
+    315 +
+    316 +## 14. Security და privacy
+    317 +
+    318 +- deny-by-default;
+    319 +- tenant/site/product/dataset/field/file-level authorization;
+    320 +- artifact metadata და bytes-ის განცალკევებული policy;
+    321 +- short-lived signed URL;
+    322 +- URL-ში secret ან permanent credential არ იდება;
+    323 +- private/quarantine bucket public access-ს არ უშვებს;
+    324 +- download/view audit event სავალდებულოა;
+    325 +- sensitive artifact-ს აქვს confidentiality class და redaction policy;
+    326 +- cross-tenant relation fail-closed-ია;
+    327 +- object storage credentials API response-ში არასდროს გადის.
+    328 +
+    329 +## 15. API contract
+    330 +
+    331 +### Metadata response
+    332 +
+    333 +```json
+    334 +{
+    335 +  "id": "row|1001",
+    336 +  "attachments": [
+    337 +    {
+    338 +      "artifactId": "artifact|1500",
+    339 +      "name": "report-001.xlsx",
+    340 +      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    341 +      "sizeBytes": 482913,
+    342 +      "sha256": "a1b2...",
+    343 +      "snapshotId": 13,
+    344 +      "download": {
+    345 +        "mode": "SIGNED_URL",
+    346 +        "expiresInSeconds": 300
+    347 +      }
+    348 +    }
+    349 +  ]
+    350 +}
+    351 +```
+    352 +
+    353 +### Error semantics
+    354 +
+    355 +```text
+    356 +400 invalid package/manifest
+    357 +401 missing authentication
+    358 +403 policy/tenant denial
+    359 +404 artifact or row not visible
+    360 +409 duplicate/version/conflicting idempotency key
+    361 +410 retired or expired artifact
+    362 +422 validation/relation/checksum/quarantine failure
+    363 +503 storage or dependency unavailable
+    364 +```
+    365 +
+    366 +API არასდროს აბრუნებს raw object path-ს, local filesystem path-ს ან undeclared
+    367 +artifact-ს.
+    368 +
+    369 +## 16. Upload reliability
+    370 +
+    371 +სავალდებულოა:
+    372 +
+    373 +- streaming SHA-256;
+    374 +- multipart/resumable upload დიდი ფაილებისთვის;
+    375 +- idempotency key package დონეზე;
+    376 +- retry with bounded backoff;
+    377 +- partial object cleanup;
+    378 +- atomic manifest commit;
+    379 +- optimistic concurrency/ETag package update-ზე;
+    380 +- storage quota და tenant quota;
+    381 +- orphan-object scanner;
+    382 +- retryable job state და checkpoint.
+    383 +
+    384 +## 17. Retention, archive და DR
+    385 +
+    386 +- ingest object ინახება validation/replay window-ის განმავლობაში;
+    387 +- published object გადადის archive retention policy-ში;
+    388 +- legal hold purge-ს ბლოკავს;
+    389 +- superseded versions ინარჩუნებს rollback-ს;
+    390 +- archive object-ს აქვს checksum და snapshot reference;
+    391 +- backup/restore ამოწმებს object existence-სა და DB locator parity-ს;
+    392 +- measured RPO/RTO evidence აუცილებელია production closure-ისთვის.
+    393 +
+    394 +## 18. Provenance
+    395 +
+    396 +ყოველი artifact და row უნდა იძლეოდეს შემდეგ ჯაჭვს:
+    397 +
+    398 +```text
+    399 +source artifact (Entity)
+    400 +  → ingest/materialization (Activity)
+    401 +  → contract/steward/service (Agent)
+    402 +  → canonical row (Entity)
+    403 +  → snapshot/publication (Activity)
+    404 +  → API distribution (Entity/Distribution)
+    405 +```
+    406 +
+    407 +Provenance ინახავს source, activity, agent, timestamp, checksum, revision,
+    408 +derivation და supersession კავშირებს.
+    409 +
+    410 +## 19. Operational controls
+    411 +
+    412 +აუცილებელია scheduled checks:
+    413 +
+    414 +- missing object detector;
+    415 +- orphan DB locator detector;
+    416 +- orphan storage object detector;
+    417 +- checksum drift detector;
+    418 +- relation orphan detector;
+    419 +- duplicate logical identity detector;
+    420 +- stale upload cleanup;
+    421 +- expired signed URL/download audit;
+    422 +- snapshot-to-cache count/checksum reconciliation;
+    423 +- contract/documentation zero-drift report.
+    424 +
+    425 +## 20. Acceptance checklist
+    426 +
+    427 +- [ ] package manifest validated;
+    428 +- [ ] contract revision approved;
+    429 +- [ ] every row has stable identity;
+    430 +- [ ] every artifact has checksum identity;
+    431 +- [ ] every artifact has immutable object URI;
+    432 +- [ ] every row↔artifact edge is explicit or deterministically resolved;
+    433 +- [ ] no ambiguous/orphan/duplicate relation remains;
+    434 +- [ ] MIME/size/malware checks PASS;
+    435 +- [ ] raw lineage is complete;
+    436 +- [ ] canonical locator is persisted;
+    437 +- [ ] dataset version and snapshot are bound;
+    438 +- [ ] row/file/checksum reconciliation PASS;
+    439 +- [ ] quality/privacy/security gates PASS;
+    440 +- [ ] signed download policy verified;
+    441 +- [ ] rollback and replay tested;
+    442 +- [ ] archive/retention/DR evidence stored;
+    443 +- [ ] API response matches declared projection;
+    444 +- [ ] documentation/runtime ledger reconciled.
+    445 +
+    446 +## 21. Final decision rules
+    447 +
+    448 +1. File bytes belong only to Object Storage.
+    449 +2. Identity and relation metadata belong to contract-governed Data Plane tables.
+    450 +3. Contract and policy belong to Control Plane.
+    451 +4. Historical retention and rollback belong to Archive Plane.
+    452 +5. API serves only approved snapshot members.
+    453 +6. Frontend receives metadata and short-lived signed URLs.
+    454 +7. Ambiguity blocks publication.
+    455 +8. Retry must be idempotent.
+    456 +9. New content creates a new immutable version.
+    457 +10. No consumer may lower these guarantees.
+    458 +
+    459 +**Completion criterion:** artifact attachment work is complete only when the
+    460 +package, artifact, row, relation, snapshot, policy, API response, download,
+    461 +archive and rollback chain has automated tests and immutable evidence.**
+
+• Ran git add docs/reference/ARTIFACT-ATTACHMENT-CONTRACT.md; git commit -m "Define canonical artifact attachment contract"
+  └ warning: in the working copy of 'docs/reference/ARTIFACT-ATTACHMENT-CONTRACT.md', LF will be replaced by CRLF the next time Git touches it
+    [master 4a13383] Define canonical artifact attachment contract
+     1 file changed, 461 insertions(+)
+     create mode 100644 docs/reference/ARTIFACT-ATTACHMENT-CONTRACT.md
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  შეიქმნა სრული canonical დოკუმენტი:
+
+  /C:/Users/Test-User/Desktop/gesotat-system/docs/reference/ARTIFACT-ATTACHMENT-CONTRACT.md
+
+  შიგნით სრულად არის:
+
+  - package/manifest upload;
+  - row და artifact identity;
+  - row↔file cardinality;
+  - Access ცხრილები და კავშირები;
+  - Object Storage სტრუქტურა;
+  - checksum/idempotency;
+  - lifecycle და snapshot binding;
+  - partial failure/quarantine;
+  - security/privacy;
+  - API response/error semantics;
+  - retention/archive/DR;
+  - provenance;
+  - operational controls;
+  - საბოლოო acceptance checklist.
+
+  გამოყენებული სტანდარტების საფუძველი: Frictionless Data Package (https://specs.frictionlessdata.io/data-package/), W3C DCAT 3 (https://www.w3.org/TR/vocab-dcat-3/) და W3C PROV (https://www.w3.org/TR/prov-primer/).
+
+─ Worked for 1m 02s ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  ყველა კთხვას რაცდასვი უპასუხე ყვლეაზე სეუკტსო გადწყტიებით?
+
+
+  დიახ — ყველა დასმული კითხვა სრულად არის პასუხგაცემული და თითოეულზე არჩეულია canonical გადაწყვეტა:
+
+  - identity;
+  - row↔file კავშირი;
+  - cardinality;
+  - Access სტრუქტურა;
+  - manifest;
+  - Object Storage;
+  - 1000 row / 1500 file შემთხვევა;
+  - checksum და duplicate handling;
+  - upload/retry/idempotency;
+  - quarantine და partial failure;
+  - snapshot/versioning;
+  - security/privacy;
+  - API response/download;
+  - retention/archive/DR;
+  - provenance;
+  - monitoring და reconciliation.
+
+  დოკუმენტში დარჩენილია მხოლოდ implementation work:
+
+  manifest → resource identity
+  resource identity → entity.resource_locator
+  entity.resource_locator → snapshot
+  snapshot → signed API download
+
+  ანუ არქიტექტურული გადაწყვეტილებები დახურულია; დასარჩენი არის მათი კოდის, migration-ისა და acceptance test-ების შესრულება.
+
+
+  მაიფესტი ავოტმატურად დაგენრიედება?
+
+
+  დიახ. manifest.json ავტომატურად გენერირდება, თუ პაკეტში არ არის.
+
+  სისტემა აგროვებს:
+
+  - ყველა ფაილის original path-ს;
+  - SHA-256 checksum-ს;
+  - ზომას;
+  - MIME type-ს;
+  - artifact identity-ს;
+  - Access row key-ს;
+  - row↔file კავშირებს;
+  - contract code/revision-ს;
+  - dataset version-ს;
+  - package checksum-ს.
+
+  გენერირებული manifest-ის მაგალითი:
+
+  {
+    "packageCode": "KIDS_RESOURCE_PACKAGE",
+    "contractCode": "KIDS_PORTAL_V1",
+    "contractRevision": 8,
+    "files": [
+      {
+        "path": "files/report-001.xlsx",
+        "sha256": "a1b2...",
+        "bytes": 482913,
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "rowKeys": ["row|1001"]
+      }
+    ]
+  }
+
+  თუ manifest მომხმარებელმა თავადაც ატვირთა, სისტემა მას მხოლოდ contract validation-ის შემდეგ მიიღებს. წინააღმდეგ შემთხვევაში შექმნის საკუთარ canonical manifest-ს და მომხმარებელს მისცემს preview-სა და validation report-ს.

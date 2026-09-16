@@ -1,6 +1,14 @@
 # GeoStat Canonical Directory Tree
 
 Access schema → contract fields → language/classifier relation → lineage → Data Plane materialization → projection → API response → legacy comparison → structural improvement review
+ახლა ზუსტად ამ კანონიკური ჯაჭვით ვმუშაობთ:
+
+contract revision → dataset version → immutable dataset snapshot → canonical entity/statistics rows → relation/projection → API response
+
+
+კანონიკური მოდელი ასეთია:
+
+resource entity → governed locator/path → immutable object/file artifact → optional statistical carrier → typed observations
 
 ```text
 gesotat-system/

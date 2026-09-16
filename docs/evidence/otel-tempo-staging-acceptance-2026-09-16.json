@@ -1,0 +1,45 @@
+{
+  "schema": "geostat.otel-tempo-staging-acceptance.v1",
+  "generatedAt": "2026-09-16T06:30:32Z",
+  "scope": "isolated geostat-net staging probe",
+  "result": "PASS_STAGING_ONLY",
+  "components": {
+    "composeConfiguration": "PASS; production environment interpolation validated without printing values",
+    "otelCollector": {
+      "image": "otel/opentelemetry-collector-contrib:0.135.0",
+      "configValidation": "PASS",
+      "listeners": ["0.0.0.0:4317", "0.0.0.0:4318", "0.0.0.0:9464"],
+      "persistentExporterQueue": "file_storage WAL configured"
+    },
+    "tempo": {
+      "image": "grafana/tempo:3.0.3",
+      "backend": "local filesystem on disposable tmpfs",
+      "queryAcceptance": "PASS"
+    }
+  },
+  "replays": {
+    "syntheticOtlpMetric": {
+      "receiverHttp": 200,
+      "prometheusExporter": "sample visible at /metrics",
+      "result": "PASS"
+    },
+    "syntheticOtlpTrace": {
+      "receiverHttp": 200,
+      "tempoTraceLookupHttp": 200,
+      "exportErrors": 0,
+      "result": "PASS"
+    }
+  },
+  "cleanup": {
+    "temporaryContainersRemoved": true,
+    "temporaryConfigFilesRemoved": true,
+    "liveApiRecreated": false,
+    "nonGeostatProjectsTouched": false
+  },
+  "limitations": [
+    "The live Collector configuration has not been replaced; Prometheus scrape remains down until the approved infrastructure change is applied.",
+    "Tempo staging used disposable local storage and does not prove production-grade object-storage durability, backup, HA, or DR.",
+    "No real application telemetry was replayed; production API OTLP metrics remain disabled.",
+    "This synthetic run does not constitute a signed production acceptance."
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "evidenceType": "kids-contract-https-boundary-replay",
+  "contract": { "code": "KIDS_PORTAL_V1", "revision": 8 },
+  "scope": "existing-contract-only",
+  "kidsRefactoring": "not-performed",
+  "checks": {
+    "https_edge": "PASS",
+    "oidc_discovery": "PASS",
+    "oidc_jwks": "PASS",
+    "anonymous_request": "PASS_FAIL_CLOSED",
+    "protected_replay": "BLOCKED_STALE_TOKEN_ISSUER"
+  },
+  "reason": "The available test token is issued by https://keycloak:8443/realms/geostat; the active canonical issuer is https://auth.geostat.internal/realms/geostat. No validator bypass or KIDS refactoring was introduced.",
+  "nextAction": "obtain a fresh approved token from auth.geostat.internal and rerun the existing page/query runner",
+  "overall": "BOUNDARY_READY_REPLAY_PENDING"
+}

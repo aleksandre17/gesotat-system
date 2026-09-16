@@ -1,0 +1,74 @@
+{
+  "schema": "geostat.production-readiness-probe.v1",
+  "generatedAt": "2026-09-16T06:32:56.1691081Z",
+  "scope": "geostat project only",
+  "productionDecision": "NOT_READY_FOR_PRODUCTION",
+  "checks": {
+    "apiContainer": {
+      "status": "PASS",
+      "state": "running",
+      "health": "healthy",
+      "changed": false
+    },
+    "prometheus": {
+      "status": "PARTIAL",
+      "started": true,
+      "readinessEndpoint": "PASS",
+      "otelCollectorScrapeTarget": "DOWN",
+      "observedError": "connection refused on collector metrics endpoint"
+    },
+    "grafana": {
+      "status": "PARTIAL",
+      "started": true,
+      "externalPortPublished": false,
+      "endToEndDashboardAndAlertAcceptance": "NOT_RUN"
+    },
+    "otelCollector": {
+      "status": "FAIL",
+      "observedListeners": [
+        "127.0.0.1:4317",
+        "127.0.0.1:4318"
+      ],
+      "metricsExporterListener": "9464 not listening",
+      "tracesBackend": "debug exporter only; no durable trace backend"
+    },
+    "otelTempoStaging": {
+      "status": "PASS_STAGING_ONLY",
+      "evidence": "otel-tempo-staging-acceptance-2026-09-16.json",
+      "liveConfigurationApplied": false
+    },
+    "releaseGate": {
+      "diagnosticAllowDirty": "PASS",
+      "strictReleaseGate": "FAIL",
+      "dirtyEntries": 20
+    },
+    "oidcTenant": {
+      "oidcIssuerHttps": "previously observed PASS in internal HTTPS evidence",
+      "containerCurlTrustValidation": "FAIL: self-signed certificate is not trusted by curl system CA store",
+      "tenantDataBoundary": "NOT_IMPLEMENTED_OR_NOT_EVIDENCED"
+    },
+    "truststoreCredential": {
+      "status": "ROTATION_REQUIRED",
+      "reason": "credential value was exposed in diagnostic output; value intentionally omitted",
+      "activeApiRestarted": false
+    },
+    "externalApprovals": {
+      "releaseAndDeployAuthority": "NOT_ASSERTED",
+      "approvedTenantPolicy": "NOT_ASSERTED",
+      "approvedRpoRto": "NOT_ASSERTED",
+      "approvedResilienceTestWindow": "NOT_ASSERTED"
+    }
+  },
+  "changesMade": [
+    "Started geostat-prometheus and geostat-grafana using the existing geostat-platform Compose project; no API or non-GeoStat container was recreated.",
+    "Updated the repository OTel Collector configuration to bind OTLP gRPC and HTTP receivers on the container network interface."
+  ],
+  "notClaimed": [
+    "production deployment",
+    "durable traces/logs",
+    "tenant ABAC enforcement",
+    "signed release approval",
+    "backup/DR RPO/RTO acceptance",
+    "load/chaos/security signed acceptance"
+  ]
+}

@@ -74,8 +74,11 @@ OIDC_TENANT_CLAIM=tenant_id
 - [ ] wrong issuer/audience/signature/expiry → 401;
 - [ ] wrong tenant/role → 403/deny;
 - [ ] pageId=8 introspection/query → 200;
+- [ ] pageId=11 query → 200 with non-empty contract-projected rows and both revision-declared relation includes hydrated;
 - [ ] response, checksum და authorization evidence signed bundle-შია;
 - [ ] approved deploy authority და rollback plan დადასტურებულია.
+
+Page 11-ის include regression-ის დაკვირვება, source fix და მისი release-gated runtime მდგომარეობა აღირიცხება [`kids-r8-live-include-regression-2026-09-16.json`](../evidence/kids-r8-live-include-regression-2026-09-16.json)-ში. Source-level tests PASS-ია; live API container-ის ხელახალი acceptance მხოლოდ ამ ცვლილების approved release image-ში მოხვედრის შემდეგ ჩაითვლება შესრულებულად.
 
 ## Local/staging distinction
 
