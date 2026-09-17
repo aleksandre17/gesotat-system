@@ -108,6 +108,15 @@ storage:
     export-bucket: ${STORAGE_BUCKET_EXPORT:geostat-export}
 
 platform:
+  # Identity binding is environment-agnostic: every profile reads the same keys;
+  # only the env file decides whether and against which issuer OIDC runs.
+  oidc:
+    enabled: ${PLATFORM_OIDC_ENABLED:false}
+    issuer-uri: ${OIDC_ISSUER_URL:}
+    audience: ${OIDC_AUDIENCE:geostat-api}
+    roles-claim: ${OIDC_ROLES_CLAIM:realm_access.roles}
+    tenant-claim: ${OIDC_TENANT_CLAIM:tenant_id}
+    role-authority-map: ${OIDC_ROLE_AUTHORITY_MAP:contract.read=READ_RESOURCE;contract.write=WRITE_RESOURCE;ingest.execute=WRITE_RESOURCE;quality.approve=PUBLISH_RESOURCE;publish.execute=PUBLISH_RESOURCE;raw.read=READ_RESOURCE;admin=ADMIN}
   provider:
     discovery:
       enabled: ${PLATFORM_PROVIDER_DISCOVERY_ENABLED:false}
