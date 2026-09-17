@@ -117,7 +117,7 @@ if ($Mode -eq "local") {
     Push-Location $BUILD_CONTEXT
     docker build `
         --target production `
-        --build-arg "VITE_API_URL=$VITE_API_URL" `
+        --build-arg "VITE_BASE_URL=$VITE_API_URL" `
         --file $DOCKERFILE_PATH `
         -t $APP_NAME . 2>&1 | ForEach-Object {
             Add-Content -Path $LOG_FILE -Value "[docker] $_" -Encoding UTF8
@@ -159,13 +159,13 @@ elseif ($Mode -eq "dist") {
     Log "VITE_API_URL will be baked into JS bundle" "WARN"
 
     Push-Location $BUILD_CONTEXT
-    $env:VITE_API_URL = $VITE_API_URL
+    $env:VITE_BASE_URL = $VITE_API_URL
     npm run build 2>&1 | ForEach-Object {
         Add-Content -Path $LOG_FILE -Value "[npm] $_" -Encoding UTF8
         Write-Host "[npm] $_" -ForegroundColor DarkGray
     }
     $exitCode = $LASTEXITCODE
-    Remove-Item Env:VITE_API_URL -ErrorAction SilentlyContinue
+    Remove-Item Env:VITE_BASE_URL -ErrorAction SilentlyContinue
     Pop-Location
 
     if ($exitCode -ne 0) { Log "npm build FAILED (exit $exitCode)" "ERROR"; exit 1 }
@@ -263,7 +263,7 @@ docker rm   $APP_NAME 2>/dev/null || true
 
 echo '[remote] Building...'
 cd $DEPLOY_PATH
-export VITE_API_URL=$VITE_API_URL
+export VITE_BASE_URL=$VITE_API_URL
 export HOST_PORT=$HOST_PORT
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 docker ps --filter name=$APP_NAME
@@ -295,13 +295,13 @@ elseif ($Mode -eq "sync") {
 
     LogSection "[1/2] npm run build (local)"
     Push-Location $BUILD_CONTEXT
-    $env:VITE_API_URL = $VITE_API_URL
+    $env:VITE_BASE_URL = $VITE_API_URL
     npm run build 2>&1 | ForEach-Object {
         Add-Content -Path $LOG_FILE -Value "[npm] $_" -Encoding UTF8
         Write-Host "[npm] $_" -ForegroundColor DarkGray
     }
     $exitCode = $LASTEXITCODE
-    Remove-Item Env:VITE_API_URL -ErrorAction SilentlyContinue
+    Remove-Item Env:VITE_BASE_URL -ErrorAction SilentlyContinue
     Pop-Location
 
     if ($exitCode -ne 0) { Log "npm build FAILED" "ERROR"; exit 1 }
