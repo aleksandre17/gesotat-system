@@ -109,6 +109,7 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
         executeAndRecord(control, "db/platform/079_api_operation_idempotency.sql");
         executeAndRecord(control, "db/platform/080_api_operation_owner_scope.sql");
         executeAndRecord(control, "db/platform/081_provider_capability_registry.sql");
+        executeAndRecord(control, "db/platform/082_contract_approval_receipt.sql");
         executeAndRecord(control, "db/platform/083_data_family_lifecycle_state.sql");
         executeAndRecord(control, "db/platform/084_contract_revision_lifecycle.sql");
         executeAndRecord(control, "db/platform/085_canonical_storage_bindings.sql");
