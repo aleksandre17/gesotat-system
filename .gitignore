@@ -189,3 +189,6 @@ jacoco/
 /codex-session-*.md
 /chartjson.dat
 
+
+# Claude Code personal settings
+.claude/settings.local.json
