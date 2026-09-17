@@ -11,8 +11,8 @@
 |---|---|
 | **მიზანი** | Repository hygiene (P0), remote-dev გარემოს ჯანსაღება და prod-თან ფუნქციური parity |
 | **შედეგი** | Remote-dev `geostat-api-dev` — prod profile, OIDC enforced, health ALL UP; working tree clean |
-| **Commits** | superproject 14 (`a9d68f2 … e393d3c`), stack-kit 1 (`1b2c77b`) |
-| **Push** | ❌ **არცერთი** — master ahead 14; kit branch ahead 1 |
+| **Commits** | superproject 16 (`a9d68f2 … this report`), stack-kit 1 (`1b2c77b`) |
+| **Push** | ❌ **არცერთი** — master ahead 16; kit branch ahead 1 |
 | **Legacy prod** | უცვლელი (მხოლოდ read-only inspection) |
 | **Tests** | `:api:test` BUILD SUCCESSFUL · stack-kit `287 passed, 23 skipped` |
 | **Production readiness** | უცვლელი: `NOT_READY_FOR_PRODUCTION` (B-01…B-07 ღია) |
@@ -89,7 +89,7 @@
 ## 5. ღია საქმეები (prioritized)
 
 ### P0 — decision / action required
-1. **Push.** superproject `master` ahead 14; stack-kit `1b2c77b` unpushed. ⚠ Submodule pointer unpushed commit-ზე — **clone broken, სანამ kit push არ მოხდება.** თანმიმდევრობა: kit branch push → superproject push. (მომხმარებლის ნებართვა საჭიროა.)
+1. **Push.** superproject `master` ahead 16; stack-kit `1b2c77b` unpushed. ⚠ Submodule pointer unpushed commit-ზე — **clone broken, სანამ kit push არ მოხდება.** თანმიმდევრობა: kit branch push → superproject push. (მომხმარებლის ნებართვა საჭიროა.)
 2. **Duplicate DNS alias `api`** — `geostat-api` და `geostat-api-dev` ორივე `api` geostat-net-ზე → round-robin prod/dev. Fix: kit workspace compose-ში service key `api` იძლევა default alias-ს; dev-ზე alias-ი მოისილოს (მაგ. kit-ში declared `networkAliases` ან service key ≠ `api`). Edge სრული სახელს იყენებს — ამჟამად უსაფრთხოა.
 
 ### P1 — parity / drift
