@@ -1,0 +1,8 @@
+
+# --- geostat: legacy SQL Server TLS compatibility --------------------------
+# Appended to $JAVA_HOME/conf/security/java.security by every API image; the
+# later definition overrides the JDK default (java.util.Properties: last wins).
+# JDK >= 17.0.16 additionally disables TLS_RSA_* and rsa_pkcs1_sha1 handshake
+# signatures, which the legacy secondary SQL Server still requires. This keeps
+# the 17.0.15 policy. Remove once the secondary server supports modern suites.
+jdk.tls.disabledAlgorithms=SSLv3, TLSv1, TLSv1.1, DTLSv1.0, RC4, DES, MD5withRSA, DH keySize < 1024, EC keySize < 224, 3DES_EDE_CBC, anon, NULL, ECDH

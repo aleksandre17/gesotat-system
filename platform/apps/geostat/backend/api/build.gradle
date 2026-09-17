@@ -94,6 +94,17 @@ tasks.named('bootJar') {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
+// Application JVM options for source runs. JAVA_TOOL_OPTIONS would also reach the
+// Gradle daemon (GC conflicts, truststore replacing the dependency-download trust),
+// so source runs pass options to the application process only. Image runs keep
+// JAVA_TOOL_OPTIONS, where the application is the only JVM.
+tasks.named('bootRun') {
+    def appJvmArgs = providers.environmentVariable('BOOTRUN_JVM_ARGS')
+    if (appJvmArgs.present) {
+        jvmArgs(appJvmArgs.get().trim().split(/\s+/).findAll { it })
+    }
+}
+
 // Canonical KIDS package is generated outside the application source set so it
 // remains an explicit, repeatable artifact build step rather than runtime API code.
 sourceSets {
