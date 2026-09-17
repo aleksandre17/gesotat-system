@@ -35,7 +35,12 @@
             "dockerfile": "api/Dockerfile.dev.remote",
             "portEnv": "API_PORT",
             "port": 8081,
-            "healthPath": "/health"
+            "healthPath": "/health",
+            "composeBase": "ops/compose/projects/geostat/services/api/docker-compose.base.yml",
+            "profile": "prod",
+            "volumes": [
+              "${PUBLIC_TRUSTSTORE_FILE:?PUBLIC_TRUSTSTORE_FILE is required}:/run/secrets/public-truststore.p12:ro"
+            ]
           }
         }
       }
