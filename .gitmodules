@@ -1,0 +1,4 @@
+[submodule "platform/kits/stack-kit"]
+	path = platform/kits/stack-kit
+	url = https://github.com/aleksandre17/stack-kit.git
+	branch = main

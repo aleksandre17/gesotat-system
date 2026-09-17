@@ -1,0 +1,55 @@
+{
+  "$schema": "./platform/kits/stack-kit/manifest.schema.json",
+  "version": 2,
+  "package": "platform/kits/stack-kit",
+  "secrets": "ops/config/projects/geostat/services",
+  "compose": {
+    "catalog": "ops/compose/projects/geostat/catalog.json"
+  },
+  "stack": {
+    "composeDir": "ops/compose/projects/geostat",
+    "infraComposeDir": "ops/compose/projects/geostat/services/infra",
+    "networkName": "geostat-net",
+    "infra": {
+      "services": ["mssql"]
+    }
+  },
+  "cli": {
+    "aliases": {
+      "api": "api",
+      "ui": "control-plane-ui"
+    }
+  },
+  "modules": {
+    "api": {
+      "role": "api",
+      "type": "java-boot",
+      "path": "platform/apps/geostat/backend",
+      "secretsModule": "api",
+      "target": "api",
+      "composeDir": "ops/compose/projects/geostat",
+      "dev": {
+        "watchRoots": ["core/src", "api/src"],
+        "services": {
+          "api": {
+            "dockerfile": "api/Dockerfile.dev.remote",
+            "portEnv": "API_PORT",
+            "port": 8081,
+            "healthPath": "/health"
+          }
+        }
+      }
+    },
+    "control-plane-ui": {
+      "role": "ui",
+      "type": "node-vite",
+      "path": "platform/apps/geostat/frontend/geostat-system-app",
+      "secretsModule": "control-plane-ui",
+      "composeDir": "ops/compose/projects/geostat/services/control-plane-ui"
+    }
+  },
+  "vscode": {
+    "folder": ".vscode",
+    "geostatScript": "ops/cli/lifecycle/geostat.ps1"
+  }
+}

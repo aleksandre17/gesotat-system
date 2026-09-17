@@ -1,0 +1,25 @@
+# SQL Server for remote dev: holds the dev copies of the primary, data and archive planes.
+services:
+  mssql:
+    image: ${MSSQL_IMAGE:?MSSQL_IMAGE is required}
+    container_name: ${INFRA_SLUG}-mssql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: ${MSSQL_PID:?MSSQL_PID is required}
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?MSSQL_SA_PASSWORD is required}
+    volumes:
+      - mssql-data:/var/opt/mssql
+      - mssql-restore:/var/opt/mssql/restore
+    networks:
+      - project-net
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' -b -o /dev/null"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  mssql-data:
+  mssql-restore:

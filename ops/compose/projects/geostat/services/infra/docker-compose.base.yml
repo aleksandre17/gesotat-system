@@ -1,0 +1,8 @@
+# Project-owned remote dev infrastructure (geostat infra remote up).
+# Scoped by INFRA_SLUG; joins the existing project network only.
+name: ${INFRA_SLUG:?INFRA_SLUG is required}
+
+networks:
+  project-net:
+    name: ${DOCKER_NETWORK:?DOCKER_NETWORK is required}
+    external: true

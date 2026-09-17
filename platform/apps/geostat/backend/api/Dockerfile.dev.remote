@@ -1,0 +1,14 @@
+# Remote source dev image (geostat api dev bootstrap): toolchain only.
+# Source is bind-mounted at /app and run with `gradlew :api:bootRun` by the kit.
+FROM eclipse-temurin:17-jdk-jammy
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends wget \
+    && rm -rf /var/lib/apt/lists/*
+# JDK >= 17.0.16 disables TLS_RSA_* and rsa_pkcs1_sha1, which breaks the TLS
+# handshake with the legacy secondary SQL Server (192.168.0.230). Keep the same
+# policy as the prod image (17.0.15).
+RUN printf '%s\n' \
+      'jdk.tls.disabledAlgorithms=SSLv3, TLSv1, TLSv1.1, DTLSv1.0, RC4, DES, MD5withRSA, DH keySize < 1024, EC keySize < 224, 3DES_EDE_CBC, anon, NULL, ECDH' \
+      > /opt/java/geostat-legacy-mssql.security
+ENV JAVA_TOOL_OPTIONS="-Djava.security.properties=/opt/java/geostat-legacy-mssql.security"
+WORKDIR /app
