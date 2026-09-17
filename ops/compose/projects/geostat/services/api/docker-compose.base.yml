@@ -1,0 +1,79 @@
+# ============================================================
+#  GeoStat API — shared service definition (every environment line)
+#
+#  Declares WHAT the API needs: configuration keys, persistent state,
+#  network, health and logging. Environment lines extend this service and
+#  add only HOW they run it:
+#    - docker-compose.prod.yml       immutable image, prod profile
+#    - stack-kit remote dev workspace source + bootRun (manifest composeBase)
+#
+#  Rules: no relative paths, no image/build, no profile, no ports; values
+#  come from the line's env file (--env-file), never from this file.
+# ============================================================
+
+services:
+  api:
+    environment:
+      SPRING_DATASOURCE_PRIMARY_JDBC_URL: ${DB_PRIMARY_URL}
+      SPRING_DATASOURCE_PRIMARY_USERNAME: ${DB_PRIMARY_USER}
+      SPRING_DATASOURCE_PRIMARY_PASSWORD: ${DB_PRIMARY_PASS}
+      SPRING_DATASOURCE_SECONDARY_JDBC_URL: ${DB_SECONDARY_URL}
+      SPRING_DATASOURCE_SECONDARY_USERNAME: ${DB_SECONDARY_USER}
+      SPRING_DATASOURCE_SECONDARY_PASSWORD: ${DB_SECONDARY_PASS}
+      SPRING_DATASOURCE_DATA_PLANE_JDBC_URL: ${DB_DATA_URL}
+      SPRING_DATASOURCE_DATA_PLANE_USERNAME: ${DB_DATA_USER}
+      SPRING_DATASOURCE_DATA_PLANE_PASSWORD: ${DB_DATA_PASS}
+      SPRING_DATASOURCE_ARCHIVE_PLANE_JDBC_URL: ${DB_ARCHIVE_URL}
+      SPRING_DATASOURCE_ARCHIVE_PLANE_USERNAME: ${DB_ARCHIVE_USER}
+      SPRING_DATASOURCE_ARCHIVE_PLANE_PASSWORD: ${DB_ARCHIVE_PASS}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ISSUER: ${JWT_ISSUER:-geostat-api}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-geostat-platform}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-86400000}
+      PLATFORM_OIDC_ENABLED: ${PLATFORM_OIDC_ENABLED:-false}
+      OIDC_ISSUER_URL: ${OIDC_ISSUER_URL:-}
+      OIDC_AUDIENCE: ${OIDC_AUDIENCE:-geostat-api}
+      OIDC_ROLES_CLAIM: ${OIDC_ROLES_CLAIM:-realm_access.roles}
+      OIDC_TENANT_CLAIM: ${OIDC_TENANT_CLAIM:-tenant_id}
+      OIDC_ROLE_AUTHORITY_MAP: ${OIDC_ROLE_AUTHORITY_MAP:-contract.read=READ_RESOURCE;contract.write=WRITE_RESOURCE;ingest.execute=WRITE_RESOURCE;quality.approve=PUBLISH_RESOURCE;publish.execute=PUBLISH_RESOURCE;raw.read=READ_RESOURCE;admin=ADMIN}
+      PLATFORM_CURSOR_SIGNING_SECRET: ${PLATFORM_CURSOR_SIGNING_SECRET}
+      STORAGE_ENDPOINT: ${STORAGE_ENDPOINT}
+      STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY}
+      STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY}
+      STORAGE_BUCKET_INGEST: ${STORAGE_BUCKET_INGEST:-geostat-ingest}
+      STORAGE_BUCKET_QUARANTINE: ${STORAGE_BUCKET_QUARANTINE:-geostat-quarantine}
+      STORAGE_BUCKET_ARCHIVE: ${STORAGE_BUCKET_ARCHIVE:-geostat-archive}
+      STORAGE_BUCKET_EXPORT: ${STORAGE_BUCKET_EXPORT:-geostat-export}
+      KIDS_SQL_PASSWORD: ${KIDS_SQL_PASSWORD}
+      PLATFORM_BOOTSTRAP_AUTH_ENABLED: ${PLATFORM_BOOTSTRAP_AUTH_ENABLED:-false}
+      PLATFORM_BOOTSTRAP_AUTH_TOKEN: ${PLATFORM_BOOTSTRAP_AUTH_TOKEN:-}
+      PLATFORM_RATE_LIMIT_REQUESTS: ${PLATFORM_RATE_LIMIT_REQUESTS:-120}
+      PLATFORM_RATE_LIMIT_WINDOW_MS: ${PLATFORM_RATE_LIMIT_WINDOW_MS:-60000}
+      PLATFORM_RATE_LIMIT_MAX_CLIENT_KEYS: ${PLATFORM_RATE_LIMIT_MAX_CLIENT_KEYS:-10000}
+      PLATFORM_RATE_LIMIT_REDIS_ENABLED: ${PLATFORM_RATE_LIMIT_REDIS_ENABLED:-false}
+      PLATFORM_RATE_LIMIT_REDIS_URL: ${PLATFORM_RATE_LIMIT_REDIS_URL:-}
+      PLATFORM_RATE_LIMIT_REDIS_KEY_PREFIX: ${PLATFORM_RATE_LIMIT_REDIS_KEY_PREFIX:-geostat:rate-limit}
+      OTEL_METRICS_ENABLED: ${OTEL_METRICS_ENABLED:-false}
+      OTEL_METRICS_ENDPOINT: ${OTEL_METRICS_ENDPOINT:-http://geostat-otel-collector:4318/v1/metrics}
+      OTEL_METRICS_STEP: ${OTEL_METRICS_STEP:-60s}
+      PLATFORM_QUERY_COST_MAX: ${PLATFORM_QUERY_COST_MAX:-5000}
+      PLATFORM_QUERY_MAX_EXPORT_BYTES: ${PLATFORM_QUERY_MAX_EXPORT_BYTES:-52428800}
+      PLATFORM_QUERY_MAX_REQUEST_BYTES: ${PLATFORM_QUERY_MAX_REQUEST_BYTES:-262144}
+      PLATFORM_CORS_ALLOWED_ORIGINS: ${PLATFORM_CORS_ALLOWED_ORIGINS}
+      PLATFORM_CORS_ALLOWED_ORIGIN_PATTERNS: ${PLATFORM_CORS_ALLOWED_ORIGIN_PATTERNS:-}
+      PLATFORM_MAX_ACCESS_ARTIFACT_BYTES: ${PLATFORM_MAX_ACCESS_ARTIFACT_BYTES:-1073741824}
+    volumes:
+      - api-storage:/app/storage
+      - api-uploads:/app/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8081/health | grep -q UP"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
