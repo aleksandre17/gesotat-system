@@ -20,4 +20,6 @@ The complete KIDS reference and preserved source extraction are included in the 
 
 Current release identity is `KIDS_PORTAL_V1` revision 8, artifact `platform/apps/geostat/backend/api/kids-portal-v1-canonical-r8-final.accdb`, with migrations 071–074 and the acceptance evidence recorded in the current status document.
 
+The Linux Docker host map (prod and remote-dev lines, shared infrastructure, IPs, pseudo-domains, ports, images and risks) is [Server Topology](reference/SERVER-TOPOLOGY.html); published view: <https://claude.ai/artifact/6frDAfNHEvgT2KQyNomuwT> (snapshot 2026-09-17).
+
 For the implementation-ready API handoff (page map, discovery, entity/statistical requests, relation includes, pagination, errors and release checklist), see [KIDS R8 API delivery runbook](kids-r8-api-delivery-runbook.md).

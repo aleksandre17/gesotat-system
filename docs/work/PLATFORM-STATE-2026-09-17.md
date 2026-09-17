@@ -121,6 +121,8 @@ Frontend decisions: anonymous vs OIDC pages 8–12, public API origin, section�
 
 ## 6. Remote dev გარემო (192.168.1.199)
 
+სრული ტოპოლოგიის რუკა: [`docs/reference/SERVER-TOPOLOGY.html`](../reference/SERVER-TOPOLOGY.html) · ონლაინ: <https://claude.ai/artifact/6frDAfNHEvgT2KQyNomuwT>
+
 | Container | Port | სტატუსი |
 |---|---|---|
 | `geostat-system-app-dev` | 5176 | UP, HTTP 200 |

@@ -1,0 +1,316 @@
+<title>GeoStat Server Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;700&family=Noto+Serif+Georgian:wght@600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ground:#F3F5F7; --paper:#FFFFFF; --ink:#16202A; --ink-2:#4A5866; --ink-3:#7A8794;
+  --rule:#D9E0E6; --rule-2:#E8EDF1;
+  --prod:#2F4FA8; --prod-soft:#E6ECF9; --prod-line:#9DB0E3;
+  --dev:#A8620F; --dev-soft:#FBF0E1; --dev-line:#E4B57A;
+  --shared:#1F7A6D; --shared-soft:#E2F2EF; --shared-line:#8CC7BD;
+  --ext:#6B4FA0; --ext-soft:#EFEAF7;
+  --warn:#B3261E; --warn-soft:#FCE9E7;
+  --sans:"Noto Sans Georgian","Segoe UI",system-ui,sans-serif;
+  --serif:"Noto Serif Georgian","Noto Sans Georgian",Georgia,serif;
+  --mono:"JetBrains Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0F1419; --paper:#161D24; --ink:#E6ECF1; --ink-2:#A9B6C2; --ink-3:#7C8995;
+  --rule:#2A3440; --rule-2:#212A33;
+  --prod:#8FA8F0; --prod-soft:#1B2644; --prod-line:#3A4F85;
+  --dev:#F0B062; --dev-soft:#33250F; --dev-line:#7A5520;
+  --shared:#6FD1C0; --shared-soft:#12302B; --shared-line:#2E6B61;
+  --ext:#B9A2E8; --ext-soft:#281F3A;
+  --warn:#FF8A80; --warn-soft:#3A1614;
+}}
+:root[data-theme="dark"]{
+  --ground:#0F1419; --paper:#161D24; --ink:#E6ECF1; --ink-2:#A9B6C2; --ink-3:#7C8995;
+  --rule:#2A3440; --rule-2:#212A33;
+  --prod:#8FA8F0; --prod-soft:#1B2644; --prod-line:#3A4F85;
+  --dev:#F0B062; --dev-soft:#33250F; --dev-line:#7A5520;
+  --shared:#6FD1C0; --shared-soft:#12302B; --shared-line:#2E6B61;
+  --ext:#B9A2E8; --ext-soft:#281F3A;
+  --warn:#FF8A80; --warn-soft:#3A1614;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font:15px/1.55 var(--sans);margin:0;padding-inline:20px;padding-block:32px 64px}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:28px}
+code,.mono{font-family:var(--mono);font-size:.86em}
+h1,h2{font-family:var(--serif);text-wrap:balance;margin:0}
+h1{font-size:clamp(26px,3.4vw,36px);line-height:1.2}
+h2{font-size:20px}
+.eyebrow{font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+header{display:grid;gap:14px}
+.lede{color:var(--ink-2);max-width:68ch;margin:0}
+.host{display:flex;flex-wrap:wrap;gap:8px 20px;font-family:var(--mono);font-size:13px;color:var(--ink-2);padding:12px 16px;background:var(--paper);border:1px solid var(--rule);border-radius:6px}
+.host b{color:var(--ink);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+/* ---------- diagram ---------- */
+.map{background:var(--paper);border:1px solid var(--rule);border-radius:10px;padding:22px;display:grid;gap:18px}
+.tier-label{display:flex;align-items:baseline;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.tier-label .mono{color:var(--ink-3)}
+.entry{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.port{border:1px solid var(--rule);border-radius:6px;padding:10px 12px;display:grid;gap:3px;background:var(--ground)}
+.port .n{font:600 20px/1 var(--mono);font-variant-numeric:tabular-nums}
+.port .d{font-size:12.5px;color:var(--ink-2)}
+.port.prod{border-color:var(--prod-line)} .port.prod .n{color:var(--prod)}
+.port.dev{border-color:var(--dev-line)} .port.dev .n{color:var(--dev)}
+.port.shared{border-color:var(--shared-line)} .port.shared .n{color:var(--shared)}
+.flow{height:22px;display:grid;place-items:center;color:var(--ink-3);font:12px var(--mono)}
+.flow::before{content:"";display:block;width:1px;height:100%;background:repeating-linear-gradient(var(--ink-3) 0 4px,transparent 4px 8px)}
+
+.lanes{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.lane{border-radius:8px;padding:16px;display:grid;gap:12px;align-content:start}
+.lane.prod{background:var(--prod-soft);border:1px solid var(--prod-line)}
+.lane.dev{background:var(--dev-soft);border:1px solid var(--dev-line)}
+.lane-h{display:grid;gap:4px}
+.lane-h h2{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.lane.prod h2{color:var(--prod)} .lane.dev h2{color:var(--dev)}
+.lane-h p{margin:0;font-size:13px;color:var(--ink-2)}
+.tag{font:600 10.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:4px 7px;border-radius:4px;border:1px solid currentColor}
+
+.svc{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:12px 14px;display:grid;gap:8px}
+.svc-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.svc-name{font:600 14px var(--mono);word-break:break-all}
+.svc-role{font-size:12.5px;color:var(--ink-2)}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:3px 12px;font-size:12.5px;margin:0}
+.kv dt{color:var(--ink-3)}
+.kv dd{margin:0;font-family:var(--mono);font-size:12px;word-break:break-word}
+.pub{font:600 12px var(--mono);padding:3px 7px;border-radius:4px;white-space:nowrap}
+.lane.prod .pub{background:var(--prod-soft);color:var(--prod)}
+.lane.dev .pub{background:var(--dev-soft);color:var(--dev)}
+.pub.none{background:var(--rule-2);color:var(--ink-3)}
+.flag{display:flex;gap:8px;font-size:12.5px;color:var(--warn);background:var(--warn-soft);border-radius:5px;padding:7px 9px;line-height:1.45}
+.flag b{font-family:var(--mono);font-weight:600}
+
+.net{border:1px solid var(--shared-line);background:var(--shared-soft);border-radius:8px;padding:16px;display:grid;gap:12px}
+.net h2{color:var(--shared)}
+.infra{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.infra .svc .pub{background:var(--shared-soft);color:var(--shared)}
+.aliases{display:flex;flex-wrap:wrap;gap:5px}
+.alias{font:500 11.5px var(--mono);padding:2px 6px;border-radius:4px;background:var(--rule-2);color:var(--ink-2)}
+.alias.dom{background:var(--shared-soft);color:var(--shared);font-weight:600}
+
+.ext{border:1px dashed var(--ext);background:var(--ext-soft);border-radius:8px;padding:14px 16px;display:grid;gap:6px}
+.ext h2{color:var(--ext);font-size:17px}
+.ext p{margin:0;font-size:13px;color:var(--ink-2)}
+
+/* ---------- tables ---------- */
+section{display:grid;gap:12px}
+.tbl{overflow-x:auto;background:var(--paper);border:1px solid var(--rule);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule-2);vertical-align:top}
+th{font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);background:var(--ground)}
+td.m{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.line{display:inline-block;font:600 10.5px/1 var(--mono);padding:4px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:.06em}
+.line.prod{background:var(--prod-soft);color:var(--prod)}
+.line.dev{background:var(--dev-soft);color:var(--dev)}
+.line.shared{background:var(--shared-soft);color:var(--shared)}
+
+.routes{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.route{background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:12px 14px;display:grid;gap:4px}
+.route .p{font:600 14px var(--mono);color:var(--shared)}
+.route .t{font:12.5px var(--mono);color:var(--ink-2)}
+.route .w{font-size:12.5px;color:var(--ink-3)}
+
+.notes{display:grid;gap:10px}
+.note{display:grid;grid-template-columns:auto 1fr;gap:12px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:12px 14px;font-size:13.5px}
+.sev{font:600 10.5px/1 var(--mono);text-transform:uppercase;letter-spacing:.06em;padding:5px 7px;border-radius:4px;height:max-content}
+.sev.hi{background:var(--warn-soft);color:var(--warn)}
+.sev.md{background:var(--dev-soft);color:var(--dev)}
+.sev.lo{background:var(--rule-2);color:var(--ink-2)}
+.note p{margin:0}
+footer{font-size:12.5px;color:var(--ink-3)}
+@media (max-width:820px){.lanes{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">Linux · Docker · geostat</span>
+  <h1>GeoStat-ის სერვერის რუკა: prod და remote-dev</h1>
+  <p class="lede">ერთ Linux ჰოსტზე ორი გარემოს ხაზი — <b>prod</b> (ძველი, უცვლელი) და <b>remote-dev</b> (prod-ის პროტოტიპი, prod profile + OIDC). ორივე ხაზი იყენებს ერთ საერთო ინფრასტრუქტურას <code>geostat-net</code>-ზე.</p>
+  <div class="host">
+    <span>host <b>ubuntu</b></span>
+    <span>LAN <b>192.168.1.199</b></span>
+    <span>docker bridge <b>172.17.0.1</b></span>
+    <span>geostat-net <b>172.23.0.0/16</b></span>
+    <span>snapshot <b>2026-09-17 11:00 +04</b></span>
+  </div>
+  <div class="legend">
+    <span><i class="sw" style="background:var(--prod)"></i>prod ხაზი</span>
+    <span><i class="sw" style="background:var(--dev)"></i>remote-dev ხაზი</span>
+    <span><i class="sw" style="background:var(--shared)"></i>საერთო ინფრასტრუქტურა</span>
+    <span><i class="sw" style="background:var(--ext)"></i>გარე სისტემა</span>
+    <span><i class="sw" style="background:var(--warn)"></i>რისკი</span>
+  </div>
+</header>
+
+<div class="map" role="figure" aria-label="geostat Docker topology">
+  <div class="tier-label"><h2>შესასვლელი: host პორტები</h2><span class="mono">http(s)://192.168.1.199:&lt;port&gt;</span></div>
+  <div class="entry">
+    <div class="port shared"><span class="n">443</span><span class="d">edge · HTTPS · *.geostat.internal</span></div>
+    <div class="port prod"><span class="n">5175</span><span class="d">prod UI (nginx)</span></div>
+    <div class="port prod"><span class="n">8083</span><span class="d">prod API</span></div>
+    <div class="port prod"><span class="n">8082</span><span class="d">prod mobile API</span></div>
+    <div class="port dev"><span class="n">5176</span><span class="d">dev UI (Vite)</span></div>
+    <div class="port dev"><span class="n">8081</span><span class="d">dev API (bootRun)</span></div>
+  </div>
+  <div class="flow" aria-hidden="true"></div>
+
+  <div class="lanes">
+    <div class="lane prod">
+      <div class="lane-h">
+        <h2>Prod <span class="tag">legacy · არ ეხება</span></h2>
+        <p>Immutable image-ები · <code>SPRING_PROFILES_ACTIVE=prod</code> · DB: 192.168.0.230</p>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><span class="svc-name">geostat-system-app</span><span class="pub">:5175 → 80</span></div>
+        <span class="svc-role">Control-plane UI, სტატიკური build</span>
+        <dl class="kv"><dt>image</dt><dd>nginx:1.27-alpine</dd><dt>network</dt><dd>bridge · 172.17.0.2</dd></dl>
+        <div class="flag">⚠ <span>geostat-net-ზე <b>არ არის</b>; edge მას ჰოსტის პორტით (host.docker.internal:5175) წვდება.</span></div>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><span class="svc-name">geostat-api</span><span class="pub">:8083 → 8081</span></div>
+        <span class="svc-role">Platform API, jar image</span>
+        <dl class="kv"><dt>image</dt><dd>api-api</dd><dt>ip</dt><dd>172.23.0.3</dd><dt>aliases</dt><dd>geostat-api · api</dd><dt>compose</dt><dd>~/geostat/backend/api</dd><dt>DB</dt><dd>192.168.0.230 (system · data · archive · auto)</dd></dl>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><span class="svc-name">geostat-mobile</span><span class="pub">:8082 → 8082</span></div>
+        <span class="svc-role">Mobile API</span>
+        <dl class="kv"><dt>image</dt><dd>mobile-mobile</dd><dt>ip</dt><dd>172.23.0.2</dd><dt>aliases</dt><dd>geostat-mobile · mobile</dd><dt>compose</dt><dd>~/geostat/backend/mobile</dd></dl>
+      </div>
+    </div>
+
+    <div class="lane dev">
+      <div class="lane-h">
+        <h2>Remote-dev <span class="tag">prod-ის პროტოტიპი</span></h2>
+        <p>stack-kit workspace · <code>SPRING_PROFILES_ACTIVE=prod</code> · OIDC on · shared compose base</p>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><span class="svc-name">geostat-system-app-dev</span><span class="pub">:5176 → 5175</span></div>
+        <span class="svc-role">Control-plane UI, Vite dev server</span>
+        <dl class="kv"><dt>image</dt><dd>geostat-system-app-dev</dd><dt>network</dt><dd>geostat-system-app-dev_default · 192.168.16.2</dd><dt>API</dt><dd>VITE_BASE_URL=http://192.168.1.199:8081</dd><dt>compose</dt><dd>~/geostat/frontend/compose/dev/geostat-system-app-dev</dd></dl>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><span class="svc-name">geostat-api-dev</span><span class="pub">:8081 → 8081</span></div>
+        <span class="svc-role">Platform API, source + bootRun</span>
+        <dl class="kv"><dt>image</dt><dd>geostat-api-dev-workspace</dd><dt>ip</dt><dd>172.23.0.14</dd><dt>aliases</dt><dd>geostat-api-dev · api</dd><dt>workspace</dt><dd>~/geostat/backend/workspace/geostat-api-dev</dd><dt>volumes</dt><dd>api-storage · api-uploads · public-truststore.p12:ro</dd></dl>
+        <div class="flag">⚠ <span>alias <b>api</b> ორივე API-ს აქვს: <b>api</b> სახელი prod-ზე ან dev-ზე შემთხვევით მიდის.</span></div>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><span class="svc-name">geostat-system-mssql</span><span class="pub none">internal 1433</span></div>
+        <span class="svc-role">dev SQL Server: geostat-system · geostat-data · geostat-archive</span>
+        <dl class="kv"><dt>image</dt><dd>mssql/server:2022-CU20-ubuntu-22.04</dd><dt>ip</dt><dd>172.23.0.13</dd><dt>compose</dt><dd>~/geostat/infra/geostat-system/compose</dd></dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow" aria-hidden="true"></div>
+
+  <div class="net">
+    <div class="tier-label"><h2>საერთო ინფრასტრუქტურა · geostat-net</h2><span class="mono">172.23.0.0/16 · ორივე ხაზი</span></div>
+    <div class="infra">
+      <div class="svc">
+        <div class="svc-top"><span class="svc-name">geostat-edge</span><span class="pub">:443</span></div>
+        <span class="svc-role">HTTPS edge, self-signed CN=geostat.internal</span>
+        <dl class="kv"><dt>image</dt><dd>nginx:1.29.1-alpine</dd><dt>ip</dt><dd>172.23.0.10 · 172.31.0.2</dd></dl>
+        <div class="aliases"><span class="alias dom">geostat.internal</span><span class="alias dom">api.geostat.internal</span><span class="alias dom">auth.geostat.internal</span></div>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><span class="svc-name">geostat-keycloak</span><span class="pub none">8080 · 8443 · 9000</span></div>
+        <span class="svc-role">OIDC · realm geostat</span>
+        <dl class="kv"><dt>image</dt><dd>keycloak:26.3.3</dd><dt>ip</dt><dd>172.23.0.9</dd><dt>issuer</dt><dd>https://auth.geostat.internal/realms/geostat</dd></dl>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><span class="svc-name">geostat-keycloak-db</span><span class="pub none">5432</span></div>
+        <span class="svc-role">Keycloak storage</span>
+        <dl class="kv"><dt>image</dt><dd>postgres:16.4-alpine</dd><dt>ip</dt><dd>172.23.0.6</dd></dl>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><span class="svc-name">geostat-minio</span><span class="pub none">9000 · 9001</span></div>
+        <span class="svc-role">S3: ingest · quarantine · archive · export</span>
+        <dl class="kv"><dt>image</dt><dd>minio:RELEASE.2025-09-07T16-13-09Z</dd><dt>ip</dt><dd>172.23.0.5</dd><dt>alias</dt><dd>minio</dd></dl>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><span class="svc-name">geostat-redis</span><span class="pub none">6379</span></div>
+        <span class="svc-role">Rate-limit storage (ამჟამად disabled)</span>
+        <dl class="kv"><dt>image</dt><dd>redis:7.4.2-alpine</dd><dt>ip</dt><dd>172.23.0.7</dd></dl>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><span class="svc-name">geostat-otel-collector</span><span class="pub none">4317 · 4318</span></div>
+        <span class="svc-role">OTLP metrics/traces</span>
+        <dl class="kv"><dt>image</dt><dd>otel-collector-contrib:0.135.0</dd><dt>ip</dt><dd>172.23.0.8</dd></dl>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><span class="svc-name">geostat-prometheus</span><span class="pub none">9090</span></div>
+        <span class="svc-role">Metrics store</span>
+        <dl class="kv"><dt>image</dt><dd>prom/prometheus:v3.5.0</dd><dt>ip</dt><dd>172.23.0.11</dd></dl>
+      </div>
+      <div class="svc">
+        <div class="svc-top"><span class="svc-name">geostat-grafana</span><span class="pub none">3000</span></div>
+        <span class="svc-role">Dashboards</span>
+        <dl class="kv"><dt>image</dt><dd>grafana/grafana:12.1.1</dd><dt>ip</dt><dd>172.23.0.12</dd></dl>
+      </div>
+    </div>
+  </div>
+
+  <div class="flow" aria-hidden="true"></div>
+
+  <div class="ext">
+    <h2>გარე სისტემა · 192.168.0.230</h2>
+    <p>Legacy SQL Server (ძველი TLS). Prod: primary · data · archive · secondary (<code>auto</code>). Remote-dev: მხოლოდ secondary (<code>auto</code>); დანარჩენი — <code>geostat-system-mssql</code>.</p>
+  </div>
+</div>
+
+<section>
+  <h2>Edge-ის მარშრუტები · https://*.geostat.internal</h2>
+  <div class="routes">
+    <div class="route"><span class="p">/api/</span><span class="t">→ http://geostat-api:8081</span><span class="w">მხოლოდ prod API. Dev API edge-ის უკან არ არის.</span></div>
+    <div class="route"><span class="p">/realms/</span><span class="t">→ https://geostat-keycloak:8443</span><span class="w">OIDC discovery, token, JWKS — ორივე ხაზი</span></div>
+    <div class="route"><span class="p">/</span><span class="t">→ http://host.docker.internal:5175</span><span class="w">prod UI ჰოსტის პორტით</span></div>
+    <div class="route"><span class="p">/healthz</span><span class="t">→ edge</span><span class="w">edge-ის საკუთარი health</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>სრული ცხრილი</h2>
+  <div class="tbl">
+  <table>
+    <thead><tr><th>ხაზი</th><th>container</th><th>image</th><th>host → container</th><th>IP</th><th>DNS / domain</th></tr></thead>
+    <tbody>
+      <tr><td><span class="line prod">prod</span></td><td class="m">geostat-system-app</td><td class="m">nginx:1.27-alpine</td><td class="m">5175 → 80</td><td class="m">172.17.0.2</td><td class="m">— (bridge)</td></tr>
+      <tr><td><span class="line prod">prod</span></td><td class="m">geostat-api</td><td class="m">api-api</td><td class="m">8083 → 8081</td><td class="m">172.23.0.3</td><td class="m">geostat-api, api</td></tr>
+      <tr><td><span class="line prod">prod</span></td><td class="m">geostat-mobile</td><td class="m">mobile-mobile</td><td class="m">8082 → 8082</td><td class="m">172.23.0.2</td><td class="m">geostat-mobile, mobile</td></tr>
+      <tr><td><span class="line dev">dev</span></td><td class="m">geostat-system-app-dev</td><td class="m">geostat-system-app-dev</td><td class="m">5176 → 5175</td><td class="m">192.168.16.2</td><td class="m">— (own network)</td></tr>
+      <tr><td><span class="line dev">dev</span></td><td class="m">geostat-api-dev</td><td class="m">geostat-api-dev-workspace</td><td class="m">8081 → 8081</td><td class="m">172.23.0.14</td><td class="m">geostat-api-dev, api</td></tr>
+      <tr><td><span class="line dev">dev</span></td><td class="m">geostat-system-mssql</td><td class="m">mssql/server:2022-CU20</td><td class="m">— · 1433</td><td class="m">172.23.0.13</td><td class="m">geostat-system-mssql</td></tr>
+      <tr><td><span class="line shared">shared</span></td><td class="m">geostat-edge</td><td class="m">nginx:1.29.1-alpine</td><td class="m">443 → 443</td><td class="m">172.23.0.10</td><td class="m">geostat.internal, api.geostat.internal, auth.geostat.internal</td></tr>
+      <tr><td><span class="line shared">shared</span></td><td class="m">geostat-keycloak</td><td class="m">keycloak:26.3.3</td><td class="m">— · 8080/8443/9000</td><td class="m">172.23.0.9</td><td class="m">keycloak</td></tr>
+      <tr><td><span class="line shared">shared</span></td><td class="m">geostat-keycloak-db</td><td class="m">postgres:16.4-alpine</td><td class="m">— · 5432</td><td class="m">172.23.0.6</td><td class="m">keycloak-db</td></tr>
+      <tr><td><span class="line shared">shared</span></td><td class="m">geostat-minio</td><td class="m">minio:RELEASE.2025-09-07</td><td class="m">— · 9000/9001</td><td class="m">172.23.0.5</td><td class="m">minio</td></tr>
+      <tr><td><span class="line shared">shared</span></td><td class="m">geostat-redis</td><td class="m">redis:7.4.2-alpine</td><td class="m">— · 6379</td><td class="m">172.23.0.7</td><td class="m">redis</td></tr>
+      <tr><td><span class="line shared">shared</span></td><td class="m">geostat-otel-collector</td><td class="m">otel-collector-contrib:0.135.0</td><td class="m">— · 4317/4318</td><td class="m">172.23.0.8</td><td class="m">otel-collector</td></tr>
+      <tr><td><span class="line shared">shared</span></td><td class="m">geostat-prometheus</td><td class="m">prom/prometheus:v3.5.0</td><td class="m">— · 9090</td><td class="m">172.23.0.11</td><td class="m">prometheus</td></tr>
+      <tr><td><span class="line shared">shared</span></td><td class="m">geostat-grafana</td><td class="m">grafana/grafana:12.1.1</td><td class="m">— · 3000</td><td class="m">172.23.0.12</td><td class="m">grafana</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>რისკები და შენიშვნები</h2>
+  <div class="notes">
+    <div class="note"><span class="sev hi">high</span><p><b>alias <code>api</code> დუბლია.</b> <code>geostat-api</code> და <code>geostat-api-dev</code> ორივე <code>api</code>-ა geostat-net-ზე, ასე რომ Docker DNS round-robin prod/dev-ს შორის. Edge სრული სახელს იყენებს, მაგრამ ყველა სხვა client-მა <code>geostat-api</code> ან <code>geostat-api-dev</code> უნდა გამოიყენოს; dev alias-ი უნდა მოისილდეს.</p></div>
+    <div class="note"><span class="sev md">medium</span><p><b>Dev API edge-ის უკან არ არის.</b> <code>api.geostat.internal/api/</code> prod-ზე მიდის. Dev HTTPS ტესტისთვის საჭიროა ცალკე ფსევდო-დომენი (მაგ. <code>api-dev.geostat.internal</code>).</p></div>
+    <div class="note"><span class="sev md">medium</span><p><b>UI-ები geostat-net-ზე არ არიან.</b> prod UI — default bridge, dev UI — საკუთარი ქსელი; edge prod UI-ს ჰოსტის პორტით წვდება.</p></div>
+    <div class="note"><span class="sev lo">info</span><p>ამ ჰოსტზე ასევე ცხოვრობს <code>geostat-chat-*</code>, <code>geostat-chat-ai-*</code>, <code>statdash-*</code>, <code>trade-*</code>, <code>national-accounts-app</code> — სხვა პროდუქტები, რუკაზე არ შედის.</p></div>
+  </div>
+</section>
+
+<footer>წყარო: <code>docker ps</code> / <code>docker inspect</code> და edge <code>nginx.conf</code>, 192.168.1.199 · IP-ები Docker-ის მიერ ინიჭებულია და restart-ზე შეიძლება შეიცვალოს.</footer>
+</div>
