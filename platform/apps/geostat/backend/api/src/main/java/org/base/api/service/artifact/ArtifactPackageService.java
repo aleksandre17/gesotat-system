@@ -71,7 +71,7 @@ public class ArtifactPackageService {
         }
         ArtifactManifest manifest = ArtifactManifestGenerator.generate(packageCode, objects.ingestBucket(), objectPrefix,
                 "s3://" + inventoryLocation.bucket() + "/" + inventoryLocation.key(), inventory);
-        return registerAndVerify(manifest);
+        return registerAndVerify(manifest, true);
     }
 
     /** Accepts a ZIP package: every entry is stored under its checksum key, then manifested and verified. */
@@ -111,7 +111,7 @@ public class ArtifactPackageService {
         } finally {
             if (buffer != null) try { Files.deleteIfExists(buffer); } catch (IOException ignored) { /* temp cleanup is best effort */ }
         }
-        return registerAndVerify(ArtifactManifestGenerator.generate(packageCode, objects.ingestBucket(), objectPrefix, "upload:" + packageCode, inventory));
+        return registerAndVerify(ArtifactManifestGenerator.generate(packageCode, objects.ingestBucket(), objectPrefix, "upload:" + packageCode, inventory), false);
     }
 
     /** Re-checks every object of a manifest against Object Storage (existence and full SHA-256). */
@@ -120,15 +120,17 @@ public class ArtifactPackageService {
         return verify(manifestId, false, null);
     }
 
-    private ManifestReceipt registerAndVerify(ArtifactManifest manifest) {
+    private ManifestReceipt registerAndVerify(ArtifactManifest manifest, boolean inspectStoredContent) {
         ArtifactObjectStore objects = requireStore();
         // Inventory import is an independent trust boundary: validate every staged object's
         // bytes before creating a manifest that can later be bound to a published snapshot.
-        for (ArtifactManifest.Entry entry : manifest.entries()) {
-            try (InputStream content = objects.open(new ArtifactObjectStore.ObjectLocation(entry.bucket(), entry.objectKey()))) {
-                contentTypes.verify(entry.originalPath(), content);
-            } catch (IOException error) {
-                throw new ArtifactStorageException("Artifact content could not be inspected", error);
+        if (inspectStoredContent) {
+            for (ArtifactManifest.Entry entry : manifest.entries()) {
+                try (InputStream content = objects.open(new ArtifactObjectStore.ObjectLocation(entry.bucket(), entry.objectKey()))) {
+                    contentTypes.verify(entry.originalPath(), content);
+                } catch (IOException error) {
+                    throw new ArtifactStorageException("Artifact content could not be inspected", error);
+                }
             }
         }
         ArtifactRegistry.Registration registration = registry.register(manifest);

@@ -388,5 +388,6 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   imports. CSV allows plain-text detection because generic MIME detectors do not distinguish delimited
   text from other UTF text. Type mismatches fail before registry registration.
 - **Evidence:** `ArtifactContentTypeVerifierTest`, ZIP spoof rejection and inventory-import spoof
-  rejection in `ArtifactPackageServiceTest`; full suite rerun pending. Malware scanning remains a
-  separate open control and this change does not claim virus-free content.
+  rejection in `ArtifactPackageServiceTest`; `:api:test` PASS — 181 tests, 0 failures/errors, 1 skipped
+  (64 artifact-related tests). Tika 4.0.0 is present in the remote dev API classpath and health is UP.
+  Malware scanning remains a separate open control and this change does not claim virus-free content.
