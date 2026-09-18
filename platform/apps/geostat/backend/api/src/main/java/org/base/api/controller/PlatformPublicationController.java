@@ -5,6 +5,8 @@ import org.base.api.service.platform.PlatformPublicationService;
 import org.base.api.service.platform.PublicationReceipt;
 import org.base.api.service.platform.PublishSnapshotRequest;
 import org.base.api.service.platform.RollbackPublicationRequest;
+import org.base.api.service.publication.gate.ReleaseGateService;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.base.core.anotation.Api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PlatformPublicationController {
     private final PlatformPublicationService publicationService;
+    private final ReleaseGateService releaseGates;
+
+    /** Evaluates every release gate on measured facts and records the evidence publication requires. */
+    @PostMapping("/snapshots/{snapshotId}/gates")
+    @PreAuthorize("hasAuthority('WRITE_RESOURCE')")
+    public ResponseEntity<ReleaseGateService.GateReport> evaluateGates(@PathVariable long snapshotId) {
+        return ResponseEntity.ok(releaseGates.evaluate(snapshotId));
+    }
 
     @PostMapping("/publish")
     @PreAuthorize("hasAuthority('PUBLISH_RESOURCE')")

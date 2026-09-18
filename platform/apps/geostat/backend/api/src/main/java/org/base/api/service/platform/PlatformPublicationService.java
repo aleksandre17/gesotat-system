@@ -1,6 +1,7 @@
 package org.base.api.service.platform;
 
 import org.base.api.service.artifact.ArtifactReconciliationService;
+import org.base.api.service.publication.gate.ReleaseGateService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -14,17 +15,19 @@ public class PlatformPublicationService {
     private final PublicationControlStore controlStore;
     private final PlatformClassificationMirrorService classifications;
     private final ArtifactReconciliationService artifactGate;
+    private final ReleaseGateService releaseGates;
 
     public PlatformPublicationService(@Qualifier("dataPlaneJdbcTemplate") JdbcTemplate dataPlane,
                                       @Qualifier("primaryJdbcTemplate") JdbcTemplate controlPlane,
                                       DataPlanePublicationWriter dataPlaneWriter, PublicationControlStore controlStore, PlatformClassificationMirrorService classifications,
-                                      ArtifactReconciliationService artifactGate) {
+                                      ArtifactReconciliationService artifactGate, ReleaseGateService releaseGates) {
         this.dataPlane = dataPlane;
         this.controlPlane = controlPlane;
         this.dataPlaneWriter = dataPlaneWriter;
         this.controlStore = controlStore;
         this.classifications = classifications;
         this.artifactGate = artifactGate;
+        this.releaseGates = releaseGates;
     }
 
     public PublicationReceipt publish(PublishSnapshotRequest request) {
@@ -33,7 +36,7 @@ public class PlatformPublicationService {
         Long rowCount = dataPlane.query("SELECT row_count FROM publication.dataset_snapshot WHERE dataset_snapshot_id=? AND dataset_version_id=? AND status='REVIEW_REQUIRED'",
                 rs -> rs.next() ? rs.getLong(1) : null, request.datasetSnapshotId(), request.datasetVersionId());
         if (rowCount == null) throw new IllegalStateException("Snapshot is not in REVIEW_REQUIRED state");
-        assertReleaseGates(request.datasetSnapshotId());
+        releaseGates.requireReleasable(request.datasetSnapshotId());
         artifactGate.requirePassIfDeclared(request.datasetSnapshotId(), request.datasetVersionId());
         long releaseId = controlStore.createIntent(request);
         PublicationReceipt receipt = dataPlaneWriter.publish(request, releaseId, rowCount);
@@ -51,16 +54,6 @@ public class PlatformPublicationService {
                 "WHERE d.product_id=? AND c.status='ACTIVE' " +
                 "AND s.status='APPROVED' AND r.lifecycle_status='APPROVED'", rs -> rs.next() ? rs.getInt(1) : 0, productId);
         if (ok == null || ok == 0) throw new IllegalStateException("Publication requires an ACTIVE ingestion contract and APPROVED site/ingestion revision");
-    }
-
-    /** Publication is fail-closed until every declared release gate has PASS evidence. */
-    private void assertReleaseGates(long datasetSnapshotId) {
-        Integer passed = dataPlane.query("SELECT COUNT(DISTINCT gate_code) FROM publication.release_gate_audit " +
-                "WHERE dataset_snapshot_id=? AND result='PASS' AND gate_code IN " +
-                "('SCHEMA_VALID','KEYS_VALID','RELATIONS_VALID','CLASSIFIERS_VALID','STATISTICAL_SEMANTICS_VALID','RAW_LINEAGE_VALID','PUBLICATION_ATOMIC')",
-                rs -> rs.next() ? rs.getInt(1) : 0, datasetSnapshotId);
-        if (passed == null || passed != 7)
-            throw new IllegalStateException("Publication requires PASS evidence for all release gates");
     }
 
     public PublicationReceipt rollback(RollbackPublicationRequest request) {
