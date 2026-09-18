@@ -136,7 +136,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 
 - [ ] 14.1 Package upload orchestration across package checksum, approved contract revision, Access validation, manifest and relation state — OPEN
 - [ ] 14.2 Tenant/site/owner authorization is enforced from authenticated claims through dataset and artifact access — OPEN (current resource authority is global; do not treat as production tenant isolation)
-- [ ] 14.3 Provenance chain and scheduled missing/orphan/checksum/retention reconciliation jobs — PARTIAL (094 migration applied/read-back PASS; remote dev audit run 1 COMPLETED, 1 registered synthetic object correctly raised MISSING, API health all UP; full suite 212/0/0/1; evidence: `docs/evidence/artifact-integrity-audit-runtime-2026-09-18.json`. Orphan storage listing, locator/relation, snapshot/cache, retention and zero-drift jobs remain open.)
+- [ ] 14.3 Provenance chain and scheduled missing/orphan/checksum/retention reconciliation jobs — PARTIAL (094 registered-object audit migration applied/read-back PASS; remote dev object audit correctly raised MISSING for one retained synthetic object; scheduled relation audit wrote `ARTIFACT_RECONCILIATION=FAIL` for snapshots 16 and 31, each with 225 entities, 0 attachments, and 450 missing required slots; API health UP. Evidence: `docs/evidence/artifact-integrity-audit-runtime-2026-09-18.json` and `docs/evidence/artifact-relation-integrity-audit-runtime-2026-09-18.json`. Storage orphan listing, locator audit, snapshot/cache parity, retention and zero-drift jobs remain open.)
 - [ ] 14.4 One-click operator experience and progress/retry surface — OPEN
 - [ ] 14.5 Rollback, replay, load/performance and recovery evidence — OPEN
 

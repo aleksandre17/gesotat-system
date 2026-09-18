@@ -131,6 +131,7 @@ platform:
     integrity-audit-issue-retry-minutes: ${PLATFORM_ARTIFACT_INTEGRITY_AUDIT_ISSUE_RETRY_MINUTES:10}
     integrity-audit-lease-minutes: ${PLATFORM_ARTIFACT_INTEGRITY_AUDIT_LEASE_MINUTES:30}
     integrity-audit-max-bytes-per-run: ${PLATFORM_ARTIFACT_INTEGRITY_AUDIT_MAX_BYTES_PER_RUN:2147483648}
+    relation-audit-batch-size: ${PLATFORM_ARTIFACT_RELATION_AUDIT_BATCH_SIZE:100}
     report-issue-limit: ${PLATFORM_ARTIFACT_REPORT_ISSUE_LIMIT:200}
     malware-scan-required: ${PLATFORM_ARTIFACT_MALWARE_SCAN_REQUIRED:true}
     malware-scanner-host: ${PLATFORM_ARTIFACT_MALWARE_SCANNER_HOST:}

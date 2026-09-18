@@ -30,6 +30,7 @@ public class ArtifactProperties {
     private int integrityAuditIssueRetryMinutes = 10;
     private int integrityAuditLeaseMinutes = 30;
     private long integrityAuditMaxBytesPerRun = 2L * 1024 * 1024 * 1024;
+    private int relationAuditBatchSize = 100;
     /** Upper bound of findings returned in one report; counts per code are always complete. */
     private int reportIssueLimit = 200;
     /** Artifact admission is fail-closed unless an operational malware scanner returns CLEAN. */
@@ -57,6 +58,7 @@ public class ArtifactProperties {
                 || integrityAuditIssueRetryMinutes <= 0
                 || integrityAuditLeaseMinutes <= 0 || integrityAuditLeaseMinutes > Integer.MAX_VALUE / 2
                 || integrityAuditMaxBytesPerRun < maxEntryBytes
+                || relationAuditBatchSize <= 0
                 || reportIssueLimit <= 0 || malwareScannerPort < 1 || malwareScannerPort > 65535
                 || malwareScannerTimeoutMillis <= 0 || malwareScannerMaxBytes <= 0)
             throw new IllegalStateException("platform.artifacts limits must be positive and maxPackageBytes >= maxEntryBytes");
@@ -101,6 +103,8 @@ public class ArtifactProperties {
     public void setIntegrityAuditLeaseMinutes(int integrityAuditLeaseMinutes) { this.integrityAuditLeaseMinutes = integrityAuditLeaseMinutes; }
     public long getIntegrityAuditMaxBytesPerRun() { return integrityAuditMaxBytesPerRun; }
     public void setIntegrityAuditMaxBytesPerRun(long integrityAuditMaxBytesPerRun) { this.integrityAuditMaxBytesPerRun = integrityAuditMaxBytesPerRun; }
+    public int getRelationAuditBatchSize() { return relationAuditBatchSize; }
+    public void setRelationAuditBatchSize(int relationAuditBatchSize) { this.relationAuditBatchSize = relationAuditBatchSize; }
     public int getReportIssueLimit() { return reportIssueLimit; }
     public void setReportIssueLimit(int reportIssueLimit) { this.reportIssueLimit = reportIssueLimit; }
     public boolean isMalwareScanRequired() { return malwareScanRequired; }

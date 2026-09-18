@@ -506,6 +506,22 @@ remain separate required controls. Remote development acceptance and explicit
 scope limits are recorded in
 [`artifact-integrity-audit-runtime-2026-09-18.json`](../evidence/artifact-integrity-audit-runtime-2026-09-18.json).
 
+### Relation reconciliation sweep
+
+The API runs a bounded scheduled reconciliation over snapshots governed by
+approved or retired artifact relation definitions. It selects snapshots with
+no recent `ARTIFACT_RECONCILIATION` evidence, evaluates declared per-entity and
+language cardinalities, appends durable gate evidence, and refreshes a
+distributed job lease while processing the batch. Retired definitions remain
+eligible so historical snapshots retain their original contract semantics.
+A runtime `FAIL` is a data-integrity failure and blocks publication; successful
+execution of the job alone does not imply the data passed. On 2026-09-18, the
+remote development sweep evaluated snapshots 16 and 31 under dataset version
+73: each had 225 entities, zero attachments, and 450 missing required slots
+(`PRIMARY_FILE`, English and Georgian). The sweep is operational, while these
+historical snapshots are not attachment-ready. See
+[`artifact-relation-integrity-audit-runtime-2026-09-18.json`](../evidence/artifact-relation-integrity-audit-runtime-2026-09-18.json).
+
 ## 20. Acceptance checklist
 
 - [ ] package manifest validated;

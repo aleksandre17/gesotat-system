@@ -21,6 +21,10 @@ public class ArtifactContractResolver {
             "p.policy_code,p.revision,p.access_mode,p.required_authority,p.allowed_media_types_json,p.max_bytes,p.signed_url_ttl_seconds,p.retention_class " +
             "FROM platform.artifact_relation_definition d JOIN platform.artifact_policy p ON p.artifact_policy_id=d.artifact_policy_id " +
             "WHERE d.lifecycle_status='APPROVED' AND p.lifecycle_status='APPROVED' AND d.dataset_version_id=?";
+    private static final String RECONCILIATION_SELECT = "SELECT d.dataset_version_id,d.relation_code,d.artifact_role,d.min_per_row,d.max_per_row,d.ordered,d.match_rule_json," +
+            "p.policy_code,p.revision,p.access_mode,p.required_authority,p.allowed_media_types_json,p.max_bytes,p.signed_url_ttl_seconds,p.retention_class " +
+            "FROM platform.artifact_relation_definition d JOIN platform.artifact_policy p ON p.artifact_policy_id=d.artifact_policy_id " +
+            "WHERE d.lifecycle_status IN('APPROVED','RETIRED') AND p.lifecycle_status IN('APPROVED','RETIRED') AND d.dataset_version_id=?";
     private final JdbcTemplate controlPlane;
     private final ObjectMapper json;
     private final ArtifactMatchRules rules;
@@ -33,6 +37,19 @@ public class ArtifactContractResolver {
 
     public List<ArtifactRelationDefinition> approved(long datasetVersionId) {
         return controlPlane.query(SELECT + " ORDER BY d.relation_code", (rs, n) -> map(rs), datasetVersionId);
+    }
+
+    /** Active and retired immutable definitions used to re-evaluate existing snapshots. */
+    public List<ArtifactRelationDefinition> forReconciliation(long datasetVersionId) {
+        return controlPlane.query(RECONCILIATION_SELECT + " ORDER BY d.relation_code", (rs, n) -> map(rs), datasetVersionId);
+    }
+
+    /** Dataset versions with active or retired immutable artifact relation evidence. */
+    public List<Long> reconcilableDatasetVersions() {
+        return controlPlane.query("SELECT DISTINCT d.dataset_version_id FROM platform.artifact_relation_definition d " +
+                        "JOIN platform.artifact_policy p ON p.artifact_policy_id=d.artifact_policy_id " +
+                        "WHERE d.lifecycle_status IN('APPROVED','RETIRED') AND p.lifecycle_status IN('APPROVED','RETIRED') ORDER BY d.dataset_version_id",
+                (rs, n) -> rs.getLong(1));
     }
 
     public Optional<ArtifactRelationDefinition> approved(long datasetVersionId, String relationCode) {

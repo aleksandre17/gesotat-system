@@ -45,7 +45,7 @@ public class ArtifactReconciliationService {
     public ReconciliationReport reconcile(long datasetSnapshotId) {
         long datasetVersionId = attachments.snapshot(datasetSnapshotId)
                 .orElseThrow(() -> new ArtifactNotFoundException("Snapshot " + datasetSnapshotId + " not found")).datasetVersionId();
-        List<ArtifactRelationDefinition> definitions = contracts.approved(datasetVersionId);
+        List<ArtifactRelationDefinition> definitions = contracts.forReconciliation(datasetVersionId);
         if (definitions.isEmpty()) throw new IllegalStateException("Dataset version " + datasetVersionId + " declares no approved artifact relation");
         List<ArtifactReconciler.SlotCounts> counts = new ArrayList<>();
         for (ArtifactRelationDefinition definition : definitions)

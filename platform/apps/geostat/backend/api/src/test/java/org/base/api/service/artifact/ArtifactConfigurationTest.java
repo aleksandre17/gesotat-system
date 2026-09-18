@@ -40,6 +40,9 @@ class ArtifactConfigurationTest {
         ArtifactProperties audit = new ArtifactProperties();
         audit.setIntegrityAuditMaxBytesPerRun(1);
         assertThrows(IllegalStateException.class, audit::validate);
+        ArtifactProperties relationAudit = new ArtifactProperties();
+        relationAudit.setRelationAuditBatchSize(0);
+        assertThrows(IllegalStateException.class, relationAudit::validate);
     }
 
     @Test

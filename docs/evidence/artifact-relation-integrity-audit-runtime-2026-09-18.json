@@ -1,0 +1,55 @@
+{
+  "schema": "geostat.artifact-relation-integrity-audit-runtime.v1",
+  "recordedAt": "2026-09-18T10:17:15Z",
+  "scope": "bounded scheduled relation reconciliation for governed Data Plane snapshots",
+  "runtime": {
+    "environment": "remote dev API 192.168.1.199:8081; SQL Server container geostat-system-mssql; Data Plane geostat-data; Control Plane geostat-system",
+    "deployment": "geostat.ps1 api dev bootstrap api --no-build, then dev restart api",
+    "job": "ARTIFACT_RELATION_INTEGRITY_AUDIT",
+    "lease": "acquired and released; Control Plane lease row observed",
+    "health": "UP",
+    "datasetVersionId": 73,
+    "contractStatus": "APPROVED"
+  },
+  "snapshots": [
+    {
+      "datasetSnapshotId": 16,
+      "result": "FAIL",
+      "entities": 225,
+      "attachments": 0,
+      "expectedSlots": 450,
+      "missingSlots": 450,
+      "relation": "PRIMARY_FILE",
+      "languages": ["en", "ka"],
+      "attachmentChecksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "createdAt": "2026-09-18T10:17:15.6328438"
+    },
+    {
+      "datasetSnapshotId": 31,
+      "result": "FAIL",
+      "entities": 225,
+      "attachments": 0,
+      "expectedSlots": 450,
+      "missingSlots": 450,
+      "relation": "PRIMARY_FILE",
+      "languages": ["en", "ka"],
+      "attachmentChecksum": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "createdAt": "2026-09-18T10:17:15.6532933"
+    }
+  ],
+  "tests": {
+    "command": "./gradlew :api:test --rerun-tasks",
+    "tests": 215,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "result": "PASS"
+  },
+  "interpretation": "The scheduled job acquired the distributed lease, evaluated both due snapshots, and appended immutable gate evidence. The job is operational; both snapshots fail the approved relation cardinality because all expected attachments are absent. These snapshots are not attachment-ready and publication must remain blocked until the governed binding workflow supplies and reconciles the artifacts.",
+  "limits": [
+    "This job checks relation integrity only for snapshots governed by approved or retired relation definitions.",
+    "Storage orphan enumeration, orphan locators, snapshot/cache parity, retention reconciliation and full provenance zero-drift remain open under checklist item 14.3.",
+    "This remote development evidence does not establish production readiness or KIDS package acceptance."
+  ],
+  "status": "RELATION_AUDIT_RUNTIME_PASS_DATA_INTEGRITY_FAIL_PARTIAL_RECONCILIATION_SCOPE"
+}

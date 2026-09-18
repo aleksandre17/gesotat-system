@@ -34,6 +34,10 @@ public class ArtifactMetrics {
         count("geostat.artifact.integrity_audit", "result", result);
     }
 
+    public void relationAudit(String result) {
+        count("geostat.artifact.relation_audit", "result", result);
+    }
+
     public void download(String relationCode, String outcome) {
         MeterRegistry meters = registry.getIfAvailable();
         if (meters != null) meters.counter("geostat.artifact.download", "relation", relationCode, "outcome", outcome).increment();

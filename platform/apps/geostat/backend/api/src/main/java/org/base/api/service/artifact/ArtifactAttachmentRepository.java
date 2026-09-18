@@ -14,6 +14,8 @@ import java.util.Optional;
 /** Data Plane access for snapshots, their entity rows and artifact attachment edges. SQL lives only here. */
 @Repository
 public class ArtifactAttachmentRepository {
+    /** Leaves room below SQL Server's 2,100-parameter ceiling for query controls and predicates. */
+    private static final int DATASET_VERSION_QUERY_CHUNK = 1800;
     private final JdbcTemplate dataPlane;
     private final ObjectMapper json;
 
@@ -45,6 +47,40 @@ public class ArtifactAttachmentRepository {
         return dataPlane.query("SELECT dataset_version_id,status FROM publication.dataset_snapshot WHERE dataset_snapshot_id=?",
                 (rs, n) -> new SnapshotState(rs.getLong(1), rs.getString(2)), datasetSnapshotId).stream().findFirst();
     }
+
+    /** Oldest snapshots whose relation reconciliation is absent or past its configured refresh window. */
+    public List<Long> reconciliationCandidates(List<Long> datasetVersionIds, int limit, int recheckMinutes) {
+        if (datasetVersionIds == null || datasetVersionIds.isEmpty()) return List.of();
+        if (limit <= 0 || recheckMinutes <= 0) throw new IllegalArgumentException("Reconciliation bounds must be positive");
+        List<SnapshotAuditCandidate> candidates = new java.util.ArrayList<>();
+        for (int offset = 0; offset < datasetVersionIds.size(); offset += DATASET_VERSION_QUERY_CHUNK) {
+            List<Long> chunk = datasetVersionIds.subList(offset, Math.min(offset + DATASET_VERSION_QUERY_CHUNK, datasetVersionIds.size()));
+            String placeholders = String.join(",", java.util.Collections.nCopies(chunk.size(), "?"));
+            String age = "COALESCE((SELECT MAX(a.created_at) FROM publication.release_gate_audit a " +
+                    "WHERE a.dataset_snapshot_id=s.dataset_snapshot_id AND a.gate_code=?),CONVERT(DATETIME2,'19000101'))";
+            String sql = "SELECT TOP (?) s.dataset_snapshot_id," + age + " AS last_reconciled_at FROM publication.dataset_snapshot s " +
+                    "WHERE s.dataset_version_id IN (" + placeholders + ") AND NOT EXISTS(" +
+                    "SELECT 1 FROM publication.release_gate_audit a WHERE a.dataset_snapshot_id=s.dataset_snapshot_id " +
+                    "AND a.gate_code=? AND a.created_at>DATEADD(MINUTE,-?,SYSUTCDATETIME())) " +
+                    "ORDER BY last_reconciled_at,s.dataset_snapshot_id";
+            java.util.ArrayList<Object> arguments = new java.util.ArrayList<>(chunk.size() + 4);
+            arguments.add(limit);
+            arguments.add(ArtifactReconciliationService.GATE_CODE);
+            arguments.addAll(chunk);
+            arguments.add(ArtifactReconciliationService.GATE_CODE);
+            arguments.add(recheckMinutes);
+            candidates.addAll(dataPlane.query(sql, (rs, n) -> {
+                java.sql.Timestamp audited = rs.getTimestamp("last_reconciled_at");
+                return new SnapshotAuditCandidate(rs.getLong("dataset_snapshot_id"), audited == null ? null : audited.toInstant());
+            }, arguments.toArray()));
+        }
+        return candidates.stream().sorted(java.util.Comparator.comparing(SnapshotAuditCandidate::lastReconciledAt,
+                        java.util.Comparator.nullsFirst(java.util.Comparator.naturalOrder()))
+                .thenComparingLong(SnapshotAuditCandidate::snapshotId)).limit(limit)
+                .map(SnapshotAuditCandidate::snapshotId).toList();
+    }
+
+    private record SnapshotAuditCandidate(long snapshotId, java.time.Instant lastReconciledAt) {}
 
     public List<ArtifactMatcher.SourceRow> sourceRows(long datasetSnapshotId) {
         return dataPlane.query("SELECT entity_id,external_key,source_record_id,payload_json FROM entity.entity_record WHERE dataset_snapshot_id=? AND external_key IS NOT NULL",
