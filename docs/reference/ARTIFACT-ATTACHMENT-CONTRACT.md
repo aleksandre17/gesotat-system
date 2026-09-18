@@ -502,7 +502,9 @@ object aggregates repeat detections and is resolved by a later verified read.
 Storage/Data Plane failures leave the object due for retry. This sweep covers
 registered Data Plane objects only. Orphan storage enumeration, orphan locator
 and relation checks, snapshot/cache parity, and contract/documentation drift
-remain separate required controls.
+remain separate required controls. Remote development acceptance and explicit
+scope limits are recorded in
+[`artifact-integrity-audit-runtime-2026-09-18.json`](../evidence/artifact-integrity-audit-runtime-2026-09-18.json).
 
 ## 20. Acceptance checklist
 
@@ -770,11 +772,15 @@ forbidden.
 
 The KIDS source inventory has been staged as 719 files and 532 unique
 checksum-addressed objects under `geostat-ingest/kids/r8/resources/`, with an
-inventory manifest preserving every original path. The remaining implementation
-boundary is deterministic inventory-to-resource binding, persistence of
-`entity.resource_locator`/generic attachment relations, snapshot membership,
-checksum reconciliation and governed signed-download serving. Only after those
-checks reach `VERIFIED` may the frontend's static `public/files` copy be retired.
+inventory manifest preserving every original path. The conformance rule matches
+225 stable resource rows to exactly 450 language-specific file entries and 450
+distinct objects in test fixtures; the bucket inventory separately proves all
+532 physical objects match their content-addressed keys. Those proofs establish
+the row/path rule and stored inventory, but not runtime attachment state. Runtime
+import, persisted snapshot bindings, tenant/site authorization, full
+reconciliation and governed signed-download acceptance remain open. The
+frontend's static `public/files` copy must remain until those checks reach
+`VERIFIED`.
 
 ### 29.1 Implementation status (2026-09-18)
 
