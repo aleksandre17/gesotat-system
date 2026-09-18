@@ -130,7 +130,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [ ] 12.4 Bind (dry-run → write) on the KIDS_RESOURCE REVIEW snapshot + reconciliation PASS — READY (token)
 - [ ] 12.5 Signed download smoke (200, checksum equal) + 403/404/409 — READY (token + 13 EXT-4 for browser)
 - [x] 12.6 Evidence JSON + reference docs + ADR + AIR — DONE
-- [ ] 12.7 Upload bound is configurable across Spring multipart and artifact expansion budgets — READY (source/config/test deployed; runtime max-size assertion still pending)
+- [x] 12.7 Upload bound is configurable across Spring multipart and artifact expansion budgets — DONE (file/request limits are separate configurable settings; startup validation enforces file-size agreement and multipart framing capacity; remote dev booted healthy; `ArtifactConfigurationTest` PASS)
 
 ## 13. Remaining generic capability work
 

@@ -3,7 +3,7 @@
   "scope": "source-level implementation and regression evidence for artifact resumable upload sessions",
   "status": "PARTIAL_NOT_RUNTIME_ACCEPTED",
   "baselineCommit": "5b678d4",
-  "sourceCommit": "0e826b1",
+  "sourceCommit": "14f8ee8",
   "implementation": {
     "migration": "platform/apps/geostat/backend/core/src/main/resources/db/platform/093_artifact_upload_sessions.sql",
     "migrationRegistered": true,
@@ -25,8 +25,8 @@
     "targetedTests": "ArtifactUploadIdentityResolverTest and PlatformArtifactControllerTest PASS",
     "fullApiSuite": {
       "command": "./gradlew :api:test --no-daemon",
-      "tests": 202,
-      "artifactRelatedTests": 85,
+      "tests": 205,
+      "artifactRelatedTests": 88,
       "failures": 0,
       "errors": 0,
       "skipped": 1,
@@ -51,6 +51,8 @@
       "secondary": "UP"
     },
     "anonymousUploadSessionRequest": 401,
+    "multipartLimitStartupValidation": "PASS: API reached UP health with max-file-size bound to PLATFORM_ARTIFACT_MAX_UPLOAD_BYTES and max-request-size including multipart framing",
+    "uploadCleanupSchedulerStartupGate": "PASS: after the first scheduled interval, no invalid-object or upload-session SQL error; scheduler remains gated until ApplicationReadyEvent and when schema migrations are disabled",
     "migration093": {
       "status": "APPLIED",
       "controlLedgerChecksum": "db19191157a76ad2f64e5235721d4fa2534ed3c4efc089dbc44aa60eaa578ad4",
