@@ -40,6 +40,7 @@ public class ArtifactPackageService {
     private final ArtifactQuarantineRegistry quarantineRegistry;
     private final ArtifactPackageContractResolver packageContracts;
     private final ArtifactAccessPackageValidator accessPackageValidator;
+    private final ArtifactMalwareAdmission malwareAdmission;
 
     public record ManifestReceipt(long manifestId, boolean created, String packageChecksum, int entryCount, int objectCount,
                                   int verified, int missing, int checksumMismatch) {}
@@ -60,6 +61,7 @@ public class ArtifactPackageService {
         this.quarantineRegistry = quarantineRegistry;
         this.packageContracts = packageContracts;
         this.accessPackageValidator = accessPackageValidator;
+        this.malwareAdmission = new ArtifactMalwareAdmission(properties, malwareScanners, quarantineRegistry, metrics);
     }
 
     /**
@@ -258,46 +260,7 @@ public class ArtifactPackageService {
 
     private void scanForMalware(Path content, ArtifactObjectStore objects, String packageCode, String originalPath,
                                 String sha256, long byteSize, String sourceType) {
-        boolean configured = properties.getMalwareScannerHost() != null && !properties.getMalwareScannerHost().isBlank();
-        if (!configured && !properties.isMalwareScanRequired()) return;
-        ArtifactMalwareScanner scanner = malwareScanners.getIfAvailable();
-        if (scanner == null) {
-            metrics.malwareScan("unavailable");
-            throw new ArtifactScannerUnavailableException("Required malware scanner is not configured");
-        }
-        ArtifactMalwareScanner.ScanResult result;
-        try {
-            result = scanner.scan(content);
-        } catch (ArtifactScannerUnavailableException unavailable) {
-            metrics.malwareScan("unavailable");
-            throw unavailable;
-        } catch (IllegalArgumentException invalid) {
-            throw invalid;
-        } catch (RuntimeException failure) {
-            metrics.malwareScan("unavailable");
-            throw new ArtifactScannerUnavailableException("Required malware scanner did not return a verdict", failure);
-        }
-        if (result == null || result.verdict() == null) {
-            metrics.malwareScan("unavailable");
-            throw new ArtifactScannerUnavailableException("Required malware scanner returned no verdict");
-        }
-        if (result.verdict() == ArtifactMalwareScanner.Verdict.CLEAN) {
-            metrics.malwareScan("clean");
-            return;
-        }
-        metrics.malwareScan("infected");
-        if (result.verdict() == ArtifactMalwareScanner.Verdict.INFECTED) {
-            try (InputStream quarantinedContent = Files.newInputStream(content)) {
-                ArtifactObjectStore.ObjectLocation location = objects.putQuarantined(sha256, quarantinedContent, byteSize);
-                String sourceHash = quarantineSourceHash(packageCode, sourceType, originalPath, sha256);
-                quarantineRegistry.record(sha256, byteSize, location, sourceType, sourceHash, "CLAMAV", result.signature());
-                log.warn("artifact.malware_quarantined sha256={} bytes={} sourceType={} quarantineBucket={} quarantineKeyHash={}",
-                        sha256, byteSize, sourceType, location.bucket(), sha256(location.key().getBytes(java.nio.charset.StandardCharsets.UTF_8)));
-            } catch (IOException error) {
-                throw new ArtifactStorageException("Rejected content could not be quarantined", error);
-            }
-            throw new ArtifactMalwareDetectedException();
-        }
+        malwareAdmission.admit(content, objects, packageCode, originalPath, sha256, byteSize, sourceType);
     }
 
     private static String sha256(Path path) throws IOException {
@@ -321,27 +284,5 @@ public class ArtifactPackageService {
         }
     }
 
-    private static String quarantineSourceHash(String packageCode, String sourceType, String originalPath, String sha256) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            try (java.io.DataOutputStream canonical = new java.io.DataOutputStream(
-                    new DigestOutputStream(OutputStream.nullOutputStream(), digest))) {
-                writeString(canonical, packageCode);
-                writeString(canonical, sourceType);
-                writeString(canonical, originalPath);
-                writeString(canonical, sha256);
-            }
-            return hex(digest.digest());
-        } catch (java.security.NoSuchAlgorithmException impossible) {
-            throw new IllegalStateException("SHA-256 is unavailable", impossible);
-        } catch (IOException impossible) {
-            throw new IllegalStateException("Quarantine reference could not be encoded", impossible);
-        }
-    }
 
-    private static void writeString(java.io.DataOutputStream out, String value) throws IOException {
-        byte[] bytes = value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
-        out.writeInt(bytes.length);
-        out.write(bytes);
-    }
 }
