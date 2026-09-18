@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.zip.ZipFile;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import com.healthmarketscience.jackcess.DatabaseBuilder;
 
 /**
  * Checks that bytes agree with the media type inferred from the package path. The path is used
@@ -30,6 +31,7 @@ public final class ArtifactContentTypeVerifier {
                 && detected.equals("application/x-tika-ooxml") && hasSpreadsheetWorkbookPart(contentFile);
         boolean xls = declared.equals("application/vnd.ms-excel")
                 && detected.equals("application/x-tika-msoffice") && hasLegacyExcelWorkbookStream(contentFile);
+        boolean access = declared.equals("application/x-msaccess") && isReadableAccessDatabase(contentFile);
         boolean compatible = declared.equals(detected)
                 // Plain text detectors cannot distinguish CSV from other UTF text. The extension
                 // declares CSV semantics; binary data still resolves to a non-text MIME type.
@@ -37,11 +39,19 @@ public final class ArtifactContentTypeVerifier {
                 // tika-core deliberately reports Office containers at their container-family
                 // MIME. The extension supplies the narrower, contract-facing subtype only after
                 // those Office container bytes have independently been detected.
-                || xlsx || xls;
+                || xlsx || xls || access;
         if (!compatible) {
             throw new IllegalArgumentException("Package content does not match declared media type " + declared + "; detected " + detected);
         }
         return declared;
+    }
+
+    private static boolean isReadableAccessDatabase(Path path) {
+        try (var database = new DatabaseBuilder(path.toFile()).setReadOnly(true).open()) {
+            return !database.getTableNames().isEmpty();
+        } catch (IOException | RuntimeException invalidAccess) {
+            return false;
+        }
     }
 
     private static boolean hasSpreadsheetWorkbookPart(Path path) throws IOException {

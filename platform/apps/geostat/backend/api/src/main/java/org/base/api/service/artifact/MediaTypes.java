@@ -14,6 +14,7 @@ public final class MediaTypes {
     private MediaTypes() {}
 
     public static String forFileName(String fileName) {
+        if (fileName != null && fileName.toLowerCase(java.util.Locale.ROOT).endsWith(".accdb")) return "application/x-msaccess";
         return MediaTypeFactory.getMediaType(fileName).map(MediaType::toString).orElse(OCTET_STREAM);
     }
 }

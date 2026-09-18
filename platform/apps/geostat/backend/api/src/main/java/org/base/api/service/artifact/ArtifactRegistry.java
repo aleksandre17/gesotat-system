@@ -30,9 +30,10 @@ public class ArtifactRegistry {
     public Registration register(ArtifactManifest manifest) {
         Long existing = manifestId(manifest.packageChecksum());
         if (existing != null) return new Registration(existing, false);
-        long manifestId = dataPlane.queryForObject("INSERT INTO ingest.artifact_manifest(manifest_schema,package_code,package_checksum,generator_version,entry_count,source_reference) " +
-                        "OUTPUT INSERTED.artifact_manifest_id VALUES(?,?,?,?,?,?)", Long.class,
-                manifest.schema(), manifest.packageCode(), manifest.packageChecksum(), manifest.generatorVersion(), manifest.entries().size(), manifest.sourceReference());
+        long manifestId = dataPlane.queryForObject("INSERT INTO ingest.artifact_manifest(manifest_schema,package_code,package_checksum,generator_version,entry_count,source_reference,contract_code,contract_revision,dataset_version_id) " +
+                        "OUTPUT INSERTED.artifact_manifest_id VALUES(?,?,?,?,?,?,?,?,?)", Long.class,
+                manifest.schema(), manifest.packageCode(), manifest.packageChecksum(), manifest.generatorVersion(), manifest.entries().size(), manifest.sourceReference(),
+                manifest.contractCode(), manifest.contractRevision(), manifest.datasetVersionId());
         for (ArtifactManifest.Entry entry : manifest.entries()) {
             long objectId = objectId(entry);
             dataPlane.update("INSERT INTO ingest.artifact_version(artifact_manifest_id,original_path,original_name,artifact_object_id) VALUES(?,?,?,?)",

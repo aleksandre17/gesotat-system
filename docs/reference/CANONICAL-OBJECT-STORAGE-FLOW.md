@@ -255,8 +255,11 @@ typed data-სა და დროებით signed URL-ს.
 ## Implementation map (2026-09-18)
 
 ```text
-package (inventory | ZIP)          POST /api/v1/platform/artifacts/manifests/{inventory|package}
-  → manifest v1 + checksum keys    ArtifactManifestGenerator
+package inventory                 POST .../manifests/inventory (existing governed inventory)
+contract ZIP package              POST .../manifests/package?contractCode=&revision=&datasetCode=
+  → approved contract resolver    platform.site_contract_revision + site_contract_dataset/field
+  → Access schema validation       contract-declared Access table + required fields
+  → manifest v1 + checksum keys    contract revision + dataset version participate in package checksum
   → ingest.artifact_manifest / artifact_object / artifact_version
   → verify (stat + full SHA-256)   POST .../manifests/{id}/verification
 snapshot (REVIEW)                  POST .../snapshots/{id}/attachments?manifestId=&dryRun=

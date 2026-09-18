@@ -62,6 +62,24 @@ class ArtifactContentTypeVerifierTest {
         }
     }
 
+    @Test
+    void acceptsOnlyReadableAccessDatabaseForAccdbPath() throws Exception {
+        var databaseFile = Files.createTempFile("artifact-access-content-", ".accdb");
+        try (var database = com.healthmarketscience.jackcess.DatabaseBuilder.create(
+                com.healthmarketscience.jackcess.Database.FileFormat.V2010, databaseFile.toFile())) {
+            new com.healthmarketscience.jackcess.TableBuilder("records")
+                    .addColumn(new com.healthmarketscience.jackcess.ColumnBuilder("id", com.healthmarketscience.jackcess.DataType.TEXT))
+                    .toTable(database);
+        }
+        try {
+            assertEquals("application/x-msaccess", verifier.verify("records.accdb", databaseFile));
+            Files.writeString(databaseFile, "not an Access database");
+            assertThrows(IllegalArgumentException.class, () -> verifier.verify("records.accdb", databaseFile));
+        } finally {
+            Files.deleteIfExists(databaseFile);
+        }
+    }
+
     private String verify(String fileName, byte[] bytes) throws Exception {
         Path temporary = Files.createTempFile("artifact-content-type-test-", ".bin");
         try {

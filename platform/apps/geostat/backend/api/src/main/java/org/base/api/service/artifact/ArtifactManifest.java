@@ -8,11 +8,16 @@ import java.util.List;
  * same manifest identity (idempotent re-ingest).
  */
 public record ArtifactManifest(String schema, String packageCode, String packageChecksum, String generatorVersion,
-                               String sourceReference, List<Entry> entries) {
+                               String sourceReference, List<Entry> entries, String contractCode, Integer contractRevision,
+                               Long datasetVersionId) {
     public static final String SCHEMA = "geostat.artifact-manifest.v1";
 
     public ArtifactManifest {
         entries = List.copyOf(entries);
+        if ((contractCode == null) != (contractRevision == null) || (contractCode == null) != (datasetVersionId == null))
+            throw new IllegalArgumentException("Manifest contract identity must be complete or absent");
+        if (contractCode != null && (contractCode.isBlank() || contractRevision < 1 || datasetVersionId < 1))
+            throw new IllegalArgumentException("Manifest contract identity is invalid");
     }
 
     /** One file of the package: where it came from, what its bytes are and where they live. */

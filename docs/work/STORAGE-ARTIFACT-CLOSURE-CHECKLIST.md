@@ -77,7 +77,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [x] 6.2a Relation `ordered` semantics are enforced for multi-value bindings — DONE (ordered preserves source order; unordered uses canonical path order)
 - [x] 6.3 Dry-run preview (default `dryRun=true`); any ERROR → nothing written — DONE
 - [x] 6.4 Inventory import (existing KIDS package) + ZIP package upload — DONE (code); runtime run → 12.3
-- [ ] 6.5 Generic package upload contract/revision resolution and Access structural validation — OPEN (current ZIP API accepts a package code; it does not ingest/validate an Access dataset in the same transaction)
+- [ ] 6.5 Generic package upload contract/revision resolution and Access structural validation — PARTIAL (approved contract/dataset resolution, required Access field checks, checksum-bound manifest identity, migrations 091–092, and SQL Server partial-binding rejection PASS; authenticated upload smoke awaits scoped WRITE_RESOURCE token, EXT-5)
 - [x] 6.6 Package checksum uses unambiguous canonical field encoding — DONE (length-prefixed fields; delimiter-collision regression test)
 
 ## 7. Ingestion / materialization

@@ -27,6 +27,12 @@ public final class ArtifactManifestGenerator {
 
     public static ArtifactManifest generate(String packageCode, String bucket, String objectPrefix, String sourceReference,
                                             List<InventoryEntry> inventory) {
+        return generate(packageCode, bucket, objectPrefix, sourceReference, inventory, null, null, null);
+    }
+
+    public static ArtifactManifest generate(String packageCode, String bucket, String objectPrefix, String sourceReference,
+                                            List<InventoryEntry> inventory, String contractCode, Integer contractRevision,
+                                            Long datasetVersionId) {
         if (packageCode == null || !packageCode.matches("[A-Za-z0-9][A-Za-z0-9_.:-]{0,159}")) throw new IllegalArgumentException("Invalid packageCode");
         ArtifactKeys.requirePrefix(objectPrefix);
         if (inventory == null || inventory.isEmpty()) throw new IllegalArgumentException("Inventory must not be empty");
@@ -42,7 +48,8 @@ public final class ArtifactManifestGenerator {
                     ArtifactKeys.contentKey(objectPrefix, sha, extension)));
         }
         entries.sort(Comparator.comparing(ArtifactManifest.Entry::originalPath));
-        return new ArtifactManifest(ArtifactManifest.SCHEMA, packageCode, checksum(packageCode, entries), GENERATOR_VERSION, sourceReference, entries);
+        return new ArtifactManifest(ArtifactManifest.SCHEMA, packageCode, checksum(packageCode, contractCode, contractRevision, datasetVersionId, entries),
+                GENERATOR_VERSION, sourceReference, entries, contractCode, contractRevision, datasetVersionId);
     }
 
     /** NFC relative path with forward slashes; absolute paths and traversal are rejected. */
@@ -57,12 +64,21 @@ public final class ArtifactManifestGenerator {
         return value;
     }
 
-    private static String checksum(String packageCode, List<ArtifactManifest.Entry> entries) {
+    private static String checksum(String packageCode, String contractCode, Integer contractRevision, Long datasetVersionId,
+                                   List<ArtifactManifest.Entry> entries) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             try (DataOutputStream canonical = new DataOutputStream(new DigestOutputStream(OutputStream.nullOutputStream(), digest))) {
                 writeString(canonical, ArtifactManifest.SCHEMA);
                 writeString(canonical, packageCode);
+                // Preserve v1 checksums for pre-existing unbound inventory manifests. A binding
+                // marker makes the added identity unambiguous for contract-bound packages.
+                if (contractCode != null) {
+                    writeString(canonical, "contract-binding/v1");
+                    writeString(canonical, contractCode);
+                    canonical.writeInt(contractRevision);
+                    canonical.writeLong(datasetVersionId);
+                }
                 canonical.writeInt(entries.size());
                 for (ArtifactManifest.Entry entry : entries) {
                     writeString(canonical, entry.originalPath());

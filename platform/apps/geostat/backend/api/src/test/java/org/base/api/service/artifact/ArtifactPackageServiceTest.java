@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.time.Duration;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
+import com.healthmarketscience.jackcess.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -85,7 +86,8 @@ class ArtifactPackageServiceTest {
         when(provider.getIfAvailable()).thenReturn(store);
         ObjectProvider<ArtifactMalwareScanner> scannerProvider = mock(ObjectProvider.class);
         when(scannerProvider.getIfAvailable()).thenReturn(scanner);
-        return new ArtifactPackageService(provider, registry, new ObjectMapper(), new ArtifactMetrics(mock(ObjectProvider.class)), new ArtifactProperties(), new ArtifactContentTypeVerifier(), scannerProvider, quarantineRegistry);
+        return new ArtifactPackageService(provider, registry, new ObjectMapper(), new ArtifactMetrics(mock(ObjectProvider.class)), new ArtifactProperties(), new ArtifactContentTypeVerifier(), scannerProvider, quarantineRegistry,
+                mock(ArtifactPackageContractResolver.class), new ArtifactAccessPackageValidator());
     }
 
     @Test
@@ -117,6 +119,46 @@ class ArtifactPackageServiceTest {
     void notAZipIsRejected() {
         assertThrows(IllegalArgumentException.class, () -> service(new MemoryStore(), mock(ArtifactRegistry.class))
                 .uploadPackage("PKG", new ByteArrayInputStream("not a zip".getBytes(StandardCharsets.UTF_8))));
+    }
+
+    @Test
+    void contractBoundUploadValidatesAccessStructureAndPersistsContractIdentity() throws Exception {
+        MemoryStore store = new MemoryStore();
+        ArtifactRegistry registry = mock(ArtifactRegistry.class);
+        when(registry.register(any())).thenReturn(new ArtifactRegistry.Registration(9, true));
+        when(registry.entries(9)).thenReturn(List.of());
+        ObjectProvider<ArtifactObjectStore> provider = mock(ObjectProvider.class);
+        when(provider.getIfAvailable()).thenReturn(store);
+        ObjectProvider<ArtifactMalwareScanner> scannerProvider = mock(ObjectProvider.class);
+        when(scannerProvider.getIfAvailable()).thenReturn(path -> new ArtifactMalwareScanner.ScanResult(ArtifactMalwareScanner.Verdict.CLEAN, ""));
+        ArtifactPackageContractResolver resolver = mock(ArtifactPackageContractResolver.class);
+        var contract = new ArtifactPackageContractResolver.DatasetContract("SITE_A", 2, "a".repeat(64), 41,
+                "RECORDS", "records", List.of("record_id", "title"));
+        when(resolver.resolve("SITE_A", 2, "RECORDS")).thenReturn(contract);
+        ArtifactPackageService service = new ArtifactPackageService(provider, registry, new ObjectMapper(), new ArtifactMetrics(mock(ObjectProvider.class)),
+                new ArtifactProperties(), new ArtifactContentTypeVerifier(), scannerProvider, mock(ArtifactQuarantineRegistry.class),
+                resolver, new ArtifactAccessPackageValidator());
+        var accessFile = Files.createTempFile("contract-upload-", ".accdb");
+        var archive = new ByteArrayOutputStream();
+        try {
+            try (Database database = DatabaseBuilder.create(Database.FileFormat.V2010, accessFile.toFile())) {
+                new TableBuilder("records").addColumn(new ColumnBuilder("record_id", DataType.TEXT))
+                        .addColumn(new ColumnBuilder("title", DataType.TEXT)).toTable(database).addRow("1", "example");
+            }
+            try (ZipOutputStream zip = new ZipOutputStream(archive)) {
+                zip.putNextEntry(new ZipEntry("data.accdb"));
+                Files.copy(accessFile, zip);
+                zip.closeEntry();
+            }
+            service.uploadPackage("PACKAGE", "SITE_A", 2, "RECORDS", new ByteArrayInputStream(archive.toByteArray()));
+            ArgumentCaptor<ArtifactManifest> manifest = ArgumentCaptor.forClass(ArtifactManifest.class);
+            verify(registry).register(manifest.capture());
+            assertEquals("SITE_A", manifest.getValue().contractCode());
+            assertEquals(2, manifest.getValue().contractRevision());
+            assertEquals(41L, manifest.getValue().datasetVersionId());
+        } finally {
+            Files.deleteIfExists(accessFile);
+        }
     }
 
     @Test

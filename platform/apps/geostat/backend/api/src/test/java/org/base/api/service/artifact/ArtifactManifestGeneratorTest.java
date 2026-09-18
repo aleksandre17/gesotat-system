@@ -49,6 +49,18 @@ class ArtifactManifestGeneratorTest {
     }
 
     @Test
+    void contractBindingParticipatesInManifestIdentity() {
+        ArtifactManifest unbound = ArtifactManifestGenerator.generate("P", "geostat-ingest", PREFIX, "src", inventory());
+        ArtifactManifest bound = ArtifactManifestGenerator.generate("P", "geostat-ingest", PREFIX, "src", inventory(), "SITE_A", 3, 41L);
+        assertNotEquals(unbound.packageChecksum(), bound.packageChecksum());
+        assertEquals("SITE_A", bound.contractCode());
+        assertEquals(3, bound.contractRevision());
+        assertEquals(41L, bound.datasetVersionId());
+        assertThrows(IllegalArgumentException.class, () -> new ArtifactManifest(ArtifactManifest.SCHEMA, "P", "a".repeat(64),
+                "generator", "src", List.of(), "SITE_A", null, 41L));
+    }
+
+    @Test
     void pathsAreNfcNormalizedSoEquivalentSpellingsCollide() {
         String decomposed = "mainstat/café.xlsx";
         String composed = "mainstat/café.xlsx";

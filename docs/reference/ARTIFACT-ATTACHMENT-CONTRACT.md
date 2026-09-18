@@ -346,6 +346,15 @@ contract revision
 
 ## 15. API contract
 
+Package ZIP admission uses `POST /api/v1/platform/artifacts/manifests/package`
+with required `packageCode`, `contractCode`, `revision`, and `datasetCode`
+multipart parameters. The Control Plane must resolve that exact approved
+revision/dataset. The archive must contain one `.accdb` whose contract-declared
+Access table and required fields are present. The accepted manifest stores
+`contractCode`, `contractRevision`, and `datasetVersionId`; those values are
+included in its package checksum. Inventory import remains a separate governed
+path for previously staged content.
+
 ### Metadata response
 
 ```json
@@ -719,5 +728,9 @@ primitives (`platform.artifact_policy`, `platform.artifact_relation_definition`)
 physical registry (`ingest.artifact_object|artifact_manifest|artifact_version`,
 `entity.artifact_attachment`), content-addressed storage port with presign,
 manifest engine, deterministic matcher, reconciliation gate and signed-download
-API. KIDS binding is a seed row set only (migration 088). Status per layer and
-open external gates: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md`.
+API. Contract-bound ZIP admission now resolves an approved site contract revision
+and dataset version, validates the required Access table fields, and persists that
+identity into manifest evidence (migrations 091–092). Runtime SQL Server migration
+and partial-binding rejection fixture pass. Authenticated package upload smoke
+still requires a scoped `WRITE_RESOURCE` token. KIDS binding is a seed row set only (migration 088). Status per
+layer and open external gates: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md`.

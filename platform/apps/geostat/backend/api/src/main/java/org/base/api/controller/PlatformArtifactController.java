@@ -49,8 +49,11 @@ public class PlatformArtifactController {
     @PostMapping(value = "/manifests/package", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('WRITE_RESOURCE')")
     public ResponseEntity<ArtifactPackageService.ManifestReceipt> uploadPackage(@RequestParam String packageCode,
+                                                                                @RequestParam String contractCode,
+                                                                                @RequestParam int revision,
+                                                                                @RequestParam String datasetCode,
                                                                                 @RequestPart("package") MultipartFile archive) throws IOException {
-        return ResponseEntity.ok(packages.uploadPackage(packageCode, archive.getInputStream()));
+        return ResponseEntity.ok(packages.uploadPackage(packageCode, contractCode, revision, datasetCode, archive.getInputStream()));
     }
 
     @PostMapping("/manifests/{manifestId}/verification")

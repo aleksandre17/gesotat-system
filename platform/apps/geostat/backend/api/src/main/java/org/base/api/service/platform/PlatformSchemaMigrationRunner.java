@@ -118,6 +118,8 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
         executeAndRecord(control, "db/platform/088_kids_r8_resource_artifact_binding.sql");
         executeAndRecord(control, "db/platform/089_artifact_contract_lifecycle_immutability.sql");
         executeAndRecord(data, "db/platform/090_artifact_malware_quarantine.sql");
+        executeAndRecord(data, "db/platform/091_artifact_manifest_contract_binding.sql");
+        executeAndRecord(data, "db/platform/092_artifact_manifest_contract_binding_integrity.sql");
     }
 
     private void executeAndRecord(JdbcTemplate jdbc, String resource) throws Exception {

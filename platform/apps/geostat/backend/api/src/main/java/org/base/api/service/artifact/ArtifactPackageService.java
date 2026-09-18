@@ -38,6 +38,8 @@ public class ArtifactPackageService {
     private final ArtifactContentTypeVerifier contentTypes;
     private final ObjectProvider<ArtifactMalwareScanner> malwareScanners;
     private final ArtifactQuarantineRegistry quarantineRegistry;
+    private final ArtifactPackageContractResolver packageContracts;
+    private final ArtifactAccessPackageValidator accessPackageValidator;
 
     public record ManifestReceipt(long manifestId, boolean created, String packageChecksum, int entryCount, int objectCount,
                                   int verified, int missing, int checksumMismatch) {}
@@ -45,7 +47,9 @@ public class ArtifactPackageService {
     public ArtifactPackageService(ObjectProvider<ArtifactObjectStore> store, ArtifactRegistry registry, ObjectMapper json, ArtifactMetrics metrics,
                                   ArtifactProperties properties, ArtifactContentTypeVerifier contentTypes,
                                   ObjectProvider<ArtifactMalwareScanner> malwareScanners,
-                                  ArtifactQuarantineRegistry quarantineRegistry) {
+                                  ArtifactQuarantineRegistry quarantineRegistry,
+                                  ArtifactPackageContractResolver packageContracts,
+                                  ArtifactAccessPackageValidator accessPackageValidator) {
         this.store = store;
         this.registry = registry;
         this.json = json;
@@ -54,6 +58,8 @@ public class ArtifactPackageService {
         this.contentTypes = contentTypes;
         this.malwareScanners = malwareScanners;
         this.quarantineRegistry = quarantineRegistry;
+        this.packageContracts = packageContracts;
+        this.accessPackageValidator = accessPackageValidator;
     }
 
     /**
@@ -82,10 +88,21 @@ public class ArtifactPackageService {
 
     /** Accepts a ZIP package: every entry is stored under its checksum key, then manifested and verified. */
     public ManifestReceipt uploadPackage(String packageCode, InputStream zip) {
+        return uploadPackage(packageCode, zip, null);
+    }
+
+    /** Canonical contract-bound upload; the contract determines the Access table/field structure. */
+    public ManifestReceipt uploadPackage(String packageCode, String contractCode, int revision, String datasetCode, InputStream zip) {
+        ArtifactPackageContractResolver.DatasetContract contract = packageContracts.resolve(contractCode, revision, datasetCode);
+        return uploadPackage(packageCode, zip, contract);
+    }
+
+    private ManifestReceipt uploadPackage(String packageCode, InputStream zip, ArtifactPackageContractResolver.DatasetContract contract) {
         ArtifactObjectStore objects = requireStore();
         String objectPrefix = properties.getUploadPrefix();
         List<ArtifactManifestGenerator.InventoryEntry> inventory = new ArrayList<>();
         long packageBytes = 0;
+        int accessDatasets = 0;
         Path buffer = null;
         try (ZipInputStream entries = new ZipInputStream(zip)) {
             buffer = Files.createTempFile("artifact-entry-", ".bin");
@@ -103,6 +120,10 @@ public class ArtifactPackageService {
                 if (packageBytes > properties.getMaxPackageBytes()) throw new IllegalArgumentException("Package exceeds " + properties.getMaxPackageBytes() + " uncompressed bytes");
                 String sha = hex(digest.digest());
                 contentTypes.verify(path, buffer);
+                if (contract != null && extension.equals("accdb")) {
+                    accessPackageValidator.validate(buffer.toFile(), contract);
+                    accessDatasets++;
+                }
                 scanForMalware(buffer, objects, packageCode, path, sha, size, "ZIP_PACKAGE");
                 try (InputStream content = Files.newInputStream(buffer)) {
                     objects.putContentAddressed(objectPrefix, sha, extension, MediaTypes.forFileName(path), content, size);
@@ -116,7 +137,13 @@ public class ArtifactPackageService {
         } finally {
             if (buffer != null) try { Files.deleteIfExists(buffer); } catch (IOException ignored) { /* temp cleanup is best effort */ }
         }
-        return registerAndVerify(ArtifactManifestGenerator.generate(packageCode, objects.ingestBucket(), objectPrefix, "upload:" + packageCode, inventory), false);
+        if (contract != null && accessDatasets != 1)
+            throw new IllegalArgumentException("Contract-bound package must contain exactly one Access dataset file");
+        ArtifactManifest manifest = contract == null
+                ? ArtifactManifestGenerator.generate(packageCode, objects.ingestBucket(), objectPrefix, "upload:" + packageCode, inventory)
+                : ArtifactManifestGenerator.generate(packageCode, objects.ingestBucket(), objectPrefix, "upload:" + packageCode,
+                    inventory, contract.contractCode(), contract.revision(), contract.datasetVersionId());
+        return registerAndVerify(manifest, false);
     }
 
     /** Re-checks every object of a manifest against Object Storage (existence and full SHA-256). */
