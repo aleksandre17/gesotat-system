@@ -1,0 +1,53 @@
+{
+  "schema": "geostat.artifact-object-integrity-audit-runtime.v1",
+  "recordedAt": "2026-09-18T10:03:00Z",
+  "scope": "registered Data Plane object existence, byte-size, and SHA-256 scheduled audit",
+  "migration": {
+    "resource": "db/platform/094_artifact_integrity_audit.sql",
+    "sha256": "4643c8fa98a9cc018282e060f2d65000c9fa2bfc432390c05c1b24c9bd3a35f5",
+    "controlLedgerReadback": "PASS",
+    "dataPlaneAuditRunAndIssueTables": "PASS"
+  },
+  "runtime": {
+    "environment": "remote dev API 192.168.1.199:8081; SQL Server container geostat-system-mssql; Data Plane geostat-data",
+    "deployment": "geostat.ps1 api dev bootstrap api --no-build, then dev restart api",
+    "health": {
+      "status": "UP",
+      "primary": "UP",
+      "dataPlane": "UP",
+      "archivePlane": "UP",
+      "objectStorage": "UP",
+      "secondary": "UP"
+    },
+    "auditRun": {
+      "id": 1,
+      "status": "COMPLETED",
+      "objectsExamined": 1,
+      "objectsVerified": 0,
+      "objectsMissing": 1,
+      "objectsMismatched": 0,
+      "lastErrorCode": null
+    },
+    "openIssue": {
+      "artifactObjectId": 1,
+      "issueCode": "MISSING",
+      "expectedByteSize": 13,
+      "observedByteSize": null,
+      "occurrenceCount": 1,
+      "interpretation": "retained synthetic AIR-2026-018 concurrency fixture has a Data Plane registry row but no uploaded storage payload or attachment; audit correctly reports it missing"
+    }
+  },
+  "tests": {
+    "command": "./gradlew :api:test --rerun-tasks",
+    "tests": 212,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "result": "PASS"
+  },
+  "limits": [
+    "This audit enumerates registered Data Plane objects only.",
+    "Storage-side orphan enumeration, orphan locators and relations, snapshot/cache parity, retention reconciliation, and complete zero-drift evidence remain open under checklist item 14.3."
+  ],
+  "status": "REGISTERED_OBJECT_AUDIT_RUNTIME_PASS_PARTIAL_RECONCILIATION_SCOPE"
+}

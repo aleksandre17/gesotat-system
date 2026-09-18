@@ -121,6 +121,7 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
         executeAndRecord(data, "db/platform/091_artifact_manifest_contract_binding.sql");
         executeAndRecord(data, "db/platform/092_artifact_manifest_contract_binding_integrity.sql");
         executeAndRecord(data, "db/platform/093_artifact_upload_sessions.sql");
+        executeAndRecord(data, "db/platform/094_artifact_integrity_audit.sql");
     }
 
     private void executeAndRecord(JdbcTemplate jdbc, String resource) throws Exception {

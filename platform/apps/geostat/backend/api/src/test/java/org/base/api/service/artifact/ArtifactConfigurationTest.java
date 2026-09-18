@@ -37,6 +37,9 @@ class ArtifactConfigurationTest {
         unrepresentable.setUploadPartBytes(1);
         unrepresentable.setMaxUploadBytes((long) Integer.MAX_VALUE + 1);
         assertThrows(IllegalStateException.class, unrepresentable::validate);
+        ArtifactProperties audit = new ArtifactProperties();
+        audit.setIntegrityAuditMaxBytesPerRun(1);
+        assertThrows(IllegalStateException.class, audit::validate);
     }
 
     @Test

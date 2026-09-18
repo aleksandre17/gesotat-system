@@ -23,6 +23,13 @@ public class ArtifactProperties {
     private int maxTenantActiveUploadSessions = 100;
     private long uploadSessionTtlSeconds = 86_400;
     private int uploadProcessingLeaseSeconds = 900;
+    private boolean integrityAuditEnabled = true;
+    private long integrityAuditDelayMillis = 60_000;
+    private int integrityAuditBatchSize = 100;
+    private int integrityAuditRecheckMinutes = 1_440;
+    private int integrityAuditIssueRetryMinutes = 10;
+    private int integrityAuditLeaseMinutes = 30;
+    private long integrityAuditMaxBytesPerRun = 2L * 1024 * 1024 * 1024;
     /** Upper bound of findings returned in one report; counts per code are always complete. */
     private int reportIssueLimit = 200;
     /** Artifact admission is fail-closed unless an operational malware scanner returns CLEAN. */
@@ -46,6 +53,10 @@ public class ArtifactProperties {
                 || 1 + (maxUploadBytes - 1) / uploadPartBytes > Integer.MAX_VALUE
                 || maxTenantReservedUploadBytes <= 0 || maxTenantActiveUploadSessions <= 0 || uploadSessionTtlSeconds <= 0
                 || uploadProcessingLeaseSeconds <= 0
+                || integrityAuditDelayMillis <= 0 || integrityAuditBatchSize <= 0 || integrityAuditRecheckMinutes <= 0
+                || integrityAuditIssueRetryMinutes <= 0
+                || integrityAuditLeaseMinutes <= 0 || integrityAuditLeaseMinutes > Integer.MAX_VALUE / 2
+                || integrityAuditMaxBytesPerRun < maxEntryBytes
                 || reportIssueLimit <= 0 || malwareScannerPort < 1 || malwareScannerPort > 65535
                 || malwareScannerTimeoutMillis <= 0 || malwareScannerMaxBytes <= 0)
             throw new IllegalStateException("platform.artifacts limits must be positive and maxPackageBytes >= maxEntryBytes");
@@ -76,6 +87,20 @@ public class ArtifactProperties {
     public void setUploadSessionTtlSeconds(long uploadSessionTtlSeconds) { this.uploadSessionTtlSeconds = uploadSessionTtlSeconds; }
     public int getUploadProcessingLeaseSeconds() { return uploadProcessingLeaseSeconds; }
     public void setUploadProcessingLeaseSeconds(int uploadProcessingLeaseSeconds) { this.uploadProcessingLeaseSeconds = uploadProcessingLeaseSeconds; }
+    public boolean isIntegrityAuditEnabled() { return integrityAuditEnabled; }
+    public void setIntegrityAuditEnabled(boolean integrityAuditEnabled) { this.integrityAuditEnabled = integrityAuditEnabled; }
+    public long getIntegrityAuditDelayMillis() { return integrityAuditDelayMillis; }
+    public void setIntegrityAuditDelayMillis(long integrityAuditDelayMillis) { this.integrityAuditDelayMillis = integrityAuditDelayMillis; }
+    public int getIntegrityAuditBatchSize() { return integrityAuditBatchSize; }
+    public void setIntegrityAuditBatchSize(int integrityAuditBatchSize) { this.integrityAuditBatchSize = integrityAuditBatchSize; }
+    public int getIntegrityAuditRecheckMinutes() { return integrityAuditRecheckMinutes; }
+    public void setIntegrityAuditRecheckMinutes(int integrityAuditRecheckMinutes) { this.integrityAuditRecheckMinutes = integrityAuditRecheckMinutes; }
+    public int getIntegrityAuditIssueRetryMinutes() { return integrityAuditIssueRetryMinutes; }
+    public void setIntegrityAuditIssueRetryMinutes(int integrityAuditIssueRetryMinutes) { this.integrityAuditIssueRetryMinutes = integrityAuditIssueRetryMinutes; }
+    public int getIntegrityAuditLeaseMinutes() { return integrityAuditLeaseMinutes; }
+    public void setIntegrityAuditLeaseMinutes(int integrityAuditLeaseMinutes) { this.integrityAuditLeaseMinutes = integrityAuditLeaseMinutes; }
+    public long getIntegrityAuditMaxBytesPerRun() { return integrityAuditMaxBytesPerRun; }
+    public void setIntegrityAuditMaxBytesPerRun(long integrityAuditMaxBytesPerRun) { this.integrityAuditMaxBytesPerRun = integrityAuditMaxBytesPerRun; }
     public int getReportIssueLimit() { return reportIssueLimit; }
     public void setReportIssueLimit(int reportIssueLimit) { this.reportIssueLimit = reportIssueLimit; }
     public boolean isMalwareScanRequired() { return malwareScanRequired; }

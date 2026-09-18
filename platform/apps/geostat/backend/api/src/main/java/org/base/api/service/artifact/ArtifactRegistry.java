@@ -17,6 +17,60 @@ public class ArtifactRegistry {
 
     public record Registration(long manifestId, boolean created) {}
 
+    public record AuditCandidate(long artifactObjectId, String sha256, long byteSize, String bucket, String objectKey) {}
+
+    public List<AuditCandidate> auditCandidates(int limit, int recheckMinutes, int issueRetryMinutes) {
+        return dataPlane.query("SELECT TOP (?) artifact_object_id,sha256,byte_size,bucket,object_key FROM ingest.artifact_object " +
+                        "WHERE last_audit_attempt_at IS NULL OR " +
+                        "(verification_status='VERIFIED' AND last_audit_attempt_at<=DATEADD(MINUTE,-?,SYSUTCDATETIME())) OR " +
+                        "(verification_status<>'VERIFIED' AND last_audit_attempt_at<=DATEADD(MINUTE,-?,SYSUTCDATETIME())) " +
+                        "ORDER BY last_audit_attempt_at,artifact_object_id",
+                (rs, n) -> new AuditCandidate(rs.getLong("artifact_object_id"), rs.getString("sha256"), rs.getLong("byte_size"),
+                        rs.getString("bucket"), rs.getString("object_key")), limit, recheckMinutes, issueRetryMinutes);
+    }
+
+    public long startAuditRun() {
+        return dataPlane.queryForObject("INSERT INTO ingest.artifact_object_audit_run OUTPUT INSERTED.audit_run_id DEFAULT VALUES", Long.class);
+    }
+
+    /** Persists the current object state, immutable issue evidence and run counters atomically. */
+    @Transactional(transactionManager = "dataPlaneTransactionManager")
+    public void recordAuditResult(long runId, AuditCandidate candidate, VerificationStatus status, Long observedBytes, String observedSha256) {
+        if (status == VerificationStatus.REGISTERED) throw new IllegalArgumentException("REGISTERED is not an audit result");
+        String counter = switch (status) {
+            case VERIFIED -> "objects_verified";
+            case MISSING -> "objects_missing";
+            case CHECKSUM_MISMATCH -> "objects_mismatched";
+            case REGISTERED -> throw new IllegalArgumentException("REGISTERED is not an audit result");
+        };
+        int counted = dataPlane.update("UPDATE ingest.artifact_object_audit_run SET objects_examined=objects_examined+1," + counter + "=" + counter + "+1 WHERE audit_run_id=? AND status='RUNNING'", runId);
+        if (counted != 1) throw new IllegalStateException("Artifact audit run is no longer active");
+        int updated = dataPlane.update("UPDATE ingest.artifact_object SET verification_status=?,verified_at=SYSUTCDATETIME(),last_audit_attempt_at=SYSUTCDATETIME() WHERE artifact_object_id=?",
+                status.name(), candidate.artifactObjectId());
+        if (updated != 1) throw new IllegalStateException("Artifact object disappeared during integrity audit");
+        if (status == VerificationStatus.VERIFIED) {
+            dataPlane.update("UPDATE ingest.artifact_object_audit_issue SET resolved_at=SYSUTCDATETIME(),audit_run_id=? WHERE artifact_object_id=? AND resolved_at IS NULL",
+                    runId, candidate.artifactObjectId());
+        } else {
+            String issue = status == VerificationStatus.MISSING ? "MISSING" : "CHECKSUM_MISMATCH";
+            int updatedIssue = dataPlane.update("UPDATE ingest.artifact_object_audit_issue SET audit_run_id=?,issue_code=?,expected_sha256=?,observed_sha256=?,expected_byte_size=?,observed_byte_size=?,last_detected_at=SYSUTCDATETIME(),occurrence_count=occurrence_count+1 " +
+                            "WHERE artifact_object_id=? AND resolved_at IS NULL",
+                    runId, issue, candidate.sha256(), observedSha256, candidate.byteSize(), observedBytes, candidate.artifactObjectId());
+            if (updatedIssue == 0) dataPlane.update("INSERT INTO ingest.artifact_object_audit_issue(audit_run_id,artifact_object_id,issue_code,expected_sha256,observed_sha256,expected_byte_size,observed_byte_size) VALUES(?,?,?,?,?,?,?)",
+                    runId, candidate.artifactObjectId(), issue, candidate.sha256(), observedSha256, candidate.byteSize(), observedBytes);
+        }
+    }
+
+    public void completeAuditRun(long runId, String status, String errorCode) {
+        dataPlane.update("UPDATE ingest.artifact_object_audit_run SET status=?,last_error_code=?,completed_at=SYSUTCDATETIME() WHERE audit_run_id=? AND status='RUNNING'",
+                status, errorCode, runId);
+    }
+
+    public void abandonStaleAuditRuns(int staleMinutes) {
+        dataPlane.update("UPDATE ingest.artifact_object_audit_run SET status='ABANDONED',last_error_code='WORKER_LEASE_EXPIRED',completed_at=SYSUTCDATETIME() " +
+                "WHERE status='RUNNING' AND started_at<DATEADD(MINUTE,-?,SYSUTCDATETIME())", staleMinutes);
+    }
+
     public ArtifactRegistry(@Qualifier("dataPlaneJdbcTemplate") JdbcTemplate dataPlane) {
         this.dataPlane = dataPlane;
     }

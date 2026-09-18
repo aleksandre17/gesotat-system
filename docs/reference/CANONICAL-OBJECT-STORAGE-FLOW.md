@@ -272,4 +272,5 @@ snapshot (REVIEW)                  POST .../snapshots/{id}/attachments?manifestI
   → publication (gate enforced)    PlatformPublicationService
 published entity                   GET  .../entities/{recordType}/{key}
   → presigned GET (policy TTL)     GET  .../entities/{recordType}/{key}/{relation}/{lang}/{ordinal}/download
+registered objects                scheduled bounded existence/size/SHA-256 sweep → durable audit run + open issue state
 ```

@@ -30,6 +30,10 @@ public class ArtifactMetrics {
         count("geostat.artifact.malware_scan", "result", result);
     }
 
+    public void integrityAudit(String result) {
+        count("geostat.artifact.integrity_audit", "result", result);
+    }
+
     public void download(String relationCode, String outcome) {
         MeterRegistry meters = registry.getIfAvailable();
         if (meters != null) meters.counter("geostat.artifact.download", "relation", relationCode, "outcome", outcome).increment();

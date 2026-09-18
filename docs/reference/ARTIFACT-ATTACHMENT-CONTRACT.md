@@ -490,6 +490,20 @@ derivation და supersession კავშირებს.
 - snapshot-to-cache count/checksum reconciliation;
 - contract/documentation zero-drift report.
 
+### Registered object integrity sweep
+
+The API runs a bounded Data Plane sweep over registered content objects. It
+checks storage existence first, compares stored byte size, then streams the full
+SHA-256 only when the size agrees. Each batch uses the distributed platform job
+lease, is limited by candidate count and total bytes, and starts only after
+schema migrations complete. Current object state moves to `VERIFIED`, `MISSING`
+or `CHECKSUM_MISMATCH`; each batch writes a run receipt, while an open issue per
+object aggregates repeat detections and is resolved by a later verified read.
+Storage/Data Plane failures leave the object due for retry. This sweep covers
+registered Data Plane objects only. Orphan storage enumeration, orphan locator
+and relation checks, snapshot/cache parity, and contract/documentation drift
+remain separate required controls.
+
 ## 20. Acceptance checklist
 
 - [ ] package manifest validated;

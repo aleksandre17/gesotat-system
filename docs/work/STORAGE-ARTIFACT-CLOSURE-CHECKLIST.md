@@ -86,7 +86,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [x] 7.2 Snapshot binding from approved definitions (generic, no site branch) — DONE
 - [x] 7.3 Fail-closed binding — DONE (test)
 - [x] 7.4 Legacy `resource_locator PATH` untouched — DONE
-- [ ] 7.5 Resumable upload sessions, durable part checkpoints, tenant quota admission and retryable completion — PARTIAL (source + 205-test API suite PASS; migration 093 applied and checksum/tables read back on remote dev; anonymous request 401; authenticated storage/recovery acceptance awaits scoped token and scanner, EXT-5/EXT-6)
+- [ ] 7.5 Resumable upload sessions, durable part checkpoints, tenant quota admission and retryable completion — PARTIAL (source + 212-test API suite PASS; migration 093 applied and checksum/tables read back on remote dev; anonymous request 401; authenticated storage/recovery acceptance awaits scoped token and scanner, EXT-5/EXT-6)
 - [x] 7.6 Concurrent same-checksum manifest registration replay — DONE (remote SQL Server two-session replay on the registry key-range locking statement returned the same manifest id and exactly one manifest/version/object registry set; retained append-only test row has no attachment and is recorded in evidence; AIR-2026-018; authenticated HTTP replay remains under EXT-5)
 
 ## 8. Snapshot / publication
@@ -136,7 +136,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 
 - [ ] 14.1 Package upload orchestration across package checksum, approved contract revision, Access validation, manifest and relation state — OPEN
 - [ ] 14.2 Tenant/site/owner authorization is enforced from authenticated claims through dataset and artifact access — OPEN (current resource authority is global; do not treat as production tenant isolation)
-- [ ] 14.3 Provenance chain and scheduled missing/orphan/checksum/retention reconciliation jobs — OPEN
+- [ ] 14.3 Provenance chain and scheduled missing/orphan/checksum/retention reconciliation jobs — PARTIAL (094 migration applied/read-back PASS; remote dev audit run 1 COMPLETED, 1 registered synthetic object correctly raised MISSING, API health all UP; full suite 212/0/0/1; evidence: `docs/evidence/artifact-integrity-audit-runtime-2026-09-18.json`. Orphan storage listing, locator/relation, snapshot/cache, retention and zero-drift jobs remain open.)
 - [ ] 14.4 One-click operator experience and progress/retry surface — OPEN
 - [ ] 14.5 Rollback, replay, load/performance and recovery evidence — OPEN
 
