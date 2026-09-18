@@ -472,7 +472,7 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 
 ### AIR-2026-017 — Publication release gates were asserted by SQL, never evaluated
 
-- **სტატუსი:** `TRIAGED` / **priority:** `P0` (ბლოკავს ნებისმიერ ახალ publication-ს, მათ შორის KIDS snapshot 52-ს)
+- **სტატუსი:** `VERIFIED` (dev, commit `c1143c8`; snapshot 52 evaluated → REVIEW_REQUIRED) / **priority:** `P0`
 - **აღმოჩენა:** `PlatformPublicationService` 7 gate-ის (`SCHEMA_VALID`, `KEYS_VALID`, `RELATIONS_VALID`,
   `CLASSIFIERS_VALID`, `STATISTICAL_SEMANTICS_VALID`, `RAW_LINEAGE_VALID`, `PUBLICATION_ATOMIC`) PASS-ს მოითხოვს,
   მაგრამ მათ Java კოდი არ აფასებს. migration 072 ყველა snapshot-ს უპირობოდ უწერდა PASS-ს

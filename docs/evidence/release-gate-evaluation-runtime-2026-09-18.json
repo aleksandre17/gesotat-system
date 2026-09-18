@@ -1,0 +1,21 @@
+{
+  "schema": "geostat.release-gate-evaluation-runtime.v1",
+  "recordedAt": "2026-09-18",
+  "environment": "remote dev geostat-api-dev:8081; production untouched",
+  "commit": "c1143c8 evaluate publication release gates on measured snapshot facts",
+  "resolves": "AIR-2026-017 (gates were asserted by migration 072, never evaluated)",
+  "call": "ops/scripts/shell/artifact-operator-api.sh POST /api/v1/platform/publication/snapshots/52/gates",
+  "snapshot": { "datasetSnapshotId": 52, "datasetVersionId": 73, "before": "SEMANTIC_REVIEW", "after": "REVIEW_REQUIRED" },
+  "factsDigest": "6516ce7c6258752e534e59fb42a0104da234091b3db38ef70a7b145c2d9ace77",
+  "gates": {
+    "SCHEMA_VALID": "PASS", "KEYS_VALID": "PASS", "RAW_LINEAGE_VALID": "PASS", "PUBLICATION_ATOMIC": "PASS",
+    "RELATIONS_VALID": "NOT_APPLICABLE (no entity relations materialized)",
+    "CLASSIFIERS_VALID": "NOT_APPLICABLE (no classifications assigned)",
+    "STATISTICAL_SEMANTICS_VALID": "NOT_APPLICABLE (no observations)"
+  },
+  "artifactGate": "ARTIFACT_RECONCILIATION PASS (checksum 0737e9c2...) recorded earlier",
+  "publicationGuard": "accepts only geostat.release-gate.v1 evidence whose factsDigest equals current facts; legacy KIDS_R8_ACCEPTANCE rows are rejected (tests)",
+  "tests": { "suite": ":api:test", "tests": 234, "failures": 0, "errors": 0, "skipped": 1 },
+  "next": "publish snapshot 52 requires a PUBLISH_RESOURCE identity (publish.execute role on the operator client; grant blocked by auto mode pending explicit user permission)",
+  "status": "GATES_EVALUATED_READY_TO_PUBLISH"
+}
