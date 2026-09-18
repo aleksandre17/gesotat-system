@@ -1,0 +1,56 @@
+{
+  "schema": "geostat.artifact-manifest-concurrency-evidence.v1",
+  "recordedAt": "2026-09-18",
+  "environment": {
+    "name": "remote dev",
+    "database": "geostat-data",
+    "databaseHost": "192.168.1.199",
+    "productionTouched": false
+  },
+  "method": {
+    "fixture": "ops/tests/sql/artifact-manifest-concurrent-replay.sh",
+    "sessions": 2,
+    "startOffsetMillis": 250,
+    "firstSessionLockHoldSeconds": 3,
+    "registryLockQuery": "UPDLOCK,HOLDLOCK,INDEX(uq_artifact_manifest_checksum)",
+    "scope": "SQL Server key-range locking and manifest/version/object registry replay; the Java service/API was not invoked"
+  },
+  "result": {
+    "status": "PASS",
+    "isolatedReplay": {
+      "database": "artifact_concurrency_acceptance_20260918_01",
+      "commonManifestId": 1,
+      "manifestRows": 1,
+      "artifactVersionRows": 1,
+      "artifactObjectRegistryRows": 1,
+      "databaseCleanup": "isolated SQL Server database dropped; DROPPED"
+    },
+    "sharedDevReplay": {
+      "database": "geostat-data",
+      "commonManifestId": 3,
+      "manifestRows": 1,
+      "artifactVersionRows": 1,
+      "artifactObjectRegistryRows": 1,
+      "outcome": "PASS; append-only test rows retained with no attachment"
+    },
+    "manifestRows": 1,
+    "artifactVersionRows": 1,
+    "artifactObjectRegistryRows": 1,
+    "apiLevelConcurrentReplay": "NOT_RUN; requires scoped WRITE_RESOURCE token (EXT-5)"
+  },
+  "retainedFixture": {
+    "packageCode": "AIR_018_CONCURRENT_0d126763de1d463d080a59854b792fc8",
+    "manifestId": 3,
+    "packageChecksum": "6a2ecd3e2f81c00e73bd71c3b428c0264290c3dbbc9b63cf2ea83cd3e55a2c71",
+    "artifactObjectId": 1,
+    "contentSha256": "1ac06cb0b4b9d834125250595ed6eb30e641b852fb915c61463f759d252a3c66",
+    "objectKey": "air-018/concurrency/1ac06cb0b4b9d834125250595ed6eb30e641b852fb915c61463f759d252a3c66.bin",
+    "attachments": 0,
+    "reasonRetained": "The shared-dev run created an append-only version; it has no attachment and is retained rather than bypassing the immutability trigger. The final fixture was also run on an isolated database that was dropped after the test.",
+    "contentObjectBytesUploaded": false
+  },
+  "limitations": [
+    "The fixture reproduces ArtifactRegistry's SQL lock and persistence sequence; it does not execute the Java repository proxy.",
+    "The object row is registry metadata only; no physical bytes were uploaded and the test object is not verified or attached."
+  ]
+}

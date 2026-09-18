@@ -337,15 +337,19 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 
 ### AIR-2026-018 — Concurrent identical manifest registration could race
 
-- **სტატუსი:** `TRIAGED` / **priority:** `P1` / **owner:** Data Platform
+- **სტატუსი:** `VERIFIED` / **priority:** `P1` / **owner:** Data Platform
 - **აღმოჩენა:** two retries with the same package checksum could both observe no manifest before the
   unique-key insert; one request could fail with a duplicate-key error instead of idempotently returning
   the existing manifest.
 - **Fix in source:** manifest checksum lookup now takes an update/serializable key-range lock on its
   declared unique index inside the registration transaction.
-- **Acceptance:** concurrent SQL Server replay with the same checksum returns one manifest identity
-  to every caller and creates exactly one manifest/version set. Until replay, concurrency behavior is
-  `NOT_VERIFIED`.
+- **Acceptance/evidence:** `ops/tests/sql/artifact-manifest-concurrent-replay.sh` ran on the remote
+  dev SQL Server against the exact `UPDLOCK,HOLDLOCK,INDEX(uq_artifact_manifest_checksum)` lookup and
+  transaction used by `ArtifactRegistry`. Two overlapping sessions returned manifest id `3`; the
+  committed database contained exactly one manifest, version, and content-object registry row. The
+  generated fixture is retained because artifact versions are immutable; it has no attachment and
+  is explicitly identified in `docs/evidence/artifact-manifest-concurrent-replay-2026-09-18.json`.
+  SQL locking/replay is `PASS`; an authenticated API-level concurrent upload remains gated by EXT-5.
 
 ### AIR-2026-019 — Absolute source paths were silently converted to relative paths
 

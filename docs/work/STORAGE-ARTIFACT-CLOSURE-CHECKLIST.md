@@ -87,7 +87,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [x] 7.3 Fail-closed binding — DONE (test)
 - [x] 7.4 Legacy `resource_locator PATH` untouched — DONE
 - [ ] 7.5 Resumable/multipart upload, durable checkpoints, quota admission and retryable job state — OPEN (current ZIP upload is bounded but synchronous)
-- [ ] 7.6 Concurrent same-checksum manifest registration replay — OPEN (source uses unique-index key-range locking; SQL Server concurrency evidence pending, AIR-2026-018)
+- [x] 7.6 Concurrent same-checksum manifest registration replay — DONE (remote SQL Server two-session replay on the registry key-range locking statement returned the same manifest id and exactly one manifest/version/object registry set; retained append-only test row has no attachment and is recorded in evidence; AIR-2026-018; authenticated HTTP replay remains under EXT-5)
 
 ## 8. Snapshot / publication
 

@@ -63,6 +63,7 @@
     "migration092Runtime": "Control Plane ledger read-back PASS; ops/tests/sql/artifact-manifest-contract-binding-integrity.sql executed on remote geostat-data; ARTIFACT_MANIFEST_CONTRACT_BINDING_INTEGRITY_PASS; transaction rollback",
     "contractBoundPackageRuntime": "not exercised: no WRITE_RESOURCE token available; anonymous route rejected with 401",
     "actuatorHealth": "DOWN due to existing remote-dev Redis NOAUTH configuration; application /health reports primary, dataPlane, archivePlane, objectStorage, secondary UP",
+    "manifestConcurrencyRuntime": "SQL Server two-session replay PASS on geostat-data (manifestId=3; one manifest/version/object registry row retained, no attachment) and isolated acceptance DB (manifestId=1; one of each; DB dropped); evidence in artifact-manifest-concurrent-replay-2026-09-18.json; HTTP upload replay awaits scoped token",
     "lifecycleIntegration": "ops/tests/sql/artifact-contract-lifecycle.sql; policy and relation immutability rejection PASS; transaction rollback PASS",
     "quarantineIntegration": "ops/tests/sql/artifact-malware-quarantine.sql on remote geostat-data; ARTIFACT_MALWARE_QUARANTINE_PASS; rollback PASS",
     "contentTypeRuntime": "Tika 4.0.0 present in remote API JVM classpath after restart; workbook structure refinement deployed; health all UP; anonymous artifact request 401",
