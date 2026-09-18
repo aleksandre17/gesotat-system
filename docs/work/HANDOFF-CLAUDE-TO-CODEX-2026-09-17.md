@@ -135,3 +135,42 @@ cd platform/kits/stack-kit; python -m pytest -q tests
 ---
 
 **ჩაბარა:** Claude (Opus 5) · **მიიღოს:** Codex · 2026-09-17
+
+---
+
+## 7. დამატება 2026-09-18 — Storage / Artifact Attachment ხაზი (ცალკე სამუშაო ნაკადი)
+
+**სტატუსი:** source + tests DONE (`:api:test` 171 PASS, 0 failure; 54 artifact test) · **uncommitted** (commit არ გაკეთებულა — მომხმარებლის ნებართვა საჭიროა) · dev runtime-ზე დგას **refactor-მდე** ვერსია → საჭიროა redeploy.
+**Checklist (layer-by-layer სტატუსები):** `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · **ADR-008** (`docs/platform-decisions.md`) · **AIR-2026-010…013** · **Evidence:** `docs/evidence/kids-r8-resource-artifact-binding-2026-09-18.json`.
+
+### 7.1 რა გაკეთდა (ზემოდან ქვემოთ)
+
+| Layer | Artifact |
+|---|---|
+| Meta-schema / Control | `086_artifact_attachment_meta_schema.sql` — `platform.artifact_policy`, `platform.artifact_relation_definition`; APPROVED immutable (THROW 51020/51021) |
+| Physical Data plane | `087_artifact_registry_data_plane.sql` — `ingest.artifact_object` (SHA-256 UK), `ingest.artifact_manifest`, `ingest.artifact_version` (append-only, 51023), `entity.artifact_attachment` (published immutable, 51022), view `entity.v_artifact_attachment_reconciliation` |
+| Contract binding (KIDS, seed only) | `088_kids_r8_resource_artifact_binding.sql` — policy `KIDS_PUBLIC_STATISTICAL_FILE` r1, relation `PRIMARY_FILE` (ka/en, 1..1), rule `SOURCE_PATH` (NFC, strip `files/`, root `mainstat/`) |
+| Runner | 086 control, 087 data, 088 control — `PlatformSchemaMigrationRunner` |
+| Object Storage port | `service/artifact/ArtifactObjectStore` (port) ← `service/storage/ObjectStorageService` (MinIO adapter): stat, full SHA-256, bounded read, content-addressed put, presign (`STORAGE_PUBLIC_ENDPOINT`, `STORAGE_REGION`) |
+| Domain (pure) | `ArtifactKeys`, `MediaTypes` (Spring `MediaTypeFactory`), `ArtifactManifest(+Generator)` v1, `ArtifactMatchRule` strategy + `SourcePathMatchRule(+Parser)` + `ArtifactMatchRules` registry, `ArtifactMatcher` (1:N ordinals, cardinality), `ArtifactBindingPlanner`, `ArtifactReconciler`, `ArtifactPolicy`, enums (`VerificationStatus`, `ArtifactRole`, `RetentionClass`, `BindingStatus`, `GateResult`) |
+| Persistence | `ArtifactRegistry`, `ArtifactAttachmentRepository`, `ReleaseGateEvidenceRepository`, `ArtifactContractResolver` |
+| Application | `ArtifactPackageService` (inventory import, ZIP upload → `artifacts/sha256/`, verify), `ArtifactAttachmentService`, `ArtifactReconciliationService` (gate `ARTIFACT_RECONCILIATION` + checksum), `ArtifactDistributionService`, `ArtifactMetrics`, `ArtifactProperties` (`platform.artifacts.*`) |
+| Publication | `PlatformPublicationService` → `requirePassIfDeclared` (declared datasets only); `PlatformArchiveService` → attached objects into `archive.artifact_reference` |
+| API | `PlatformArtifactController` `/api/v1/platform/artifacts/**` (7 routes) + `ArtifactApiExceptionHandler` (RFC 9457) |
+| Edge | `ops/compose/.../edge/nginx.conf` server `files.geostat.internal` (signed GET/HEAD only) + alias — `nginx -t` PASS, **არ არის deployed** |
+| Config | `application.yml`: `storage.s3.public-endpoint`, `storage.s3.region`, `platform.artifacts.*`; local `.env.dev` (gitignored): `STORAGE_PUBLIC_ENDPOINT=http://minio:9000` |
+
+### 7.2 დადასტურებული ფაქტები
+- MinIO: 532/532 object ფიზიკურ prefix-ზე `kids/r8/resources/kids-files-r8-sanitized/`, content SHA-256 = key; inventory `objectName` ამ segment-ს არ შეიცავს (AIR-2026-010 — manifest key-ს ახლიდან ითვლის).
+- `source_resource_id` 225/225 unique non-null; 450/450 slot exact match; 450 distinct object; 115 orphan (warning).
+- Dev (`geostat-api-dev:8081`, DB `geostat-system-mssql`, prod DB `192.168.0.230` ხელშეუხებელი): bootstrap OK, health ALL UP, 7 route, anonymous 401, startup-ზე migration შეცდომა არ ყოფილა.
+
+### 7.3 დარჩენილი (რიგით)
+1. **Commit** (explicit pathspec, ზემოთ ჩამოთვლილი ფაილები) → **dev redeploy**: `pwsh -NoProfile -File ops/cli/lifecycle/geostat.ps1 api dev bootstrap api --no-build`.
+2. **Ledger read** 086–088 (`platform.schema_migration`) — DB read-ს auto-mode classifier-მა უარი უთხრა; ოპერატორის ნებართვა/`!` command.
+3. **Token** (`contract.write`/`contract.read`) → runtime acceptance:
+   - `POST /api/v1/platform/artifacts/manifests/inventory` `{"packageCode":"KIDS_R8_RESOURCES","inventoryKey":"kids/r8/resources/kids-files-r8-sanitized/inventory.json","objectPrefix":"kids/r8/resources/kids-files-r8-sanitized/"}` → ელოდება 532 VERIFIED;
+   - `POST .../snapshots/{KIDS_RESOURCE snapshot}/attachments?manifestId=..&dryRun=true` → `false` → `POST .../reconciliation` → PASS;
+   - download smoke (200 + checksum) და negatives 403/404/409 → evidence JSON განახლება.
+4. **EXT:** `files.geostat.internal` (TLS SAN, DNS, edge redeploy, `STORAGE_PUBLIC_ENDPOINT`), anonymous policy (EXT-1), retention/DR/encryption (B-06).
+5. Frontend `/files/...` → governed download (AIR-2026-009/013) — მხოლოდ live gate PASS-ის შემდეგ.

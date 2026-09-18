@@ -45,7 +45,13 @@ public class PlatformArchiveService {
                     ps.setString(7, (String) row.get("payload_json"));
                     ps.setString(8, (String) row.get("payload_hash"));
                 });
-        List<Map<String, Object>> artifacts = dataPlane.queryForList("SELECT DISTINCT a.object_uri,a.checksum,a.original_name FROM ingest.artifact a JOIN raw.source_record r ON r.artifact_id=a.artifact_id WHERE r.dataset_snapshot_id=?", request.datasetSnapshotId());
+        /* Upload receipts plus every content object attached to the snapshot's rows, so an archived
+           snapshot keeps the byte references its published attachments pointed to. */
+        List<Map<String, Object>> artifacts = dataPlane.queryForList("SELECT a.object_uri,MIN(a.checksum) checksum,MIN(a.original_name) original_name FROM (" +
+                "SELECT a.object_uri,a.checksum,a.original_name FROM ingest.artifact a JOIN raw.source_record r ON r.artifact_id=a.artifact_id WHERE r.dataset_snapshot_id=? " +
+                "UNION ALL SELECT CONCAT('s3://',o.bucket,'/',o.object_key),o.sha256,v.original_name FROM entity.artifact_attachment t " +
+                "JOIN ingest.artifact_version v ON v.artifact_version_id=t.artifact_version_id JOIN ingest.artifact_object o ON o.artifact_object_id=v.artifact_object_id " +
+                "WHERE t.dataset_snapshot_id=?) a GROUP BY a.object_uri", request.datasetSnapshotId(), request.datasetSnapshotId());
         archivePlane.batchUpdate("IF NOT EXISTS (SELECT 1 FROM archive.artifact_reference WHERE archive_snapshot_id=? AND object_uri=?) INSERT INTO archive.artifact_reference(archive_snapshot_id,object_uri,checksum,original_name) VALUES(?,?,?,?)",
                 artifacts, 250, (ps, row) -> {
                     ps.setLong(1, archiveId); ps.setString(2, (String) row.get("object_uri"));

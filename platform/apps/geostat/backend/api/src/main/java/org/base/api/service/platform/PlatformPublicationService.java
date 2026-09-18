@@ -1,5 +1,6 @@
 package org.base.api.service.platform;
 
+import org.base.api.service.artifact.ArtifactReconciliationService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -12,15 +13,18 @@ public class PlatformPublicationService {
     private final DataPlanePublicationWriter dataPlaneWriter;
     private final PublicationControlStore controlStore;
     private final PlatformClassificationMirrorService classifications;
+    private final ArtifactReconciliationService artifactGate;
 
     public PlatformPublicationService(@Qualifier("dataPlaneJdbcTemplate") JdbcTemplate dataPlane,
                                       @Qualifier("primaryJdbcTemplate") JdbcTemplate controlPlane,
-                                      DataPlanePublicationWriter dataPlaneWriter, PublicationControlStore controlStore, PlatformClassificationMirrorService classifications) {
+                                      DataPlanePublicationWriter dataPlaneWriter, PublicationControlStore controlStore, PlatformClassificationMirrorService classifications,
+                                      ArtifactReconciliationService artifactGate) {
         this.dataPlane = dataPlane;
         this.controlPlane = controlPlane;
         this.dataPlaneWriter = dataPlaneWriter;
         this.controlStore = controlStore;
         this.classifications = classifications;
+        this.artifactGate = artifactGate;
     }
 
     public PublicationReceipt publish(PublishSnapshotRequest request) {
@@ -30,6 +34,7 @@ public class PlatformPublicationService {
                 rs -> rs.next() ? rs.getLong(1) : null, request.datasetSnapshotId(), request.datasetVersionId());
         if (rowCount == null) throw new IllegalStateException("Snapshot is not in REVIEW_REQUIRED state");
         assertReleaseGates(request.datasetSnapshotId());
+        artifactGate.requirePassIfDeclared(request.datasetSnapshotId(), request.datasetVersionId());
         long releaseId = controlStore.createIntent(request);
         PublicationReceipt receipt = dataPlaneWriter.publish(request, releaseId, rowCount);
         classifications.mirror(receipt.publicationSnapshotId());

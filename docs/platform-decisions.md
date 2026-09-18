@@ -69,3 +69,19 @@ Recovery: ყოველთვიური restore test
 ## ADR-007 — Publication policy
 
 **გადაწყვეტილება:** ნაგულისხმევი მდგომარეობაა `REVIEW_REQUIRED`. დამტკიცებული contract-ის import შეიძლება ავტომატურად გაიაროს catalog, mapping, type, relation და quality validation, მაგრამ public publication მოითხოვს publisher/steward approval-ს. მხოლოდ ცალკე მონიშნულ trusted machine feed-ს შეიძლება ჰქონდეს `AUTO_PUBLISH` policy, მკაცრი quality SLA-ით.
+
+## ADR-008 — Artifact identity, attachment and distribution
+
+**სტატუსი:** ACCEPTED (2026-09-18) · **Authority:** `docs/reference/ARTIFACT-ATTACHMENT-CONTRACT.md`
+
+**გადაწყვეტილება:**
+
+1. **Content identity = SHA-256.** `ingest.artifact_object` ერთი row-ია ერთ უნიკალურ ბაიტ-შიგთავსზე; object key არის `<prefix>/<sha256>.<ext>`. ორიგინალი სახელი და path ინახება `ingest.artifact_version`-ში (manifest-ის ფარგლებში). ეს ავრცელებს ADR-ის „S3 bucket layout“ key convention-ს განაწილებად (distribution) artifact-ებზე: dedup, idempotent re-upload და path-collision-ის გამორიცხვა. Access package-ის upload receipt (`ingest.artifact`, `incoming/<date>/<uuid>-name`) სხვა grain-ია და უცვლელი რჩება.
+2. **Attachment = typed edge.** `entity.artifact_attachment` (entity → artifact_version, relation code, role, language, ordinal, snapshot). მიბმის წესი ცხადდება მხოლოდ Control Plane-ში (`platform.artifact_relation_definition` + `platform.artifact_policy`); site-specific ცხრილი ან branch აკრძალულია.
+3. **Match = დეკლარირებული, ზუსტი.** `SOURCE_PATH` წესი: NFC, prefix strip, package root. case-insensitive ან „უახლოესი“ დამთხვევა არასდროს ხდება ავტომატურად — ყოველი გაურკვევლობა `ERROR` issue-ა და binding ჩერდება.
+4. **Publication gate.** `ARTIFACT_RECONCILIATION` PASS სავალდებულოა ყველა snapshot-ისთვის, რომლის dataset version-ს approved artifact relation აქვს; PASS evidence შეიცავს attachment-set checksum-ს და publication მოწმდება მიმდინარე set-თან.
+5. **Distribution.** API აბრუნებს მხოლოდ metadata-სა და მოკლევადიან presigned GET-ს (`signed_url_ttl_seconds` policy-დან, 30–3600). URL იწერება `STORAGE_PUBLIC_ENDPOINT` host-ზე; მისი არარსებობისას distribution fail-closed (503). Edge `files.geostat.internal` ატარებს მხოლოდ signed GET/HEAD-ს.
+6. **Access.** `PUBLIC_WHEN_PUBLISHED | AUTHENTICATED | RESTRICTED`. API boundary ამჟამად authenticated-ია (`READ_RESOURCE`); anonymous გახსნა მოითხოვს ცალკე security decision-ს (EXT-1).
+7. **Retention.** Policy-level `retention_class`. ADR-003-ის 1-წლიანი purge ეხება source/quarantine/archive artifact-ებს; published distribution artifact, რომელსაც მოქმედი snapshot მიუთითებს, არ იშლება (`RETAIN_INDEFINITE` ან `RETAIN_WHILE_REFERENCED`).
+
+**Trade-off:** checksum-addressed key კარგავს „ადამიანისთვის წასაკითხ“ ფიზიკურ სახელს — ეს განზრახულია; სახელი ინახება metadata-ში და `Content-Disposition`-ით ბრუნდება ჩამოტვირთვისას.

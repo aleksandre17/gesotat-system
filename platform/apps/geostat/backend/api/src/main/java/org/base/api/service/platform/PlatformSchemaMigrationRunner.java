@@ -113,6 +113,9 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
         executeAndRecord(control, "db/platform/083_data_family_lifecycle_state.sql");
         executeAndRecord(control, "db/platform/084_contract_revision_lifecycle.sql");
         executeAndRecord(control, "db/platform/085_canonical_storage_bindings.sql");
+        executeAndRecord(control, "db/platform/086_artifact_attachment_meta_schema.sql");
+        executeAndRecord(data, "db/platform/087_artifact_registry_data_plane.sql");
+        executeAndRecord(control, "db/platform/088_kids_r8_resource_artifact_binding.sql");
     }
 
     private void executeAndRecord(JdbcTemplate jdbc, String resource) throws Exception {

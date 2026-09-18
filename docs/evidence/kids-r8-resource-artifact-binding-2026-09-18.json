@@ -1,0 +1,70 @@
+{
+  "schema": "geostat.kids.resource-artifact-binding.v1",
+  "recordedAt": "2026-09-18",
+  "contract": {
+    "code": "KIDS_PORTAL_V1",
+    "revision": 8,
+    "datasetCode": "KIDS_RESOURCE",
+    "relationCode": "PRIMARY_FILE"
+  },
+  "stableKeyProof": {
+    "source": "platform/apps/geostat/backend/api/kids-portal-v1-canonical-r8-final.accdb :: __ent_kids_resource",
+    "key": "source_resource_id",
+    "rows": 225,
+    "distinct": 225,
+    "nulls": 0,
+    "status": "PASS"
+  },
+  "objectStorage": {
+    "bucket": "geostat-ingest",
+    "physicalPrefix": "kids/r8/resources/kids-files-r8-sanitized/",
+    "inventoryObject": "kids/r8/resources/kids-files-r8-sanitized/inventory.json",
+    "inventoryEntries": 719,
+    "inventoryDistinctSha256": 532,
+    "objectsListed": 532,
+    "objectsWhoseContentSha256EqualsKey": 532,
+    "inventoryChecksumsPresent": 532,
+    "unexpectedObjects": 0,
+    "method": "mc cat <object> | sha256sum inside geostat-minio (read-only), 2026-09-18",
+    "drift": "inventory objectName says kids/r8/resources/<sha>.<ext>; physical keys carry the kids-files-r8-sanitized/ segment (AIR-2026-010). Manifest v1 recomputes keys from the physical prefix and never trusts objectName."
+  },
+  "matching": {
+    "rule": "088_kids_r8_resource_artifact_binding.sql (SOURCE_PATH, NFC, stripPrefix files/, packageRoot mainstat/)",
+    "slots": 450,
+    "exactMatches": 450,
+    "distinctObjectsBound": 450,
+    "caseMismatches": 0,
+    "unmatched": 0,
+    "orphanPackageEntriesUnderRoot": 115,
+    "packageEntriesOutsideRoot": 154,
+    "test": "KidsR8ArtifactBindingConformanceTest (fixtures: api/src/test/resources/artifact/)",
+    "status": "PASS"
+  },
+  "runtime": {
+    "environment": "remote dev 192.168.1.199 geostat-api-dev:8081 (DB geostat-system-mssql; prod DB untouched)",
+    "deploy": "geostat.ps1 api dev bootstrap api --no-build",
+    "health": {
+      "primary": "UP",
+      "dataPlane": "UP",
+      "archivePlane": "UP",
+      "objectStorage": "UP",
+      "secondary": "UP"
+    },
+    "routesRegistered": 7,
+    "anonymousArtifactRequest": 401,
+    "migrationRunner": "no startup failure after 086/087/088 registration; ledger row read pending (see checklist 12.2)",
+    "edgeConfig": "nginx -t PASS on nginx:1.29.1-alpine; unsigned request 403, signed request forwarded"
+  },
+  "tests": {
+    "suite": ":api:test",
+    "runDate": "2026-09-18",
+    "verificationEnvironment": "local Windows worktree",
+    "tests": 176,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "artifactServiceTests": 59,
+    "newArtifactTests": 59
+  },
+  "status": "STORAGE_AND_BINDING_VERIFIED_RUNTIME_API_ACCEPTANCE_PENDING"
+}

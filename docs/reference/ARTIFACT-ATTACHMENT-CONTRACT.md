@@ -693,3 +693,13 @@ boundary is deterministic inventory-to-resource binding, persistence of
 `entity.resource_locator`/generic attachment relations, snapshot membership,
 checksum reconciliation and governed signed-download serving. Only after those
 checks reach `VERIFIED` may the frontend's static `public/files` copy be retired.
+
+### 29.1 Implementation status (2026-09-18)
+
+Upper-layer gate items implemented in source and verified by tests: meta-schema
+primitives (`platform.artifact_policy`, `platform.artifact_relation_definition`),
+physical registry (`ingest.artifact_object|artifact_manifest|artifact_version`,
+`entity.artifact_attachment`), content-addressed storage port with presign,
+manifest engine, deterministic matcher, reconciliation gate and signed-download
+API. KIDS binding is a seed row set only (migration 088). Status per layer and
+open external gates: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md`.

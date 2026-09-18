@@ -245,3 +245,132 @@ mapper, `006` drift evidence) იმავე ფორმით ემატე
 task. Chat message, issue ან commit message შეიძლება იყოს ბმული, მაგრამ AIR არის
 canonical status. კვირეული review ამოწმებს stale `DISCOVERED/DEFERRED` ჩანაწერებს,
 დამოკიდებულებებს და evidence-ის ვადაგასულობას.
+
+## 7. Storage / artifact attachment ჩანაწერები (2026-09-18)
+
+Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evidence
+`docs/evidence/kids-r8-resource-artifact-binding-2026-09-18.json`.
+
+### AIR-2026-010 — Inventory object key drift
+
+- **სტატუსი:** `VERIFIED` / **priority:** `P1`
+- **აღმოჩენა:** `inventory.json`-ის `objectName` = `kids/r8/resources/<sha>.<ext>`, ფიზიკური
+  key კი `kids/r8/resources/kids-files-r8-sanitized/<sha>.<ext>`; დოკუმენტაციაც ძველ prefix-ს
+  ასახელებდა. `objectName`-ზე დაყრდნობილი binding 532-ვე object-ს ვერ იპოვიდა.
+- **გადაწყვეტა:** manifest v1 (`ArtifactManifestGenerator`) key-ს ყოველთვის ახლიდან ითვლის
+  checksum-იდან და დეკლარირებული ფიზიკური prefix-იდან; inventory-ს `objectName` საერთოდ არ
+  გამოიყენება. Reference docs გასწორდა.
+- **Evidence:** 532/532 object — content SHA-256 = key; `KidsR8ArtifactBindingConformanceTest`.
+
+### AIR-2026-011 — Meta-schema lacked artifact primitives
+
+- **სტატუსი:** `READY` (runtime ledger read pending) / **priority:** `P0` (blocking gate §22)
+- **აღმოჩენა:** meta-schema-ში არ იყო artifact policy / relation definition; `entity.resource_locator`
+  ინახავდა მხოლოდ legacy path string-ს checksum-ის, object-ისა და policy-ის გარეშე.
+- **გადაწყვეტა:** migrations 086 (Control), 087 (Data), 088 (KIDS seed); approved definition/policy
+  immutable trigger-ებით; published attachment immutable.
+- **დახურვა:** dev ledger rows 086–088 + API binding/reconciliation run (checklist 12.2–12.5).
+
+### AIR-2026-012 — Browser-reachable signed distribution endpoint
+
+- **სტატუსი:** `TRIAGED` / **priority:** `P1` / **owner:** ops
+- **აღმოჩენა:** MinIO მხოლოდ `geostat-net`-შია; presigned URL-ის host უნდა იყოს consumer-ისთვის
+  ხელმისაწვდომი და SigV4 host-ს აწერს ხელს.
+- **გადაწყვეტა (repo-ში მზადაა):** edge server block `files.geostat.internal` (GET/HEAD, signature
+  სავალდებულო, Host უცვლელი) — `nginx -t` PASS. **გააქტიურებას სჭირდება:** TLS SAN
+  `files.geostat.internal`, DNS/hosts, edge redeploy, `STORAGE_PUBLIC_ENDPOINT=https://files.geostat.internal`.
+- **Containment:** endpoint-ის გარეშე distribution აბრუნებს 503-ს (fail-closed), არა storage path-ს.
+
+### AIR-2026-013 — Legacy locator and static files coexist
+
+- **სტატუსი:** `DEFERRED` / **priority:** `P2`
+- **აღმოჩენა:** `entity.resource_locator` (`PATH` kind) და frontend `public/files` კვლავ legacy
+  consumer-ისთვის რჩება.
+- **წესი:** ორივე რჩება backward compatibility-სთვის, სანამ AIR-2026-009 (frontend governed client)
+  არ დასრულდება და live snapshot-ზე `ARTIFACT_RECONCILIATION` PASS არ იქნება; retirement — მხოლოდ
+  შემდეგ, ცალკე migration-ით.
+
+### AIR-2026-014 — Approved artifact contract identity could be mutated
+
+- **სტატუსი:** `TRIAGED` / **priority:** `P0` / **owner:** Data Platform
+- **აღმოჩენა:** migration 086-ის approved-row triggers არ იცავდა policy/relation version identity-ს,
+  checksum algorithm-სა და retired-state immutability-ს. პირდაპირ SQL update-ს შეეძლო approved
+  contract-ის semantic identity შეეცვალა ისე, რომ trigger არ ამოქმედებულიყო.
+- **Fix in source:** trigger-ები იცავს identity-სა და ყველა semantic field-ს; DRAFT-იდან დაშვებულია
+  APPROVED/RETIRED, APPROVED-იდან მხოლოდ RETIRED, RETIRED terminal-ია. Delete და reactivation იბლოკება.
+- **Blocking evidence:** SQL Server-ზე clean migration 086 apply და positive/negative transition
+  replay (approve/retire; semantic edit, identity edit, delete, reactivation). იქამდე runtime status
+  `NOT_VERIFIED` რჩება.
+
+### AIR-2026-015 — Artifact reconciliation checksum omitted served metadata
+
+- **სტატუსი:** `READY` / **priority:** `P1` / **owner:** Data Platform
+- **აღმოჩენა:** publication gate-ის checksum შეიცავდა slot-სა და content SHA-256-ს, მაგრამ არა
+  filename/MIME/size/role/verification-ს. Reconcile-ის შემდეგ API-visible metadata შეიძლებოდა
+  შეცვლილიყო checksum-ის ცვლილების გარეშე.
+- **გადაწყვეტა:** checksum canonical-ად, length-prefixed UTF-8-ით, input order-ისგან დამოუკიდებლად
+  ითვლის ყველა API-visible identity/metadata field-ს; digest streaming-ად გამოითვლება bounded memory-ით.
+- **Evidence:** `ArtifactReconcilerTest.checksumCoversServedMetadataAndIsIndependentOfInputOrder`;
+  full `:api:test` PASS (176 tests).
+
+### AIR-2026-016 — Artifact metadata response omitted declared download policy
+
+- **სტატუსი:** `READY` / **priority:** `P1` / **owner:** API Platform
+- **აღმოჩენა:** contract §15 metadata shape-ს `download.mode` და `expiresInSeconds` სჭირდება; API
+  response ამას ტოვებდა და undeclared relation-ის metadata-ს fail-closed არ ბლოკავდა.
+- **გადაწყვეტა:** metadata approved relation/policy-იდან აბრუნებს mode-სა და TTL-ს; approved definition-ის
+  გარეშე serving fail-closed-ია.
+- **Evidence:** `ArtifactDistributionServiceTest` policy response და undeclared-relation negative;
+  full `:api:test` PASS (176 tests).
+
+### AIR-2026-017 — Multipart ingress limit contradicted artifact package budget
+
+- **სტატუსი:** `READY` / **priority:** `P1` / **owner:** API Platform
+- **აღმოჩენა:** package service allowed configurable large bounded ZIPs, but Spring multipart defaulted
+  to the Access artifact cap. Valid package uploads could be rejected before application validation.
+- **გადაწყვეტა:** separate `PLATFORM_ARTIFACT_MAX_UPLOAD_BYTES` now controls both servlet multipart
+  limits and artifact configuration; compressed request size remains distinct from bounded expanded
+  entry/package sizes. Compose and env template declare the same override.
+- **Evidence:** artifact configuration test, full `:api:test` PASS (176 tests); remote config/deployment replay pending.
+
+### AIR-2026-018 — Concurrent identical manifest registration could race
+
+- **სტატუსი:** `TRIAGED` / **priority:** `P1` / **owner:** Data Platform
+- **აღმოჩენა:** two retries with the same package checksum could both observe no manifest before the
+  unique-key insert; one request could fail with a duplicate-key error instead of idempotently returning
+  the existing manifest.
+- **Fix in source:** manifest checksum lookup now takes an update/serializable key-range lock on its
+  declared unique index inside the registration transaction.
+- **Acceptance:** concurrent SQL Server replay with the same checksum returns one manifest identity
+  to every caller and creates exactly one manifest/version set. Until replay, concurrency behavior is
+  `NOT_VERIFIED`.
+
+### AIR-2026-019 — Absolute source paths were silently converted to relative paths
+
+- **სტატუსი:** `READY` / **priority:** `P1` / **owner:** Ingestion
+- **აღმოჩენა:** manifest path normalization stripped leading `/`, so an absolute POSIX/UNC path could
+  be accepted as a different relative package path; Windows drive paths were also accepted as metadata.
+- **გადაწყვეტა:** NFC/forward-slash normalization now rejects POSIX/UNC roots and drive-prefixed paths
+  before manifest construction, while preserving safe relative paths.
+- **Evidence:** `ArtifactManifestGeneratorTest.invalidInventoryIsRejected`; full `:api:test` PASS (176 tests).
+
+### AIR-2026-020 — Package checksum encoding had delimiter ambiguity
+
+- **სტატუსი:** `READY` / **priority:** `P1` / **owner:** Ingestion
+- **აღმოჩენა:** concatenating path, checksum, size and MIME fields with tabs/newlines allowed legal
+  filenames containing those characters to make distinct manifests serialize to the same pre-hash byte
+  stream, weakening package idempotency identity without requiring a SHA-256 collision.
+- **გადაწყვეტა:** canonical package checksum now uses length-prefixed UTF-8 strings, fixed-width numeric
+  fields and an explicit entry count; computation streams directly into SHA-256.
+- **Evidence:** `ArtifactManifestGeneratorTest.packageChecksumUsesUnambiguousLengthPrefixedFields`;
+  full `:api:test` PASS (176 tests).
+
+### AIR-2026-021 — Relation ordering declaration was ignored for array bindings
+
+- **სტატუსი:** `READY` / **priority:** `P1` / **owner:** Data Platform
+- **აღმოჩენა:** matcher assigned array ordinals in source order even when the approved relation
+  declared `ordered=false`, allowing input array permutation to change the persisted edge identity.
+- **გადაწყვეტა:** unordered values now receive deterministic ordinals by resolved canonical package path;
+  declared ordered relations still preserve source array order.
+- **Evidence:** `ArtifactMatcherTest.unorderedArrayValuesUseCanonicalPathOrder` and existing ordered
+  source-order test; full `:api:test` PASS (176 tests).

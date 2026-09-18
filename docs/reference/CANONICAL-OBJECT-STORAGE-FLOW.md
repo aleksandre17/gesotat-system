@@ -14,10 +14,10 @@ Network: geostat-net
 
 ```text
 geostat-ingest/
-  kids/r8/resources/
+  kids/r8/resources/kids-files-r8-sanitized/
     <sha256>.xlsx
     <sha256>.xls
-    inventory.json
+    inventory.json        # objectName inside omits the kids-files-r8-sanitized/ segment (AIR-2026-010)
 
 geostat-quarantine/
   rejected/...
@@ -77,9 +77,13 @@ Frontend
 - 719 source files discovered;
 - 532 unique SHA-256 payload objects staged in `geostat-ingest`;
 - `inventory.json` preserves every original path and object mapping;
-- DB locator binding and final published signed-download projection are the next
-  governed step;
-- frontend static files remain unchanged until that binding reaches `VERIFIED`.
+- 532/532 objects verified on 2026-09-18 (content SHA-256 equals key);
+- artifact registry, attachment relation, reconciliation gate and signed-download
+  API are implemented (ADR-008, migrations 086–088,
+  `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md`);
+- 225 `KIDS_RESOURCE` rows × ka/en = 450 slots match 450 distinct objects exactly;
+- frontend static files remain unchanged until the live snapshot gate is `PASS`
+  and the governed client replaces `/files/...` (AIR-2026-009/013).
 
 ## სრული განმარტება
 
@@ -247,3 +251,18 @@ API response
 checksum integrity-ს, immutable snapshot-ს, idempotent re-upload-ს, duplicate
 detection-სა და rollback-ს. API აბრუნებს მხოლოდ კონტრაქტით დამტკიცებულ metadata-ს,
 typed data-სა და დროებით signed URL-ს.
+
+## Implementation map (2026-09-18)
+
+```text
+package (inventory | ZIP)          POST /api/v1/platform/artifacts/manifests/{inventory|package}
+  → manifest v1 + checksum keys    ArtifactManifestGenerator
+  → ingest.artifact_manifest / artifact_object / artifact_version
+  → verify (stat + full SHA-256)   POST .../manifests/{id}/verification
+snapshot (REVIEW)                  POST .../snapshots/{id}/attachments?manifestId=&dryRun=
+  → entity.artifact_attachment     rule: platform.artifact_relation_definition
+  → ARTIFACT_RECONCILIATION        POST .../snapshots/{id}/reconciliation
+  → publication (gate enforced)    PlatformPublicationService
+published entity                   GET  .../entities/{recordType}/{key}
+  → presigned GET (policy TTL)     GET  .../entities/{recordType}/{key}/{relation}/{lang}/{ordinal}/download
+```

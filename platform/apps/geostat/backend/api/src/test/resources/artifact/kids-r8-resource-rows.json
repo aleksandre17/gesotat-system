@@ -1,0 +1,1352 @@
+[
+ {
+  "source_resource_id": "128",
+  "source_row_key": "files|128",
+  "path_ka": "files/mosaxleoba/01_01_მოსახლეობის რიცხოვნობა ასაკისა და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_01_Number of population by age and sex.xlsx"
+ },
+ {
+  "source_resource_id": "129",
+  "source_row_key": "files|129",
+  "path_ka": "files/mosaxleoba/01_02_მოსახლეობის რიცხოვნობა ასაკისა და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_02-Number of population by age and sex.xlsx"
+ },
+ {
+  "source_resource_id": "130",
+  "source_row_key": "files|130",
+  "path_ka": "files/mosaxleoba/01_03_სქესთა რაოდენობრივი თანაფარდობა ასაკის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_03_Sex ratio by age.xlsx"
+ },
+ {
+  "source_resource_id": "131",
+  "source_row_key": "files|131",
+  "path_ka": "files/mosaxleoba/01_04_ახალგაზრდა ასაკის დატვირთვის კოეფიციენტი.xlsx",
+  "path_en": "files/mosaxleoba/01_04_Child dependency ratio.xlsx"
+ },
+ {
+  "source_resource_id": "132",
+  "source_row_key": "files|132",
+  "path_ka": "files/mosaxleoba/01_05_მოსახლეობის რიცხოვნობა რეგიონების, ასაკის და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_05_Number of population by regions, age and sex.xlsx"
+ },
+ {
+  "source_resource_id": "133",
+  "source_row_key": "files|133",
+  "path_ka": "files/mosaxleoba/01_06_ცოცხლად დაბადებულთა რიცხოვნობა რეგიონების მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_06_Number of live births by regions.xlsx"
+ },
+ {
+  "source_resource_id": "134",
+  "source_row_key": "files|134",
+  "path_ka": "files/mosaxleoba/01_07_ცოცხლად დაბადებულთა რიცხოვნობა რეგიონების, სქესის და დედის ასაკის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_07_Number of live births by regions, sex and age of mother.xlsx"
+ },
+ {
+  "source_resource_id": "135",
+  "source_row_key": "files|135",
+  "path_ka": "files/mosaxleoba/01_08_ცოცხლად დაბადებულთა რიცხოვნობა რეგიონების, მშობლების ქორწინებითი მდგომარეობის და დედის ასაკის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_08_Number of live births by regions, legitimacy status and age of mother.xlsx"
+ },
+ {
+  "source_resource_id": "136",
+  "source_row_key": "files|136",
+  "path_ka": "files/mosaxleoba/01_09_ცოცხლად დაბადებულთა რიცხოვნობა რიგითობის და დედის ასაკის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_09_Live births by order and age of mother.xlsx"
+ },
+ {
+  "source_resource_id": "137",
+  "source_row_key": "files|137",
+  "path_ka": "files/mosaxleoba/01_10_შობადობის ასაკობრივი კოეფიციენტები.xlsx",
+  "path_en": "files/mosaxleoba/01_10_Age specific fertility rates.xlsx"
+ },
+ {
+  "source_resource_id": "138",
+  "source_row_key": "files|138",
+  "path_ka": "files/mosaxleoba/01_11_მკვდრადშობილთა რიცხოვნობა დედის ასაკის და ბავშვის სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_11_Number of stillbirths by age of mother and sex.xlsx"
+ },
+ {
+  "source_resource_id": "139",
+  "source_row_key": "files|139",
+  "path_ka": "files/mosaxleoba/01_12_გარდაცვლილთა რიცხოვნობა რეგიონების, ასაკის და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_12_Number of deaths by regions, age and sex.xlsx"
+ },
+ {
+  "source_resource_id": "140",
+  "source_row_key": "files|140",
+  "path_ka": "files/mosaxleoba/01_13_დაქორწინებულთა რიცხოვნობა ასაკის და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_13_Number of married people by age and sex.xlsx"
+ },
+ {
+  "source_resource_id": "141",
+  "source_row_key": "files|141",
+  "path_ka": "files/mosaxleoba/01_14_დაქორწინებულთა რიცხოვნობა ქორწინების რიგითობის, ასაკის და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_14_Number of married people by order of marriages, age and sex.xlsx"
+ },
+ {
+  "source_resource_id": "142",
+  "source_row_key": "files|142",
+  "path_ka": "files/mosaxleoba/01_15_დაქორწინებულთა რიცხოვნობა  წინა ქორწინებითი მდგომარეობის, ასაკისა და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_15_Number of married people by previous marital status, age and sex.xlsx"
+ },
+ {
+  "source_resource_id": "143",
+  "source_row_key": "files|143",
+  "path_ka": "files/mosaxleoba/01_16_დაქორწინებულთა რიცხოვნობა კაცის და ქალის ასაკის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_16_Number of married people by age of spouses.xlsx"
+ },
+ {
+  "source_resource_id": "144",
+  "source_row_key": "files|144",
+  "path_ka": "files/mosaxleoba/01_17_განქორწინებულთა რიცხოვნობა ასაკის და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_17_Number of divorced people by age and sexთ.xlsx"
+ },
+ {
+  "source_resource_id": "145",
+  "source_row_key": "files|145",
+  "path_ka": "files/mosaxleoba/01_18_25 წლამდე ასაკის განქორწინებულთა რიცხოვნობა სქესის და ქორწინების ხანგრძლივობის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_18_Number of divorced people under 25 by sex and duration of marriage (year).xlsx"
+ },
+ {
+  "source_resource_id": "146",
+  "source_row_key": "files|146",
+  "path_ka": "files/mosaxleoba/01_19_25-29 წლის ასაკის განქორწინებულთა რიცხოვნობა სქესის და ქორწინების ხანგრძლივობის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_19_Number of divorced people aged 25-29 by sex and duration of marriage (year).xlsx"
+ },
+ {
+  "source_resource_id": "147",
+  "source_row_key": "files|147",
+  "path_ka": "files/mosaxleoba/01_20_ემიგრანტების რიცხოვნობა ასაკის და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_20_Number of emigrants by age and sex.xlsx"
+ },
+ {
+  "source_resource_id": "148",
+  "source_row_key": "files|148",
+  "path_ka": "files/mosaxleoba/01_21_იმიგრანტების რიცხოვნობა ასაკის და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_21_Number of immigrants by age and sex.xlsx"
+ },
+ {
+  "source_resource_id": "149",
+  "source_row_key": "files|149",
+  "path_ka": "files/mosaxleoba/01_22_ემიგრანტების რიცხოვნობა ასაკის და მოქალაქეობის ქვეყნის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_22_Number of emigrants by age and citizenship.xlsx"
+ },
+ {
+  "source_resource_id": "150",
+  "source_row_key": "files|150",
+  "path_ka": "files/mosaxleoba/01_23_იმიგრანტების რიცხოვნობა ასაკის და მოქალაქეობის ქვეყნის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_23_Number of imigrants by age and citizenshipთ.xlsx"
+ },
+ {
+  "source_resource_id": "151",
+  "source_row_key": "files|151",
+  "path_ka": "files/mosaxleoba/01_24_მოსახლეობის რიცხოვნობა საქართველოში დაბადების ადგილის, ასაკისა და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_24_Number of population by place of birth, age and sex.xlsx"
+ },
+ {
+  "source_resource_id": "152",
+  "source_row_key": "files|152",
+  "path_ka": "files/mosaxleoba/01_25_25 წლამდე შიდა მიგრანტების რიცხოვნობა წინა და ამჟამინდელი მუდმივი საცხოვრებელი ადგილის და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_25_Internal migrants under 25 by previous and current usual place of residence and sex.xlsx"
+ },
+ {
+  "source_resource_id": "153",
+  "source_row_key": "files|153",
+  "path_ka": "files/mosaxleoba/01_26_მოსახლეობის რიცხოვნობა ასაკის და ეროვნებების-ეთნიკური წარმომავლობის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_26_Number of population by ethnicity and age.xlsx"
+ },
+ {
+  "source_resource_id": "154",
+  "source_row_key": "files|154",
+  "path_ka": "files/mosaxleoba/01_27_მოსახლეობის რიცხოვნობა ასაკის და აღმსარებლობის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_27_Numbers of population by religion and age.xlsx"
+ },
+ {
+  "source_resource_id": "155",
+  "source_row_key": "files|155",
+  "path_ka": "files/mosaxleoba/01_28_მოსახლეობის რიცხოვნობა ასაკის, მშობლიური ენისა და ქართული ენის თავისუფლად ფლობის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_28_Number of population by native languages and fluently speak Georgian language and age.xlsx"
+ },
+ {
+  "source_resource_id": "156",
+  "source_row_key": "files|156",
+  "path_ka": "files/mosaxleoba/01_29_0-24 წლის ასაკის მოსახლეობის რიცხოვნობა რეგიონების და  ქართული ენის თავისუფლად ფლობის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_29_Number of population under 25 by regions, native languages and fluently speak Georgian language.xlsx"
+ },
+ {
+  "source_resource_id": "157",
+  "source_row_key": "files|157",
+  "path_ka": "files/mosaxleoba/01_30_0-29 წლის ასაკის მოსახლეობის რიცხოვნობა რეგიონების და  ქართული ენის თავისუფლად ფლობის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_30_Number of population under 30 by regions, native languages and fluently speak Georgian language.xlsx"
+ },
+ {
+  "source_resource_id": "158",
+  "source_row_key": "files|158",
+  "path_ka": "files/mosaxleoba/01_31_მოსახლეობის რიცხოვნობა ასაკის და ჯანმრთელობასთან დაკავშირებული პრობლემების მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_31_Number of population by health related limitations and age.xlsx"
+ },
+ {
+  "source_resource_id": "159",
+  "source_row_key": "files|159",
+  "path_ka": "files/mosaxleoba/01_32_25 წლამდე ასაკის მოსახლეობის რიცხოვნობა ჯანმრთელობასთან დაკავშირებული პრობლემების (მნიშვნელოვანი ან სრული ფუნქციური სირთულეები) და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_32_Number of population under 25 by health related limitations (with a lot of difficulty or cannot do it at all) and sex.xlsx"
+ },
+ {
+  "source_resource_id": "160",
+  "source_row_key": "files|160",
+  "path_ka": "files/mosaxleoba/01_33_მოსახლეობის რიცხოვნობა ასაკის და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_33_Number of population  by age and sex.xlsx"
+ },
+ {
+  "source_resource_id": "161",
+  "source_row_key": "files|161",
+  "path_ka": "files/mosaxleoba/01_34_მოსახლეობა ასაკით რეგიონი.xlsx",
+  "path_en": "files/mosaxleoba/01_34_Population by regions, age and sex.xlsx"
+ },
+ {
+  "source_resource_id": "162",
+  "source_row_key": "files|162",
+  "path_ka": "files/jandacva/02_01_Abortebi.xlsx",
+  "path_en": "files/jandacva/02_01_Abortions.xlsx"
+ },
+ {
+  "source_resource_id": "163",
+  "source_row_key": "files|163",
+  "path_ka": "files/jandacva/02_02_Simsivneebi.xlsx",
+  "path_en": "files/jandacva/02_02_Malignant Neoplasms.xlsx"
+ },
+ {
+  "source_resource_id": "164",
+  "source_row_key": "files|164",
+  "path_ka": "files/jandacva/02_03_sggd.xlsx",
+  "path_en": "files/jandacva/02_03_std.xlsx"
+ },
+ {
+  "source_resource_id": "165",
+  "source_row_key": "files|165",
+  "path_ka": "files/jandacva/02_04_Shaqriani_diabeti.xlsx",
+  "path_en": "files/jandacva/02_04_Diabetes Mellitus.xlsx"
+ },
+ {
+  "source_resource_id": "166",
+  "source_row_key": "files|166",
+  "path_ka": "files/jandacva/02_05_Suntqvis_organota_tuberkulozi.xlsx",
+  "path_en": "files/jandacva/02_05_respiratory systems_tuberculosis.xlsx"
+ },
+ {
+  "source_resource_id": "167",
+  "source_row_key": "files|167",
+  "path_ka": "files/jandacva/02_06_Nervuli_tuberkulozi.xlsx",
+  "path_en": "files/jandacva/02_06_nervous system_tuberculosis.xlsx"
+ },
+ {
+  "source_resource_id": "168",
+  "source_row_key": "files|168",
+  "path_ka": "files/jandacva/02_07_Dzval_saxsarta_tuberkulozi.xlsx",
+  "path_en": "files/jandacva/02_07_musculosceletal system_tuberculosis.xlsx"
+ },
+ {
+  "source_resource_id": "169",
+  "source_row_key": "files|169",
+  "path_ka": "files/jandacva/02_08_Infeqciuri.xlsx",
+  "path_en": "files/jandacva/02_08_infectious.xlsx"
+ },
+ {
+  "source_resource_id": "170",
+  "source_row_key": "files|170",
+  "path_ka": "files/jandacva/02_09_Sisxlmbadi.xlsx",
+  "path_en": "files/jandacva/02_09_blood and blood-forming.xlsx"
+ },
+ {
+  "source_resource_id": "171",
+  "source_row_key": "files|171",
+  "path_ka": "files/jandacva/02_10_Endokrinuli.xlsx",
+  "path_en": "files/jandacva/02_10_endocrin system.xlsx"
+ },
+ {
+  "source_resource_id": "172",
+  "source_row_key": "files|172",
+  "path_ka": "files/jandacva/02_11_Fsiqikuri.xlsx",
+  "path_en": "files/jandacva/02_11_psychic.xlsx"
+ },
+ {
+  "source_resource_id": "173",
+  "source_row_key": "files|173",
+  "path_ka": "files/jandacva/02_12_Nervuli.xlsx",
+  "path_en": "files/jandacva/02_12_Nervous.xlsx"
+ },
+ {
+  "source_resource_id": "174",
+  "source_row_key": "files|174",
+  "path_ka": "files/jandacva/02_13_Tvali.xlsx",
+  "path_en": "files/jandacva/02_13_Eye.xlsx"
+ },
+ {
+  "source_resource_id": "175",
+  "source_row_key": "files|175",
+  "path_ka": "files/jandacva/02_14_Yuris.xlsx",
+  "path_en": "files/jandacva/02_14_Ear.xlsx"
+ },
+ {
+  "source_resource_id": "176",
+  "source_row_key": "files|176",
+  "path_ka": "files/jandacva/02_15_Sisxlis_mimoqcevis.xlsx",
+  "path_en": "files/jandacva/02_15_circulatory system.xlsx"
+ },
+ {
+  "source_resource_id": "177",
+  "source_row_key": "files|177",
+  "path_ka": "files/jandacva/02_16_Suntqvis_organota.xlsx",
+  "path_en": "files/jandacva/02_16_respiratory system.xlsx"
+ },
+ {
+  "source_resource_id": "178",
+  "source_row_key": "files|178",
+  "path_ka": "files/jandacva/02_17_Sachmlis_momnelebeli.xlsx",
+  "path_en": "files/jandacva/02_17_digestive organs.xlsx"
+ },
+ {
+  "source_resource_id": "179",
+  "source_row_key": "files|179",
+  "path_ka": "files/jandacva/02_18_Kani_da_Kanqvesha.xlsx",
+  "path_en": "files/jandacva/02_18_skin and subcutaneous.xlsx"
+ },
+ {
+  "source_resource_id": "180",
+  "source_row_key": "files|180",
+  "path_ka": "files/jandacva/02_19_Dzval_saxsarta.xlsx",
+  "path_en": "files/jandacva/02_19_musculosceletal.xlsx"
+ },
+ {
+  "source_resource_id": "181",
+  "source_row_key": "files|181",
+  "path_ka": "files/jandacva/02_20_Shard_sasqeso.xlsx",
+  "path_en": "files/jandacva/02_20_urogenital.xlsx"
+ },
+ {
+  "source_resource_id": "182",
+  "source_row_key": "files|182",
+  "path_ka": "files/jandacva/02_21_Perinataluri.xlsx",
+  "path_en": "files/jandacva/02_21_Perinatal.xlsx"
+ },
+ {
+  "source_resource_id": "183",
+  "source_row_key": "files|183",
+  "path_ka": "files/jandacva/02_22_Tandayolili_anomaliebi.xlsx",
+  "path_en": "files/jandacva/02_22_congenital malformations.xlsx"
+ },
+ {
+  "source_resource_id": "184",
+  "source_row_key": "files|184",
+  "path_ka": "files/jandacva/02_23_janmrtelobis dazghvevis dafarva.xlsx",
+  "path_en": "files/jandacva/02_23_Health insurance coverage.xlsx"
+ },
+ {
+  "source_resource_id": "185",
+  "source_row_key": "files|185",
+  "path_ka": "files/jandacva/02_24_xelovnuri abortis koeficienti da mkvdardshobadobis koeficienti.xlsx",
+  "path_en": "files/jandacva/02_24_abortion rate and stillbirth rate.xlsx"
+ },
+ {
+  "source_resource_id": "186",
+  "source_row_key": "files|186",
+  "path_ka": "files/jandacva/02_25_adreuli shvilosnoba.xlsx",
+  "path_en": "files/jandacva/02_25_ Early childbearing.xlsx"
+ },
+ {
+  "source_resource_id": "187",
+  "source_row_key": "files|187",
+  "path_ka": "files/jandacva/02_26_mshobiarobis adgili.xlsx",
+  "path_en": "files/jandacva/02_26_Place of delivery.xlsx"
+ },
+ {
+  "source_resource_id": "188",
+  "source_row_key": "files|188",
+  "path_ka": "files/jandacva/02_27_sakeisro kveta.xlsx",
+  "path_en": "files/jandacva/02_27_Caesarean section.xlsx"
+ },
+ {
+  "source_resource_id": "189",
+  "source_row_key": "files|189",
+  "path_ka": "files/jandacva/02_28_axalshobilisa da dedis mshobiarobis shemdgomi shemowmeba.xlsx",
+  "path_en": "files/jandacva/02_28_Post-natal health checks for newborns and mothers.xlsx"
+ },
+ {
+  "source_resource_id": "190",
+  "source_row_key": "files|190",
+  "path_ka": "files/jandacva/02_29_adreuli dzudzuti kveba.xlsx",
+  "path_en": "files/jandacva/02_29_Initial breastfeeding.xlsx"
+ },
+ {
+  "source_resource_id": "191",
+  "source_row_key": "files|191",
+  "path_ka": "files/jandacva/02_30_dzudzuti kvebis statusi.xlsx",
+  "path_en": "files/jandacva/02_30_Breastfeeding status.xlsx"
+ },
+ {
+  "source_resource_id": "192",
+  "source_row_key": "files|192",
+  "path_ka": "files/jandacva/02_31_bavshvebis da axalshobilebis kvebis gamocdileba.xlsx",
+  "path_en": "files/jandacva/02_31_Infant and young child feeding (IYCF) practices.xlsx"
+ },
+ {
+  "source_resource_id": "193",
+  "source_row_key": "files|193",
+  "path_ka": "files/jandacva/02_32_bavshvis funqcionireba.xlsx",
+  "path_en": "files/jandacva/02_32_Child functioning.xlsx"
+ },
+ {
+  "source_resource_id": "194",
+  "source_row_key": "files|194",
+  "path_ka": "files/jandacva/02_33_HIV gadacema.xlsx",
+  "path_en": "files/jandacva/02_33_HIV transmission.xlsx"
+ },
+ {
+  "source_resource_id": "195",
+  "source_row_key": "files|195",
+  "path_ka": "files/jandacva/02_34_bavshvebis nutriciuli statusi.xlsx",
+  "path_en": "files/jandacva/02_34_Nutritional status of children.xlsx"
+ },
+ {
+  "source_resource_id": "196",
+  "source_row_key": "files|196",
+  "path_ka": "files/jandacva/02_35_bavshvis funqcionireba.xlsx",
+  "path_en": "files/jandacva/02_35_Child functioning.xlsx"
+ },
+ {
+  "source_resource_id": "197",
+  "source_row_key": "files|197",
+  "path_ka": "files/jandacva/02_36_informaciuli, nebayoflobiti gadawyvetileba reproduqciuli janmrtelobis shesaxeb.xlsx",
+  "path_en": "files/jandacva/02_36_Informed decision on reproductive health care.xlsx"
+ },
+ {
+  "source_resource_id": "261",
+  "source_row_key": "files|261",
+  "path_ka": "files/education/03_01_skolamdeli-dawesebulebebi-municipalitetebis-mixedviT.XLSX",
+  "path_en": "files/education/03_01_PEC-institutions-by-Municipalities.xlsx"
+ },
+ {
+  "source_resource_id": "262",
+  "source_row_key": "files|262",
+  "path_ka": "files/education/03_02_zogadsaganmanaTleblo-dawesebulebebi-da-maTSi-moswavleTa-ricxovnoba.xlsx",
+  "path_en": "files/education/03_02_Number-of-General-Education-Schools-and-Pupils-in-them.xlsx"
+ },
+ {
+  "source_resource_id": "264",
+  "source_row_key": "files|264",
+  "path_ka": "files/education/03_04_moswavleTa ganawileba safexurebis da klasebis mixedviT.XLSX",
+  "path_en": "files/education/03_04_Distribution of Public and Private General School  Pupils by Level....xlsx"
+ },
+ {
+  "source_resource_id": "265",
+  "source_row_key": "files|265",
+  "path_ka": "files/education/03_05_moswavleebi  asakisa da sqesis mixedviT.XLSX",
+  "path_en": "files/education/03_05_Number-of-general-Education-School-Pupils-by-grades-and-ages.XLSX"
+ },
+ {
+  "source_resource_id": "266",
+  "source_row_key": "files|266",
+  "path_ka": "files/education/03_06_ICT_geo.xlsx",
+  "path_en": "files/education/03_06_ICT.xlsx"
+ },
+ {
+  "source_resource_id": "267",
+  "source_row_key": "files|267",
+  "path_ka": "files/education/03_07_sssm moswavleebi.xlsx",
+  "path_en": "files/education/03_07_with Special needs.xlsx"
+ },
+ {
+  "source_resource_id": "268",
+  "source_row_key": "files|268",
+  "path_ka": "files/education/03_08_SeuCerdat statusi_Seuwydat statusi.xlsx",
+  "path_en": "files/education/03_08_suspended or terminated out studying.xlsx"
+ },
+ {
+  "source_resource_id": "269",
+  "source_row_key": "files|269",
+  "path_ka": "files/education/03_09_skolis-damtavreba.xlsx",
+  "path_en": "files/education/03_09_Graduation.xlsx"
+ },
+ {
+  "source_resource_id": "270",
+  "source_row_key": "files|270",
+  "path_ka": "files/education/03_10_skolebis-tipebis-da-regionebis-mixedviT.xlsx",
+  "path_en": "files/education/03_10_Number-of-schools-by-stages-and-regions.xlsx"
+ },
+ {
+  "source_resource_id": "271",
+  "source_row_key": "files|271",
+  "path_ka": "files/education/03_11_skolebisa-da-moswavleebis-raodenoba-regionebis-mixedviT.xlsx",
+  "path_en": "files/education/03_11_Number-of-schools_Pupils_Teachers by Municipalities.xlsx"
+ },
+ {
+  "source_resource_id": "272",
+  "source_row_key": "files|272",
+  "path_ka": "files/education/03_12_maswavleblebis ricxovnoba.xlsx",
+  "path_en": "files/education/03_12_Number-of-General-Education-School-Teachers.xlsx"
+ },
+ {
+  "source_resource_id": "274",
+  "source_row_key": "files|274",
+  "path_ka": "files/education/03_14_profesiuli-saganmanaTleblo-dawesebulebebis-raodenoba.xlsx",
+  "path_en": "files/education/03_14_Number-of-educational-institutions,-that-conducted-admission-of-students-in-vocational-education-programs.xlsx"
+ },
+ {
+  "source_resource_id": "275",
+  "source_row_key": "files|275",
+  "path_ka": "files/education/03_15_studentebis-ricxovnoba-saganmanasTleblo-dawesebulebebis-profesiul-saganm....xlsx",
+  "path_en": "files/education/03_15_Number-of-students-in-Public-and-Private-Vocational-Education-Institutions'-Education-Programs.xlsx"
+ },
+ {
+  "source_resource_id": "276",
+  "source_row_key": "files|276",
+  "path_ka": "files/education/03_16_profesiuli ganaTlebis maCveneblebi regionebis da sqesis mixedviT.XLSX",
+  "path_en": "files/education/03_16_Indicators of Vocational Education by Regions and Sex.XLSX"
+ },
+ {
+  "source_resource_id": "277",
+  "source_row_key": "files|277",
+  "path_ka": "files/education/03_17_sssm studentebis ricxovnoba.xlsx",
+  "path_en": "files/education/03_17_Disabled Student.xlsx"
+ },
+ {
+  "source_resource_id": "278",
+  "source_row_key": "files|278",
+  "path_ka": "files/education/03_18_umaRlesi-saganmanaTleblo-dawesebulebebis-raodenoba-regionebis-mixedviT.xls",
+  "path_en": "files/education/03_18_Number-of-Higher-Education-Institutions-by-Form-of-Ownership-and-Regions-of-Georgia.xlsx"
+ },
+ {
+  "source_resource_id": "279",
+  "source_row_key": "files|279",
+  "path_ka": "files/education/03_19_studentTa-miReba-saxelmwifo da kerzo-saganmanaTleblo-dawesebulebebSi-programebis-mixedviT.xls",
+  "path_en": "files/education/03_19_Number of Students Admitted in Public and Private Institutions by Programmes and Sex.xlsx"
+ },
+ {
+  "source_resource_id": "280",
+  "source_row_key": "files|280",
+  "path_ka": "files/education/03_20_studentTa-ricxovnoba-saxelmwifo da kerZo-saganmanaTleblo-dawesebulebebSi-programebis-mixedviT.xls",
+  "path_en": "files/education/03_20_Number of Students in Public and Private Institutions by Programmes and Sex.xlsx"
+ },
+ {
+  "source_resource_id": "281",
+  "source_row_key": "files|281",
+  "path_ka": "files/education/03_21_studentTa-ganawileba-asakis_da_sqesis_mixedviT.xls",
+  "path_en": "files/education/03_21_Number of Students in Institutions by Age and Sex.xlsx"
+ },
+ {
+  "source_resource_id": "282",
+  "source_row_key": "files|282",
+  "path_ka": "files/education/03_22_kursdamTavrebulTa-raodenoba-saxelmwifo-da kerdzo saganmanaTleblo-dawesebulebebidan-programebis-mixedviT.xls",
+  "path_en": "files/education/03_22_Graduates of Public and Private Institutions by Programmes and Sex.xlsx"
+ },
+ {
+  "source_resource_id": "283",
+  "source_row_key": "files|283",
+  "path_ka": "files/education/03_23_doqt. miReba.xlsx",
+  "path_en": "files/education/03_23_doqtoral admission.xlsx"
+ },
+ {
+  "source_resource_id": "284",
+  "source_row_key": "files|284",
+  "path_ka": "files/education/03_24_doqt. ricxovnoba.xlsx",
+  "path_en": "files/education/03_24_doqtoral number.xlsx"
+ },
+ {
+  "source_resource_id": "285",
+  "source_row_key": "files|285",
+  "path_ka": "files/education/03_25_doqt. kursdamt..xlsx",
+  "path_en": "files/education/03_25_doqtoral completed.xlsx"
+ },
+ {
+  "source_resource_id": "286",
+  "source_row_key": "files|286",
+  "path_ka": "files/education/03_26_doqtorantebi asakit.xlsx",
+  "path_en": "files/education/03_26_doqtoral age.xlsx"
+ },
+ {
+  "source_resource_id": "287",
+  "source_row_key": "files|287",
+  "path_ka": "files/education/03_27_sabavshvo baghi.xlsx",
+  "path_en": "files/education/03_27_Kindergarten.xlsx"
+ },
+ {
+  "source_resource_id": "288",
+  "source_row_key": "files|288",
+  "path_ka": "files/education/03_28_skolis shesabamis safexurze shesvlis saerto, safexuris dasrulebisa da efeqturi gadasvlis doneebi.xlsx",
+  "path_en": "files/education/03_28_Gross intake, completion and effective transition rates.xlsx"
+ },
+ {
+  "source_resource_id": "289",
+  "source_row_key": "files|289",
+  "path_ka": "files/education/03_29_formaluri ganatlebis mighma darchenili bavshvebis machvenebeli dawyebiti da sabaziso ganatlebis safexurebistvis.xlsx",
+  "path_en": "files/education/03_29_Children left beyond formal education at the primary and lower secondary levels of education.xlsx"
+ },
+ {
+  "source_resource_id": "290",
+  "source_row_key": "files|290",
+  "path_ka": "files/education/03_30_tanasworobis indeqsi.xlsx",
+  "path_en": "files/education/03_30_Parity indices.xlsx"
+ },
+ {
+  "source_resource_id": "291",
+  "source_row_key": "files|291",
+  "path_ka": "files/education/03_31_swavlashi xelshewyoba.xlsx",
+  "path_en": "files/education/03_31_Support for learning.xlsx"
+ },
+ {
+  "source_resource_id": "292",
+  "source_row_key": "files|292",
+  "path_ka": "files/education/03_32_fizikuri dasjis mimart damokidebuleba.xlsx",
+  "path_en": "files/education/03_32_Attitudes toward physical punishment.xlsx"
+ },
+ {
+  "source_resource_id": "294",
+  "source_row_key": "files|294",
+  "path_ka": "files/education/03_34_bavshvta adreuli ganvitarebis indeqsi.xlsx",
+  "path_en": "files/education/03_34_Early child development index.xlsx"
+ },
+ {
+  "source_resource_id": "295",
+  "source_row_key": "files|295",
+  "path_ka": "files/education/03_35_organizebul swavlebashi chartulobis machvenebeli.xlsx",
+  "path_en": "files/education/03_35_Participation rate in organised learning.xlsx"
+ },
+ {
+  "source_resource_id": "296",
+  "source_row_key": "files|296",
+  "path_ka": "files/education/03_36_bavshvis aghzrda.xlsx",
+  "path_en": "files/education/03_36_Child discipline.xlsx"
+ },
+ {
+  "source_resource_id": "297",
+  "source_row_key": "files|297",
+  "path_ka": "files/social/04_01_SSm socpaketi sul.xlsx",
+  "path_en": "files/social/04_01_disability socpak by age and sex;.xlsx"
+ },
+ {
+  "source_resource_id": "298",
+  "source_row_key": "files|298",
+  "path_ka": "files/social/04_02_SSm socpak. reg..xlsx",
+  "path_en": "files/social/04_02_disability socpak by sex and regions.xlsx"
+ },
+ {
+  "source_resource_id": "299",
+  "source_row_key": "files|299",
+  "path_ka": "files/social/04_03_marCenali sul.xlsx",
+  "path_en": "files/social/04_03_survivors receiving socpak by sex;.xlsx"
+ },
+ {
+  "source_resource_id": "300",
+  "source_row_key": "files|300",
+  "path_ka": "files/social/04_04_marCenali reg..xlsx",
+  "path_en": "files/social/04_04_survivors receiving socpak by sex and regions;.xlsx"
+ },
+ {
+  "source_resource_id": "301",
+  "source_row_key": "files|301",
+  "path_ka": "files/social/04_05_saarsebo sul.xlsx",
+  "path_en": "files/social/04_05_subsistence allowance by age and sex;.xlsx"
+ },
+ {
+  "source_resource_id": "302",
+  "source_row_key": "files|302",
+  "path_ka": "files/social/04_06_saarsebo reg..xlsx",
+  "path_en": "files/social/04_06_subsistence allowance by sex adn regions.xlsx"
+ },
+ {
+  "source_resource_id": "303",
+  "source_row_key": "files|303",
+  "path_ka": "files/social/04_07_gegmiuri ambulatoria sul.xlsx",
+  "path_en": "files/social/04_07_planned outpatient services by age and sex;.xlsx"
+ },
+ {
+  "source_resource_id": "304",
+  "source_row_key": "files|304",
+  "path_ka": "files/social/04_08_gegmiuri ambulatoria reg..xlsx",
+  "path_en": "files/social/04_08_planned outpatient services by sex and regions;.xlsx"
+ },
+ {
+  "source_resource_id": "305",
+  "source_row_key": "files|305",
+  "path_ka": "files/social/04_09_qronikuli daavadebebi sul.xlsx",
+  "path_en": "files/social/04_09_beneficiaries of chronic diseases by age and sex;.xlsx"
+ },
+ {
+  "source_resource_id": "306",
+  "source_row_key": "files|306",
+  "path_ka": "files/social/04_10_gaSvilebuli sul.xlsx",
+  "path_en": "files/social/04_10_adopted children by age and sex;.xlsx"
+ },
+ {
+  "source_resource_id": "307",
+  "source_row_key": "files|307",
+  "path_ka": "files/social/04_11_gaSvilebuli reg..xlsx",
+  "path_en": "files/social/04_11_adopted children by sex and regions;.xlsx"
+ },
+ {
+  "source_resource_id": "308",
+  "source_row_key": "files|308",
+  "path_ka": "files/social/04_12_statusi sul.xlsx",
+  "path_en": "files/social/04_12_granting adoption status by age and sex;.xlsx"
+ },
+ {
+  "source_resource_id": "309",
+  "source_row_key": "files|309",
+  "path_ka": "files/social/04_13_statusi reg..xlsx",
+  "path_en": "files/social/04_13_grantimg adoption status by sex and regions;.xlsx"
+ },
+ {
+  "source_resource_id": "310",
+  "source_row_key": "files|310",
+  "path_ka": "files/social/04_14_devnilebi sul.xlsx",
+  "path_en": "files/social/04_14_IDPs from the occupied territories by age and sex;.xlsx"
+ },
+ {
+  "source_resource_id": "311",
+  "source_row_key": "files|311",
+  "path_ka": "files/social/04_15_devnilebi reg..xlsx",
+  "path_en": "files/social/04_15_IDPs from the occupied territories by sex and regions..xlsx"
+ },
+ {
+  "source_resource_id": "312",
+  "source_row_key": "files|312",
+  "path_ka": "files/cxovrebisdone/05_01_ginis-koeficientebi.xls",
+  "path_en": "files/cxovrebisdone/05_01_GINI COEFFICIENTS.xls"
+ },
+ {
+  "source_resource_id": "313",
+  "source_row_key": "files|313",
+  "path_ka": "files/cxovrebisdone/05_02_absoluturi-sigaribe.xlsx",
+  "path_en": "files/cxovrebisdone/05_02_Absolute Poverty.xlsx"
+ },
+ {
+  "source_resource_id": "314",
+  "source_row_key": "files|314",
+  "path_ka": "files/cxovrebisdone/05_03_bavshvis materialuri da socialuri danaklisi.xlsx",
+  "path_en": "files/cxovrebisdone/05_03_Material and social deprivation of child.XLSX"
+ },
+ {
+  "source_resource_id": "315",
+  "source_row_key": "files|315",
+  "path_ka": "files/cxovrebisdone/05_04_sasmeli wylis dziritadi da shezguduli momsaxurebebis gamoyeneba.xlsx",
+  "path_en": "files/cxovrebisdone/05_04_Use of basic and limited drinking water services.xlsx"
+ },
+ {
+  "source_resource_id": "316",
+  "source_row_key": "files|316",
+  "path_ka": "files/cxovrebisdone/05_05_gaumjobesebuli da gasaumjobesebeli sanitaruli kvandzit sargebloba.xlsx",
+  "path_en": "files/cxovrebisdone/05_05_Use of improved and unimproved sanitation facilities.xlsx"
+ },
+ {
+  "source_resource_id": "317",
+  "source_row_key": "files|317",
+  "path_ka": "files/cxovrebisdone/05_06_sacxovreblis maxasiateblebi.xlsx",
+  "path_en": "files/cxovrebisdone/05_06_Housing characteristics.xlsx"
+ },
+ {
+  "source_resource_id": "318",
+  "source_row_key": "files|318",
+  "path_ka": "files/cxovrebisdone/05_07_usafrtxod martuli sasmeli wylis momsaxurebebi.xlsx",
+  "path_en": "files/cxovrebisdone/05_07_Safely managed drinking water services.xlsx"
+ },
+ {
+  "source_resource_id": "319",
+  "source_row_key": "files|319",
+  "path_ka": "files/cxovrebisdone/05_08_dziritadi da shezghuduli sanitaruli momsaxurebebit sargebloba.xlsx",
+  "path_en": "files/cxovrebisdone/05_08_Use of basic and limited sanitation services.xlsx"
+ },
+ {
+  "source_resource_id": "320",
+  "source_row_key": "files|320",
+  "path_ka": "files/cxovrebisdone/05_09_xelsabani mowyobilobebi sapnita da wylit sacxovrisis teritoriaze.xlsx",
+  "path_en": "files/cxovrebisdone/05_09_Handwashing facility with soap and water on premises.xlsx"
+ },
+ {
+  "source_resource_id": "321",
+  "source_row_key": "files|321",
+  "path_ka": "files/cxovrebisdone/05_10_dziritadad sufta sawvavisa da teqnologiebis gamoyeneba sakvebis mosamzadeblad, sacxovrisis gasatbobad da ganatebistvis.xlsx",
+  "path_en": "files/cxovrebisdone/05_10_Primary reliance on clean fuels and technologies for cooking, space heating, and lighting.xlsx"
+ },
+ {
+  "source_resource_id": "322",
+  "source_row_key": "files|322",
+  "path_ka": "files/cxovrebisdone/05_11_medianuri shemosavlis 50 procentze qvemot mcxovrebi adamianebis proporciuli odenoba.xlsx",
+  "path_en": "files/cxovrebisdone/05_11_Proportion of people living below 50 per cent of median income.xlsx"
+ },
+ {
+  "source_resource_id": "323",
+  "source_row_key": "files|323",
+  "path_ka": "files/cxovrebisdone/05_12_usafrtxoebis shegrzneba.xlsx",
+  "path_en": "files/cxovrebisdone/05_12_Feelings of safety.xlsx"
+ },
+ {
+  "source_resource_id": "372",
+  "source_row_key": "files|372",
+  "path_ka": "files/cxovrebisdone/05_13_bavshvebis sacxovrebeli pirobebi da obloba.xlsx",
+  "path_en": "files/cxovrebisdone/05_13_Children's living arrangements and orphanhood.xlsx"
+ },
+ {
+  "source_resource_id": "373",
+  "source_row_key": "files|373",
+  "path_ka": "files/labour/06_01_samushao-dzalis-machveneblebi-sqesis-mixedvit.xlsx",
+  "path_en": "files/labour/06_01_Labour-Force-Indicators-by-sex.xlsx"
+ },
+ {
+  "source_resource_id": "374",
+  "source_row_key": "files|374",
+  "path_ka": "files/labour/06_02_samushao-dzalis-machveneblebi-qalaq-soflis-mixedvit.xlsx",
+  "path_en": "files/labour/06_02_Labour-Force-Indicators-in-urban-rural-areas.xlsx"
+ },
+ {
+  "source_resource_id": "375",
+  "source_row_key": "files|375",
+  "path_ka": "files/labour/06_03_samushao-dzalis-machveneblebi-ganatleba.xlsx",
+  "path_en": "files/labour/06_03_Labour-force-indicators-by-education.xlsx"
+ },
+ {
+  "source_resource_id": "376",
+  "source_row_key": "files|376",
+  "path_ka": "files/labour/06_04_dasaqmeba-saqmianobis_saxe.xlsx",
+  "path_en": "files/labour/06_04_Distribution-of-Employed-by-Main-Economic Activity.xlsx"
+ },
+ {
+  "source_resource_id": "377",
+  "source_row_key": "files|377",
+  "path_ka": "files/labour/06_05_faqtiurad-namushevari_saatebi.xlsx",
+  "path_en": "files/labour/06_05_Hours-Actually-Worked.xlsx"
+ },
+ {
+  "source_resource_id": "378",
+  "source_row_key": "files|378",
+  "path_ka": "files/labour/06_06_araformaluri-dasaqmeba.xlsx",
+  "path_en": "files/labour/06_06_Informal-Employment.xlsx"
+ },
+ {
+  "source_resource_id": "382",
+  "source_row_key": "files|382",
+  "path_ka": "files/ICT/07_01_internetis gamoyeneba.xlsx",
+  "path_en": "files/ICT/07_01_Last internet usage.xlsx"
+ },
+ {
+  "source_resource_id": "384",
+  "source_row_key": "files|384",
+  "path_ka": "files/ICT/07_03_mobiluri telefonis ploba.xlsx",
+  "path_en": "files/ICT/07_03_Mobile phone ownership.xlsx"
+ },
+ {
+  "source_resource_id": "385",
+  "source_row_key": "files|385",
+  "path_ka": "files/turizmi/08_01-ადგილობრივი_ვიზიტორები.xlsx",
+  "path_en": "files/turizmi/08_01-Domestic_Visitors.xlsx"
+ },
+ {
+  "source_resource_id": "386",
+  "source_row_key": "files|386",
+  "path_ka": "files/turizmi/08_02-ადგილობრივი_ვიზიტები.xlsx",
+  "path_en": "files/turizmi/08_02-Domestic_Visits.xlsx"
+ },
+ {
+  "source_resource_id": "387",
+  "source_row_key": "files|387",
+  "path_ka": "files/turizmi/08_03-ადგილობრივი_ღამეები.xlsx",
+  "path_en": "files/turizmi/08_03-Domestic_Nights.xlsx"
+ },
+ {
+  "source_resource_id": "388",
+  "source_row_key": "files|388",
+  "path_ka": "files/turizmi/08_04-რეზიდენტები_გასვლა.xlsx",
+  "path_en": "files/turizmi/08_04-Residents_Trips.xlsx"
+ },
+ {
+  "source_resource_id": "389",
+  "source_row_key": "files|389",
+  "path_ka": "files/turizmi/08_05-რეზიდენტები_ღამეები.xlsx",
+  "path_en": "files/turizmi/08_05-Residents_Nights.xlsx"
+ },
+ {
+  "source_resource_id": "390",
+  "source_row_key": "files|390",
+  "path_ka": "files/crime/09_01_devna.xlsx",
+  "path_en": "files/crime/09_01_prosecut.xlsx"
+ },
+ {
+  "source_resource_id": "391",
+  "source_row_key": "files|391",
+  "path_ka": "files/crime/09_02_devna_asaki.xlsx",
+  "path_en": "files/crime/09_02_prosecut_ages.xlsx"
+ },
+ {
+  "source_resource_id": "392",
+  "source_row_key": "files|392",
+  "path_ka": "files/crime/09_03_dazaralebuli.xlsx",
+  "path_en": "files/crime/09_03_victim.xlsx"
+ },
+ {
+  "source_resource_id": "393",
+  "source_row_key": "files|393",
+  "path_ka": "files/crime/09_04_dazaralebuli_asaki.xlsx",
+  "path_en": "files/crime/09_04_victim_ages.xlsx"
+ },
+ {
+  "source_resource_id": "394",
+  "source_row_key": "files|394",
+  "path_ka": "files/crime/09_05_danaSauli.xlsx",
+  "path_en": "files/crime/09_05_convicted.xlsx"
+ },
+ {
+  "source_resource_id": "395",
+  "source_row_key": "files|395",
+  "path_ka": "files/crime/09_06_sasjelebi.xlsx",
+  "path_en": "files/crime/09_06_sentence.xlsx"
+ },
+ {
+  "source_resource_id": "396",
+  "source_row_key": "files|396",
+  "path_ka": "files/crime/09_07_ganaTlebis done.xlsx",
+  "path_en": "files/crime/09_07_edu level.xlsx"
+ },
+ {
+  "source_resource_id": "397",
+  "source_row_key": "files|397",
+  "path_ka": "files/crime/09_08_car.xlsx",
+  "path_en": "files/crime/09_08_car_ENG.xlsx"
+ },
+ {
+  "source_resource_id": "398",
+  "source_row_key": "files|398",
+  "path_ka": "files/crime/09_09_drive.xlsx",
+  "path_en": "files/crime/09_09_drive_ENG.xlsx"
+ },
+ {
+  "source_resource_id": "399",
+  "source_row_key": "files|399",
+  "path_ka": "files/crime/09_10_DV.xlsx",
+  "path_en": "files/crime/09_10_DV_en.XLSX"
+ },
+ {
+  "source_resource_id": "400",
+  "source_row_key": "files|400",
+  "path_ka": "files/crime/09_11_dagupuli.xlsx",
+  "path_en": "files/crime/09_11_accidents_killed.xlsx"
+ },
+ {
+  "source_resource_id": "401",
+  "source_row_key": "files|401",
+  "path_ka": "files/crime/09_12_daSavebuli.xlsx",
+  "path_en": "files/crime/09_12_injured.xlsx"
+ },
+ {
+  "source_resource_id": "402",
+  "source_row_key": "files|402",
+  "path_ka": "files/crime/09_13_diskriminacia da sheviwroeba.xlsx",
+  "path_en": "files/crime/09_13_Discrimination and harassment.xlsx"
+ },
+ {
+  "source_resource_id": "403",
+  "source_row_key": "files|403",
+  "path_ka": "files/crime/09_14_dzarcvis da tavdasxmis shemtxvevis shetyobineba bolo erti wlis ganmavlobashi.xlsx",
+  "path_en": "files/crime/09_14_Reporting of robbery and assault in the last one year.xlsx"
+ },
+ {
+  "source_resource_id": "404",
+  "source_row_key": "files|404",
+  "path_ka": "files/jandacva/02_37_SDG_3.1.1_დედათა მოკვდაობის კოეფიციენტი.xlsx",
+  "path_en": "files/jandacva/02_37_Maternal mortality ratio.xlsx"
+ },
+ {
+  "source_resource_id": "405",
+  "source_row_key": "files|405",
+  "path_ka": "files/jandacva/02_38_SDG_3.1.2_კვალიფიციური სამედიცინო პერსონალის მიერ მიღებული მშობიარობები.xlsx",
+  "path_en": "files/jandacva/02_38_Skilled birth attendant.xlsx"
+ },
+ {
+  "source_resource_id": "406",
+  "source_row_key": "files|406",
+  "path_ka": "files/jandacva/02_39_SDG_3.2.1_5 წლამდე ასაკის ბავშვთა მოკვდაობის.xlsx",
+  "path_en": "files/jandacva/02_39_Under-5 mortality rate.xlsx"
+ },
+ {
+  "source_resource_id": "407",
+  "source_row_key": "files|407",
+  "path_ka": "files/jandacva/02_40_SDG_3.3.1_შიდსის შემთხვევათა რაოდენობა სიცოცხლეში პირველად.xlsx",
+  "path_en": "files/jandacva/02_40_Estimated incidence rate (new HIV infection per 1,000 uninfected population).xlsx"
+ },
+ {
+  "source_resource_id": "408",
+  "source_row_key": "files|408",
+  "path_ka": "files/jandacva/02_41_SDG_3.2.2_ნეონატალური სიკვდილიანობის მაჩვენებელი.xlsx",
+  "path_en": "files/jandacva/02_41_Neonatal mortality rate.xlsx"
+ },
+ {
+  "source_resource_id": "409",
+  "source_row_key": "files|409",
+  "path_ka": "files/jandacva/02_42_SDG_2.2.3_ანემიის გავრცელება.xlsx",
+  "path_en": "files/jandacva/02_42_Prevalence of anaemia.xlsx"
+ },
+ {
+  "source_resource_id": "410",
+  "source_row_key": "files|410",
+  "path_ka": "files/jandacva/02_43_SDG_3.2.2_ჩვილ ბავშვთა მოკვდაობის კოეფიციენტი.xlsx",
+  "path_en": "files/jandacva/02_43_Infant mortality rate (per 1,000 live births).xlsx"
+ },
+ {
+  "source_resource_id": "411",
+  "source_row_key": "files|411",
+  "path_ka": "files/jandacva/02_44_ნეონატალური სიკვდილიანობის წილი.xlsx",
+  "path_en": "files/jandacva/02_44_Neonatal deaths as a percentage of under-5 deaths.xlsx"
+ },
+ {
+  "source_resource_id": "412",
+  "source_row_key": "files|412",
+  "path_ka": "files/jandacva/02_45_მკვდრადშობადობის კოეფიციენტი.xlsx",
+  "path_en": "files/jandacva/02_45_Stillbirth rate.xlsx"
+ },
+ {
+  "source_resource_id": "413",
+  "source_row_key": "files|413",
+  "path_ka": "files/jandacva/02_46_მოზარდების (10-19 წლის) მოკვდაობის კოეფიციენტი.xlsx",
+  "path_en": "files/jandacva/02_46_Adolescent (aged 10-19 years) mortality rate.xlsx"
+ },
+ {
+  "source_resource_id": "414",
+  "source_row_key": "files|414",
+  "path_ka": "files/jandacva/02_47_დაბალი წონის გავრცელება ახალშობილებში.xlsx",
+  "path_en": "files/jandacva/02_47_Prevalence of low birth weight among new-borns.xlsx"
+ },
+ {
+  "source_resource_id": "415",
+  "source_row_key": "files|415",
+  "path_ka": "files/jandacva/02_48_შიდსი 0-14 წლის ბავშვებში და 10-19 წლის მოზარდებში.xlsx",
+  "path_en": "files/jandacva/02_48_Estimated incidence rate (new HIV infection per 1,000 uninfected population, children aged 0-14.xlsx"
+ },
+ {
+  "source_resource_id": "416",
+  "source_row_key": "files|416",
+  "path_ka": "files/jandacva/02_49_შიდსი 15-24 წლის მოზარდებში.xlsx",
+  "path_en": "files/jandacva/02_49_Estimated number of new HIV infections among adolescents and young people aged 15-24 years.xlsx"
+ },
+ {
+  "source_resource_id": "417",
+  "source_row_key": "files|417",
+  "path_ka": "files/jandacva/02_50_Tvitmkvlelobebi.xlsx",
+  "path_en": "files/jandacva/02_50_Suicide.xlsx"
+ },
+ {
+  "source_resource_id": "418",
+  "source_row_key": "files|418",
+  "path_ka": "files/jandacva/02_51_SDG_3.4.2_tvitmkvlelobis koeficienti.xlsx",
+  "path_en": "files/jandacva/02_51_Suicide rate.xlsx"
+ },
+ {
+  "source_resource_id": "419",
+  "source_row_key": "files|419",
+  "path_ka": "files/mosaxleoba/01_35_იმიგრანტები და ემიგრანტები ასაკით.xlsx",
+  "path_en": "files/mosaxleoba/01_35_Number of immigrants and emigrants.xlsx"
+ },
+ {
+  "source_resource_id": "420",
+  "source_row_key": "files|420",
+  "path_ka": "files/mosaxleoba/01_36_მიგრაციული სალდო.xlsx",
+  "path_en": "files/mosaxleoba/01_36_Net migration.xlsx"
+ },
+ {
+  "source_resource_id": "421",
+  "source_row_key": "files|421",
+  "path_ka": "files/mosaxleoba/01_37_adreuli qorwineba.xlsx",
+  "path_en": "files/mosaxleoba/01_37_Child marriage.xlsx"
+ },
+ {
+  "source_resource_id": "422",
+  "source_row_key": "files|422",
+  "path_ka": "files/mshp/10_01_mshp.xlsx",
+  "path_en": "files/mshp/10_01_GDP.xlsx"
+ },
+ {
+  "source_resource_id": "423",
+  "source_row_key": "files|423",
+  "path_ka": "files/mshp/10_02_erovnuli Semosavali.xlsx",
+  "path_en": "files/mshp/10_02_GNI per capita.xlsx"
+ },
+ {
+  "source_resource_id": "424",
+  "source_row_key": "files|424",
+  "path_ka": "files/mshp/10_03_ rate to GDP.xlsx",
+  "path_en": "files/mshp/10_03_budget revenue share in GDP.xlsx"
+ },
+ {
+  "source_resource_id": "425",
+  "source_row_key": "files|425",
+  "path_ka": "files/mshp/10_04_budget rate to GDP.xlsx",
+  "path_en": "files/mshp/10_04_budget expenditure to GDP.xlsx"
+ },
+ {
+  "source_resource_id": "426",
+  "source_row_key": "files|426",
+  "path_ka": "files/mshp/10_05_vali to GDP.xlsx",
+  "path_en": "files/mshp/10_05_debt to GDP.xlsx"
+ },
+ {
+  "source_resource_id": "427",
+  "source_row_key": "files|427",
+  "path_ka": "files/mshp/10_06_education to GDP.xlsx",
+  "path_en": "files/mshp/10_06_education expenditure to GDP.xlsx"
+ },
+ {
+  "source_resource_id": "428",
+  "source_row_key": "files|428",
+  "path_ka": "files/mshp/10_07_soc. dacva to GDP.xlsx",
+  "path_en": "files/mshp/10_07_social expenditures to GDP.xlsx"
+ },
+ {
+  "source_resource_id": "429",
+  "source_row_key": "files|429",
+  "path_ka": "files/mshp/10_08_ojaxebis socdacva to GDP.xlsx",
+  "path_en": "files/mshp/10_08_family-children benefits to GDP.xlsx"
+ },
+ {
+  "source_resource_id": "430",
+  "source_row_key": "files|430",
+  "path_ka": "files/mshp/10_09_jandacva to GDP.xlsx",
+  "path_en": "files/mshp/10_09_current health expenditures to GDP.xlsx"
+ },
+ {
+  "source_resource_id": "431",
+  "source_row_key": "files|431",
+  "path_ka": "files/mshp/10_10_naerTi biujetis wili.xlsx",
+  "path_en": "files/mshp/10_10_budget health expenditures to GDP.xlsx"
+ },
+ {
+  "source_resource_id": "432",
+  "source_row_key": "files|432",
+  "path_ka": "files/mshp/10_11_naerti biujetis Sesruleba.xlsx",
+  "path_en": "files/mshp/10_11_expenditure by functions of general government.xlsx"
+ },
+ {
+  "source_resource_id": "433",
+  "source_row_key": "files|433",
+  "path_ka": "files/mshp/10_12_jandacvis xarjebi ert sulze.xlsx",
+  "path_en": "files/mshp/10_12_current health expenditure per capita.xlsx"
+ },
+ {
+  "source_resource_id": "434",
+  "source_row_key": "files|434",
+  "path_ka": "files/mshp/10_13_HH gadaxda jandacvaze.xlsx",
+  "path_en": "files/mshp/10_13_HH out-of-pocket expenditure on health.xlsx"
+ },
+ {
+  "source_resource_id": "435",
+  "source_row_key": "files|435",
+  "path_ka": "files/mshp/10_14_adgxarji jandacvaze.xlsx",
+  "path_en": "files/mshp/10_14_domestic private health expenditure.xlsx"
+ },
+ {
+  "source_resource_id": "436",
+  "source_row_key": "files|436",
+  "path_ka": "files/mshp/10_15_martvis xarji jandacvaze.xlsx",
+  "path_en": "files/mshp/10_15_general government health expenditure.xlsx"
+ },
+ {
+  "source_resource_id": "438",
+  "source_row_key": "files|438",
+  "path_ka": "files/ICT/07_04_internetis gamoyenebis sixshire.xlsx",
+  "path_en": "files/ICT/07_04_Frequency of internet usage.xlsx"
+ },
+ {
+  "source_resource_id": "439",
+  "source_row_key": "files|439",
+  "path_ka": "files/ICT/07_05_kompiuteris gamoyeneba.xlsx",
+  "path_en": "files/ICT/07_05_Last computer usage.xlsx"
+ },
+ {
+  "source_resource_id": "440",
+  "source_row_key": "files|440",
+  "path_ka": "files/ICT/07_06_mobiluri telefonis gamoyeneba.xlsx",
+  "path_en": "files/ICT/07_06_Mobile phone usage.xlsx"
+ },
+ {
+  "source_resource_id": "441",
+  "source_row_key": "files|441",
+  "path_ka": "files/education/03_37_კვალიფიცირებულ მასწავლებელთა წილი.xlsx",
+  "path_en": "files/education/03_37_Proportion of teachers qualified.xlsx"
+ },
+ {
+  "source_resource_id": "442",
+  "source_row_key": "files|442",
+  "path_ka": "files/education/03_38_მოსწავლეთა რაოდენობა სკოლებში.xlsx",
+  "path_en": "files/education/03_38_Number of children with disabilities in education.xlsx"
+ },
+ {
+  "source_resource_id": "443",
+  "source_row_key": "files|443",
+  "path_ka": "files/education/03_39_სწავლის მიტოვება.xlsx",
+  "path_en": "files/education/03_39_Number of early school leavers.xlsx"
+ },
+ {
+  "source_resource_id": "444",
+  "source_row_key": "files|444",
+  "path_ka": "files/labour/06_07_umushevrobis done.xlsx",
+  "path_en": "files/labour/06_07_Unemployment rate.xlsx"
+ },
+ {
+  "source_resource_id": "446",
+  "source_row_key": "files|446",
+  "path_ka": "files/labour/06_09_NEET_GEO.xlsx",
+  "path_en": "files/labour/06_09_NEET_ENG.xlsx"
+ },
+ {
+  "source_resource_id": "449",
+  "source_row_key": "files|449",
+  "path_ka": "files/labour/06_12_bavshvta shroma.xlsx",
+  "path_en": "files/labour/06_12_Child Labour.xlsx"
+ },
+ {
+  "source_resource_id": "450",
+  "source_row_key": "files|450",
+  "path_ka": "files/education/03_40_ganatlebashi chartuloba.xlsx",
+  "path_en": "files/education/03_40_Participation in education.xlsx"
+ },
+ {
+  "source_resource_id": "451",
+  "source_row_key": "files|451",
+  "path_ka": "files/education/03_41_wera-kitxvis codna.xlsx",
+  "path_en": "files/education/03_41_Literacy rate.xlsx"
+ },
+ {
+  "source_resource_id": "452",
+  "source_row_key": "files|452",
+  "path_ka": "files/education/03_42_18-24_swavla adre miatova.xlsx",
+  "path_en": "files/education/03_42_18-24- early leavers.xlsx"
+ },
+ {
+  "source_resource_id": "453",
+  "source_row_key": "files|453",
+  "path_ka": "files/mosaxleoba/01_38_თავშესაფრის მაძიებლად რეგისტრირებულ პირთა რაოდენობა.xlsx",
+  "path_en": "files/mosaxleoba/01_38_Registered asylum applications.xlsx"
+ },
+ {
+  "source_resource_id": "454",
+  "source_row_key": "files|454",
+  "path_ka": "files/mshp/10_16_ganaTlebis xarjebis struqtura.xlsx",
+  "path_en": "files/mshp/10_16_structure of budget expenditure on education.xlsx"
+ },
+ {
+  "source_resource_id": "455",
+  "source_row_key": "files|455",
+  "path_ka": "files/education/03_43_mkvlevarebis ricxovnoba.xlsx",
+  "path_en": "files/education/03_43_Researchers.xlsx"
+ },
+ {
+  "source_resource_id": "456",
+  "source_row_key": "files|456",
+  "path_ka": "files/jandacva/02_53_imunizacia.xlsx",
+  "path_en": "files/jandacva/02_53_Immunization.xlsx"
+ },
+ {
+  "source_resource_id": "457",
+  "source_row_key": "files|457",
+  "path_ka": "files/mosaxleoba/01_07_1_სქესთა რაოდენობრივი თანაფარდობა დაბადებისას რეგიონების მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_07_1_Sex ratio at birth by regions.xlsx"
+ },
+ {
+  "source_resource_id": "458",
+  "source_row_key": "files|458",
+  "path_ka": "files/mosaxleoba/01_10_1_მოზარდების შობადობის კოეფიციენტები.xlsx",
+  "path_en": "files/mosaxleoba/01_10_1_Adolescent birth rate.xlsx"
+ },
+ {
+  "source_resource_id": "459",
+  "source_row_key": "files|459",
+  "path_ka": "files/mosaxleoba/01_12_1_5 წლამდე ასაკის გარდაცვლილთა რიცხოვნობა გარდაცვალების მიზეზების და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_12_1_Number of under-5 deaths by ICD-10 chapters and sex.xlsx"
+ },
+ {
+  "source_resource_id": "460",
+  "source_row_key": "files|460",
+  "path_ka": "files/mosaxleoba/01_12_2_სიცოცხლის მოსალოდნელი ხანგრძლივობა ასაკის და სქესის მიხედვით.xlsx",
+  "path_en": "files/mosaxleoba/01_12_2_Life expectancy by age and sex.xlsx"
+ },
+ {
+  "source_resource_id": "461",
+  "source_row_key": "files|461",
+  "path_ka": "files/education/03-44_განათლების მიღწევის_მიტოვების მაჩვენებლები.xlsx",
+  "path_en": "files/education/03-44_Survival rate_dropout.xlsx"
+ },
+ {
+  "source_resource_id": "462",
+  "source_row_key": "files|462",
+  "path_ka": "files/education/03-45_სკოლების უზრუნველყოფა ინფრასტრუქტურით.xlsx",
+  "path_en": "files/education/03-45_Infrastructure.xlsx"
+ },
+ {
+  "source_resource_id": "463",
+  "source_row_key": "files|463",
+  "path_ka": "files/education/03-46_შესწორებული წმინდა ჩაბმის მაჩვენებელი დაწყებით და საბაზო განათლებაში.xlsx",
+  "path_en": "files/education/03-46_Adjusted enrolment.xlsx"
+ },
+ {
+  "source_resource_id": "464",
+  "source_row_key": "files|464",
+  "path_ka": "files/jandacva/ანტენატალური ვიზიტი.xlsx",
+  "path_en": "files/jandacva/Antenatal care 4+.xlsx"
+ },
+ {
+  "source_resource_id": "465",
+  "source_row_key": "files|465",
+  "path_ka": "files/jandacva/HPV_ვაქცინა.xlsx",
+  "path_en": "files/jandacva/HPV_Vaccine.xlsx"
+ },
+ {
+  "source_resource_id": "466",
+  "source_row_key": "files|466",
+  "path_ka": "files/social/შშმპ ახალი შემთხვევები.xlsx",
+  "path_en": "files/social/New Cases of Disabilities.xlsx"
+ },
+ {
+  "source_resource_id": "467",
+  "source_row_key": "files|467",
+  "path_ka": "files/mosaxleoba/ადრეული ქორწინება (მამაკაცები).xlsx",
+  "path_en": "files/mosaxleoba/Child marriage (men).xlsx"
+ },
+ {
+  "source_resource_id": "468",
+  "source_row_key": "files|468",
+  "path_ka": "files/crime/ქალებისა და გოგოების მიმართ ძალადობა ბოლო 12 თვის მანძილზე.xlsx",
+  "path_en": "files/crime/Experiences of violence against women and girls in the last 12 month.xlsx"
+ },
+ {
+  "source_resource_id": "469",
+  "source_row_key": "files|469",
+  "path_ka": "files/crime/ძალადობა პარტნიორის მხრიდან.xlsx",
+  "path_en": "files/crime/Prevalence of intimate partner violence.xlsx"
+ },
+ {
+  "source_resource_id": "470",
+  "source_row_key": "files|470",
+  "path_ka": "files/jandacva/ტყვიის შემცველობის გავრცელება.xlsx",
+  "path_en": "files/jandacva/Lead-test.xlsx"
+ },
+ {
+  "source_resource_id": "471",
+  "source_row_key": "files|471",
+  "path_ka": "files/social/შინამეურნეობების დაფარვა სოციალური გადარიცხვებით და სარგებლით.xlsx",
+  "path_en": "files/social/Coverage of households with social transfers and benefits.xlsx"
+ },
+ {
+  "source_resource_id": "472",
+  "source_row_key": "files|472",
+  "path_ka": "files/ICT/07_07_cifruli unarebi.xlsx",
+  "path_en": "files/ICT/07_07_ICT skills.xlsx"
+ },
+ {
+  "source_resource_id": "473",
+  "source_row_key": "files|473",
+  "path_ka": "files/labour/არაანაზღაურებად საოჯახო საქმეებზე დახარჯული დრო.xlsx",
+  "path_en": "files/labour/time spent on unpaid domestic work.xlsx"
+ },
+ {
+  "source_resource_id": "474",
+  "source_row_key": "files|474",
+  "path_ka": "files/social/მოსახლეობის რიცხოვნობა, რომელიც იღებს ერთ დახმარებას მაინც.xlsx",
+  "path_en": "files/social/The_number_of_the_population_receiving_social_assistence.xlsx"
+ }
+]

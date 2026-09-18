@@ -35,8 +35,8 @@ spring:
   servlet:
     multipart:
       enabled: true
-      max-file-size: ${PLATFORM_MAX_ACCESS_ARTIFACT_BYTES:1073741824}
-      max-request-size: ${PLATFORM_MAX_ACCESS_ARTIFACT_BYTES:1073741824}
+      max-file-size: ${PLATFORM_ARTIFACT_MAX_UPLOAD_BYTES:2147483648}
+      max-request-size: ${PLATFORM_ARTIFACT_MAX_UPLOAD_BYTES:2147483648}
       file-size-threshold: 0B
       location: /app/uploads
   main:
@@ -106,8 +106,20 @@ storage:
     quarantine-bucket: ${STORAGE_BUCKET_QUARANTINE:geostat-quarantine}
     archive-bucket: ${STORAGE_BUCKET_ARCHIVE:geostat-archive}
     export-bucket: ${STORAGE_BUCKET_EXPORT:geostat-export}
+    # Host consumers use for signed artifact downloads; empty disables distribution (fail closed).
+    public-endpoint: ${STORAGE_PUBLIC_ENDPOINT:}
+    region: ${STORAGE_REGION:us-east-1}
 
 platform:
+  # Artifact line bounds (ArtifactProperties); all overridable per environment.
+  artifacts:
+    upload-prefix: ${PLATFORM_ARTIFACT_UPLOAD_PREFIX:artifacts/sha256/}
+    max-inventory-bytes: ${PLATFORM_ARTIFACT_MAX_INVENTORY_BYTES:16777216}
+    max-package-entries: ${PLATFORM_ARTIFACT_MAX_PACKAGE_ENTRIES:20000}
+    max-entry-bytes: ${PLATFORM_ARTIFACT_MAX_ENTRY_BYTES:1073741824}
+    max-package-bytes: ${PLATFORM_ARTIFACT_MAX_PACKAGE_BYTES:8589934592}
+    max-upload-bytes: ${PLATFORM_ARTIFACT_MAX_UPLOAD_BYTES:2147483648}
+    report-issue-limit: ${PLATFORM_ARTIFACT_REPORT_ISSUE_LIMIT:200}
   # Identity binding is environment-agnostic: every profile reads the same keys;
   # only the env file decides whether and against which issuer OIDC runs.
   oidc:

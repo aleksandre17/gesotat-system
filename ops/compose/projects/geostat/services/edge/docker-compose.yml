@@ -18,6 +18,7 @@ services:
           - auth.geostat.internal
           - api.geostat.internal
           - geostat.internal
+          - files.geostat.internal
       geostat-edge-host: {}
     restart: always
     healthcheck:
