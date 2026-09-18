@@ -442,3 +442,30 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 
 - **სტატუსი:** AIR-2026-023 → `DEFERRED` (malware scanning removed); AIR-2026-014 scan part → `DEFERRED`.
 - ClamAV rejected; all scanner/admission/quarantine code and configuration removed (ADR-009, `docs/work/DEFERRED-PLANS.md` DP-001).
+
+### AIR-2026-015 — Migration runner re-executed applied migrations on every startup
+
+- **სტატუსი:** `VERIFIED` (dev) / **priority:** `P0` · commit `69aea23`
+- **აღმოჩენა:** `executeAndRecord` recorded migration-ებს checksum-ით ამოწმებდა, მაგრამ მაინც ხელახლა
+  უშვებდა. 017/020/021 ყოველ startup-ზე ყველა KIDS dataset-ს ახალ `dataset_version`-ს უმატებდა
+  (~973 version თითოეულზე, სულ 11 684) და `ingestion_contract`-ს revision 4/5 + `REVIEW_REQUIRED`-ზე
+  აბრუნებდა, სანამ შემდეგი migration-ები 8/ACTIVE-ს დააბრუნებდნენ.
+- **გადაწყვეტა:** recorded + checksum-equal migration გამოტოვდება (run-once); შეცვლილი checksum კვლავ fail-closed.
+  `PlatformSchemaMigrationRunnerTest`.
+- **Evidence:** dev ორი restart: `dataset_version` 11 684 → 11 684; contract 8/ACTIVE უცვლელი; health UP.
+- **ღია:** production API იგივე runner-ს იყენებს — fix production release-ით უნდა ჩავიდეს (ჩვენ არ ვეხებით).
+  დაგროვილი ზედმეტი DRAFT version-ების cleanup — ცალკე, backup-იანი migration-ით (FK-ები contract source-ებზე).
+
+### AIR-2026-016 — KIDS R8 ingestion source registry contradicts its approved table definitions
+
+- **სტატუსი:** `TRIAGED` / **priority:** `P0` (ბლოკავს ახალ KIDS R8 review snapshot-ს)
+- **აღმოჩენა:** approved `contract_table_definition` (rev 8): `KIDS_RESOURCE` → `__ent_kids_resource` → canonical
+  version 73. rev 8 `contract_revision_source`-ში კი ორივე row არასწორია: 568 `ACCESS.__ent_kids_resource` → 6964
+  (067-მა `MAX(version)` აიღო — AIR-2026-015-ის შედეგი), 575 `ACCESS.kids_resource` → 73 (068-მა site contract-ის
+  legacy `access_table_name` აიღო; ასეთი ცხრილი R8 package-ში არ არსებობს). ყველა dataset-ზე იგივე ორმაგობაა.
+  შედეგი: `POST /platform/access/semantic/ingest` R8 package-ზე → 400 `Contracted Access table not found: kids_goal`
+  (preview კი valid), და artifact relation (version 73) ახალ snapshot-ს (6964) არ შეეხებოდა.
+- **Side effect:** batch 8 `FAILED` (9 staged load); იგივე checksum-ზე ingest მას ხელახლა გამოიყენებს.
+- **გადაწყვეტა (მოლოდინში — owner decision):** rev 8 registry-ის reconciliation approved table definition-ებთან
+  (locator = `ACCESS.`+access_table_name, target = canonical_dataset_version_id; გამოუცხადებელი legacy locator-ები
+  მოიხსნება) ცალკე migration-ით, ან ახალი revision 9.
