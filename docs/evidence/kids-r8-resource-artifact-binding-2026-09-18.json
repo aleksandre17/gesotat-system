@@ -43,7 +43,8 @@
   "runtime": {
     "environment": "remote dev 192.168.1.199 geostat-api-dev:8081 (DB geostat-system-mssql; prod DB untouched)",
     "deploy": "geostat.ps1 api dev bootstrap api --no-build",
-    "runtimeStartedAt": "2026-09-18T08:46:36Z",
+    "runtimeStartedAt": "2026-09-18T08:49:27Z",
+    "deployedSourceCommit": "f7d6f21",
     "health": {
       "primary": "UP",
       "dataPlane": "UP",
