@@ -411,9 +411,12 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   `ClamAvArtifactMalwareScannerTest`; ZIP and staged inventory fail-closed plus quarantine behavior in
   `ArtifactPackageServiceTest`; API 422/503 mappings in `PlatformArtifactControllerTest`; full
   `:api:test` PASS — 193 tests, 0 failures/errors, 1 skipped (76 artifact-related).
-- **Open runtime evidence:** SQL replay `ops/tests/sql/artifact-malware-quarantine.sql`, a reachable
-  ClamAV daemon with current signatures and configured `StreamMaxLength`, EICAR canary pass/block,
-  quarantine object/audit read-back and approved retention cleanup. Remote dev has only ~1.2 GiB
+- **Database evidence:** migration 090 applied in the remote Data Plane; transactional replay
+  `ops/tests/sql/artifact-malware-quarantine.sql` prints `ARTIFACT_MALWARE_QUARANTINE_PASS` and rolls
+  test rows back.
+- **Open runtime evidence:** a reachable ClamAV daemon with current signatures and configured
+  `StreamMaxLength`, EICAR canary pass/block, live quarantine object/audit read-back and approved
+  retention cleanup. Remote dev has only ~1.2 GiB
   currently available; the official ClamAV container guide recommends ≥3 GiB, so scanner service
   provisioning is external until its resource budget or a remote scanner endpoint is approved.
   Malware scanning remains a separate open control and this change does not claim virus-free content.

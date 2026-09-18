@@ -144,7 +144,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 
 - [x] 15.1 Content-derived media type must agree with the declared path type before package storage/manifest registration — DONE (`ArtifactContentTypeVerifier`; content-only Tika detection; PDF spoof and inventory negative tests)
 - [x] 15.2 ClamAV `INSTREAM` provider, fail-closed admission, scanner metrics, private quarantine copy and Data Plane audit code — DONE in source; unit protocol/security suite PASS
-- [ ] 15.3 Migration 090 quarantine evidence persistence — READY (SQL Server fixture exists; remote SQL replay pending)
+- [x] 15.3 Migration 090 quarantine evidence persistence — DONE (applied in Data Plane; transactional SQL Server fixture PASS)
 - [x] 15.4 Scanner protocol vectors: clean, infected, timeout, byte ceiling, and unavailable — DONE (local protocol fixture; included in full suite)
 
 ## 14. External gates
