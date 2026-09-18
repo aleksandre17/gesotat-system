@@ -62,7 +62,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [x] 4.5 Key/prefix/path validation (traversal, charset) — DONE (test)
 - [ ] 4.6 Encryption at rest / versioning / object lock — EXT (ADR-006, ops)
 - [ ] 4.7 `minio-data` backup/restore — EXT (B-06)
-- [ ] 4.8 Malware scanning and content-based media verification — OPEN (Tika signature/type checks and ClamAV `INSTREAM` fail-closed adapter are implemented; remote dev scanner endpoint and signature freshness are not provisioned/verified)
+- [x] 4.8 Content-based media verification (Tika) — DONE; malware scanning — DEFERRED/REMOVED (ADR-009, DP-001; ClamAV rejected)
 
 ## 5. Contract binding — `088_kids_r8_resource_artifact_binding.sql`
 
@@ -144,9 +144,9 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 ## 15. Security verification follow-up
 
 - [x] 15.1 Content-derived media type must agree with the declared path type before package storage/manifest registration — DONE (`ArtifactContentTypeVerifier`; content-only Tika detection; PDF spoof and inventory negative tests)
-- [x] 15.2 ClamAV `INSTREAM` provider, fail-closed admission, scanner metrics, private quarantine copy and Data Plane audit code — DONE in source; unit protocol/security suite PASS
+- [ ] 15.2 ClamAV provider / malware admission / quarantine — REMOVED (ADR-009, DP-001)
 - [x] 15.3 Migration 090 quarantine evidence persistence — DONE (applied in Data Plane; transactional SQL Server fixture PASS)
-- [x] 15.4 Scanner protocol vectors: clean, infected, timeout, byte ceiling, and unavailable — DONE (local protocol fixture; included in full suite)
+- [ ] 15.4 Scanner protocol vectors — REMOVED with the scanner (ADR-009)
 
 ## 14. External gates
 
@@ -155,16 +155,16 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - EXT-3 Production release provenance (B-01)
 - EXT-4 `files.geostat.internal`: TLS SAN + DNS + edge redeploy + `STORAGE_PUBLIC_ENDPOINT` (edge config in repo, `nginx -t` PASS) — AIR-2026-012
 - EXT-5 Token with `contract.write`/`contract.read` roles for 12.3–12.5
-- EXT-6 Private-network `clamd` endpoint with current definitions, `StreamMaxLength >= PLATFORM_ARTIFACT_MALWARE_SCANNER_MAX_BYTES`, and signed-off quarantine retention. Runtime recheck 2026-09-18: dev API has no scanner host configured; port 3310 is configured but TCP is unreachable. No daemon is provisioned; remote dev has ~1.2 GiB memory available while ClamAV's official Docker guide recommends at least 3 GiB, so a sidecar cannot be added safely to this shared host without changing its resource envelope. Evidence: `docs/evidence/platform-schema-readiness-runtime-2026-09-18.json`.
+- ~~EXT-6 clamd endpoint~~ — CLOSED: ClamAV rejected, scanning deferred (ADR-009)
 
 ## 16. Session 2026-09-18 (continuation) — status
 
 - [x] 16.1 Snapshot creation path identified (read-only): `POST /platform/access/semantic/ingest` → `POST /platform/ingestion/validate/{loadId}` → `POST /platform/ingestion/prepare-snapshot` (`REVIEW_REQUIRED`) → `POST /platform/ingestion/materialize` (`SEMANTIC_REVIEW`); no direct SQL — DONE
 - [x] 16.2 Snapshot provenance hardening (Codex WIP reviewed, tests corrected/extended) — DONE (`6595587`, 231 PASS)
-- [x] 16.3 Access upload malware admission gap closed (AIR-2026-014, migration 095 ledger PASS on dev) — DONE (`c614f07`)
-- [ ] 16.4 New KIDS_RESOURCE review snapshot — BLOCKED by EXT-6 (upload requires a malware verdict; replaying a stored, never-scanned artifact would bypass the policy)
-- [ ] 16.5 Inventory registration 532/532, binding 450 edges, reconciliation PASS, signed download, ZIP — BLOCKED by EXT-6 (and EXT-4 for browser download)
-- [x] 16.6 clamd acceptance tool `ops/scripts/python/clamd_acceptance_probe.py` (PING, signature freshness, clean, EICAR, StreamMaxLength) — DONE (fail-closed verified; live PASS pending EXT-6)
-- 14.1–14.5 unchanged: 14.1 OPEN (orchestration end-to-end needs EXT-6 for runtime), 14.2 OPEN (tenant claims model not defined — owner decision), 14.3 PARTIAL, 14.4 OPEN, 14.5 OPEN (needs a bound snapshot → EXT-6).
+- [ ] 16.3 Access upload malware admission — REMOVED with the scanner (ADR-009); `c614f07` superseded
+- [ ] 16.4 New KIDS_RESOURCE review snapshot — OPEN (no longer blocked by a scanner; needs a governed Access upload with a temporary WRITE_RESOURCE credential)
+- [ ] 16.5 Inventory registration 532/532, binding 450 edges, reconciliation PASS, signed download — OPEN (runnable; EXT-4 only for browser download)
+- [ ] 16.6 clamd acceptance tool — REMOVED (ADR-009)
+- 14.1–14.5 unchanged: 14.1 OPEN, 14.2 OPEN (tenant claims model not defined — owner decision), 14.3 PARTIAL, 14.4 OPEN, 14.5 OPEN (needs a bound snapshot).
 
 Evidence: `docs/evidence/access-admission-and-snapshot-provenance-runtime-2026-09-18.json`.

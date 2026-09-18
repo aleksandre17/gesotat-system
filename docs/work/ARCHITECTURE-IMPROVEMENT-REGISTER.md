@@ -437,3 +437,8 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 - **Evidence:** `docs/evidence/access-admission-and-snapshot-provenance-runtime-2026-09-18.json`;
   `AccessAdmissionControllerTest`, `ArtifactMalwareAdmissionTest`; 231 PASS.
 - **შედეგი:** KIDS review snapshot-ის შექმნაც ახლა EXT-6 (clamd) გარე dependency-ზეა დამოკიდებული.
+
+### ADR-009 effect on AIR-2026-023 and AIR-2026-014
+
+- **სტატუსი:** AIR-2026-023 → `DEFERRED` (malware scanning removed); AIR-2026-014 scan part → `DEFERRED`.
+- ClamAV rejected; all scanner/admission/quarantine code and configuration removed (ADR-009, `docs/work/DEFERRED-PLANS.md` DP-001).

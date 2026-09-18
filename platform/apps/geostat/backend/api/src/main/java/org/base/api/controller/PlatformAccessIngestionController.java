@@ -2,7 +2,6 @@ package org.base.api.controller;
 
 import org.base.api.service.platform.PlatformAccessIngestionService;
 import org.base.api.service.platform.PlatformIngestReceipt;
-import org.base.api.service.artifact.ArtifactMalwareAdmission;
 import org.base.api.service.storage.ObjectStorageService;
 import org.base.api.service.storage.StoredArtifact;
 import org.base.core.anotation.Api;
@@ -29,15 +28,12 @@ public class PlatformAccessIngestionController {
     private final long maxAccessArtifactBytes;
     private final PlatformAccessIngestionService ingestion;
     private final ObjectProvider<ObjectStorageService> storageProvider;
-    private final ArtifactMalwareAdmission malwareAdmission;
 
     public PlatformAccessIngestionController(PlatformAccessIngestionService ingestion, ObjectProvider<ObjectStorageService> storageProvider,
-                                              ArtifactMalwareAdmission malwareAdmission,
                                               @Value("${platform.ingest.max-artifact-bytes:1073741824}") long maxAccessArtifactBytes) {
         if (maxAccessArtifactBytes < 1) throw new IllegalArgumentException("Invalid platform ingest artifact size limit");
         this.ingestion = ingestion;
         this.storageProvider = storageProvider;
-        this.malwareAdmission = malwareAdmission;
         this.maxAccessArtifactBytes = maxAccessArtifactBytes;
     }
 
@@ -56,7 +52,6 @@ public class PlatformAccessIngestionController {
         File temporary = File.createTempFile("platform-access-", ".accdb");
         try {
             file.transferTo(temporary);
-            malwareAdmission.admit(temporary.toPath(), storage, "ACCESS_SOURCE_" + contractSourceId, String.valueOf(originalName), "ACCESS_PACKAGE");
             StoredArtifact artifact;
             try (var input = Files.newInputStream(temporary.toPath())) {
                 artifact = storage.storeOriginal(file.getOriginalFilename(), file.getContentType(), input, file.getSize());

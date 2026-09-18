@@ -85,3 +85,29 @@ Recovery: ყოველთვიური restore test
 7. **Retention.** Policy-level `retention_class`. ADR-003-ის 1-წლიანი purge ეხება source/quarantine/archive artifact-ებს; published distribution artifact, რომელსაც მოქმედი snapshot მიუთითებს, არ იშლება (`RETAIN_INDEFINITE` ან `RETAIN_WHILE_REFERENCED`).
 
 **Trade-off:** checksum-addressed key კარგავს „ადამიანისთვის წასაკითხ“ ფიზიკურ სახელს — ეს განზრახულია; სახელი ინახება metadata-ში და `Content-Disposition`-ით ბრუნდება ჩამოტვირთვისას.
+
+## ADR-009 — ClamAV უარყოფილია; malware scanning ამოღებული და გადადებულია
+
+**სტატუსი:** ACCEPTED (2026-09-18) · **Owner:** პროექტის მფლობელი · **ანაცვლებს:** AIR-2026-023, AIR-2026-014 (scan ნაწილი), checklist 4.8 / 15.2 / 15.4 / EXT-6
+
+**გადაწყვეტილება:**
+
+1. **ClamAV / `clamd` უარყოფილია** — არ ვიყენებთ არც როგორც service-ს, არც როგორც dependency-ს.
+   მიზეზი: გამოყოფილი ≥3 GiB რესურსი და ცალკე private-network daemon-ის ოპერირება ამ ეტაპზე
+   მიზანშეუწონელია; shared dev host-ზე ~1 GiB თავისუფალი მეხსიერებაა.
+2. **Malware scanning მთლიანად ამოღებულია კოდიდან** — scanner port, admission gate, quarantine
+   registry, `422/503` scanner mapping, metrics და `platform.artifacts.malware-*` / `PLATFORM_ARTIFACT_MALWARE_*`
+   კონფიგურაცია. ფუნქცია გადატანილია **გადადებულ გეგმებში** (`docs/work/DEFERRED-PLANS.md`, DP-001).
+3. **Schema:** migrations 090/095 immutable ledger-შია და რჩება; `ingest.artifact_quarantine`
+   ცხრილი უმოქმედოა (კოდი მასში არ წერს). ფიზიკური წაშლა — მხოლოდ ცალკე migration-ით, backup-ით.
+
+**Compensating controls (მოქმედი):** მხოლოდ authenticated `WRITE_RESOURCE` ატვირთვა; content-only
+MIME/signature შემოწმება (Tika) extension-ის ნდობის გარეშე; entry/package ზომისა და რაოდენობის ლიმიტი
+(zip-bomb); path traversal validation; approved-contract Access სტრუქტურის შემოწმება write-მდე; SHA-256
+content addressing და verification; private bucket-ები; მხოლოდ მოკლევადიანი signed download.
+
+**Trade-off / რისკი:** ატვირთული ფაილის შიგთავსი ანტივირუსით არ მოწმდება. რისკი მისაღებია მხოლოდ
+სანდო, ავტორიზებული ოპერატორების ატვირთვისთვის.
+
+**ხელახლა განხილვის trigger:** anonymous/გარე მომწოდებლის upload, public production release, ან
+ორგანიზაციული scanner სერვისის ხელმისაწვდომობა.

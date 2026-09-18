@@ -26,10 +26,6 @@ public class ArtifactMetrics {
         count("geostat.artifact.reconciliation", "result", result);
     }
 
-    public void malwareScan(String result) {
-        count("geostat.artifact.malware_scan", "result", result);
-    }
-
     public void integrityAudit(String result) {
         count("geostat.artifact.integrity_audit", "result", result);
     }

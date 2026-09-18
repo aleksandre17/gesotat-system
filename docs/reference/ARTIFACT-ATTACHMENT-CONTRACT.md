@@ -184,7 +184,7 @@ RECEIVE
   → package checksum
   → contract/revision resolution
   → Access structural validation
-  → file type/size/malware validation
+  → file type/size validation (malware scan deferred: ADR-009)
   → SHA-256 streaming calculation
   → multipart/resumable object upload
   → artifact manifest persistence
@@ -203,19 +203,10 @@ Upload და staged-inventory import path-ის MIME მნიშვნელ�
 არ ენდობა: content-only detector ბაიტებს ამოწმებს, caller filename/MIME hint-ის
 გარეშე, და mismatch-ზე manifest registration-მდე fail-closed ქცევა აქვს. CSV-ის
 შიგთავსი detector-მა შეიძლება ზოგად `text/plain`-ად ამოიცნოს; `text/csv` policy-ს
-ეს შეესაბამება მხოლოდ ტექსტური payload-ის შემთხვევაში. MIME შემოწმება malware
-სკანირება არ არის; production admission-ს სჭირდება ჩართული scanner, quarantine
-flow და მისი runtime evidence.
+ეს შეესაბამება მხოლოდ ტექსტური payload-ის შემთხვევაში.
 
-Malware admission იყენებს `ArtifactMalwareScanner` provider boundary-ს და ამჟამად
-ClamAV `clamd`-ს `INSTREAM` პროტოკოლით. TCP daemon უნდა იყოს მხოლოდ იზოლირებულ,
-სანდო ქსელში, რადგან პროტოკოლი არც peer authentication-ს და არც transport
-encryption-ს იძლევა. უცნობი verdict, timeout, daemon error ან დაუკონფიგურებელი
-provider ატვირთვას აჩერებს (`503`); აღმოჩენილი საფრთხე ვერ შევა ingest pool-ში,
-ხოლო bytes გადადის private `geostat-quarantine` bucket-ში და მისი audit metadata
-Data Plane-ში იწერება. Scanner-ის stream maximum უნდა ემთხვეოდეს clamd-ის
-`StreamMaxLength`-ს; production-ზე საჭიროა signature freshness, resource და
-quarantine retention/cleanup evidence.
+Malware scanning ამოღებულია და გადადებულია (ADR-009, `docs/work/DEFERRED-PLANS.md` DP-001);
+ClamAV უარყოფილია. MIME შემოწმება malware სკანირება არ არის.
 
 ## 8. Object Storage model
 
@@ -353,7 +344,7 @@ revision/dataset. The archive must contain one `.accdb` whose contract-declared
 Access table and required fields are present. The accepted manifest stores
 `contractCode`, `contractRevision`, and `datasetVersionId`; those values are
 included in its package checksum. ZIP entries are first expanded into a bounded
-temporary staging directory and checked for path safety, type, size, malware,
+temporary staging directory and checked for path safety, type, size,
 and contract structure; only after the complete archive passes admission are
 content objects written and the manifest registered. This prevents a late
 structural rejection, such as a missing required Access database, from leaving
@@ -402,7 +393,7 @@ completion streams ordered parts through the same approved-contract ZIP
 admission path as the synchronous endpoint. Dependency failures retain parts
 and quota in `RETRYABLE`; terminal outcomes release quota, while part cleanup
 can retry independently. Legacy non-tenant JWTs cannot use this API. Runtime
-storage/clamd availability and authenticated HTTP acceptance remain release
+storage availability and authenticated HTTP acceptance remain release
 gates and are not implied by this contract description.
 
 ### Metadata response
@@ -542,7 +533,7 @@ historical snapshots are not attachment-ready. See
 - [ ] every artifact has immutable object URI;
 - [ ] every row↔artifact edge is explicit or deterministically resolved;
 - [ ] no ambiguous/orphan/duplicate relation remains;
-- [ ] MIME/size/malware checks PASS;
+- [ ] MIME/size checks PASS (malware scan deferred: ADR-009);
 - [ ] raw lineage is complete;
 - [ ] canonical locator is persisted;
 - [ ] dataset version and snapshot are bound;

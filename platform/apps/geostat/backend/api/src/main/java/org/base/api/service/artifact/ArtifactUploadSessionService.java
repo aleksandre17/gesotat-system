@@ -182,9 +182,9 @@ public class ArtifactUploadSessionService {
             cleanupParts(sessionId, parts);
             return session.receipt("COMMITTED", manifest.manifestId(), manifest.packageChecksum());
         } catch (Exception failure) {
-            boolean retryable = failure instanceof ArtifactStorageException || failure instanceof ArtifactScannerUnavailableException
+            boolean retryable = failure instanceof ArtifactStorageException
                     || failure instanceof DataAccessException;
-            String code = retryable ? "DEPENDENCY_UNAVAILABLE" : failure instanceof ArtifactMalwareDetectedException ? "CONTENT_REJECTED" : "PACKAGE_INVALID";
+            String code = retryable ? "DEPENDENCY_UNAVAILABLE" : "PACKAGE_INVALID";
             transaction.executeWithoutResult(status -> finish(session, retryable ? "RETRYABLE" : "REJECTED", code, null, null));
             if (!retryable) cleanupParts(sessionId, data.query("SELECT part_number,sha256,byte_size,status FROM ingest.artifact_upload_part WHERE upload_session_id=?", PART_MAPPER, sessionId));
             if (failure instanceof RuntimeException runtime) throw runtime;

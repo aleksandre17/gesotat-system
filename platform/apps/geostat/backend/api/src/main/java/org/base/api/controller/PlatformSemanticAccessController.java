@@ -4,7 +4,6 @@ import org.base.api.service.platform.access.SemanticAccessPreview;
 import org.base.api.service.platform.access.SemanticAccessPreviewService;
 import org.base.api.service.platform.access.SemanticAccessPackageIngestionService;
 import org.base.api.service.platform.PlatformPackageIngestReceipt;
-import org.base.api.service.artifact.ArtifactMalwareAdmission;
 import org.base.api.service.storage.ObjectStorageService;
 import org.base.api.service.storage.StoredArtifact;
 import org.base.core.anotation.Api;
@@ -28,9 +27,7 @@ public class PlatformSemanticAccessController {
     private final SemanticAccessPreviewService previews;
     private final SemanticAccessPackageIngestionService ingestion;
     private final ObjectProvider<ObjectStorageService> storageProvider;
-    private final ArtifactMalwareAdmission malwareAdmission;
-    public PlatformSemanticAccessController(SemanticAccessPreviewService previews, SemanticAccessPackageIngestionService ingestion, ObjectProvider<ObjectStorageService> storageProvider,
-                                            ArtifactMalwareAdmission malwareAdmission) { this.previews=previews; this.ingestion=ingestion; this.storageProvider=storageProvider; this.malwareAdmission=malwareAdmission; }
+    public PlatformSemanticAccessController(SemanticAccessPreviewService previews, SemanticAccessPackageIngestionService ingestion, ObjectProvider<ObjectStorageService> storageProvider) { this.previews=previews; this.ingestion=ingestion; this.storageProvider=storageProvider; }
 
     @PostMapping(value="/preview",consumes="multipart/form-data")
     @PreAuthorize("hasAuthority('WRITE_RESOURCE')")
@@ -46,7 +43,6 @@ public class PlatformSemanticAccessController {
         File temporary=File.createTempFile("semantic-access-ingest-", ".accdb");
         try {
             file.transferTo(temporary);
-            malwareAdmission.admit(temporary.toPath(),storage,"SEMANTIC_ACCESS",String.valueOf(file.getOriginalFilename()),"ACCESS_PACKAGE");
             StoredArtifact artifact;
             try(var input=Files.newInputStream(temporary.toPath())) { artifact=storage.storeOriginal(file.getOriginalFilename(),file.getContentType(),input,file.getSize()); }
             return ResponseEntity.ok(ingestion.ingest(temporary,artifact));

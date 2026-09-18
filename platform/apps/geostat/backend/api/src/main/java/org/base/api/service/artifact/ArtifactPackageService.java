@@ -36,19 +36,14 @@ public class ArtifactPackageService {
     private final ArtifactMetrics metrics;
     private final ArtifactProperties properties;
     private final ArtifactContentTypeVerifier contentTypes;
-    private final ObjectProvider<ArtifactMalwareScanner> malwareScanners;
-    private final ArtifactQuarantineRegistry quarantineRegistry;
     private final ArtifactPackageContractResolver packageContracts;
     private final ArtifactAccessPackageValidator accessPackageValidator;
-    private final ArtifactMalwareAdmission malwareAdmission;
 
     public record ManifestReceipt(long manifestId, boolean created, String packageChecksum, int entryCount, int objectCount,
                                   int verified, int missing, int checksumMismatch) {}
 
     public ArtifactPackageService(ObjectProvider<ArtifactObjectStore> store, ArtifactRegistry registry, ObjectMapper json, ArtifactMetrics metrics,
                                   ArtifactProperties properties, ArtifactContentTypeVerifier contentTypes,
-                                  ObjectProvider<ArtifactMalwareScanner> malwareScanners,
-                                  ArtifactQuarantineRegistry quarantineRegistry,
                                   ArtifactPackageContractResolver packageContracts,
                                   ArtifactAccessPackageValidator accessPackageValidator) {
         this.store = store;
@@ -57,11 +52,8 @@ public class ArtifactPackageService {
         this.metrics = metrics;
         this.properties = properties;
         this.contentTypes = contentTypes;
-        this.malwareScanners = malwareScanners;
-        this.quarantineRegistry = quarantineRegistry;
         this.packageContracts = packageContracts;
         this.accessPackageValidator = accessPackageValidator;
-        this.malwareAdmission = new ArtifactMalwareAdmission(properties, malwareScanners, quarantineRegistry, metrics);
     }
 
     /**
@@ -128,11 +120,10 @@ public class ArtifactPackageService {
                     accessPackageValidator.validate(staged.toFile(), contract);
                     accessDatasets++;
                 }
-                scanForMalware(staged, objects, packageCode, path, sha, size, "ZIP_PACKAGE");
                 inventory.add(new ArtifactManifestGenerator.InventoryEntry(path, sha, size));
                 stagedEntries.add(new StagedEntry(path, extension, sha, size, staged));
             }
-        } catch (IllegalArgumentException | ArtifactStorageException | ArtifactMalwareDetectedException | ArtifactScannerUnavailableException error) {
+        } catch (IllegalArgumentException | ArtifactStorageException error) {
             deleteStagingDirectory(stagingDirectory);
             throw error;
         } catch (Exception error) {
@@ -196,7 +187,6 @@ public class ArtifactPackageService {
                     if (copied != entry.byteSize() || !sha256(staged).equals(entry.sha256()))
                         throw new IllegalArgumentException("Inventory object checksum or size does not match: " + entry.originalPath());
                     contentTypes.verify(entry.originalPath(), staged);
-                    scanForMalware(staged, objects, manifest.packageCode(), entry.originalPath(), entry.sha256(), entry.byteSize(), "INVENTORY_IMPORT");
                 } catch (IOException error) {
                     throw new ArtifactStorageException("Artifact content could not be inspected", error);
                 } finally {
@@ -256,11 +246,6 @@ public class ArtifactPackageService {
         StringBuilder out = new StringBuilder(64);
         for (byte b : digest) out.append(String.format("%02x", b));
         return out.toString();
-    }
-
-    private void scanForMalware(Path content, ArtifactObjectStore objects, String packageCode, String originalPath,
-                                String sha256, long byteSize, String sourceType) {
-        malwareAdmission.admit(content, objects, packageCode, originalPath, sha256, byteSize, sourceType);
     }
 
     private static String sha256(Path path) throws IOException {

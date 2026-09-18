@@ -36,8 +36,6 @@ public interface ArtifactObjectStore {
     /** Writes content under its checksum address; an existing object with the same address is kept. */
     ObjectLocation putContentAddressed(String prefix, String sha256, String extension, String mediaType, InputStream content, long byteSize);
 
-    /** Preserves a rejected sample in private quarantine storage without retaining its source filename. */
-    ObjectLocation putQuarantined(String sha256, InputStream content, long byteSize);
 
     /** Durable, private checkpoint object for one resumable upload part. Keys are derived by the provider. */
     default ObjectLocation putStagedUploadPart(UUID uploadSessionId, int partNumber, String sha256, InputStream content, long byteSize) {

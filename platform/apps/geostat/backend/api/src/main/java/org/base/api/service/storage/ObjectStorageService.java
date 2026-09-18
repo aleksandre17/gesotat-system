@@ -189,36 +189,6 @@ public class ObjectStorageService implements ArtifactObjectStore {
     }
 
     @Override
-    public ObjectLocation putQuarantined(String sha256, InputStream content, long byteSize) {
-        ArtifactKeys.requireSha256(sha256);
-        if (byteSize < 0) throw new IllegalArgumentException("Invalid quarantine byte size");
-        ObjectLocation location = new ObjectLocation(quarantineBucket,
-                ArtifactKeys.contentKey("malware/sha256/", sha256, "bin"));
-        try {
-            Optional<ObjectStat> existing = stat(location);
-            if (existing.isPresent()) {
-                if (existing.get().byteSize() != byteSize || !sha256(location).equals(sha256))
-                    throw new IllegalStateException("Quarantine content address conflicts with existing bytes");
-                return location;
-            }
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            minio.putObject(PutObjectArgs.builder().bucket(location.bucket()).object(location.key())
-                    .contentType("application/octet-stream")
-                    .userMetadata(Map.of("sha256", sha256, "geostat-state", "quarantined"))
-                    .stream(new DigestInputStream(content, digest), byteSize, -1L).build());
-            if (!hex(digest.digest()).equals(sha256)) {
-                minio.removeObject(io.minio.RemoveObjectArgs.builder().bucket(location.bucket()).object(location.key()).build());
-                throw new IllegalArgumentException("Quarantine stream does not match its SHA-256 identity");
-            }
-            return location;
-        } catch (IllegalArgumentException | IllegalStateException error) {
-            throw error;
-        } catch (Exception error) {
-            throw new ArtifactStorageException("Quarantined content could not be stored", error);
-        }
-    }
-
-    @Override
     public ObjectLocation putStagedUploadPart(UUID uploadSessionId, int partNumber, String sha256, InputStream content, long byteSize) {
         if (uploadSessionId == null || partNumber < 1 || byteSize < 1) throw new IllegalArgumentException("Invalid upload part identity");
         ArtifactKeys.requireSha256(sha256);
