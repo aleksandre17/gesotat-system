@@ -118,18 +118,18 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [x] 11.4 Conformance: real KIDS package + 225 rows against seeded 088 rule — DONE
 - [x] 11.5 Migration registration/order — DONE
 - [x] 11.6 Checksum includes API-visible identity/metadata and remains input-order independent — DONE (`ArtifactReconcilerTest`)
-- [ ] 11.7 Migration 089 lifecycle transition integration on SQL Server — OPEN (`ops/tests/sql/artifact-contract-lifecycle.sql`, AIR-2026-014)
+- [x] 11.7 Migration 089 lifecycle transition integration on SQL Server — DONE (policy and relation immutability rejection; transaction rollback; AIR-2026-014)
 - [x] 11.8 POSIX/UNC and Windows drive paths are rejected before package manifest creation — DONE (`ArtifactManifestGeneratorTest`)
 
 ## 12. Delivery / runtime evidence (remote dev 192.168.1.199)
 
-- [ ] 12.1 Deploy current source via remote sync (`geostat.ps1 api dev bootstrap api --no-build`); health all UP; 7 routes — OPEN (remote currently runs pre-refactor build)
-- [ ] 12.2 Ledger rows 086–088 read back — READY (startup clean; DB read needs operator permission)
+- [x] 12.1 Deploy current source via remote sync (`geostat.ps1 api dev bootstrap api --no-build`); health all UP; 7 routes — DONE (2026-09-18; remote dev only)
+- [x] 12.2 Ledger rows 086–089 read back — DONE (SQL Server ledger checksums read back; 089 applied)
 - [ ] 12.3 `POST manifests/inventory` (`packageCode=KIDS_R8_RESOURCES`, `inventoryKey=kids/r8/resources/kids-files-r8-sanitized/inventory.json`, `objectPrefix=kids/r8/resources/kids-files-r8-sanitized/`) → 532 VERIFIED — READY (needs WRITE_RESOURCE token)
 - [ ] 12.4 Bind (dry-run → write) on the KIDS_RESOURCE REVIEW snapshot + reconciliation PASS — READY (token)
 - [ ] 12.5 Signed download smoke (200, checksum equal) + 403/404/409 — READY (token + 13 EXT-4 for browser)
 - [x] 12.6 Evidence JSON + reference docs + ADR + AIR — DONE
-- [ ] 12.7 Upload bound is configurable across Spring multipart and artifact expansion budgets — OPEN (source/config/test; deployment replay pending)
+- [ ] 12.7 Upload bound is configurable across Spring multipart and artifact expansion budgets — READY (source/config/test deployed; runtime max-size assertion still pending)
 
 ## 13. Remaining generic capability work
 

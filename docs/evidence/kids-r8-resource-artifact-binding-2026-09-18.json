@@ -52,7 +52,9 @@
     },
     "routesRegistered": 7,
     "anonymousArtifactRequest": 401,
-    "migrationRunner": "no startup failure after 086/087/088 registration; ledger row read pending (see checklist 12.2)",
+    "migrationRunner": "086/087/088/089 applied; SQL Server ledger checksum read-back PASS",
+    "migration089Checksum": "dacccda5c2d03d5f33d27bf11b0e9276ff23df19af5fb9b4e331b8aee8c68113",
+    "lifecycleIntegration": "ops/tests/sql/artifact-contract-lifecycle.sql; policy and relation immutability rejection PASS; transaction rollback PASS",
     "edgeConfig": "nginx -t PASS on nginx:1.29.1-alpine; unsigned request 403, signed request forwarded"
   },
   "tests": {
@@ -66,5 +68,5 @@
     "artifactServiceTests": 59,
     "newArtifactTests": 59
   },
-  "status": "STORAGE_AND_BINDING_VERIFIED_RUNTIME_API_ACCEPTANCE_PENDING"
+  "status": "RUNTIME_HEALTH_AND_LIFECYCLE_VERIFIED_GOVERNED_ARTIFACT_FLOW_ACCEPTANCE_PENDING"
 }
