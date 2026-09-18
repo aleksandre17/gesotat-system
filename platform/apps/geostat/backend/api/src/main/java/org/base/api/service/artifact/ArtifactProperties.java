@@ -1,6 +1,8 @@
 package org.base.api.service.artifact;
 
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +31,12 @@ public class ArtifactProperties {
     private int malwareScannerPort = 3310;
     private int malwareScannerTimeoutMillis = 30_000;
     private long malwareScannerMaxBytes = 1024L * 1024 * 1024;
+    private MultipartProperties multipartProperties;
+
+    @Autowired
+    void setMultipartProperties(MultipartProperties multipartProperties) {
+        this.multipartProperties = multipartProperties;
+    }
 
     @PostConstruct
     void validate() {
@@ -41,6 +49,9 @@ public class ArtifactProperties {
                 || reportIssueLimit <= 0 || malwareScannerPort < 1 || malwareScannerPort > 65535
                 || malwareScannerTimeoutMillis <= 0 || malwareScannerMaxBytes <= 0)
             throw new IllegalStateException("platform.artifacts limits must be positive and maxPackageBytes >= maxEntryBytes");
+        if (multipartProperties != null && (multipartProperties.getMaxFileSize().toBytes() != maxUploadBytes
+                || multipartProperties.getMaxRequestSize().toBytes() < maxUploadBytes))
+            throw new IllegalStateException("Spring multipart file limit must equal platform.artifacts.max-upload-bytes and request limit must include multipart overhead");
     }
 
     public String getUploadPrefix() { return uploadPrefix; }

@@ -376,7 +376,11 @@ The configured part size, per-tenant reserved-byte ceiling and session TTL are
 `PLATFORM_ARTIFACT_MAX_TENANT_RESERVED_UPLOAD_BYTES`,
 `PLATFORM_ARTIFACT_MAX_TENANT_ACTIVE_UPLOAD_SESSIONS`, and
 `PLATFORM_ARTIFACT_UPLOAD_SESSION_TTL_SECONDS`, and
-`PLATFORM_ARTIFACT_UPLOAD_PROCESSING_LEASE_SECONDS`. The service stores only hashed
+`PLATFORM_ARTIFACT_UPLOAD_PROCESSING_LEASE_SECONDS`. Synchronous multipart
+admission uses `PLATFORM_ARTIFACT_MAX_UPLOAD_BYTES` for the file and
+`PLATFORM_ARTIFACT_MAX_MULTIPART_REQUEST_BYTES` for the enclosing request;
+startup validation requires the file bounds to agree and the request bound to
+leave room for multipart framing. The service stores only hashed
 tenant/subject keys in its durable session registry, reserves quota atomically,
 and stores parts under server-generated private staging keys. Both reserved
 bytes and active session count have per-tenant ceilings. A part is checkpointed

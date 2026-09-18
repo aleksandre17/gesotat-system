@@ -110,7 +110,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [ ] 10.1 Frontend `/files/...` → governed download — DEFERRED (AIR-2026-009/013)
 - [ ] 10.2 Static file retirement — blocked until 12.5 on live snapshot
 
-## 11. Tests (`:api:test` 202 tests, 0 failures/errors, 1 skipped; 85 artifact-related tests)
+## 11. Tests (`:api:test` 203 tests, 0 failures/errors, 1 skipped; 86 artifact-related tests)
 
 - [x] 11.1 Unit: keys, manifest, matcher, policy — DONE
 - [x] 11.2 Property: manifest/matcher order independence (seeded shuffles) — DONE

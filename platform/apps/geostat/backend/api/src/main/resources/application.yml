@@ -36,7 +36,7 @@ spring:
     multipart:
       enabled: true
       max-file-size: ${PLATFORM_ARTIFACT_MAX_UPLOAD_BYTES:2147483648}
-      max-request-size: ${PLATFORM_ARTIFACT_MAX_UPLOAD_BYTES:2147483648}
+      max-request-size: ${PLATFORM_ARTIFACT_MAX_MULTIPART_REQUEST_BYTES:2148532224}
       file-size-threshold: 0B
       location: /app/uploads
   main:

@@ -1,6 +1,8 @@
 package org.base.api.service.artifact;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
+import org.springframework.util.unit.DataSize;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,5 +37,21 @@ class ArtifactConfigurationTest {
         unrepresentable.setUploadPartBytes(1);
         unrepresentable.setMaxUploadBytes((long) Integer.MAX_VALUE + 1);
         assertThrows(IllegalStateException.class, unrepresentable::validate);
+    }
+
+    @Test
+    void multipartFileBoundMustMatchAndRequestMustAllowBoundaryOverhead() {
+        ArtifactProperties artifacts = new ArtifactProperties();
+        MultipartProperties multipart = new MultipartProperties();
+        multipart.setMaxFileSize(DataSize.ofBytes(artifacts.getMaxUploadBytes()));
+        multipart.setMaxRequestSize(DataSize.ofBytes(artifacts.getMaxUploadBytes() + 1024));
+        artifacts.setMultipartProperties(multipart);
+        artifacts.validate();
+
+        multipart.setMaxFileSize(DataSize.ofBytes(artifacts.getMaxUploadBytes() - 1));
+        assertThrows(IllegalStateException.class, artifacts::validate);
+        multipart.setMaxFileSize(DataSize.ofBytes(artifacts.getMaxUploadBytes()));
+        multipart.setMaxRequestSize(DataSize.ofBytes(artifacts.getMaxUploadBytes() - 1));
+        assertThrows(IllegalStateException.class, artifacts::validate);
     }
 }
