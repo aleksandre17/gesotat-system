@@ -120,6 +120,11 @@ platform:
     max-package-bytes: ${PLATFORM_ARTIFACT_MAX_PACKAGE_BYTES:8589934592}
     max-upload-bytes: ${PLATFORM_ARTIFACT_MAX_UPLOAD_BYTES:2147483648}
     report-issue-limit: ${PLATFORM_ARTIFACT_REPORT_ISSUE_LIMIT:200}
+    malware-scan-required: ${PLATFORM_ARTIFACT_MALWARE_SCAN_REQUIRED:true}
+    malware-scanner-host: ${PLATFORM_ARTIFACT_MALWARE_SCANNER_HOST:}
+    malware-scanner-port: ${PLATFORM_ARTIFACT_MALWARE_SCANNER_PORT:3310}
+    malware-scanner-timeout-millis: ${PLATFORM_ARTIFACT_MALWARE_SCANNER_TIMEOUT_MS:30000}
+    malware-scanner-max-bytes: ${PLATFORM_ARTIFACT_MALWARE_SCANNER_MAX_BYTES:1073741824}
   # Identity binding is environment-agnostic: every profile reads the same keys;
   # only the env file decides whether and against which issuer OIDC runs.
   oidc:

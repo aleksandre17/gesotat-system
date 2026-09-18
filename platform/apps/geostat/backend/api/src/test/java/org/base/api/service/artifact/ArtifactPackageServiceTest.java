@@ -24,6 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -34,6 +36,7 @@ class ArtifactPackageServiceTest {
     /** In-memory adapter: proves the service depends only on the port. */
     static final class MemoryStore implements ArtifactObjectStore {
         final Map<String, byte[]> objects = new HashMap<>();
+        final Map<String, byte[]> quarantine = new HashMap<>();
         public String ingestBucket() { return "geostat-ingest"; }
         public Optional<ObjectStat> stat(ObjectLocation l) { byte[] b = objects.get(l.key()); return b == null ? Optional.empty() : Optional.of(new ObjectStat(b.length, "x")); }
         public String sha256(ObjectLocation l) { return sha(objects.get(l.key())); }
@@ -42,6 +45,13 @@ class ArtifactPackageServiceTest {
         public ObjectLocation putContentAddressed(String prefix, String sha, String ext, String media, InputStream in, long size) {
             try { String key = ArtifactKeys.contentKey(prefix, sha, ext); objects.putIfAbsent(key, in.readAllBytes()); return new ObjectLocation("geostat-ingest", key); }
             catch (java.io.IOException e) { throw new IllegalStateException(e); }
+        }
+        public ObjectLocation putQuarantined(String sha, InputStream in, long size) {
+            try {
+                String key = ArtifactKeys.contentKey("malware/sha256/", sha, "bin");
+                quarantine.putIfAbsent(key, in.readAllBytes());
+                return new ObjectLocation("geostat-quarantine", key);
+            } catch (java.io.IOException e) { throw new IllegalStateException(e); }
         }
         public URI presignGet(ObjectLocation l, Duration ttl, String name, String media) { throw new UnsupportedOperationException(); }
     }
@@ -61,9 +71,21 @@ class ArtifactPackageServiceTest {
 
     @SuppressWarnings("unchecked")
     private static ArtifactPackageService service(MemoryStore store, ArtifactRegistry registry) {
+        return service(store, registry, path -> new ArtifactMalwareScanner.ScanResult(ArtifactMalwareScanner.Verdict.CLEAN, ""));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ArtifactPackageService service(MemoryStore store, ArtifactRegistry registry, ArtifactMalwareScanner scanner) {
+        return service(store, registry, scanner, mock(ArtifactQuarantineRegistry.class));
+    }
+
+    private static ArtifactPackageService service(MemoryStore store, ArtifactRegistry registry, ArtifactMalwareScanner scanner,
+                                                  ArtifactQuarantineRegistry quarantineRegistry) {
         ObjectProvider<ArtifactObjectStore> provider = mock(ObjectProvider.class);
         when(provider.getIfAvailable()).thenReturn(store);
-        return new ArtifactPackageService(provider, registry, new ObjectMapper(), new ArtifactMetrics(mock(ObjectProvider.class)), new ArtifactProperties(), new ArtifactContentTypeVerifier());
+        ObjectProvider<ArtifactMalwareScanner> scannerProvider = mock(ObjectProvider.class);
+        when(scannerProvider.getIfAvailable()).thenReturn(scanner);
+        return new ArtifactPackageService(provider, registry, new ObjectMapper(), new ArtifactMetrics(mock(ObjectProvider.class)), new ArtifactProperties(), new ArtifactContentTypeVerifier(), scannerProvider, quarantineRegistry);
     }
 
     @Test
@@ -117,6 +139,33 @@ class ArtifactPackageServiceTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> service(store, registry).importInventory("PKG", "inventory.json", "kids/r8/resources/"));
+        verify(registry, never()).register(any());
+    }
+
+    @Test
+    void malwareVerdictBlocksStorageAndRegistryWrites() throws Exception {
+        MemoryStore store = new MemoryStore();
+        ArtifactRegistry registry = mock(ArtifactRegistry.class);
+        ArtifactQuarantineRegistry quarantineRegistry = mock(ArtifactQuarantineRegistry.class);
+        ArtifactMalwareScanner infected = path -> new ArtifactMalwareScanner.ScanResult(ArtifactMalwareScanner.Verdict.INFECTED, "test-signature");
+
+        assertThrows(ArtifactMalwareDetectedException.class, () -> service(store, registry, infected, quarantineRegistry)
+                .uploadPackage("PKG", new ByteArrayInputStream(zip(Map.of("report.csv", "safe-looking text")))));
+        assertTrue(store.objects.isEmpty(), "infected content must not enter the ingest object pool");
+        assertEquals(1, store.quarantine.size(), "infected content is retained only in private quarantine storage");
+        verify(registry, never()).register(any());
+        verify(quarantineRegistry).record(anyString(), anyLong(), any(), anyString(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void requiredScannerFailureBlocksManifestRegistration() throws Exception {
+        MemoryStore store = new MemoryStore();
+        ArtifactRegistry registry = mock(ArtifactRegistry.class);
+        ArtifactMalwareScanner unavailable = path -> { throw new ArtifactScannerUnavailableException("test outage"); };
+
+        assertThrows(ArtifactScannerUnavailableException.class, () -> service(store, registry, unavailable)
+                .uploadPackage("PKG", new ByteArrayInputStream(zip(Map.of("report.csv", "safe-looking text")))));
+        assertTrue(store.objects.isEmpty());
         verify(registry, never()).register(any());
     }
 }

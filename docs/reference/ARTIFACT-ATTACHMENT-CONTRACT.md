@@ -207,6 +207,16 @@ Upload და staged-inventory import path-ის MIME მნიშვნელ�
 სკანირება არ არის; production admission-ს სჭირდება ჩართული scanner, quarantine
 flow და მისი runtime evidence.
 
+Malware admission იყენებს `ArtifactMalwareScanner` provider boundary-ს და ამჟამად
+ClamAV `clamd`-ს `INSTREAM` პროტოკოლით. TCP daemon უნდა იყოს მხოლოდ იზოლირებულ,
+სანდო ქსელში, რადგან პროტოკოლი არც peer authentication-ს და არც transport
+encryption-ს იძლევა. უცნობი verdict, timeout, daemon error ან დაუკონფიგურებელი
+provider ატვირთვას აჩერებს (`503`); აღმოჩენილი საფრთხე ვერ შევა ingest pool-ში,
+ხოლო bytes გადადის private `geostat-quarantine` bucket-ში და მისი audit metadata
+Data Plane-ში იწერება. Scanner-ის stream maximum უნდა ემთხვეოდეს clamd-ის
+`StreamMaxLength`-ს; production-ზე საჭიროა signature freshness, resource და
+quarantine retention/cleanup evidence.
+
 ## 8. Object Storage model
 
 Object Storage არის bytes-ის sole authority:

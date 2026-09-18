@@ -35,6 +35,9 @@ public interface ArtifactObjectStore {
     /** Writes content under its checksum address; an existing object with the same address is kept. */
     ObjectLocation putContentAddressed(String prefix, String sha256, String extension, String mediaType, InputStream content, long byteSize);
 
+    /** Preserves a rejected sample in private quarantine storage without retaining its source filename. */
+    ObjectLocation putQuarantined(String sha256, InputStream content, long byteSize);
+
     /** Short-lived GET URL for the public distribution endpoint. */
     URI presignGet(ObjectLocation location, Duration ttl, String downloadName, String mediaType);
 }

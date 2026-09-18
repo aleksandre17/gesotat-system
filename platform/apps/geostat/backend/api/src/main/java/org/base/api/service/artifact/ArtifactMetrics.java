@@ -26,6 +26,10 @@ public class ArtifactMetrics {
         count("geostat.artifact.reconciliation", "result", result);
     }
 
+    public void malwareScan(String result) {
+        count("geostat.artifact.malware_scan", "result", result);
+    }
+
     public void download(String relationCode, String outcome) {
         MeterRegistry meters = registry.getIfAvailable();
         if (meters != null) meters.counter("geostat.artifact.download", "relation", relationCode, "outcome", outcome).increment();

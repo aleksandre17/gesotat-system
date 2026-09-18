@@ -36,18 +36,24 @@ public class ArtifactPackageService {
     private final ArtifactMetrics metrics;
     private final ArtifactProperties properties;
     private final ArtifactContentTypeVerifier contentTypes;
+    private final ObjectProvider<ArtifactMalwareScanner> malwareScanners;
+    private final ArtifactQuarantineRegistry quarantineRegistry;
 
     public record ManifestReceipt(long manifestId, boolean created, String packageChecksum, int entryCount, int objectCount,
                                   int verified, int missing, int checksumMismatch) {}
 
     public ArtifactPackageService(ObjectProvider<ArtifactObjectStore> store, ArtifactRegistry registry, ObjectMapper json, ArtifactMetrics metrics,
-                                  ArtifactProperties properties, ArtifactContentTypeVerifier contentTypes) {
+                                  ArtifactProperties properties, ArtifactContentTypeVerifier contentTypes,
+                                  ObjectProvider<ArtifactMalwareScanner> malwareScanners,
+                                  ArtifactQuarantineRegistry quarantineRegistry) {
         this.store = store;
         this.registry = registry;
         this.json = json;
         this.metrics = metrics;
         this.properties = properties;
         this.contentTypes = contentTypes;
+        this.malwareScanners = malwareScanners;
+        this.quarantineRegistry = quarantineRegistry;
     }
 
     /**
@@ -97,12 +103,13 @@ public class ArtifactPackageService {
                 if (packageBytes > properties.getMaxPackageBytes()) throw new IllegalArgumentException("Package exceeds " + properties.getMaxPackageBytes() + " uncompressed bytes");
                 String sha = hex(digest.digest());
                 contentTypes.verify(path, buffer);
+                scanForMalware(buffer, objects, packageCode, path, sha, size, "ZIP_PACKAGE");
                 try (InputStream content = Files.newInputStream(buffer)) {
                     objects.putContentAddressed(objectPrefix, sha, extension, MediaTypes.forFileName(path), content, size);
                 }
                 inventory.add(new ArtifactManifestGenerator.InventoryEntry(path, sha, size));
             }
-        } catch (IllegalArgumentException | ArtifactStorageException error) {
+        } catch (IllegalArgumentException | ArtifactStorageException | ArtifactMalwareDetectedException | ArtifactScannerUnavailableException error) {
             throw error;
         } catch (Exception error) {
             throw new IllegalArgumentException("Package is not a readable ZIP archive", error);
@@ -138,6 +145,7 @@ public class ArtifactPackageService {
                     if (copied != entry.byteSize() || !sha256(staged).equals(entry.sha256()))
                         throw new IllegalArgumentException("Inventory object checksum or size does not match: " + entry.originalPath());
                     contentTypes.verify(entry.originalPath(), staged);
+                    scanForMalware(staged, objects, manifest.packageCode(), entry.originalPath(), entry.sha256(), entry.byteSize(), "INVENTORY_IMPORT");
                 } catch (IOException error) {
                     throw new ArtifactStorageException("Artifact content could not be inspected", error);
                 } finally {
@@ -199,6 +207,50 @@ public class ArtifactPackageService {
         return out.toString();
     }
 
+    private void scanForMalware(Path content, ArtifactObjectStore objects, String packageCode, String originalPath,
+                                String sha256, long byteSize, String sourceType) {
+        boolean configured = properties.getMalwareScannerHost() != null && !properties.getMalwareScannerHost().isBlank();
+        if (!configured && !properties.isMalwareScanRequired()) return;
+        ArtifactMalwareScanner scanner = malwareScanners.getIfAvailable();
+        if (scanner == null) {
+            metrics.malwareScan("unavailable");
+            throw new ArtifactScannerUnavailableException("Required malware scanner is not configured");
+        }
+        ArtifactMalwareScanner.ScanResult result;
+        try {
+            result = scanner.scan(content);
+        } catch (ArtifactScannerUnavailableException unavailable) {
+            metrics.malwareScan("unavailable");
+            throw unavailable;
+        } catch (IllegalArgumentException invalid) {
+            throw invalid;
+        } catch (RuntimeException failure) {
+            metrics.malwareScan("unavailable");
+            throw new ArtifactScannerUnavailableException("Required malware scanner did not return a verdict", failure);
+        }
+        if (result == null || result.verdict() == null) {
+            metrics.malwareScan("unavailable");
+            throw new ArtifactScannerUnavailableException("Required malware scanner returned no verdict");
+        }
+        if (result.verdict() == ArtifactMalwareScanner.Verdict.CLEAN) {
+            metrics.malwareScan("clean");
+            return;
+        }
+        metrics.malwareScan("infected");
+        if (result.verdict() == ArtifactMalwareScanner.Verdict.INFECTED) {
+            try (InputStream quarantinedContent = Files.newInputStream(content)) {
+                ArtifactObjectStore.ObjectLocation location = objects.putQuarantined(sha256, quarantinedContent, byteSize);
+                String sourceHash = quarantineSourceHash(packageCode, sourceType, originalPath, sha256);
+                quarantineRegistry.record(sha256, byteSize, location, sourceType, sourceHash, "CLAMAV", result.signature());
+                log.warn("artifact.malware_quarantined sha256={} bytes={} sourceType={} quarantineBucket={} quarantineKeyHash={}",
+                        sha256, byteSize, sourceType, location.bucket(), sha256(location.key().getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+            } catch (IOException error) {
+                throw new ArtifactStorageException("Rejected content could not be quarantined", error);
+            }
+            throw new ArtifactMalwareDetectedException();
+        }
+    }
+
     private static String sha256(Path path) throws IOException {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -210,5 +262,37 @@ public class ArtifactPackageService {
         } catch (java.security.NoSuchAlgorithmException impossible) {
             throw new IllegalStateException("SHA-256 is unavailable", impossible);
         }
+    }
+
+    private static String sha256(byte[] bytes) {
+        try {
+            return hex(MessageDigest.getInstance("SHA-256").digest(bytes));
+        } catch (java.security.NoSuchAlgorithmException impossible) {
+            throw new IllegalStateException("SHA-256 is unavailable", impossible);
+        }
+    }
+
+    private static String quarantineSourceHash(String packageCode, String sourceType, String originalPath, String sha256) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            try (java.io.DataOutputStream canonical = new java.io.DataOutputStream(
+                    new DigestOutputStream(OutputStream.nullOutputStream(), digest))) {
+                writeString(canonical, packageCode);
+                writeString(canonical, sourceType);
+                writeString(canonical, originalPath);
+                writeString(canonical, sha256);
+            }
+            return hex(digest.digest());
+        } catch (java.security.NoSuchAlgorithmException impossible) {
+            throw new IllegalStateException("SHA-256 is unavailable", impossible);
+        } catch (IOException impossible) {
+            throw new IllegalStateException("Quarantine reference could not be encoded", impossible);
+        }
+    }
+
+    private static void writeString(java.io.DataOutputStream out, String value) throws IOException {
+        byte[] bytes = value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        out.writeInt(bytes.length);
+        out.write(bytes);
     }
 }

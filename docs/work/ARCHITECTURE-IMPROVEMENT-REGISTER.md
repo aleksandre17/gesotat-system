@@ -393,4 +393,27 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   `:api:test` PASS — 184 tests, 0 failures/errors, 1 skipped (67 artifact-related tests). Tika 4.0.0
   plus workbook structure validation is deployed in remote dev; Tika 4.0.0 is in the API classpath,
   and API health is UP.
+
+### AIR-2026-023 — Artifact package admission had no malware verdict or quarantine evidence
+
+- **სტატუსი:** `IN_PROGRESS` / **priority:** `P1` / **owner:** Ingestion Security
+- **აღმოჩენა:** upload/import trusted content after MIME and checksum validation without malware
+  scanning. A detection result could not be audited in the Data Plane, and scanner outages had no
+  fail-closed API outcome.
+- **გადაწყვეტა:** `ArtifactMalwareScanner` is a provider boundary; the ClamAV adapter uses framed,
+  bounded `INSTREAM` over a nonblocking socket with an overall deadline and byte ceiling. Admission
+  requires a CLEAN verdict; unavailable/error/no verdict maps to 503, infected to 422. Infected bytes
+  are written only to a deterministic private quarantine key and a hashed-source evidence row in
+  migration 090; high-cardinality source paths are not persisted. Low-cardinality verdict metrics are
+  emitted. ClamAV TCP must stay on a trusted private network because its protocol has no peer auth or
+  transport encryption.
+- **Unit evidence:** clean, infected, timeout, byte-limit and no-endpoint cases in
+  `ClamAvArtifactMalwareScannerTest`; ZIP and staged inventory fail-closed plus quarantine behavior in
+  `ArtifactPackageServiceTest`; API 422/503 mappings in `PlatformArtifactControllerTest`; full
+  `:api:test` PASS — 193 tests, 0 failures/errors, 1 skipped (76 artifact-related).
+- **Open runtime evidence:** SQL replay `ops/tests/sql/artifact-malware-quarantine.sql`, a reachable
+  ClamAV daemon with current signatures and configured `StreamMaxLength`, EICAR canary pass/block,
+  quarantine object/audit read-back and approved retention cleanup. Remote dev has only ~1.2 GiB
+  currently available; the official ClamAV container guide recommends ≥3 GiB, so scanner service
+  provisioning is external until its resource budget or a remote scanner endpoint is approved.
   Malware scanning remains a separate open control and this change does not claim virus-free content.

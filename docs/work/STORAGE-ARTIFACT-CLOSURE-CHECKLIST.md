@@ -62,7 +62,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [x] 4.5 Key/prefix/path validation (traversal, charset) — DONE (test)
 - [ ] 4.6 Encryption at rest / versioning / object lock — EXT (ADR-006, ops)
 - [ ] 4.7 `minio-data` backup/restore — EXT (B-06)
-- [ ] 4.8 Malware scanning and content-based media verification — OPEN (Tika content detection now rejects extension/MIME mismatches for ZIP upload and staged inventory import before manifest registration; malware scanning is not integrated)
+- [ ] 4.8 Malware scanning and content-based media verification — OPEN (Tika signature/type checks and ClamAV `INSTREAM` fail-closed adapter are implemented; remote dev scanner endpoint and signature freshness are not provisioned/verified)
 
 ## 5. Contract binding — `088_kids_r8_resource_artifact_binding.sql`
 
@@ -110,7 +110,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [ ] 10.1 Frontend `/files/...` → governed download — DEFERRED (AIR-2026-009/013)
 - [ ] 10.2 Static file retirement — blocked until 12.5 on live snapshot
 
-## 11. Tests (`:api:test` 184 tests, 0 failures/errors, 1 skipped; 67 artifact-related tests)
+## 11. Tests (`:api:test` 193 tests, 0 failures/errors, 1 skipped; 76 artifact-related tests)
 
 - [x] 11.1 Unit: keys, manifest, matcher, policy — DONE
 - [x] 11.2 Property: manifest/matcher order independence (seeded shuffles) — DONE
@@ -143,7 +143,9 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 ## 15. Security verification follow-up
 
 - [x] 15.1 Content-derived media type must agree with the declared path type before package storage/manifest registration — DONE (`ArtifactContentTypeVerifier`; content-only Tika detection; PDF spoof and inventory negative tests)
-- [ ] 15.2 Malware scanning with an operational scanner, fail-closed admission, quarantine evidence and replay behavior — OPEN (scanner service/provider and deployment configuration required)
+- [x] 15.2 ClamAV `INSTREAM` provider, fail-closed admission, scanner metrics, private quarantine copy and Data Plane audit code — DONE in source; unit protocol/security suite PASS
+- [ ] 15.3 Migration 090 quarantine evidence persistence — READY (SQL Server fixture exists; remote SQL replay pending)
+- [x] 15.4 Scanner protocol vectors: clean, infected, timeout, byte ceiling, and unavailable — DONE (local protocol fixture; included in full suite)
 
 ## 14. External gates
 
@@ -152,3 +154,4 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - EXT-3 Production release provenance (B-01)
 - EXT-4 `files.geostat.internal`: TLS SAN + DNS + edge redeploy + `STORAGE_PUBLIC_ENDPOINT` (edge config in repo, `nginx -t` PASS) — AIR-2026-012
 - EXT-5 Token with `contract.write`/`contract.read` roles for 12.3–12.5
+- EXT-6 Private-network `clamd` endpoint with current definitions, `StreamMaxLength >= PLATFORM_ARTIFACT_MALWARE_SCANNER_MAX_BYTES`, and signed-off quarantine retention. No daemon is currently provisioned; remote dev has ~1.2 GiB memory available while ClamAV's official Docker guide recommends at least 3 GiB, so a sidecar cannot be added safely to this shared host without changing its resource envelope.

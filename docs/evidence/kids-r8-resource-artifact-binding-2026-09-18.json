@@ -63,13 +63,14 @@
     "suite": ":api:test",
     "runDate": "2026-09-18",
     "verificationEnvironment": "local Windows worktree",
-    "tests": 184,
+    "tests": 193,
     "failures": 0,
     "errors": 0,
     "skipped": 1,
-    "artifactServiceTests": 67,
-    "newArtifactTests": 67,
-    "contentTypeSecurity": "Tika 4.0.0 content-only detection; ZIP and staged-inventory media spoofing rejected before manifest registration; generated XLS/XLSX accepted, DOCX disguised as XLSX rejected; full suite PASS; remote dev deployed"
+    "artifactServiceTests": 76,
+    "newArtifactTests": 76,
+    "contentTypeSecurity": "Tika 4.0.0 content-only detection; ZIP and staged-inventory media spoofing rejected before manifest registration; generated XLS/XLSX accepted, DOCX disguised as XLSX rejected; full suite PASS; remote dev deployed",
+    "malwareAdmissionTests": "ClamAV INSTREAM local protocol fixture: clean, infected, timeout, byte ceiling and unavailable; package clean-gate, quarantine, 422/503 mappings; full suite PASS. Remote ClamAV endpoint not configured; artifact writes fail closed (EXT-6)."
   },
   "status": "RUNTIME_HEALTH_AND_LIFECYCLE_VERIFIED_GOVERNED_ARTIFACT_FLOW_ACCEPTANCE_PENDING"
 }

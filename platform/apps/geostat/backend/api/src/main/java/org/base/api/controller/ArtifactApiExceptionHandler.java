@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.base.api.service.artifact.ArtifactAccessDeniedException;
 import org.base.api.service.artifact.ArtifactNotFoundException;
 import org.base.api.service.artifact.ArtifactStorageException;
+import org.base.api.service.artifact.ArtifactMalwareDetectedException;
+import org.base.api.service.artifact.ArtifactScannerUnavailableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -36,6 +38,11 @@ public class ArtifactApiExceptionHandler {
         return problem(HttpStatus.FORBIDDEN, "artifact-access-denied", ex.getMessage(), request);
     }
 
+    @ExceptionHandler(ArtifactMalwareDetectedException.class)
+    public ResponseEntity<ProblemDetail> malware(ArtifactMalwareDetectedException ex, HttpServletRequest request) {
+        return problem(HttpStatus.UNPROCESSABLE_ENTITY, "artifact-content-rejected", ex.getMessage(), request);
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ProblemDetail> invalid(IllegalArgumentException ex, HttpServletRequest request) {
         return problem(HttpStatus.BAD_REQUEST, "artifact-request-invalid", ex.getMessage(), request);
@@ -50,6 +57,12 @@ public class ArtifactApiExceptionHandler {
     public ResponseEntity<ProblemDetail> storage(ArtifactStorageException ex, HttpServletRequest request) {
         log.error("Artifact storage failure: {}", ex.getMessage(), ex.getCause());
         return problem(HttpStatus.SERVICE_UNAVAILABLE, "artifact-storage-unavailable", "Artifact storage is temporarily unavailable", request);
+    }
+
+    @ExceptionHandler(ArtifactScannerUnavailableException.class)
+    public ResponseEntity<ProblemDetail> scanner(ArtifactScannerUnavailableException ex, HttpServletRequest request) {
+        log.error("Artifact malware scanner unavailable", ex.getCause());
+        return problem(HttpStatus.SERVICE_UNAVAILABLE, "artifact-scanner-unavailable", "Artifact scanning is temporarily unavailable", request);
     }
 
     @ExceptionHandler(DataAccessException.class)

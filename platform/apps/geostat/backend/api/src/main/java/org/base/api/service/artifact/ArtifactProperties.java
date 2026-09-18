@@ -18,12 +18,19 @@ public class ArtifactProperties {
     private long maxUploadBytes = 2L * 1024 * 1024 * 1024;
     /** Upper bound of findings returned in one report; counts per code are always complete. */
     private int reportIssueLimit = 200;
+    /** Artifact admission is fail-closed unless an operational malware scanner returns CLEAN. */
+    private boolean malwareScanRequired = true;
+    private String malwareScannerHost = "";
+    private int malwareScannerPort = 3310;
+    private int malwareScannerTimeoutMillis = 30_000;
+    private long malwareScannerMaxBytes = 1024L * 1024 * 1024;
 
     @PostConstruct
     void validate() {
         ArtifactKeys.requirePrefix(uploadPrefix);
         if (maxInventoryBytes <= 0 || maxPackageEntries <= 0 || maxEntryBytes <= 0 || maxPackageBytes < maxEntryBytes
-                || maxUploadBytes <= 0 || reportIssueLimit <= 0)
+                || maxUploadBytes <= 0 || reportIssueLimit <= 0 || malwareScannerPort < 1 || malwareScannerPort > 65535
+                || malwareScannerTimeoutMillis <= 0 || malwareScannerMaxBytes <= 0)
             throw new IllegalStateException("platform.artifacts limits must be positive and maxPackageBytes >= maxEntryBytes");
     }
 
@@ -41,4 +48,14 @@ public class ArtifactProperties {
     public void setMaxUploadBytes(long maxUploadBytes) { this.maxUploadBytes = maxUploadBytes; }
     public int getReportIssueLimit() { return reportIssueLimit; }
     public void setReportIssueLimit(int reportIssueLimit) { this.reportIssueLimit = reportIssueLimit; }
+    public boolean isMalwareScanRequired() { return malwareScanRequired; }
+    public void setMalwareScanRequired(boolean malwareScanRequired) { this.malwareScanRequired = malwareScanRequired; }
+    public String getMalwareScannerHost() { return malwareScannerHost; }
+    public void setMalwareScannerHost(String malwareScannerHost) { this.malwareScannerHost = malwareScannerHost == null ? "" : malwareScannerHost.strip(); }
+    public int getMalwareScannerPort() { return malwareScannerPort; }
+    public void setMalwareScannerPort(int malwareScannerPort) { this.malwareScannerPort = malwareScannerPort; }
+    public int getMalwareScannerTimeoutMillis() { return malwareScannerTimeoutMillis; }
+    public void setMalwareScannerTimeoutMillis(int malwareScannerTimeoutMillis) { this.malwareScannerTimeoutMillis = malwareScannerTimeoutMillis; }
+    public long getMalwareScannerMaxBytes() { return malwareScannerMaxBytes; }
+    public void setMalwareScannerMaxBytes(long malwareScannerMaxBytes) { this.malwareScannerMaxBytes = malwareScannerMaxBytes; }
 }

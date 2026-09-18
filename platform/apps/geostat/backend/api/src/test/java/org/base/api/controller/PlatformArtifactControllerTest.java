@@ -7,6 +7,8 @@ import org.base.api.service.artifact.ArtifactNotFoundException;
 import org.base.api.service.artifact.ArtifactPackageService;
 import org.base.api.service.artifact.ArtifactReconciliationService;
 import org.base.api.service.artifact.ArtifactStorageException;
+import org.base.api.service.artifact.ArtifactMalwareDetectedException;
+import org.base.api.service.artifact.ArtifactScannerUnavailableException;
 import org.base.api.service.artifact.BindingStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,6 +81,23 @@ class PlatformArtifactControllerTest {
         mvc.perform(get(DOWNLOAD)).andExpect(status().isServiceUnavailable())
                 .andExpect(jsonPath("$.code").value("artifact-storage-unavailable"))
                 .andExpect(content().string(not(containsString("geostat-ingest"))));
+    }
+
+    @Test
+    void scannerFailureIsProblem503WithoutScannerDetails() throws Exception {
+        when(distribution.download(anyString(), anyString(), anyString(), anyString(), anyInt(), any()))
+                .thenThrow(new ArtifactScannerUnavailableException("clamd host secret.internal timeout"));
+        mvc.perform(get(DOWNLOAD)).andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.code").value("artifact-scanner-unavailable"))
+                .andExpect(content().string(not(containsString("secret.internal"))));
+    }
+
+    @Test
+    void malwareRejectionIsProblem422() throws Exception {
+        when(distribution.download(anyString(), anyString(), anyString(), anyString(), anyInt(), any()))
+                .thenThrow(new ArtifactMalwareDetectedException());
+        mvc.perform(get(DOWNLOAD)).andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.code").value("artifact-content-rejected"));
     }
 
     @Test
