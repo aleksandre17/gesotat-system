@@ -110,7 +110,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [ ] 10.1 Frontend `/files/...` → governed download — DEFERRED (AIR-2026-009/013)
 - [ ] 10.2 Static file retirement — blocked until 12.5 on live snapshot
 
-## 11. Tests (`:api:test` 181 tests, 0 failures/errors, 1 skipped; 64 artifact-related tests)
+## 11. Tests (`:api:test` 184 tests, 0 failures/errors, 1 skipped; 67 artifact-related tests)
 
 - [x] 11.1 Unit: keys, manifest, matcher, policy — DONE
 - [x] 11.2 Property: manifest/matcher order independence (seeded shuffles) — DONE
@@ -120,7 +120,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [x] 11.6 Checksum includes API-visible identity/metadata and remains input-order independent — DONE (`ArtifactReconcilerTest`)
 - [x] 11.7 Migration 089 lifecycle transition integration on SQL Server — DONE (policy and relation immutability rejection; transaction rollback; AIR-2026-014)
 - [x] 11.8 POSIX/UNC and Windows drive paths are rejected before package manifest creation — DONE (`ArtifactManifestGeneratorTest`)
-- [x] 11.9 Content-derived media verification rejects extension spoofing on upload/import; CSV text handling is explicitly tested — DONE (Tika content detection; ZIP and inventory negative tests)
+- [x] 11.9 Content-derived media verification rejects extension spoofing on upload/import; CSV and generated XLS/XLSX workbooks are tested, including DOCX→XLSX mismatch — DONE (Tika plus OOXML/OLE workbook structure checks)
 
 ## 12. Delivery / runtime evidence (remote dev 192.168.1.199)
 

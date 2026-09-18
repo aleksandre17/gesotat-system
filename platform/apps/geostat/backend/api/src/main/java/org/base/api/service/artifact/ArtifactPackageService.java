@@ -96,9 +96,7 @@ public class ArtifactPackageService {
                 packageBytes += size;
                 if (packageBytes > properties.getMaxPackageBytes()) throw new IllegalArgumentException("Package exceeds " + properties.getMaxPackageBytes() + " uncompressed bytes");
                 String sha = hex(digest.digest());
-                try (InputStream content = Files.newInputStream(buffer)) {
-                    contentTypes.verify(path, content);
-                }
+                contentTypes.verify(path, buffer);
                 try (InputStream content = Files.newInputStream(buffer)) {
                     objects.putContentAddressed(objectPrefix, sha, extension, MediaTypes.forFileName(path), content, size);
                 }
@@ -126,10 +124,24 @@ public class ArtifactPackageService {
         // bytes before creating a manifest that can later be bound to a published snapshot.
         if (inspectStoredContent) {
             for (ArtifactManifest.Entry entry : manifest.entries()) {
-                try (InputStream content = objects.open(new ArtifactObjectStore.ObjectLocation(entry.bucket(), entry.objectKey()))) {
-                    contentTypes.verify(entry.originalPath(), content);
+                Path staged = null;
+                try {
+                    var location = new ArtifactObjectStore.ObjectLocation(entry.bucket(), entry.objectKey());
+                    var stat = objects.stat(location).orElseThrow(() -> new IllegalArgumentException("Inventory object is missing: " + entry.originalPath()));
+                    if (stat.byteSize() != entry.byteSize() || entry.byteSize() > properties.getMaxEntryBytes())
+                        throw new IllegalArgumentException("Inventory object size is invalid: " + entry.originalPath());
+                    staged = Files.createTempFile("artifact-inspection-", ".bin");
+                    long copied;
+                    try (InputStream content = objects.open(location); OutputStream out = Files.newOutputStream(staged)) {
+                        copied = copyBounded(content, out, properties.getMaxEntryBytes());
+                    }
+                    if (copied != entry.byteSize() || !sha256(staged).equals(entry.sha256()))
+                        throw new IllegalArgumentException("Inventory object checksum or size does not match: " + entry.originalPath());
+                    contentTypes.verify(entry.originalPath(), staged);
                 } catch (IOException error) {
                     throw new ArtifactStorageException("Artifact content could not be inspected", error);
+                } finally {
+                    if (staged != null) try { Files.deleteIfExists(staged); } catch (IOException ignored) { /* best-effort temp cleanup */ }
                 }
             }
         }
@@ -185,5 +197,18 @@ public class ArtifactPackageService {
         StringBuilder out = new StringBuilder(64);
         for (byte b : digest) out.append(String.format("%02x", b));
         return out.toString();
+    }
+
+    private static String sha256(Path path) throws IOException {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            try (InputStream input = Files.newInputStream(path)) {
+                byte[] bytes = new byte[64 * 1024];
+                for (int read; (read = input.read(bytes)) > 0; ) digest.update(bytes, 0, read);
+            }
+            return hex(digest.digest());
+        } catch (java.security.NoSuchAlgorithmException impossible) {
+            throw new IllegalStateException("SHA-256 is unavailable", impossible);
+        }
     }
 }

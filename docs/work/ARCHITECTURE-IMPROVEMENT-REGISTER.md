@@ -385,9 +385,11 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   inventories crossed a second trust boundary without checking bytes against the declared type.
 - **გადაწყვეტა:** pinned Apache Tika 4.0.0 core content detection inspects streams without filename or caller
   MIME hints before upload writes and again before package manifest registration, including inventory
-  imports. CSV allows plain-text detection because generic MIME detectors do not distinguish delimited
+  imports. OOXML and OLE2 spreadsheets receive workbook-structure checks so a DOCX cannot pass as
+  XLSX. CSV allows plain-text detection because generic MIME detectors do not distinguish delimited
   text from other UTF text. Type mismatches fail before registry registration.
-- **Evidence:** `ArtifactContentTypeVerifierTest`, ZIP spoof rejection and inventory-import spoof
-  rejection in `ArtifactPackageServiceTest`; `:api:test` PASS — 181 tests, 0 failures/errors, 1 skipped
-  (64 artifact-related tests). Tika 4.0.0 is present in the remote dev API classpath and health is UP.
+- **Evidence:** `ArtifactContentTypeVerifierTest` covers generated XLS/XLSX workbooks and DOCX→XLSX
+  rejection; ZIP spoof rejection and inventory-import spoof rejection in `ArtifactPackageServiceTest`;
+  `:api:test` PASS — 184 tests, 0 failures/errors, 1 skipped (67 artifact-related tests). Tika 4.0.0
+  is present in the remote dev API classpath and health is UP (runtime restart of this last refinement pending).
   Malware scanning remains a separate open control and this change does not claim virus-free content.

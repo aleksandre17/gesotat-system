@@ -63,13 +63,13 @@
     "suite": ":api:test",
     "runDate": "2026-09-18",
     "verificationEnvironment": "local Windows worktree",
-    "tests": 181,
+    "tests": 184,
     "failures": 0,
     "errors": 0,
     "skipped": 1,
-    "artifactServiceTests": 64,
-    "newArtifactTests": 64,
-    "contentTypeSecurity": "Tika 4.0.0 content-only detection; ZIP and staged-inventory media spoofing rejected before manifest registration; ArtifactContentTypeVerifierTest PASS; runtime deployed"
+    "artifactServiceTests": 67,
+    "newArtifactTests": 67,
+    "contentTypeSecurity": "Tika 4.0.0 content-only detection; ZIP and staged-inventory media spoofing rejected before manifest registration; generated XLS/XLSX accepted, DOCX disguised as XLSX rejected; full suite PASS (runtime refinement deployment pending)"
   },
   "status": "RUNTIME_HEALTH_AND_LIFECYCLE_VERIFIED_GOVERNED_ARTIFACT_FLOW_ACCEPTANCE_PENDING"
 }
