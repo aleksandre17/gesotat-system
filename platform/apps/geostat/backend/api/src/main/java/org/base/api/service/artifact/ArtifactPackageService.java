@@ -101,49 +101,71 @@ public class ArtifactPackageService {
         ArtifactObjectStore objects = requireStore();
         String objectPrefix = properties.getUploadPrefix();
         List<ArtifactManifestGenerator.InventoryEntry> inventory = new ArrayList<>();
+        List<StagedEntry> stagedEntries = new ArrayList<>();
         long packageBytes = 0;
         int accessDatasets = 0;
-        Path buffer = null;
+        Path stagingDirectory = null;
         try (ZipInputStream entries = new ZipInputStream(zip)) {
-            buffer = Files.createTempFile("artifact-entry-", ".bin");
+            stagingDirectory = Files.createTempDirectory("artifact-package-");
             for (ZipEntry entry; (entry = entries.getNextEntry()) != null; ) {
                 if (entry.isDirectory()) continue;
                 if (inventory.size() >= properties.getMaxPackageEntries()) throw new IllegalArgumentException("Package exceeds " + properties.getMaxPackageEntries() + " entries");
                 String path = ArtifactManifestGenerator.normalizePath(entry.getName());
                 String extension = ArtifactKeys.extensionOf(path);
+                Path staged = Files.createTempFile(stagingDirectory, "entry-", ".bin");
                 MessageDigest digest = MessageDigest.getInstance("SHA-256");
                 long size;
-                try (OutputStream out = new DigestOutputStream(Files.newOutputStream(buffer), digest)) {
+                try (OutputStream out = new DigestOutputStream(Files.newOutputStream(staged), digest)) {
                     size = copyBounded(entries, out, properties.getMaxEntryBytes());
                 }
                 packageBytes += size;
                 if (packageBytes > properties.getMaxPackageBytes()) throw new IllegalArgumentException("Package exceeds " + properties.getMaxPackageBytes() + " uncompressed bytes");
                 String sha = hex(digest.digest());
-                contentTypes.verify(path, buffer);
+                contentTypes.verify(path, staged);
                 if (contract != null && extension.equals("accdb")) {
-                    accessPackageValidator.validate(buffer.toFile(), contract);
+                    accessPackageValidator.validate(staged.toFile(), contract);
                     accessDatasets++;
                 }
-                scanForMalware(buffer, objects, packageCode, path, sha, size, "ZIP_PACKAGE");
-                try (InputStream content = Files.newInputStream(buffer)) {
-                    objects.putContentAddressed(objectPrefix, sha, extension, MediaTypes.forFileName(path), content, size);
-                }
+                scanForMalware(staged, objects, packageCode, path, sha, size, "ZIP_PACKAGE");
                 inventory.add(new ArtifactManifestGenerator.InventoryEntry(path, sha, size));
+                stagedEntries.add(new StagedEntry(path, extension, sha, size, staged));
             }
         } catch (IllegalArgumentException | ArtifactStorageException | ArtifactMalwareDetectedException | ArtifactScannerUnavailableException error) {
+            deleteStagingDirectory(stagingDirectory);
             throw error;
         } catch (Exception error) {
+            deleteStagingDirectory(stagingDirectory);
             throw new IllegalArgumentException("Package is not a readable ZIP archive", error);
-        } finally {
-            if (buffer != null) try { Files.deleteIfExists(buffer); } catch (IOException ignored) { /* temp cleanup is best effort */ }
         }
-        if (contract != null && accessDatasets != 1)
-            throw new IllegalArgumentException("Contract-bound package must contain exactly one Access dataset file");
-        ArtifactManifest manifest = contract == null
-                ? ArtifactManifestGenerator.generate(packageCode, objects.ingestBucket(), objectPrefix, "upload:" + packageCode, inventory)
-                : ArtifactManifestGenerator.generate(packageCode, objects.ingestBucket(), objectPrefix, "upload:" + packageCode,
-                    inventory, contract.contractCode(), contract.revision(), contract.datasetVersionId());
-        return registerAndVerify(manifest, false);
+        try {
+            if (contract != null && accessDatasets != 1)
+                throw new IllegalArgumentException("Contract-bound package must contain exactly one Access dataset file");
+            for (StagedEntry entry : stagedEntries) {
+                try (InputStream content = Files.newInputStream(entry.path())) {
+                    objects.putContentAddressed(objectPrefix, entry.sha256(), entry.extension(), MediaTypes.forFileName(entry.originalPath()), content, entry.byteSize());
+                }
+            }
+            ArtifactManifest manifest = contract == null
+                    ? ArtifactManifestGenerator.generate(packageCode, objects.ingestBucket(), objectPrefix, "upload:" + packageCode, inventory)
+                    : ArtifactManifestGenerator.generate(packageCode, objects.ingestBucket(), objectPrefix, "upload:" + packageCode,
+                        inventory, contract.contractCode(), contract.revision(), contract.datasetVersionId());
+            return registerAndVerify(manifest, false);
+        } catch (IOException failure) {
+            throw new ArtifactStorageException("Validated package content could not be stored", failure);
+        } finally {
+            deleteStagingDirectory(stagingDirectory);
+        }
+    }
+
+    private record StagedEntry(String originalPath, String extension, String sha256, long byteSize, Path path) {}
+
+    private static void deleteStagingDirectory(Path directory) {
+        if (directory == null) return;
+        try (var paths = Files.walk(directory)) {
+            paths.sorted(java.util.Comparator.reverseOrder()).forEach(path -> {
+                try { Files.deleteIfExists(path); } catch (IOException ignored) { /* best-effort temp cleanup */ }
+            });
+        } catch (IOException ignored) { /* best-effort temp cleanup */ }
     }
 
     /** Re-checks every object of a manifest against Object Storage (existence and full SHA-256). */

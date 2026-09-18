@@ -82,12 +82,19 @@ class ArtifactPackageServiceTest {
 
     private static ArtifactPackageService service(MemoryStore store, ArtifactRegistry registry, ArtifactMalwareScanner scanner,
                                                   ArtifactQuarantineRegistry quarantineRegistry) {
+        return service(store, registry, scanner, quarantineRegistry, mock(ArtifactPackageContractResolver.class));
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ArtifactPackageService service(MemoryStore store, ArtifactRegistry registry, ArtifactMalwareScanner scanner,
+                                                  ArtifactQuarantineRegistry quarantineRegistry,
+                                                  ArtifactPackageContractResolver packageContracts) {
         ObjectProvider<ArtifactObjectStore> provider = mock(ObjectProvider.class);
         when(provider.getIfAvailable()).thenReturn(store);
         ObjectProvider<ArtifactMalwareScanner> scannerProvider = mock(ObjectProvider.class);
         when(scannerProvider.getIfAvailable()).thenReturn(scanner);
         return new ArtifactPackageService(provider, registry, new ObjectMapper(), new ArtifactMetrics(mock(ObjectProvider.class)), new ArtifactProperties(), new ArtifactContentTypeVerifier(), scannerProvider, quarantineRegistry,
-                mock(ArtifactPackageContractResolver.class), new ArtifactAccessPackageValidator());
+                packageContracts, new ArtifactAccessPackageValidator());
     }
 
     @Test
@@ -166,6 +173,23 @@ class ArtifactPackageServiceTest {
         ArtifactRegistry registry = mock(ArtifactRegistry.class);
         assertThrows(IllegalArgumentException.class, () -> service(new MemoryStore(), registry)
                 .uploadPackage("PKG", new ByteArrayInputStream(zip(Map.of("report.pdf", "plain text, not a PDF")))));
+        verify(registry, never()).register(any());
+    }
+
+    @Test
+    void invalidContractPackageDoesNotWriteContentObjects() throws Exception {
+        MemoryStore store = new MemoryStore();
+        ArtifactRegistry registry = mock(ArtifactRegistry.class);
+        ArtifactPackageContractResolver contracts = mock(ArtifactPackageContractResolver.class);
+        when(contracts.resolve("SITE_A", 2, "RECORDS")).thenReturn(
+                new ArtifactPackageContractResolver.DatasetContract("SITE_A", 2, "checksum", 73, "RECORDS", "resource"));
+
+        assertThrows(IllegalArgumentException.class, () -> service(store, registry,
+                path -> new ArtifactMalwareScanner.ScanResult(ArtifactMalwareScanner.Verdict.CLEAN, ""),
+                mock(ArtifactQuarantineRegistry.class), contracts).uploadPackage("PACKAGE", "SITE_A", 2, "RECORDS",
+                new ByteArrayInputStream(zip(Map.of("resource/file.csv", "valid,csv\n1,2")))));
+
+        assertTrue(store.objects.isEmpty(), "package structure must pass before any accepted content is written");
         verify(registry, never()).register(any());
     }
 

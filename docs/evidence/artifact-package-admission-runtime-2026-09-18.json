@@ -1,0 +1,35 @@
+{
+  "schema": "geostat.artifact-package-admission-runtime.v1",
+  "recordedAt": "2026-09-18T10:26:30Z",
+  "scope": "ZIP package content staging, validation, and accepted object write ordering",
+  "change": {
+    "behavior": "The complete ZIP is expanded to a bounded temporary directory and all entry and approved-contract checks finish before content-addressed object writes begin.",
+    "failureCase": "A contract-bound archive with valid non-Access content but no required Access database is rejected before object storage or manifest registration.",
+    "residualRisk": "Storage failure after the package has passed admission can leave some immutable content-addressed objects without a manifest; storage orphan reconciliation remains required."
+  },
+  "tests": {
+    "targetedCommand": "./gradlew :api:test --tests org.base.api.service.artifact.ArtifactPackageServiceTest --rerun-tasks",
+    "targetedResult": "PASS",
+    "fullCommand": "./gradlew :api:test --rerun-tasks",
+    "tests": 216,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 1,
+    "result": "PASS"
+  },
+  "runtime": {
+    "environment": "remote dev API 192.168.1.199:8081; production untouched",
+    "deployment": "geostat.ps1 api dev bootstrap api --no-build, then dev restart api",
+    "health": {
+      "status": "UP",
+      "primary": "UP",
+      "dataPlane": "UP",
+      "archivePlane": "UP",
+      "objectStorage": "UP",
+      "secondary": "UP"
+    },
+    "authenticatedPackageHttpAcceptance": "NOT RUN; scoped WRITE_RESOURCE token unavailable in this runtime evidence",
+    "manifestToSnapshotBinding": "NOT IMPLEMENTED AS ONE ORCHESTRATED WORKFLOW; 14.1 remains OPEN"
+  },
+  "status": "PACKAGE_ADMISSION_ORDERING_SOURCE_TEST_PASS_DEV_HEALTH_PASS_PARTIAL_ORCHESTRATION"
+}

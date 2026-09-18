@@ -134,7 +134,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 
 ## 13. Remaining generic capability work
 
-- [ ] 14.1 Package upload orchestration across package checksum, approved contract revision, Access validation, manifest and relation state — OPEN
+- [ ] 14.1 Package upload orchestration across package checksum, approved contract revision, Access validation, manifest and relation state — OPEN (ZIP entries now stage and pass complete package/Access validation before any accepted content write; full package→manifest→snapshot binding→reconciliation orchestration remains open. Evidence: `docs/evidence/artifact-package-admission-runtime-2026-09-18.json`.)
 - [ ] 14.2 Tenant/site/owner authorization is enforced from authenticated claims through dataset and artifact access — OPEN (current resource authority is global; do not treat as production tenant isolation)
 - [ ] 14.3 Provenance chain and scheduled missing/orphan/checksum/retention reconciliation jobs — PARTIAL (094 registered-object audit migration applied/read-back PASS; remote dev object audit correctly raised MISSING for one retained synthetic object; scheduled relation audit wrote `ARTIFACT_RECONCILIATION=FAIL` for snapshots 16 and 31, each with 225 entities, 0 attachments, and 450 missing required slots; API health UP. Evidence: `docs/evidence/artifact-integrity-audit-runtime-2026-09-18.json` and `docs/evidence/artifact-relation-integrity-audit-runtime-2026-09-18.json`. Storage orphan listing, locator audit, snapshot/cache parity, retention and zero-drift jobs remain open.)
 - [ ] 14.4 One-click operator experience and progress/retry surface — OPEN

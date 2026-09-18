@@ -352,8 +352,19 @@ multipart parameters. The Control Plane must resolve that exact approved
 revision/dataset. The archive must contain one `.accdb` whose contract-declared
 Access table and required fields are present. The accepted manifest stores
 `contractCode`, `contractRevision`, and `datasetVersionId`; those values are
-included in its package checksum. Inventory import remains a separate governed
-path for previously staged content.
+included in its package checksum. ZIP entries are first expanded into a bounded
+temporary staging directory and checked for path safety, type, size, malware,
+and contract structure; only after the complete archive passes admission are
+content objects written and the manifest registered. This prevents a late
+structural rejection, such as a missing required Access database, from leaving
+accepted content objects behind. Storage failures during the subsequent object
+writes can still leave content-addressed orphans, which require the separate
+orphan reconciliation control. Inventory import remains a separate governed
+path for previously staged content. Package admission still does not bind the
+manifest to a snapshot or run relation reconciliation; those remain separate
+workflow states and the package orchestration gate remains open. Source test and
+remote development boot evidence is recorded in
+[`artifact-package-admission-runtime-2026-09-18.json`](../evidence/artifact-package-admission-runtime-2026-09-18.json).
 
 Large uploads can use the durable session API, also guarded by `WRITE_RESOURCE`
 and an OIDC subject plus the configured tenant claim (`tenant_id` by default):
