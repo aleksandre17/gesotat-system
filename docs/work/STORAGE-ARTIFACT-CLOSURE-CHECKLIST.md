@@ -162,10 +162,13 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [x] 16.1 Snapshot creation path identified (read-only): `POST /platform/access/semantic/ingest` → `POST /platform/ingestion/validate/{loadId}` → `POST /platform/ingestion/prepare-snapshot` (`REVIEW_REQUIRED`) → `POST /platform/ingestion/materialize` (`SEMANTIC_REVIEW`); no direct SQL — DONE
 - [x] 16.2 Snapshot provenance hardening (Codex WIP reviewed, tests corrected/extended) — DONE (`6595587`, 231 PASS)
 - [ ] 16.3 Access upload malware admission — REMOVED with the scanner (ADR-009); `c614f07` superseded
-- [ ] 16.4 New KIDS_RESOURCE review snapshot — OPEN (no longer blocked by a scanner; needs a governed Access upload with a temporary WRITE_RESOURCE credential)
-- [ ] 16.5 Inventory registration 532/532, binding 450 edges, reconciliation PASS, signed download — OPEN (runnable; EXT-4 only for browser download)
+- [x] 16.4 New KIDS_RESOURCE review snapshot 52 (version 73, 225 rows, SEMANTIC_REVIEW) via governed ingest/validate/prepare/materialize — DONE (after AIR-2026-015/016 fixes)
+- [x] 16.5 Inventory 532/532 VERIFIED (manifest 4), dry-run 450/0 errors, bind 450 + idempotent replay, ARTIFACT_RECONCILIATION PASS, negatives 401/404/409/403 — DONE
+- [ ] 16.8 Signed download smoke — OPEN: needs snapshot 52 published (PUBLISH_RESOURCE identity + steward approval, ADR-007); browser path also EXT-4
 - [ ] 16.6 clamd acceptance tool — REMOVED (ADR-009)
 - 14.1–14.5 unchanged: 14.1 OPEN, 14.2 OPEN (tenant claims model not defined — owner decision), 14.3 PARTIAL, 14.4 OPEN, 14.5 OPEN (needs a bound snapshot).
 
 Evidence: `docs/evidence/access-admission-and-snapshot-provenance-runtime-2026-09-18.json`.
 - [x] 16.7 Proper OIDC operator identity: Keycloak confidential client `geostat-artifact-operator` (client_credentials, roles `contract.read`/`contract.write`, tenant `geostat`, audience `geostat-api`) — DONE; replaces temporary bootstrap credentials. Evidence: `docs/evidence/artifact-operator-oidc-client-runtime-2026-09-18.json`
+
+Evidence (16.4–16.5): `docs/evidence/kids-r8-artifact-binding-live-runtime-2026-09-18.json`.

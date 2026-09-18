@@ -1,0 +1,35 @@
+{
+  "schema": "geostat.kids-r8-artifact-binding-live.v1",
+  "recordedAt": "2026-09-18",
+  "environment": "remote dev 192.168.1.199 geostat-api-dev:8081; DB geostat-system-mssql; shared MinIO read + dev DB writes only; production API untouched",
+  "identity": "Keycloak client geostat-artifact-operator (contract.read, contract.write; no PUBLISH_RESOURCE); tokens fetched per step and deleted",
+  "fixesBeforeRun": {
+    "AIR-2026-015": "migration runner re-executed applied migrations each startup (commit 69aea23); dataset_version count stable 11684 across two restarts",
+    "AIR-2026-016": "KIDS R8 source registry reconciled to the approved site contract (migration 096, commit 355eb9a); dry-run then applied; 15 datasets -> 15 package-table sources on approved versions"
+  },
+  "steps": {
+    "sourcePackage": { "file": "platform/apps/geostat/backend/api/kids-portal-v1-canonical-r8-final.accdb (local, untracked)", "sha256": "746487cedee93c73b99492038321c138a1bcd7f2e1d9d49fe165332be6cb8211", "preview": "valid, 15 datasets, 122 fields, 21 relations, 0 issues" },
+    "ingest": { "endpoint": "POST /platform/access/semantic/ingest", "batchId": 8, "artifactId": 8, "loads": 15, "kidsResourceLoad": { "datasetLoadId": 127, "source": "__ent_kids_resource", "datasetVersionId": 73, "rows": 225 }, "note": "load 125 (__ent_kids_goal -> 6963) is a leftover of the pre-096 failed attempt; untouched" },
+    "validate": { "datasetLoadId": 127, "accepted": 225, "rejected": 0, "status": "VALIDATED" },
+    "prepareSnapshot": { "datasetSnapshotId": 52, "status": "REVIEW_REQUIRED" },
+    "materialize": { "datasetSnapshotId": 52, "contractSourceId": 568, "family": "ENTITY", "rows": 225, "status": "SEMANTIC_REVIEW" },
+    "inventory": { "manifestId": 4, "packageChecksum": "f6cf340a185656d9a56a3633e81c493c16e9cfa32a94826fbcae91350b7b5982", "entries": 719, "objects": 532, "verified": 532, "missing": 0, "checksumMismatch": 0 },
+    "bindDryRun": { "status": "PREVIEW", "plannedEdges": 450, "errors": 0, "warnings": { "ORPHAN_ARTIFACT": "115 unreferenced mainstat entries" } },
+    "bindWrite": { "status": "BOUND", "written": 450 },
+    "bindReplay": { "status": "BOUND", "written": 0, "unchanged": 450 },
+    "reconciliation": { "gate": "ARTIFACT_RECONCILIATION", "result": "PASS", "entities": 225, "attachments": 450, "attachedBySlot": { "ka": 225, "en": 225 }, "attachmentChecksum": "0737e9c231985f280ad2245ecff71a8af87111876e26e1b9b8ecf234e287949e", "issues": 0 }
+  },
+  "negatives": {
+    "anonymousDownload": 401,
+    "downloadWhileNewestPublishedHasNoEdge": "404 artifact-not-found",
+    "unknownEntity": "404 artifact-not-found",
+    "bindPublishedSnapshot31": "409 artifact-state-conflict",
+    "reconcileUnknownSnapshot": "404 artifact-not-found",
+    "publishWithOperatorToken": 403
+  },
+  "notExercised": {
+    "signedDownloadSmoke": "requires snapshot 52 PUBLISHED: PUBLISH_RESOURCE identity + steward approval (ADR-007) + 7 release gates; browser access additionally EXT-4",
+    "policy403": "no RESTRICTED policy exists for KIDS; covered by unit tests"
+  },
+  "status": "BOUND_AND_RECONCILED_PUBLICATION_PENDING"
+}

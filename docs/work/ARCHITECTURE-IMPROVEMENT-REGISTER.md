@@ -458,7 +458,7 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 
 ### AIR-2026-016 — KIDS R8 ingestion source registry contradicts its approved table definitions
 
-- **სტატუსი:** `TRIAGED` / **priority:** `P0` (ბლოკავს ახალ KIDS R8 review snapshot-ს)
+- **სტატუსი:** `VERIFIED` (dev; migration 096, commit `355eb9a`; owner chose rev-8 reconciliation) / **priority:** `P0`
 - **აღმოჩენა:** approved `contract_table_definition` (rev 8): `KIDS_RESOURCE` → `__ent_kids_resource` → canonical
   version 73. rev 8 `contract_revision_source`-ში კი ორივე row არასწორია: 568 `ACCESS.__ent_kids_resource` → 6964
   (067-მა `MAX(version)` აიღო — AIR-2026-015-ის შედეგი), 575 `ACCESS.kids_resource` → 73 (068-მა site contract-ის
