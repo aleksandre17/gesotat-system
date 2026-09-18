@@ -3,6 +3,7 @@
   "scope": "source-level implementation and regression evidence for artifact resumable upload sessions",
   "status": "PARTIAL_NOT_RUNTIME_ACCEPTED",
   "baselineCommit": "5b678d4",
+  "sourceCommit": "0e826b1",
   "implementation": {
     "migration": "platform/apps/geostat/backend/core/src/main/resources/db/platform/093_artifact_upload_sessions.sql",
     "migrationRegistered": true,
@@ -34,10 +35,33 @@
     "diffCheck": "git diff --check PASS"
   },
   "notVerified": [
-    "migration 093 has not been applied to a runtime database",
     "authenticated tenant-scoped HTTP session replay has not been exercised",
     "object-storage part upload and cleanup recovery have not been exercised against a live provider",
     "remote dev scanner availability remains an external gate"
   ],
+  "runtime": {
+    "environment": "remote dev 192.168.1.199 geostat-api-dev:8081; production untouched",
+    "deployment": "source sync, compose up, and API restart via geostat.ps1 api dev bootstrap/restart api",
+    "health": {
+      "api": "UP",
+      "primary": "UP",
+      "dataPlane": "UP",
+      "archivePlane": "UP",
+      "objectStorage": "UP",
+      "secondary": "UP"
+    },
+    "anonymousUploadSessionRequest": 401,
+    "migration093": {
+      "status": "APPLIED",
+      "controlLedgerChecksum": "db19191157a76ad2f64e5235721d4fa2534ed3c4efc089dbc44aa60eaa578ad4",
+      "localChecksumMatch": true,
+      "dataPlaneTables": [
+        "ingest.artifact_upload_part",
+        "ingest.artifact_upload_quota",
+        "ingest.artifact_upload_session"
+      ],
+      "quotaSessionColumnPresent": true
+    }
+  },
   "productionStatus": "NOT_READY"
 }
