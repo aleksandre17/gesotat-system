@@ -60,6 +60,8 @@ dependencies {
     // Apache Commons CSV - CSV-ის ჩასაწერად
     implementation 'org.apache.commons:commons-csv:1.10.0'
     implementation 'io.minio:minio:9.0.1'
+    // Content based MIME detection only; parsers are intentionally not run on upload.
+    implementation 'org.apache.tika:tika-core:4.0.0'
 
     // Interoperability toolchain: pinned Apache Avro/Parquet runtime for the
     // contract-governed Parquet codec (schema is generated from the response

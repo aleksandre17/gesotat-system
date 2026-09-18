@@ -26,6 +26,9 @@ public interface ArtifactObjectStore {
     /** Streams the object and returns its lowercase SHA-256 hex digest. */
     String sha256(ObjectLocation location);
 
+    /** Opens the full object as a stream. The caller owns and must close the returned stream. */
+    InputStream open(ObjectLocation location);
+
     /** Reads a small object fully; fails when it exceeds {@code maxBytes}. */
     byte[] read(ObjectLocation location, int maxBytes);
 

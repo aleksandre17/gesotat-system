@@ -292,7 +292,7 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 
 ### AIR-2026-014 — Approved artifact contract identity could be mutated
 
-- **სტატუსი:** `TRIAGED` / **priority:** `P0` / **owner:** Data Platform
+- **სტატუსი:** `VERIFIED` / **priority:** `P0` / **owner:** Data Platform
 - **აღმოჩენა:** migration 086-ის approved-row triggers არ იცავდა policy/relation version identity-ს,
   checksum algorithm-სა და retired-state immutability-ს. პირდაპირ SQL update-ს შეეძლო approved
   contract-ის semantic identity შეეცვალა ისე, რომ trigger არ ამოქმედებულიყო.
@@ -300,9 +300,9 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   ახალი migration `089_artifact_contract_lifecycle_immutability.sql` trigger-ებს versioned-ად
   ცვლის. Trigger-ები იცავს identity-სა და ყველა semantic field-ს; DRAFT-იდან დაშვებულია
   APPROVED/RETIRED, APPROVED-იდან მხოლოდ RETIRED, RETIRED terminal-ია. Delete და reactivation იბლოკება.
-- **Blocking evidence:** `ops/tests/sql/artifact-contract-lifecycle.sql` უნდა გაიშვას SQL Server-ზე
-  migration 089-ის შემდეგ: positive/negative transition replay (approve/retire; semantic edit,
-  identity edit, delete, reactivation). Replay-ის დადასტურებამდე runtime status `NOT_VERIFIED` რჩება.
+- **Evidence:** migration 089 ledger checksum `dacccda5c2d03d5f33d27bf11b0e9276ff23df19af5fb9b4e331b8aee8c68113`;
+  `ops/tests/sql/artifact-contract-lifecycle.sql` SQL Server-ზე PASS — approved policy/relation mutation
+  იბლოკება, transaction rollback დასტურდება; remote dev API health PASS.
 
 ### AIR-2026-015 — Artifact reconciliation checksum omitted served metadata
 
@@ -376,3 +376,17 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   declared ordered relations still preserve source array order.
 - **Evidence:** `ArtifactMatcherTest.unorderedArrayValuesUseCanonicalPathOrder` and existing ordered
   source-order test; full `:api:test` PASS (176 tests).
+
+### AIR-2026-022 — File extensions could assert unverified content types
+
+- **სტატუსი:** `READY` / **priority:** `P1` / **owner:** Ingestion Security
+- **აღმოჩენა:** ZIP package upload derived media type only from the original filename; a text or
+  executable payload named `.pdf` could be registered under an allowed PDF policy. Imported storage
+  inventories crossed a second trust boundary without checking bytes against the declared type.
+- **გადაწყვეტა:** pinned Apache Tika 4.0.0 core content detection inspects streams without filename or caller
+  MIME hints before upload writes and again before package manifest registration, including inventory
+  imports. CSV allows plain-text detection because generic MIME detectors do not distinguish delimited
+  text from other UTF text. Type mismatches fail before registry registration.
+- **Evidence:** `ArtifactContentTypeVerifierTest`, ZIP spoof rejection and inventory-import spoof
+  rejection in `ArtifactPackageServiceTest`; full suite rerun pending. Malware scanning remains a
+  separate open control and this change does not claim virus-free content.

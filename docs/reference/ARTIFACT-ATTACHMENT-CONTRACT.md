@@ -199,6 +199,14 @@ RECEIVE
 ყველა ეტაპი არის idempotent. Retry იგივე package checksum-ით არ ქმნის duplicate
 artifact-ს ან relation-ს.
 
+Upload და staged-inventory import path-ის MIME მნიშვნელობას მხოლოდ გაფართოებიდან
+არ ენდობა: content-only detector ბაიტებს ამოწმებს, caller filename/MIME hint-ის
+გარეშე, და mismatch-ზე manifest registration-მდე fail-closed ქცევა აქვს. CSV-ის
+შიგთავსი detector-მა შეიძლება ზოგად `text/plain`-ად ამოიცნოს; `text/csv` policy-ს
+ეს შეესაბამება მხოლოდ ტექსტური payload-ის შემთხვევაში. MIME შემოწმება malware
+სკანირება არ არის; production admission-ს სჭირდება ჩართული scanner, quarantine
+flow და მისი runtime evidence.
+
 ## 8. Object Storage model
 
 Object Storage არის bytes-ის sole authority:

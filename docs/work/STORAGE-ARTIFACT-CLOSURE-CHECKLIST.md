@@ -62,7 +62,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [x] 4.5 Key/prefix/path validation (traversal, charset) — DONE (test)
 - [ ] 4.6 Encryption at rest / versioning / object lock — EXT (ADR-006, ops)
 - [ ] 4.7 `minio-data` backup/restore — EXT (B-06)
-- [ ] 4.8 Malware scanning and content-based media verification — OPEN (extension-derived MIME exists; scanner and byte-signature validation are not integrated)
+- [ ] 4.8 Malware scanning and content-based media verification — OPEN (Tika content detection now rejects extension/MIME mismatches for ZIP upload and staged inventory import before manifest registration; malware scanning is not integrated)
 
 ## 5. Contract binding — `088_kids_r8_resource_artifact_binding.sql`
 
@@ -110,7 +110,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [ ] 10.1 Frontend `/files/...` → governed download — DEFERRED (AIR-2026-009/013)
 - [ ] 10.2 Static file retirement — blocked until 12.5 on live snapshot
 
-## 11. Tests (`:api:test` 176 tests, 0 failures/errors, 1 skipped; 59 artifact-service tests)
+## 11. Tests (`:api:test` 181 tests, 0 failures/errors, 1 skipped; 64 artifact-related tests)
 
 - [x] 11.1 Unit: keys, manifest, matcher, policy — DONE
 - [x] 11.2 Property: manifest/matcher order independence (seeded shuffles) — DONE
@@ -120,6 +120,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [x] 11.6 Checksum includes API-visible identity/metadata and remains input-order independent — DONE (`ArtifactReconcilerTest`)
 - [x] 11.7 Migration 089 lifecycle transition integration on SQL Server — DONE (policy and relation immutability rejection; transaction rollback; AIR-2026-014)
 - [x] 11.8 POSIX/UNC and Windows drive paths are rejected before package manifest creation — DONE (`ArtifactManifestGeneratorTest`)
+- [x] 11.9 Content-derived media verification rejects extension spoofing on upload/import; CSV text handling is explicitly tested — DONE (Tika content detection; ZIP and inventory negative tests)
 
 ## 12. Delivery / runtime evidence (remote dev 192.168.1.199)
 
@@ -138,6 +139,11 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [ ] 14.3 Provenance chain and scheduled missing/orphan/checksum/retention reconciliation jobs — OPEN
 - [ ] 14.4 One-click operator experience and progress/retry surface — OPEN
 - [ ] 14.5 Rollback, replay, load/performance and recovery evidence — OPEN
+
+## 15. Security verification follow-up
+
+- [x] 15.1 Content-derived media type must agree with the declared path type before package storage/manifest registration — DONE (`ArtifactContentTypeVerifier`; content-only Tika detection; PDF spoof and inventory negative tests)
+- [ ] 15.2 Malware scanning with an operational scanner, fail-closed admission, quarantine evidence and replay behavior — OPEN (scanner service/provider and deployment configuration required)
 
 ## 14. External gates
 

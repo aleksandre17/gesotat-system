@@ -145,6 +145,15 @@ public class ObjectStorageService implements ArtifactObjectStore {
     }
 
     @Override
+    public InputStream open(ObjectLocation location) {
+        try {
+            return minio.getObject(GetObjectArgs.builder().bucket(location.bucket()).object(location.key()).build());
+        } catch (Exception error) {
+            throw new ArtifactStorageException("Object read stream could not be opened", error);
+        }
+    }
+
+    @Override
     public byte[] read(ObjectLocation location, int maxBytes) {
         try (InputStream input = minio.getObject(GetObjectArgs.builder().bucket(location.bucket()).object(location.key()).build())) {
             byte[] bytes = input.readNBytes(maxBytes + 1);

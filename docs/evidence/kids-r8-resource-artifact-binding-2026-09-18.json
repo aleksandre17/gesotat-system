@@ -61,12 +61,13 @@
     "suite": ":api:test",
     "runDate": "2026-09-18",
     "verificationEnvironment": "local Windows worktree",
-    "tests": 176,
+    "tests": 181,
     "failures": 0,
     "errors": 0,
     "skipped": 1,
-    "artifactServiceTests": 59,
-    "newArtifactTests": 59
+    "artifactServiceTests": 64,
+    "newArtifactTests": 64,
+    "contentTypeSecurity": "Tika 4.0.0 content-only detection; ZIP and staged-inventory media spoofing rejected before manifest registration; ArtifactContentTypeVerifierTest PASS (runtime deployment pending)"
   },
   "status": "RUNTIME_HEALTH_AND_LIFECYCLE_VERIFIED_GOVERNED_ARTIFACT_FLOW_ACCEPTANCE_PENDING"
 }

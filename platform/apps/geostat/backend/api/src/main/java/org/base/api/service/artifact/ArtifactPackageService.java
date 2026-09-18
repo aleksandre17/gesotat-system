@@ -35,17 +35,19 @@ public class ArtifactPackageService {
     private final ObjectMapper json;
     private final ArtifactMetrics metrics;
     private final ArtifactProperties properties;
+    private final ArtifactContentTypeVerifier contentTypes;
 
     public record ManifestReceipt(long manifestId, boolean created, String packageChecksum, int entryCount, int objectCount,
                                   int verified, int missing, int checksumMismatch) {}
 
     public ArtifactPackageService(ObjectProvider<ArtifactObjectStore> store, ArtifactRegistry registry, ObjectMapper json, ArtifactMetrics metrics,
-                                  ArtifactProperties properties) {
+                                  ArtifactProperties properties, ArtifactContentTypeVerifier contentTypes) {
         this.store = store;
         this.registry = registry;
         this.json = json;
         this.metrics = metrics;
         this.properties = properties;
+        this.contentTypes = contentTypes;
     }
 
     /**
@@ -95,6 +97,9 @@ public class ArtifactPackageService {
                 if (packageBytes > properties.getMaxPackageBytes()) throw new IllegalArgumentException("Package exceeds " + properties.getMaxPackageBytes() + " uncompressed bytes");
                 String sha = hex(digest.digest());
                 try (InputStream content = Files.newInputStream(buffer)) {
+                    contentTypes.verify(path, content);
+                }
+                try (InputStream content = Files.newInputStream(buffer)) {
                     objects.putContentAddressed(objectPrefix, sha, extension, MediaTypes.forFileName(path), content, size);
                 }
                 inventory.add(new ArtifactManifestGenerator.InventoryEntry(path, sha, size));
@@ -116,6 +121,16 @@ public class ArtifactPackageService {
     }
 
     private ManifestReceipt registerAndVerify(ArtifactManifest manifest) {
+        ArtifactObjectStore objects = requireStore();
+        // Inventory import is an independent trust boundary: validate every staged object's
+        // bytes before creating a manifest that can later be bound to a published snapshot.
+        for (ArtifactManifest.Entry entry : manifest.entries()) {
+            try (InputStream content = objects.open(new ArtifactObjectStore.ObjectLocation(entry.bucket(), entry.objectKey()))) {
+                contentTypes.verify(entry.originalPath(), content);
+            } catch (IOException error) {
+                throw new ArtifactStorageException("Artifact content could not be inspected", error);
+            }
+        }
         ArtifactRegistry.Registration registration = registry.register(manifest);
         log.info("artifact.manifest registered id={} created={} package={} checksum={} entries={}", registration.manifestId(),
                 registration.created(), manifest.packageCode(), manifest.packageChecksum(), manifest.entries().size());

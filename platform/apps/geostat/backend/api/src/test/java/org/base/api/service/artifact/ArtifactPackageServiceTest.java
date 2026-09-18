@@ -37,6 +37,7 @@ class ArtifactPackageServiceTest {
         public String ingestBucket() { return "geostat-ingest"; }
         public Optional<ObjectStat> stat(ObjectLocation l) { byte[] b = objects.get(l.key()); return b == null ? Optional.empty() : Optional.of(new ObjectStat(b.length, "x")); }
         public String sha256(ObjectLocation l) { return sha(objects.get(l.key())); }
+        public InputStream open(ObjectLocation l) { return new ByteArrayInputStream(objects.get(l.key())); }
         public byte[] read(ObjectLocation l, int max) { return objects.get(l.key()); }
         public ObjectLocation putContentAddressed(String prefix, String sha, String ext, String media, InputStream in, long size) {
             try { String key = ArtifactKeys.contentKey(prefix, sha, ext); objects.putIfAbsent(key, in.readAllBytes()); return new ObjectLocation("geostat-ingest", key); }
@@ -62,7 +63,7 @@ class ArtifactPackageServiceTest {
     private static ArtifactPackageService service(MemoryStore store, ArtifactRegistry registry) {
         ObjectProvider<ArtifactObjectStore> provider = mock(ObjectProvider.class);
         when(provider.getIfAvailable()).thenReturn(store);
-        return new ArtifactPackageService(provider, registry, new ObjectMapper(), new ArtifactMetrics(mock(ObjectProvider.class)), new ArtifactProperties());
+        return new ArtifactPackageService(provider, registry, new ObjectMapper(), new ArtifactMetrics(mock(ObjectProvider.class)), new ArtifactProperties(), new ArtifactContentTypeVerifier());
     }
 
     @Test
@@ -71,7 +72,7 @@ class ArtifactPackageServiceTest {
         ArtifactRegistry registry = mock(ArtifactRegistry.class);
         when(registry.register(any())).thenReturn(new ArtifactRegistry.Registration(9, true));
         when(registry.entries(9)).thenReturn(List.of());
-        service(store, registry).uploadPackage("PKG", new ByteArrayInputStream(zip(Map.of("files/a.xlsx", "same", "files/b.xlsx", "same", "c.csv", "other"))));
+        service(store, registry).uploadPackage("PKG", new ByteArrayInputStream(zip(Map.of("files/a.csv", "same", "files/b.csv", "same", "c.csv", "other"))));
 
         assertEquals(2, store.objects.size(), "identical bytes are stored once");
         assertTrue(store.objects.keySet().stream().allMatch(k -> k.startsWith(new ArtifactProperties().getUploadPrefix())));
@@ -79,7 +80,7 @@ class ArtifactPackageServiceTest {
         verify(registry).register(manifest.capture());
         assertEquals(3, manifest.getValue().entries().size());
         assertEquals(sha("same".getBytes(StandardCharsets.UTF_8)), manifest.getValue().entries().stream()
-                .filter(e -> e.originalPath().equals("files/a.xlsx")).findFirst().orElseThrow().sha256());
+                .filter(e -> e.originalPath().equals("files/a.csv")).findFirst().orElseThrow().sha256());
     }
 
     @Test
@@ -94,5 +95,28 @@ class ArtifactPackageServiceTest {
     void notAZipIsRejected() {
         assertThrows(IllegalArgumentException.class, () -> service(new MemoryStore(), mock(ArtifactRegistry.class))
                 .uploadPackage("PKG", new ByteArrayInputStream("not a zip".getBytes(StandardCharsets.UTF_8))));
+    }
+
+    @Test
+    void extensionCannotMasqueradeAsContentType() throws Exception {
+        ArtifactRegistry registry = mock(ArtifactRegistry.class);
+        assertThrows(IllegalArgumentException.class, () -> service(new MemoryStore(), registry)
+                .uploadPackage("PKG", new ByteArrayInputStream(zip(Map.of("report.pdf", "plain text, not a PDF")))));
+        verify(registry, never()).register(any());
+    }
+
+    @Test
+    void inventoryImportRejectsMisrepresentedBytesBeforeManifestRegistration() {
+        MemoryStore store = new MemoryStore();
+        ArtifactRegistry registry = mock(ArtifactRegistry.class);
+        byte[] bytes = "plain text, not a PDF".getBytes(StandardCharsets.UTF_8);
+        String sha = sha(bytes);
+        store.objects.put("inventory.json", ("[{\"originalPath\":\"report.pdf\",\"sha256\":\"" + sha
+                + "\",\"bytes\":" + bytes.length + "}]").getBytes(StandardCharsets.UTF_8));
+        store.objects.put(ArtifactKeys.contentKey("kids/r8/resources/", sha, "pdf"), bytes);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> service(store, registry).importInventory("PKG", "inventory.json", "kids/r8/resources/"));
+        verify(registry, never()).register(any());
     }
 }
