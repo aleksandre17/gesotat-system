@@ -41,7 +41,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [x] 2.2 `platform.artifact_relation_definition` (dataset version, relation code, role, min/max, ordered, match rule JSON) — DONE
 - [x] 2.3 `relationship_type` seed — N/A: `entity_link` არის entity↔entity; attachment ცალკე typed edge-ია, დუბლირებული semantic არ იქმნება
 - [x] 2.4 Lifecycle `DRAFT/APPROVED/RETIRED`; approved row immutable (triggers 51020/51021) — DONE
-- [x] 2.5 Runner registration + order (`PlatformSchemaMigrationRegistrationTest`) — DONE
+- [x] 2.5 Runner registration + order (`PlatformSchemaMigrationRegistrationTest`); post-apply trigger hardening is additive migration 089 — DONE (runtime 12.2)
 
 ## 3. Physical planes — `087_artifact_registry_data_plane.sql`
 
@@ -118,7 +118,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [x] 11.4 Conformance: real KIDS package + 225 rows against seeded 088 rule — DONE
 - [x] 11.5 Migration registration/order — DONE
 - [x] 11.6 Checksum includes API-visible identity/metadata and remains input-order independent — DONE (`ArtifactReconcilerTest`)
-- [ ] 11.7 Migration 086 lifecycle transition integration on SQL Server — OPEN (AIR-2026-014)
+- [ ] 11.7 Migration 089 lifecycle transition integration on SQL Server — OPEN (`ops/tests/sql/artifact-contract-lifecycle.sql`, AIR-2026-014)
 - [x] 11.8 POSIX/UNC and Windows drive paths are rejected before package manifest creation — DONE (`ArtifactManifestGeneratorTest`)
 
 ## 12. Delivery / runtime evidence (remote dev 192.168.1.199)

@@ -58,21 +58,10 @@ CREATE TRIGGER platform.tr_artifact_policy_approved_immutable ON platform.artifa
 BEGIN
   SET NOCOUNT ON;
   IF EXISTS (SELECT 1 FROM deleted d LEFT JOIN inserted i ON i.artifact_policy_id=d.artifact_policy_id
-             WHERE i.artifact_policy_id IS NULL
-                OR (d.lifecycle_status=''APPROVED''
-                    AND (i.policy_code<>d.policy_code OR i.revision<>d.revision OR i.access_mode<>d.access_mode
-                         OR ISNULL(i.required_authority,N'''')<>ISNULL(d.required_authority,N'''')
-                         OR i.allowed_media_types_json<>d.allowed_media_types_json OR i.max_bytes<>d.max_bytes
-                         OR i.signed_url_ttl_seconds<>d.signed_url_ttl_seconds OR i.retention_class<>d.retention_class
-                         OR i.checksum_algorithm<>d.checksum_algorithm))
-                OR (d.lifecycle_status=''RETIRED'' AND (i.policy_code<>d.policy_code OR i.revision<>d.revision
-                    OR i.access_mode<>d.access_mode OR ISNULL(i.required_authority,N'''')<>ISNULL(d.required_authority,N'''')
+             WHERE d.lifecycle_status=''APPROVED''
+               AND (i.artifact_policy_id IS NULL OR i.access_mode<>d.access_mode OR ISNULL(i.required_authority,N'''')<>ISNULL(d.required_authority,N'''')
                     OR i.allowed_media_types_json<>d.allowed_media_types_json OR i.max_bytes<>d.max_bytes
-                    OR i.signed_url_ttl_seconds<>d.signed_url_ttl_seconds OR i.retention_class<>d.retention_class
-                    OR i.checksum_algorithm<>d.checksum_algorithm OR i.lifecycle_status<>d.lifecycle_status))
-                OR (d.lifecycle_status<>i.lifecycle_status AND NOT
-                    ((d.lifecycle_status=''DRAFT'' AND i.lifecycle_status IN(''APPROVED'',''RETIRED''))
-                     OR (d.lifecycle_status=''APPROVED'' AND i.lifecycle_status=''RETIRED'')))
+                    OR i.signed_url_ttl_seconds<>d.signed_url_ttl_seconds OR i.retention_class<>d.retention_class))
     THROW 51020, ''Approved artifact policy is immutable; create a new revision.'', 1;
 END');
 
@@ -81,18 +70,9 @@ CREATE TRIGGER platform.tr_artifact_relation_approved_immutable ON platform.arti
 BEGIN
   SET NOCOUNT ON;
   IF EXISTS (SELECT 1 FROM deleted d LEFT JOIN inserted i ON i.artifact_relation_definition_id=d.artifact_relation_definition_id
-             WHERE i.artifact_relation_definition_id IS NULL
-                OR (d.lifecycle_status=''APPROVED''
-                    AND (i.dataset_version_id<>d.dataset_version_id OR i.relation_code<>d.relation_code
-                         OR i.artifact_role<>d.artifact_role OR i.artifact_policy_id<>d.artifact_policy_id
-                         OR i.min_per_row<>d.min_per_row OR ISNULL(i.max_per_row,-1)<>ISNULL(d.max_per_row,-1)
-                         OR i.ordered<>d.ordered OR i.match_rule_json<>d.match_rule_json))
-                OR (d.lifecycle_status=''RETIRED'' AND (i.dataset_version_id<>d.dataset_version_id OR i.relation_code<>d.relation_code
-                    OR i.artifact_role<>d.artifact_role OR i.artifact_policy_id<>d.artifact_policy_id
+             WHERE d.lifecycle_status=''APPROVED''
+               AND (i.artifact_relation_definition_id IS NULL OR i.artifact_role<>d.artifact_role OR i.artifact_policy_id<>d.artifact_policy_id
                     OR i.min_per_row<>d.min_per_row OR ISNULL(i.max_per_row,-1)<>ISNULL(d.max_per_row,-1)
-                    OR i.ordered<>d.ordered OR i.match_rule_json<>d.match_rule_json OR i.lifecycle_status<>d.lifecycle_status))
-                OR (d.lifecycle_status<>i.lifecycle_status AND NOT
-                    ((d.lifecycle_status=''DRAFT'' AND i.lifecycle_status IN(''APPROVED'',''RETIRED''))
-                     OR (d.lifecycle_status=''APPROVED'' AND i.lifecycle_status=''RETIRED'')))
+                    OR i.ordered<>d.ordered OR i.match_rule_json<>d.match_rule_json))
     THROW 51021, ''Approved artifact relation definition is immutable; create a new dataset version.'', 1;
 END');

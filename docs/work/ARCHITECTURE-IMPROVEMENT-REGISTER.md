@@ -296,11 +296,13 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 - **აღმოჩენა:** migration 086-ის approved-row triggers არ იცავდა policy/relation version identity-ს,
   checksum algorithm-სა და retired-state immutability-ს. პირდაპირ SQL update-ს შეეძლო approved
   contract-ის semantic identity შეეცვალა ისე, რომ trigger არ ამოქმედებულიყო.
-- **Fix in source:** trigger-ები იცავს identity-სა და ყველა semantic field-ს; DRAFT-იდან დაშვებულია
+- **Fix in source:** applied migration `086` პირვანდელ, recorded checksum-ზე აღდგა (`f22af46d…`);
+  ახალი migration `089_artifact_contract_lifecycle_immutability.sql` trigger-ებს versioned-ად
+  ცვლის. Trigger-ები იცავს identity-სა და ყველა semantic field-ს; DRAFT-იდან დაშვებულია
   APPROVED/RETIRED, APPROVED-იდან მხოლოდ RETIRED, RETIRED terminal-ია. Delete და reactivation იბლოკება.
-- **Blocking evidence:** SQL Server-ზე clean migration 086 apply და positive/negative transition
-  replay (approve/retire; semantic edit, identity edit, delete, reactivation). იქამდე runtime status
-  `NOT_VERIFIED` რჩება.
+- **Blocking evidence:** `ops/tests/sql/artifact-contract-lifecycle.sql` უნდა გაიშვას SQL Server-ზე
+  migration 089-ის შემდეგ: positive/negative transition replay (approve/retire; semantic edit,
+  identity edit, delete, reactivation). Replay-ის დადასტურებამდე runtime status `NOT_VERIFIED` რჩება.
 
 ### AIR-2026-015 — Artifact reconciliation checksum omitted served metadata
 

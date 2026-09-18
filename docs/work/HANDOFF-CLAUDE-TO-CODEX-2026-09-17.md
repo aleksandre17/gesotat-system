@@ -150,7 +150,7 @@ cd platform/kits/stack-kit; python -m pytest -q tests
 | Meta-schema / Control | `086_artifact_attachment_meta_schema.sql` — `platform.artifact_policy`, `platform.artifact_relation_definition`; APPROVED immutable (THROW 51020/51021) |
 | Physical Data plane | `087_artifact_registry_data_plane.sql` — `ingest.artifact_object` (SHA-256 UK), `ingest.artifact_manifest`, `ingest.artifact_version` (append-only, 51023), `entity.artifact_attachment` (published immutable, 51022), view `entity.v_artifact_attachment_reconciliation` |
 | Contract binding (KIDS, seed only) | `088_kids_r8_resource_artifact_binding.sql` — policy `KIDS_PUBLIC_STATISTICAL_FILE` r1, relation `PRIMARY_FILE` (ka/en, 1..1), rule `SOURCE_PATH` (NFC, strip `files/`, root `mainstat/`) |
-| Runner | 086 control, 087 data, 088 control — `PlatformSchemaMigrationRunner` |
+| Runner | 086 control, 087 data, 088 control, 089 control — `PlatformSchemaMigrationRunner`; 086 checksum preserved after its first application |
 | Object Storage port | `service/artifact/ArtifactObjectStore` (port) ← `service/storage/ObjectStorageService` (MinIO adapter): stat, full SHA-256, bounded read, content-addressed put, presign (`STORAGE_PUBLIC_ENDPOINT`, `STORAGE_REGION`) |
 | Domain (pure) | `ArtifactKeys`, `MediaTypes` (Spring `MediaTypeFactory`), `ArtifactManifest(+Generator)` v1, `ArtifactMatchRule` strategy + `SourcePathMatchRule(+Parser)` + `ArtifactMatchRules` registry, `ArtifactMatcher` (1:N ordinals, cardinality), `ArtifactBindingPlanner`, `ArtifactReconciler`, `ArtifactPolicy`, enums (`VerificationStatus`, `ArtifactRole`, `RetentionClass`, `BindingStatus`, `GateResult`) |
 | Persistence | `ArtifactRegistry`, `ArtifactAttachmentRepository`, `ReleaseGateEvidenceRepository`, `ArtifactContractResolver` |
