@@ -168,3 +168,4 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - 14.1–14.5 unchanged: 14.1 OPEN, 14.2 OPEN (tenant claims model not defined — owner decision), 14.3 PARTIAL, 14.4 OPEN, 14.5 OPEN (needs a bound snapshot).
 
 Evidence: `docs/evidence/access-admission-and-snapshot-provenance-runtime-2026-09-18.json`.
+- [x] 16.7 Proper OIDC operator identity: Keycloak confidential client `geostat-artifact-operator` (client_credentials, roles `contract.read`/`contract.write`, tenant `geostat`, audience `geostat-api`) — DONE; replaces temporary bootstrap credentials. Evidence: `docs/evidence/artifact-operator-oidc-client-runtime-2026-09-18.json`

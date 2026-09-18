@@ -1,0 +1,26 @@
+{
+  "schema": "geostat.oidc-service-client-runtime.v1",
+  "recordedAt": "2026-09-18",
+  "decision": "Shared infrastructure for dev and prod is the project rule; the operator client is added to the shared Keycloak realm without touching existing clients, users or prod configuration.",
+  "keycloak": { "container": "geostat-keycloak", "image": "quay.io/keycloak/keycloak:26.3.3", "realm": "geostat" },
+  "client": {
+    "clientId": "geostat-artifact-operator",
+    "type": "confidential, service account only (client_credentials); standard/implicit/password flows disabled",
+    "realmRoles": ["contract.read", "contract.write"],
+    "authorities": ["READ_RESOURCE", "WRITE_RESOURCE"],
+    "tenantId": "geostat (service-account user attribute via the realm 'tenant' client scope)",
+    "mappers": ["oidc-audience-mapper -> geostat-api", "oidc-usermodel-realm-role-mapper -> realm_access.roles (assigned roles only, no hardcoded claims)"],
+    "secretLocation": "ops/config/projects/geostat/services/api/.env.dev (gitignored): ARTIFACT_OPERATOR_CLIENT_ID / ARTIFACT_OPERATOR_CLIENT_SECRET; never printed"
+  },
+  "verification": {
+    "tokenClaims": { "iss": "https://auth.geostat.internal/realms/geostat", "aud": "geostat-api", "azp": "geostat-artifact-operator", "tenant_id": "geostat", "roles": ["contract.read", "contract.write"], "ttlSeconds": 300 },
+    "writeEndpointAuthenticated": "POST /api/v1/platform/artifacts/manifests/999999/verification -> 404 (authorized, no side effect); anonymous -> 401",
+    "readEndpointAuthenticated": "GET /api/v1/platform/artifacts/entities/KIDS_RESOURCE/128 -> 200; anonymous -> 401",
+    "prodApiHealth": "localhost:8083/health -> 200 (unaffected)"
+  },
+  "operations": {
+    "rotate": "kcadm.sh create clients/<id>/client-secret -r geostat, then update .env.dev",
+    "disable": "kcadm.sh update clients/<id> -r geostat -s enabled=false (tokens stop being issued; issued tokens expire within 300 s)"
+  },
+  "status": "PASS"
+}
