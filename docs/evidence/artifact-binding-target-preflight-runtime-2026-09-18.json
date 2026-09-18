@@ -1,0 +1,25 @@
+{
+  "schema": "geostat.artifact-binding-target-preflight-runtime.v1",
+  "recordedAt": "2026-09-18T10:53:53Z",
+  "scope": "read-only target selection for KIDS_RESOURCE artifact binding",
+  "query": "SELECT dataset_snapshot_id,dataset_version_id,status,created_at FROM publication.dataset_snapshot WHERE dataset_version_id=73 ORDER BY dataset_snapshot_id DESC",
+  "environment": "remote dev Data Plane geostat-data; production untouched",
+  "rows": [
+    {
+      "datasetSnapshotId": 31,
+      "datasetVersionId": 73,
+      "status": "PUBLISHED",
+      "createdAt": "2026-09-13T07:14:41.8951233"
+    },
+    {
+      "datasetSnapshotId": 16,
+      "datasetVersionId": 73,
+      "status": "PUBLISHED",
+      "createdAt": "2026-09-11T06:14:25.9085361"
+    }
+  ],
+  "bindingPolicy": "ArtifactAttachmentService only binds snapshots in REVIEW_REQUIRED or SEMANTIC_REVIEW; it must not mutate PUBLISHED snapshots.",
+  "result": "NO_BINDABLE_REVIEW_SNAPSHOT",
+  "requiredNextStep": "Create a new KIDS_RESOURCE Data Plane snapshot through the governed ingestion/review workflow; do not update snapshot rows directly.",
+  "status": "READ_ONLY_PREFLIGHT_BLOCKED"
+}

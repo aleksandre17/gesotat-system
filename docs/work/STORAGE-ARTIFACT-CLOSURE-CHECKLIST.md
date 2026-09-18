@@ -128,7 +128,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [x] 12.8 Scheduled database workers wait for schema migration completion; JWT token repository uses required constructor injection — full API suite PASS (217 tests, 0 failures/errors, 1 skipped); dev restarted 2026-09-18T10:46:59Z and remained healthy, with no schema/JWT/scheduler errors in the subsequent log window. Evidence: `docs/evidence/platform-schema-readiness-runtime-2026-09-18.json`.
 - [x] 12.2 Ledger rows 086–089 read back — DONE (SQL Server ledger checksums read back; 089 applied)
 - [ ] 12.3 `POST manifests/inventory` (`packageCode=KIDS_R8_RESOURCES`, `inventoryKey=kids/r8/resources/kids-files-r8-sanitized/inventory.json`, `objectPrefix=kids/r8/resources/kids-files-r8-sanitized/`) → 532 VERIFIED — READY (needs WRITE_RESOURCE token)
-- [ ] 12.4 Bind (dry-run → write) on the KIDS_RESOURCE REVIEW snapshot + reconciliation PASS — READY (token)
+- [ ] 12.4 Bind (dry-run → write) on the KIDS_RESOURCE REVIEW snapshot + reconciliation PASS — BLOCKED (version 73 currently has only snapshots 16 and 31, both `PUBLISHED`; the binding API correctly rejects them. A governed ingestion/review cycle must create a bindable snapshot first. Evidence: `docs/evidence/artifact-binding-target-preflight-runtime-2026-09-18.json`.)
 - [ ] 12.5 Signed download smoke (200, checksum equal) + 403/404/409 — READY (token + 13 EXT-4 for browser)
 - [x] 12.6 Evidence JSON + reference docs + ADR + AIR — DONE
 - [x] 12.7 Upload bound is configurable across Spring multipart and artifact expansion budgets — DONE (file/request limits are separate configurable settings; startup validation enforces file-size agreement and multipart framing capacity; remote dev booted healthy; `ArtifactConfigurationTest` PASS)
