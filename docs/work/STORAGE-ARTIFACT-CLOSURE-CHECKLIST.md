@@ -164,7 +164,8 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [ ] 16.3 Access upload malware admission — REMOVED with the scanner (ADR-009); `c614f07` superseded
 - [x] 16.4 New KIDS_RESOURCE review snapshot 52 (version 73, 225 rows, SEMANTIC_REVIEW) via governed ingest/validate/prepare/materialize — DONE (after AIR-2026-015/016 fixes)
 - [x] 16.5 Inventory 532/532 VERIFIED (manifest 4), dry-run 450/0 errors, bind 450 + idempotent replay, ARTIFACT_RECONCILIATION PASS, negatives 401/404/409/403 — DONE
-- [ ] 16.8 Signed download smoke — OPEN: needs snapshot 52 published (PUBLISH_RESOURCE identity + steward approval, ADR-007); browser path also EXT-4
+- [ ] 16.8 Signed download smoke — BLOCKED: snapshot 52 publication needs real release-gate evaluation (AIR-2026-017, P0) and a PUBLISH_RESOURCE identity; browser path also EXT-4
+- [x] 16.9 `ops/scripts/shell/artifact-operator-api.sh` — one-command API calls as the operator client; fresh token per call, never printed — DONE
 - [ ] 16.6 clamd acceptance tool — REMOVED (ADR-009)
 - 14.1–14.5 unchanged: 14.1 OPEN, 14.2 OPEN (tenant claims model not defined — owner decision), 14.3 PARTIAL, 14.4 OPEN, 14.5 OPEN (needs a bound snapshot).
 

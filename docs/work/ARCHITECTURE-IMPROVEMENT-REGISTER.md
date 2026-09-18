@@ -469,3 +469,21 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 - **გადაწყვეტა (მოლოდინში — owner decision):** rev 8 registry-ის reconciliation approved table definition-ებთან
   (locator = `ACCESS.`+access_table_name, target = canonical_dataset_version_id; გამოუცხადებელი legacy locator-ები
   მოიხსნება) ცალკე migration-ით, ან ახალი revision 9.
+
+### AIR-2026-017 — Publication release gates were asserted by SQL, never evaluated
+
+- **სტატუსი:** `TRIAGED` / **priority:** `P0` (ბლოკავს ნებისმიერ ახალ publication-ს, მათ შორის KIDS snapshot 52-ს)
+- **აღმოჩენა:** `PlatformPublicationService` 7 gate-ის (`SCHEMA_VALID`, `KEYS_VALID`, `RELATIONS_VALID`,
+  `CLASSIFIERS_VALID`, `STATISTICAL_SEMANTICS_VALID`, `RAW_LINEAGE_VALID`, `PUBLICATION_ATOMIC`) PASS-ს მოითხოვს,
+  მაგრამ მათ Java კოდი არ აფასებს. migration 072 ყველა snapshot-ს უპირობოდ უწერდა PASS-ს
+  (`"source":"KIDS_R8_ACCEPTANCE"`), ხოლო `SEMANTIC_REVIEW`→`REVIEW_REQUIRED` გადასვლა მხოლოდ 052-ში, hardcoded
+  ID-ებით, ხდებოდა. AIR-2026-015-მდე runner 072-ს ყოველ startup-ზე უშვებდა, ამიტომ ყოველი ახალი snapshot
+  ავტომატურად იღებდა "PASS"-ს — ეს documentation-only claim-ია, doctrine-ით აკრძალული.
+- **Containment:** ყალბი PASS არ იწერება; snapshot 52 (`SEMANTIC_REVIEW`, `ARTIFACT_RECONCILIATION=PASS`)
+  გამოუქვეყნებელი რჩება.
+- **გადაწყვეტა (შემდეგი ნაბიჯი):** generic `ReleaseGateEvaluator` port + თითო gate-ის რეალური შემფასებელი
+  (contract/Data Plane მონაცემებზე), governed endpoint `POST /platform/publication/snapshots/{id}/gates`
+  (evaluate + record + `SEMANTIC_REVIEW`→`REVIEW_REQUIRED` მხოლოდ ყველა PASS-ზე); 072/052-ის hardcoded
+  evidence-ის ჩანაცვლება; tests (PASS/FAIL თითო gate-ზე, replay, checksum-drift).
+- **დამოკიდებულება:** publish-ისთვის `PUBLISH_RESOURCE` identity — operator client-ზე `publish.execute` როლის
+  მინიჭება auto-mode-მა დაბლოკა (permission grant); საჭიროა მომხმარებლის ცალსახა ნებართვა ან მისი მიერ მინიჭება.
