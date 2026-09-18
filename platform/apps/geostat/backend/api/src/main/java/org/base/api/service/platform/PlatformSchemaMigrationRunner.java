@@ -142,7 +142,11 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
             // First Control-plane migration creates the ledger itself.
             recorded = null;
         }
-        if (recorded != null && !recorded.equalsIgnoreCase(checksum)) {
+        /* Applied migrations run exactly once. Re-executing recorded scripts on every
+           startup re-ran non-idempotent DML (new dataset versions, contract state
+           resets) on each restart; the ledger is the single source of "applied". */
+        if (recorded != null && recorded.equalsIgnoreCase(checksum)) return;
+        if (recorded != null) {
             // 065 was corrected before production rollout to make locator
             // cleanup idempotent. Reconcile that pre-release ledger entry once;
             // all other applied migrations remain immutable and fail closed.
@@ -155,7 +159,7 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
             throw new IllegalStateException("Schema migration checksum changed: " + resource + ". Create a new numbered migration instead of rewriting history.");
         }
         jdbc.execute(text);
-        if (recorded == null) control.update("INSERT INTO platform.schema_migration(migration_id,checksum) VALUES(?,?)", resource, checksum);
+        control.update("INSERT INTO platform.schema_migration(migration_id,checksum) VALUES(?,?)", resource, checksum);
     }
 
     private static String sha256(String text) throws Exception {
