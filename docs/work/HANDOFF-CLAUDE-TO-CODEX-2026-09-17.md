@@ -174,3 +174,48 @@ cd platform/kits/stack-kit; python -m pytest -q tests
    - download smoke (200 + checksum) და negatives 403/404/409 → evidence JSON განახლება.
 4. **EXT:** `files.geostat.internal` (TLS SAN, DNS, edge redeploy, `STORAGE_PUBLIC_ENDPOINT`), anonymous policy (EXT-1), retention/DR/encryption (B-06).
 5. Frontend `/files/...` → governed download (AIR-2026-009/013) — მხოლოდ live gate PASS-ის შემდეგ.
+
+---
+
+## 8. დამატება 2026-09-18 (მეორე სესია) — Claude → Codex: შესრულებული და დარჩენილი
+
+**Baseline სესიის დასაწყისში:** `86755f9`, worktree სუფთა. **ბოლო commit:** `ed49f7b`. 13 commit, **push არ გაკეთებულა**.
+**Tests:** `:api:test` 234 PASS, 0 failure, 1 skipped. **Remote dev** (`geostat-api-dev:8081`) deployed `c1143c8`+, health ALL UP. Production API (8083) და prod DB ხელშეუხებელია.
+
+### 8.1 შესრულებული (commit → რა)
+
+| Commit | შედეგი |
+|---|---|
+| `6595587` | Codex-ის snapshot-provenance WIP გადამოწმდა; 2 WIP ტესტი რეალურად FAIL-ობდა (არასრული `verifyNoMoreInteractions`) — გასწორდა; დაემატა replay/drift/partial-copy/status-race/range-lock ტესტები |
+| `c614f07`, `3b02575` | Access upload malware admission (შემდეგ ამოღებულია `ef82c9a`-ით) |
+| `ef82c9a` | **ADR-009:** ClamAV უარყოფილია, malware scanning მთლიანად ამოღებულია; `docs/work/DEFERRED-PLANS.md` DP-001. migrations 090/095 immutable ledger-შია, ცხრილი უმოქმედოა |
+| `03f755d` | Keycloak confidential client `geostat-artifact-operator` (client_credentials; tenant `geostat`; audience `geostat-api`; realm-role mapper, hardcoded claim-ების გარეშე). secret — gitignored `.env.dev` (`ARTIFACT_OPERATOR_CLIENT_ID/SECRET`) |
+| `69aea23` | **P0 AIR-2026-015:** migration runner ყოველ startup-ზე ხელახლა უშვებდა recorded migration-ებს → 017/020/021 ყოველ restart-ზე ახალ `dataset_version`-ს ქმნიდა (11 684) და contract state-ს ცვლიდა. ახლა run-once. dev: 2 restart, რაოდენობა სტაბილური |
+| `355eb9a` | **P0 AIR-2026-016:** migration 096 — KIDS R8 ingestion source registry შეუსაბამდა approved site contract-ს (package ცხრილი → approved version, legacy locator-ები მოიხსნა). dry-run → applied |
+| `d3565f2` | **Live ჯაჭვი dev-ზე:** ingest batch 8 → load 127 (`__ent_kids_resource`→v73, 225) → snapshot **52**; inventory manifest **4** (719 entry, **532/532 VERIFIED**); dry-run 450/0 error; bind **450** (+ idempotent replay); `ARTIFACT_RECONCILIATION` **PASS** (checksum `0737e9c2…`); negatives 401/404/409/403 |
+| `b2d5559`, `f0a1a7e` | `ops/scripts/shell/artifact-operator-api.sh METHOD PATH [curl args]` — operator client-ით API გამოძახება, ახალი token ყოველ ჯერზე, არასდროს იბეჭდება |
+| `c1143c8`, `ed49f7b` | **P0 AIR-2026-017:** 7 publication gate არასდროს ფასდებოდა (072 ყალბ PASS-ს წერდა). ახლა `ReleaseGate` strategy-ები + `ReleaseGateService` (evidence `geostat.release-gate.v1` + facts digest; მხოლოდ სრულ PASS/N/A-ზე `SEMANTIC_REVIEW`→`REVIEW_REQUIRED`); publication იღებს მხოლოდ evaluator evidence-ს უცვლელი digest-ით. Endpoint `POST /platform/publication/snapshots/{id}/gates`. snapshot 52 → **REVIEW_REQUIRED** (4 PASS, 3 N/A) |
+
+**Keycloak (ცვლილება prod-shared realm-ში, owner-ის წესით infra საერთოა):** `geostat-artifact-operator` როლები: `contract.read`, `contract.write`, `publish.execute`.
+
+### 8.2 სად გავჩერდი
+
+**შემდეგი ნაბიჯი — snapshot 52-ის გამოქვეყნება** (owner-მა დაამტკიცა; auto-mode-მა Claude-ს დაბლოკა, ამიტომ **არ შესრულებულა**):
+```
+ops/scripts/shell/artifact-operator-api.sh POST /api/v1/platform/publication/publish \
+  -H "Content-Type: application/json" \
+  -d '{"productId":1,"datasetVersionId":73,"datasetSnapshotId":52,"checksum":"746487cedee93c73b99492038321c138a1bcd7f2e1d9d49fe165332be6cb8211"}'
+```
+მოსალოდნელი: 200; publication guard ამოწმებს 7 gate-ის evaluator evidence-ს (digest `6516ce7c…`) და `ARTIFACT_RECONCILIATION` PASS + attachment checksum-ს.
+
+### 8.3 დარჩენილი (რიგით)
+
+1. **Publish snapshot 52** (ზემოთ) → evidence JSON.
+2. **Signed download smoke:** `GET /api/v1/platform/artifacts/entities/KIDS_RESOURCE/128` (ახლა 52-იდან 2 attachment უნდა დააბრუნოს) → `.../PRIMARY_FILE/ka/1/download` → URL (host `minio:9000`, dev) → სერვერიდან/geostat-net-იდან ჩამოტვირთვა → SHA-256 = response `sha256`. + checklist 16.8.
+3. **ZIP** — ამის შემდეგ სისტემა ZIP-ისთვის მზადაა (manifest 4, 450 mapping, checksums, reconciliation evidence). R8 წყარო `platform/apps/geostat/backend/api/kids-portal-v1-canonical-r8-final.accdb` git-ში **untracked**-ია — გადაწყვეტა: `samples/`-ში დამატება.
+4. **Production:** runner fix (`69aea23`) და gate evaluator prod-ში არ არის — prod API იგივე runner-ით ყოველ restart-ზე კვლავ ქმნის ზედმეტ `dataset_version`-ებს. საჭიროა release (B-01) და დაგროვილი DRAFT version-ების cleanup ცალკე, backup-იანი migration-ით.
+5. **EXT-4:** `files.geostat.internal` (TLS SAN, DNS, edge redeploy, `STORAGE_PUBLIC_ENDPOINT`) — ბრაუზერიდან ჩამოტვირთვისთვის.
+6. **ღია ჩანაწერები:** batch 8 load 125 (`__ent_kids_goal`→6963, pre-096 ნარჩენი, STAGING) — ხელშეუხებელია; 052/072-ის hardcoded gate evidence ძველ snapshot-ებზე რჩება, მაგრამ ახალ publication-ზე აღარ ითვლება; checklist 14.1–14.5 (tenant authorization 14.2 — owner decision).
+7. **Claude Code settings:** `.claude/settings.local.json`-ში `permissions.disableAutoMode: "disable"` + `autoMode.allow` Keycloak წესი (ლოკალური, gitignored).
+
+**Evidence:** `docs/evidence/kids-r8-artifact-binding-live-runtime-2026-09-18.json`, `release-gate-evaluation-runtime-2026-09-18.json`, `artifact-operator-oidc-client-runtime-2026-09-18.json`, `access-admission-and-snapshot-provenance-runtime-2026-09-18.json`. **Checklist:** `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` §16. **AIR:** 2026-014…017.
