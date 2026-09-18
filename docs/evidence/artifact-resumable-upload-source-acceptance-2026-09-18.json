@@ -1,0 +1,43 @@
+{
+  "evidenceId": "ARTIFACT-RESUMABLE-UPLOAD-SOURCE-2026-09-18",
+  "scope": "source-level implementation and regression evidence for artifact resumable upload sessions",
+  "status": "PARTIAL_NOT_RUNTIME_ACCEPTED",
+  "baselineCommit": "5b678d4",
+  "implementation": {
+    "migration": "platform/apps/geostat/backend/core/src/main/resources/db/platform/093_artifact_upload_sessions.sql",
+    "migrationRegistered": true,
+    "api": [
+      "POST /api/v1/platform/artifacts/upload-sessions",
+      "POST /api/v1/platform/artifacts/upload-sessions/{id}/parts/{partNumber}",
+      "GET /api/v1/platform/artifacts/upload-sessions/{id}",
+      "POST /api/v1/platform/artifacts/upload-sessions/{id}/complete",
+      "DELETE /api/v1/platform/artifacts/upload-sessions/{id}"
+    ],
+    "identity": "OIDC subject plus required tenant claim; tenant and owner keys persisted as SHA-256 pseudonyms",
+    "checkpoint": "private staged object per part; exact Content-Range, declared byte count and SHA-256 are checked on write and rechecked while streaming completion",
+    "quota": "atomic per-tenant reserved-byte and active-session accounting with terminal release",
+    "retry": "dependency failure retains durable parts and quota in RETRYABLE state",
+    "limits": "configurable maximum package bytes, part bytes, tenant reserved bytes and session TTL"
+  },
+  "verification": {
+    "compile": "./gradlew :api:compileJava --no-daemon PASS",
+    "targetedTests": "ArtifactUploadIdentityResolverTest and PlatformArtifactControllerTest PASS",
+    "fullApiSuite": {
+      "command": "./gradlew :api:test --no-daemon",
+      "tests": 202,
+      "artifactRelatedTests": 85,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "result": "PASS"
+    },
+    "diffCheck": "git diff --check PASS"
+  },
+  "notVerified": [
+    "migration 093 has not been applied to a runtime database",
+    "authenticated tenant-scoped HTTP session replay has not been exercised",
+    "object-storage part upload and cleanup recovery have not been exercised against a live provider",
+    "remote dev scanner availability remains an external gate"
+  ],
+  "productionStatus": "NOT_READY"
+}

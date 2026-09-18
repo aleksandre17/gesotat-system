@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.UUID;
 
 /** Port for immutable artifact bytes. The domain never sees a provider SDK or credentials. */
 public interface ArtifactObjectStore {
@@ -37,6 +38,21 @@ public interface ArtifactObjectStore {
 
     /** Preserves a rejected sample in private quarantine storage without retaining its source filename. */
     ObjectLocation putQuarantined(String sha256, InputStream content, long byteSize);
+
+    /** Durable, private checkpoint object for one resumable upload part. Keys are derived by the provider. */
+    default ObjectLocation putStagedUploadPart(UUID uploadSessionId, int partNumber, String sha256, InputStream content, long byteSize) {
+        throw new ArtifactStorageException("Resumable upload staging is not supported by this storage provider", null);
+    }
+
+    /** Opens a previously checkpointed upload part without exposing provider keys to callers. */
+    default InputStream openStagedUploadPart(UUID uploadSessionId, int partNumber, String sha256) {
+        throw new ArtifactStorageException("Resumable upload staging is not supported by this storage provider", null);
+    }
+
+    /** Removes only a server-generated part key belonging to the provided session and part. */
+    default void deleteStagedUploadPart(UUID uploadSessionId, int partNumber, String sha256) {
+        throw new ArtifactStorageException("Resumable upload cleanup is not supported by this storage provider", null);
+    }
 
     /** Short-lived GET URL for the public distribution endpoint. */
     URI presignGet(ObjectLocation location, Duration ttl, String downloadName, String mediaType);

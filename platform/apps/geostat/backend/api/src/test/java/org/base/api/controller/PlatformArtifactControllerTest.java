@@ -9,6 +9,8 @@ import org.base.api.service.artifact.ArtifactReconciliationService;
 import org.base.api.service.artifact.ArtifactStorageException;
 import org.base.api.service.artifact.ArtifactMalwareDetectedException;
 import org.base.api.service.artifact.ArtifactScannerUnavailableException;
+import org.base.api.service.artifact.ArtifactUploadIdentityResolver;
+import org.base.api.service.artifact.ArtifactUploadSessionService;
 import org.base.api.service.artifact.BindingStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +48,8 @@ class PlatformArtifactControllerTest {
     @BeforeEach
     void setUp() {
         mvc = MockMvcBuilders.standaloneSetup(new PlatformArtifactController(mock(ArtifactPackageService.class), attachments,
-                        mock(ArtifactReconciliationService.class), distribution))
+                        mock(ArtifactReconciliationService.class), distribution, mock(ArtifactUploadSessionService.class),
+                        mock(ArtifactUploadIdentityResolver.class)))
                 .setControllerAdvice(new ArtifactApiExceptionHandler()).build();
     }
 

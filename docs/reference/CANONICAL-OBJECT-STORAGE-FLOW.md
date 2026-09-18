@@ -257,6 +257,10 @@ typed data-სა და დროებით signed URL-ს.
 ```text
 package inventory                 POST .../manifests/inventory (existing governed inventory)
 contract ZIP package              POST .../manifests/package?contractCode=&revision=&datasetCode=
+large contract ZIP                POST .../upload-sessions → checkpointed /parts/{n} → /complete
+  → tenant quota + durable state  ingest.artifact_upload_session / artifact_upload_part
+  → private staged parts         artifacts/staging/{server-session}/{part}/{sha256}.part
+  → retryable approved admission same contract-bound package service as synchronous upload
   → approved contract resolver    platform.site_contract_revision + site_contract_dataset/field
   → Access schema validation       contract-declared Access table + required fields
   → manifest v1 + checksum keys    contract revision + dataset version participate in package checksum

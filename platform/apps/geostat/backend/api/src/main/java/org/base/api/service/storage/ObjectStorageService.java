@@ -219,6 +219,48 @@ public class ObjectStorageService implements ArtifactObjectStore {
     }
 
     @Override
+    public ObjectLocation putStagedUploadPart(UUID uploadSessionId, int partNumber, String sha256, InputStream content, long byteSize) {
+        if (uploadSessionId == null || partNumber < 1 || byteSize < 1) throw new IllegalArgumentException("Invalid upload part identity");
+        ArtifactKeys.requireSha256(sha256);
+        String prefix = stagedUploadPrefix(uploadSessionId, partNumber);
+        ObjectLocation location = new ObjectLocation(ingestBucket, ArtifactKeys.contentKey(prefix, sha256, "part"));
+        Optional<ObjectStat> existing = stat(location);
+        if (existing.isPresent()) {
+            if (existing.get().byteSize() != byteSize || !sha256(location).equals(sha256))
+                throw new IllegalStateException("Staged upload checkpoint conflicts with existing bytes");
+            return location;
+        }
+        return putContentAddressed(prefix, sha256, "part", "application/octet-stream", content, byteSize);
+    }
+
+    @Override
+    public InputStream openStagedUploadPart(UUID uploadSessionId, int partNumber, String sha256) {
+        return open(new ObjectLocation(ingestBucket, stagedUploadKey(uploadSessionId, partNumber, sha256)));
+    }
+
+    @Override
+    public void deleteStagedUploadPart(UUID uploadSessionId, int partNumber, String sha256) {
+        String prefix = stagedUploadPrefix(uploadSessionId, partNumber);
+        String key = stagedUploadKey(uploadSessionId, partNumber, sha256);
+        if (!key.startsWith(prefix)) throw new IllegalArgumentException("Upload staging key is outside its session namespace");
+        try {
+            minio.removeObject(io.minio.RemoveObjectArgs.builder().bucket(ingestBucket).object(key).build());
+        } catch (Exception error) {
+            throw new ArtifactStorageException("Upload checkpoint cleanup failed", error);
+        }
+    }
+
+    private static String stagedUploadPrefix(UUID uploadSessionId, int partNumber) {
+        if (uploadSessionId == null || partNumber < 1) throw new IllegalArgumentException("Invalid upload part identity");
+        return "artifacts/staging/" + uploadSessionId + "/" + partNumber + "/";
+    }
+
+    private static String stagedUploadKey(UUID uploadSessionId, int partNumber, String sha256) {
+        ArtifactKeys.requireSha256(sha256);
+        return ArtifactKeys.contentKey(stagedUploadPrefix(uploadSessionId, partNumber), sha256, "part");
+    }
+
+    @Override
     public URI presignGet(ObjectLocation location, Duration ttl, String downloadName, String mediaType) {
         if (distribution == null) throw new ArtifactStorageException("Artifact distribution endpoint is not configured", null);
         try {

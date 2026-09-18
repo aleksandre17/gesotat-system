@@ -355,6 +355,41 @@ Access table and required fields are present. The accepted manifest stores
 included in its package checksum. Inventory import remains a separate governed
 path for previously staged content.
 
+Large uploads can use the durable session API, also guarded by `WRITE_RESOURCE`
+and an OIDC subject plus the configured tenant claim (`tenant_id` by default):
+
+```text
+POST   /api/v1/platform/artifacts/upload-sessions
+       Idempotency-Key: <client-generated key>
+       {packageCode, contractCode, revision, datasetCode, expectedBytes}
+POST   /api/v1/platform/artifacts/upload-sessions/{id}/parts/{partNumber}
+       Content-Range: bytes <start>-<end>/<expectedBytes>
+       X-Checksum-SHA256: <lowercase sha256>
+       Content-Type: application/octet-stream
+GET    /api/v1/platform/artifacts/upload-sessions/{id}
+POST   /api/v1/platform/artifacts/upload-sessions/{id}/complete
+DELETE /api/v1/platform/artifacts/upload-sessions/{id}
+```
+
+The configured part size, per-tenant reserved-byte ceiling and session TTL are
+`PLATFORM_ARTIFACT_UPLOAD_PART_BYTES`,
+`PLATFORM_ARTIFACT_MAX_TENANT_RESERVED_UPLOAD_BYTES`,
+`PLATFORM_ARTIFACT_MAX_TENANT_ACTIVE_UPLOAD_SESSIONS`, and
+`PLATFORM_ARTIFACT_UPLOAD_SESSION_TTL_SECONDS`, and
+`PLATFORM_ARTIFACT_UPLOAD_PROCESSING_LEASE_SECONDS`. The service stores only hashed
+tenant/subject keys in its durable session registry, reserves quota atomically,
+and stores parts under server-generated private staging keys. Both reserved
+bytes and active session count have per-tenant ceilings. A part is checkpointed
+only after storage confirms its declared size and SHA-256; the service verifies
+the same size and digest again while streaming staged parts into package
+admission. Session
+completion streams ordered parts through the same approved-contract ZIP
+admission path as the synchronous endpoint. Dependency failures retain parts
+and quota in `RETRYABLE`; terminal outcomes release quota, while part cleanup
+can retry independently. Legacy non-tenant JWTs cannot use this API. Runtime
+storage/clamd availability and authenticated HTTP acceptance remain release
+gates and are not implied by this contract description.
+
 ### Metadata response
 
 ```json
@@ -380,13 +415,15 @@ path for previously staged content.
 ### Error semantics
 
 ```text
-400 invalid package/manifest
+400 invalid package/manifest or range/checksum declaration
 401 missing authentication
 403 policy/tenant denial
 404 artifact or row not visible
-409 duplicate/version/conflicting idempotency key
+409 duplicate/version/conflicting idempotency key or upload state
 410 retired or expired artifact
 422 validation/relation/checksum/quarantine failure
+413 package exceeds the configured maximum upload size
+507 tenant upload quota exhausted
 503 storage or dependency unavailable
 ```
 
@@ -398,13 +435,13 @@ artifact-ს.
 სავალდებულოა:
 
 - streaming SHA-256;
-- multipart/resumable upload დიდი ფაილებისთვის;
+- durable, tenant-scoped resumable part upload for large packages;
 - idempotency key package დონეზე;
 - retry with bounded backoff;
 - partial object cleanup;
 - atomic manifest commit;
 - optimistic concurrency/ETag package update-ზე;
-- storage quota და tenant quota;
+- storage admission and atomically reserved tenant quota;
 - orphan-object scanner;
 - retryable job state და checkpoint.
 

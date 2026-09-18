@@ -86,7 +86,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [x] 7.2 Snapshot binding from approved definitions (generic, no site branch) — DONE
 - [x] 7.3 Fail-closed binding — DONE (test)
 - [x] 7.4 Legacy `resource_locator PATH` untouched — DONE
-- [ ] 7.5 Resumable/multipart upload, durable checkpoints, quota admission and retryable job state — OPEN (current ZIP upload is bounded but synchronous)
+- [ ] 7.5 Resumable upload sessions, durable part checkpoints, tenant quota admission and retryable completion — PARTIAL (source and 199-test API suite PASS; evidence `docs/evidence/artifact-resumable-upload-source-acceptance-2026-09-18.json`; 093 migration and authenticated storage recovery runtime acceptance remain open)
 - [x] 7.6 Concurrent same-checksum manifest registration replay — DONE (remote SQL Server two-session replay on the registry key-range locking statement returned the same manifest id and exactly one manifest/version/object registry set; retained append-only test row has no attachment and is recorded in evidence; AIR-2026-018; authenticated HTTP replay remains under EXT-5)
 
 ## 8. Snapshot / publication
@@ -110,7 +110,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - [ ] 10.1 Frontend `/files/...` → governed download — DEFERRED (AIR-2026-009/013)
 - [ ] 10.2 Static file retirement — blocked until 12.5 on live snapshot
 
-## 11. Tests (`:api:test` 193 tests, 0 failures/errors, 1 skipped; 76 artifact-related tests)
+## 11. Tests (`:api:test` 202 tests, 0 failures/errors, 1 skipped; 85 artifact-related tests)
 
 - [x] 11.1 Unit: keys, manifest, matcher, policy — DONE
 - [x] 11.2 Property: manifest/matcher order independence (seeded shuffles) — DONE

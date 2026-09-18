@@ -6,6 +6,8 @@ import org.base.api.service.artifact.ArtifactNotFoundException;
 import org.base.api.service.artifact.ArtifactStorageException;
 import org.base.api.service.artifact.ArtifactMalwareDetectedException;
 import org.base.api.service.artifact.ArtifactScannerUnavailableException;
+import org.base.api.service.artifact.ArtifactUploadQuotaExceededException;
+import org.base.api.service.artifact.ArtifactUploadTooLargeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -36,6 +38,16 @@ public class ArtifactApiExceptionHandler {
     @ExceptionHandler(ArtifactAccessDeniedException.class)
     public ResponseEntity<ProblemDetail> denied(ArtifactAccessDeniedException ex, HttpServletRequest request) {
         return problem(HttpStatus.FORBIDDEN, "artifact-access-denied", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(ArtifactUploadQuotaExceededException.class)
+    public ResponseEntity<ProblemDetail> quota(ArtifactUploadQuotaExceededException ex, HttpServletRequest request) {
+        return problem(HttpStatus.INSUFFICIENT_STORAGE, "artifact-upload-quota-exceeded", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(ArtifactUploadTooLargeException.class)
+    public ResponseEntity<ProblemDetail> tooLarge(ArtifactUploadTooLargeException ex, HttpServletRequest request) {
+        return problem(HttpStatus.PAYLOAD_TOO_LARGE, "artifact-upload-too-large", ex.getMessage(), request);
     }
 
     @ExceptionHandler(ArtifactMalwareDetectedException.class)

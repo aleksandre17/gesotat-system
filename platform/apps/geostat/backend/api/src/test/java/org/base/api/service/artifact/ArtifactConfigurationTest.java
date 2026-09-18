@@ -25,5 +25,15 @@ class ArtifactConfigurationTest {
         ArtifactProperties upload = new ArtifactProperties();
         upload.setMaxUploadBytes(0);
         assertThrows(IllegalStateException.class, upload::validate);
+        ArtifactProperties sessions = new ArtifactProperties();
+        sessions.setMaxTenantActiveUploadSessions(0);
+        assertThrows(IllegalStateException.class, sessions::validate);
+        ArtifactProperties lease = new ArtifactProperties();
+        lease.setUploadProcessingLeaseSeconds(0);
+        assertThrows(IllegalStateException.class, lease::validate);
+        ArtifactProperties unrepresentable = new ArtifactProperties();
+        unrepresentable.setUploadPartBytes(1);
+        unrepresentable.setMaxUploadBytes((long) Integer.MAX_VALUE + 1);
+        assertThrows(IllegalStateException.class, unrepresentable::validate);
     }
 }
