@@ -1,0 +1,33 @@
+{
+  "schema": "geostat.access-admission-snapshot-provenance-runtime.v1",
+  "recordedAt": "2026-09-18",
+  "environment": "remote dev 192.168.1.199 geostat-api-dev:8081, DB geostat-system-mssql; production untouched; no push",
+  "commits": ["6595587 verify artifact provenance when preparing review snapshots", "c614f07 require malware admission for Access package uploads"],
+  "findings": {
+    "accessUploadWithoutMalwareVerdict": "POST /platform/access/ingest and /platform/access/semantic/ingest stored uploaded packages via storeOriginal without a malware verdict (AIR-2026-014). Fixed: shared ArtifactMalwareAdmission gate before any storage write; migration 095 adds ACCESS_PACKAGE quarantine source.",
+    "snapshotProvenanceWip": "Codex WIP reviewed: batch-bound artifact, artifact checksum as snapshot checksum, UPDLOCK/HOLDLOCK replay, raw-row count and conditional status transition. Two WIP tests had incomplete verifyNoMoreInteractions and failed; corrected. Added replay (foreign artifact rows, row drift, version/checksum conflict), fresh (non-validated load, partial copy, lost status race) and range-lock tests."
+  },
+  "runtime": {
+    "deploy": "geostat.ps1 api dev bootstrap api --no-build; geostat.ps1 api dev restart api",
+    "startedApiApplication": "11:07:09 UTC, no startup failure",
+    "health": { "primary": "UP", "dataPlane": "UP", "archivePlane": "UP", "objectStorage": "UP", "secondary": "UP" },
+    "anonymousSemanticAccessIngest": 401,
+    "migration095": { "ledgerChecksum": "5114c0c8d89606fe613f6aa6ac395aadce2b287bfc1705df7bb10fdd0186987e", "fileChecksum": "5114c0c8d89606fe613f6aa6ac395aadce2b287bfc1705df7bb10fdd0186987e", "constraint": "source_type IN (ACCESS_PACKAGE, INVENTORY_IMPORT, ZIP_PACKAGE)", "status": "PASS" },
+    "snapshotChecksumCompatibility": {
+      "method": "read-only SELECT over publication.dataset_snapshot, ingest.dataset_load, ingest.artifact, raw.source_record",
+      "snapshots": 51,
+      "artifactChecksumSemantic": 49,
+      "emptySnapshotsWithoutRawRows": 2,
+      "note": "the 2 empty snapshots have no artifact rows; a prepare replay on them fails closed, which is intended"
+    }
+  },
+  "scanner": {
+    "remoteHost": "no clamd container, image or listener on 3310; MemAvailable ~970 MiB (ClamAV guidance >= 3 GiB)",
+    "repositoryAndDocs": "no approved private-network clamd endpoint recorded (EXT-6 open)",
+    "acceptanceTool": "ops/scripts/python/clamd_acceptance_probe.py (PING, VERSION freshness, clean, EICAR, StreamMaxLength at/over limit); fail-closed verified against an unreachable endpoint",
+    "status": "BLOCKED_EXTERNAL"
+  },
+  "consequence": "A new KIDS_RESOURCE review snapshot requires an Access package upload, which now requires a malware verdict; reusing a stored, never-scanned artifact would bypass the same policy. Snapshot creation, inventory registration, binding, reconciliation, signed download and ZIP remain blocked by EXT-6.",
+  "tests": { "suite": ":api:test", "tests": 231, "failures": 0, "errors": 0, "skipped": 1 },
+  "status": "CODE_AND_RUNTIME_HEALTH_PASS_INGEST_CHAIN_BLOCKED_BY_EXT6"
+}

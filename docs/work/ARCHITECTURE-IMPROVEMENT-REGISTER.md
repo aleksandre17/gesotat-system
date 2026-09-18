@@ -424,3 +424,16 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   currently available; the official ClamAV container guide recommends ≥3 GiB, so scanner service
   provisioning is external until its resource budget or a remote scanner endpoint is approved.
   Malware scanning remains a separate open control and this change does not claim virus-free content.
+
+### AIR-2026-014 — Access package uploads bypassed malware admission
+
+- **სტატუსი:** `VERIFIED` (code + dev runtime) / **priority:** `P0`
+- **აღმოჩენა:** `/platform/access/ingest` და `/platform/access/semantic/ingest` ატვირთულ package-ს
+  `storeOriginal`-ით წერდნენ malware verdict-ის გარეშე, მაშინ როცა artifact ხაზი fail-closed scan-ს
+  მოითხოვს. ეს იყო review snapshot-ის შექმნის გზა — მისი გამოყენება scanner-ის ფაქტობრივი bypass იქნებოდა.
+- **გადაწყვეტა:** ერთიანი `ArtifactMalwareAdmission` gate ყველა untrusted upload-ზე storage write-მდე;
+  migration 095 (`ACCESS_PACKAGE` quarantine source); `AccessAdmissionExceptionHandler` (422/503).
+  შიდა, გენერირებული SQL extract (`PlatformSqlIngestionService`) upload არ არის და scope-ში არ შედის.
+- **Evidence:** `docs/evidence/access-admission-and-snapshot-provenance-runtime-2026-09-18.json`;
+  `AccessAdmissionControllerTest`, `ArtifactMalwareAdmissionTest`; 231 PASS.
+- **შედეგი:** KIDS review snapshot-ის შექმნაც ახლა EXT-6 (clamd) გარე dependency-ზეა დამოკიდებული.
