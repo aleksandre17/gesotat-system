@@ -128,6 +128,7 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
         executeAndRecord(data, "db/platform/093_artifact_upload_sessions.sql");
         executeAndRecord(data, "db/platform/094_artifact_integrity_audit.sql");
         executeAndRecord(data, "db/platform/095_access_package_malware_admission.sql");
+        executeAndRecord(control, "db/platform/096_kids_r8_source_registry_reconciliation.sql");
         events.publishEvent(new PlatformSchemaReadyEvent(Instant.now()));
     }
 

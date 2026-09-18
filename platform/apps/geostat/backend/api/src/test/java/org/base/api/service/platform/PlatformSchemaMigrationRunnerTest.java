@@ -59,7 +59,7 @@ class PlatformSchemaMigrationRunnerTest {
     @Test
     @SuppressWarnings({"unchecked", "rawtypes"})
     void newMigrationsRunOnceAndAreRecorded() throws Exception {
-        String pending = "db/platform/095_access_package_malware_admission.sql";
+        String pending = "db/platform/095_access_package_malware_admission.sql"; // a Data Plane migration
         when(control.query(startsWith("SELECT checksum FROM platform.schema_migration"), any(ResultSetExtractor.class), anyString()))
                 .thenAnswer(call -> pending.equals(call.getArgument(2)) ? null : checksum(call.getArgument(2)));
         runner().run(null);
