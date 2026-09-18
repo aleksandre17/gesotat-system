@@ -18,10 +18,12 @@ public class PlatformScheduledImportWorker {
     private final PlatformSqlIngestionService sql;
     private final ObjectProvider<ObjectStorageService> storage;
     private final PlatformJobLeaseService lease;
-    public PlatformScheduledImportWorker(@Qualifier("primaryJdbcTemplate") JdbcTemplate control,@Qualifier("dataPlaneJdbcTemplate") JdbcTemplate data,PlatformSqlIngestionService sql,ObjectProvider<ObjectStorageService> storage,PlatformJobLeaseService lease){this.control=control;this.data=data;this.sql=sql;this.storage=storage;this.lease=lease;}
+    private final PlatformSchemaReadiness schemaReadiness;
+    public PlatformScheduledImportWorker(@Qualifier("primaryJdbcTemplate") JdbcTemplate control,@Qualifier("dataPlaneJdbcTemplate") JdbcTemplate data,PlatformSqlIngestionService sql,ObjectProvider<ObjectStorageService> storage,PlatformJobLeaseService lease,PlatformSchemaReadiness schemaReadiness){this.control=control;this.data=data;this.sql=sql;this.storage=storage;this.lease=lease;this.schemaReadiness=schemaReadiness;}
 
     @Scheduled(cron = "${platform.import.schedule.cron:0 0 3 1 * *}")
     public void runMonthly() {
+        if(!schemaReadiness.isReady())return;
         if(!lease.acquire("monthly-platform-import",180))return;
         try {
         ObjectStorageService configured=storage.getIfAvailable();

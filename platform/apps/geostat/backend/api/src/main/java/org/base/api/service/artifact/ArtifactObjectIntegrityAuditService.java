@@ -4,9 +4,7 @@ import org.base.api.service.platform.PlatformJobLeaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
+import org.base.api.service.platform.PlatformSchemaReadiness;
 import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,29 +21,22 @@ public class ArtifactObjectIntegrityAuditService {
     private final ArtifactMetrics metrics;
     private final ArtifactProperties properties;
     private final PlatformJobLeaseService lease;
-    private final boolean schemaMigrationEnabled;
-    private volatile boolean applicationReady;
+    private final PlatformSchemaReadiness schemaReadiness;
 
     public ArtifactObjectIntegrityAuditService(ArtifactRegistry registry, ObjectProvider<ArtifactObjectStore> stores,
                                                ArtifactMetrics metrics, ArtifactProperties properties,
-                                               PlatformJobLeaseService lease,
-                                               @Value("${platform.schema-migration.enabled:true}") boolean schemaMigrationEnabled) {
+                                               PlatformJobLeaseService lease, PlatformSchemaReadiness schemaReadiness) {
         this.registry = registry;
         this.stores = stores;
         this.metrics = metrics;
         this.properties = properties;
         this.lease = lease;
-        this.schemaMigrationEnabled = schemaMigrationEnabled;
-    }
-
-    @EventListener(ApplicationReadyEvent.class)
-    void onApplicationReady() {
-        applicationReady = schemaMigrationEnabled;
+        this.schemaReadiness = schemaReadiness;
     }
 
     @Scheduled(fixedDelayString = "${platform.artifacts.integrity-audit-delay-millis:60000}")
     public void auditDueObjects() {
-        if (!applicationReady || !properties.isIntegrityAuditEnabled() || !lease.acquire(JOB_NAME, properties.getIntegrityAuditLeaseMinutes())) return;
+        if (!schemaReadiness.isReady() || !properties.isIntegrityAuditEnabled() || !lease.acquire(JOB_NAME, properties.getIntegrityAuditLeaseMinutes())) return;
         Long runId = null;
         try {
             registry.abandonStaleAuditRuns(Math.max(5, properties.getIntegrityAuditLeaseMinutes() * 2));

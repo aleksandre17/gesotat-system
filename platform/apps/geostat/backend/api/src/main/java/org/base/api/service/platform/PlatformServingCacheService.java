@@ -15,12 +15,14 @@ public class PlatformServingCacheService {
     private static final Logger log = LoggerFactory.getLogger(PlatformServingCacheService.class);
     private final JdbcTemplate data;
     private final boolean enabled;
+    private final PlatformSchemaReadiness schemaReadiness;
     public PlatformServingCacheService(@Qualifier("dataPlaneJdbcTemplate") JdbcTemplate data,
-                                       @Value("${platform.serving-cache.enabled:true}") boolean enabled) { this.data = data; this.enabled = enabled; }
+                                       @Value("${platform.serving-cache.enabled:true}") boolean enabled,
+                                       PlatformSchemaReadiness schemaReadiness) { this.data = data; this.enabled = enabled; this.schemaReadiness = schemaReadiness; }
 
     @Scheduled(fixedDelayString = "${platform.serving-cache.fixed-delay-ms:60000}")
     public void rebuildPublished() {
-        if (!enabled) return;
+        if (!enabled || !schemaReadiness.isReady()) return;
         try { data.update("INSERT serving.metric_cache(snapshot_id,metric_id,dimension_signature,period_start,period_end,aggregate_value) " +
                 "SELECT p.snapshot_id,s.metric_id,CONVERT(CHAR(64),HASHBYTES('SHA2_256',CONCAT(p.snapshot_id,'|',s.metric_id,'|',o.period_start)),2),o.period_start,o.period_start,SUM(o.numeric_value) " +
                 "FROM publication.snapshot p JOIN publication.snapshot_member sm ON sm.snapshot_id=p.snapshot_id " +

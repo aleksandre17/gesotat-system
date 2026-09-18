@@ -3,9 +3,7 @@ package org.base.api.service.artifact;
 import org.base.api.service.platform.PlatformJobLeaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
+import org.base.api.service.platform.PlatformSchemaReadiness;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -21,30 +19,24 @@ public class ArtifactRelationIntegrityAuditService {
     private final ArtifactMetrics metrics;
     private final ArtifactProperties properties;
     private final PlatformJobLeaseService lease;
-    private final boolean schemaMigrationEnabled;
-    private volatile boolean applicationReady;
+    private final PlatformSchemaReadiness schemaReadiness;
 
     public ArtifactRelationIntegrityAuditService(ArtifactContractResolver contracts, ArtifactAttachmentRepository attachments,
                                                  ArtifactReconciliationService reconciliation, ArtifactMetrics metrics,
                                                  ArtifactProperties properties, PlatformJobLeaseService lease,
-                                                 @Value("${platform.schema-migration.enabled:true}") boolean schemaMigrationEnabled) {
+                                                 PlatformSchemaReadiness schemaReadiness) {
         this.contracts = contracts;
         this.attachments = attachments;
         this.reconciliation = reconciliation;
         this.metrics = metrics;
         this.properties = properties;
         this.lease = lease;
-        this.schemaMigrationEnabled = schemaMigrationEnabled;
-    }
-
-    @EventListener(ApplicationReadyEvent.class)
-    void onApplicationReady() {
-        applicationReady = schemaMigrationEnabled;
+        this.schemaReadiness = schemaReadiness;
     }
 
     @Scheduled(fixedDelayString = "${platform.artifacts.integrity-audit-delay-millis:60000}")
     public void reconcileDueSnapshots() {
-        if (!applicationReady || !properties.isIntegrityAuditEnabled()
+        if (!schemaReadiness.isReady() || !properties.isIntegrityAuditEnabled()
                 || !lease.acquire(JOB_NAME, properties.getIntegrityAuditLeaseMinutes())) return;
         try {
             var datasetVersions = contracts.reconcilableDatasetVersions();

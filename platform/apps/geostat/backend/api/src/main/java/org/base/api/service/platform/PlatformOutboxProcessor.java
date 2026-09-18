@@ -21,14 +21,17 @@ public class PlatformOutboxProcessor {
     private final PublicationControlStore controlStore;
     private final PlatformPublicationArchiveService publicationArchive;
     private final ObjectMapper json;
+    private final PlatformSchemaReadiness schemaReadiness;
 
     public PlatformOutboxProcessor(@Qualifier("primaryJdbcTemplate") JdbcTemplate control, @Qualifier("dataPlaneJdbcTemplate") JdbcTemplate data,
-                                  DataPlanePublicationWriter writer, PublicationControlStore controlStore, PlatformPublicationArchiveService publicationArchive, ObjectMapper json) {
-        this.control=control; this.data=data; this.writer=writer; this.controlStore=controlStore; this.publicationArchive=publicationArchive; this.json=json;
+                                  DataPlanePublicationWriter writer, PublicationControlStore controlStore, PlatformPublicationArchiveService publicationArchive, ObjectMapper json,
+                                  PlatformSchemaReadiness schemaReadiness) {
+        this.control=control; this.data=data; this.writer=writer; this.controlStore=controlStore; this.publicationArchive=publicationArchive; this.json=json; this.schemaReadiness=schemaReadiness;
     }
 
     @Scheduled(fixedDelayString = "${platform.outbox.fixed-delay-ms:30000}")
     public void dispatch() {
+        if (!schemaReadiness.isReady()) return;
         List<Map<String,Object>> events=control.queryForList("SELECT TOP 20 event_id,aggregate_id,event_type,payload_json,attempts FROM platform.outbox_event WHERE status='PENDING' AND event_type IN ('PUBLISH_SNAPSHOT','ARCHIVE_PUBLICATION') AND available_at<=SYSUTCDATETIME() ORDER BY event_id");
         for (Map<String,Object> event:events) process(event);
     }

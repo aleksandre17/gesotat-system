@@ -2,8 +2,6 @@ package org.base.api.service.artifact;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.context.event.EventListener;
+import org.base.api.service.platform.PlatformSchemaReadiness;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -39,8 +37,7 @@ public class ArtifactUploadSessionService {
     private final ArtifactPackageContractResolver contracts;
     private final ArtifactPackageService packages;
     private final ArtifactProperties properties;
-    private final boolean schemaMigrationEnabled;
-    private volatile boolean applicationReady;
+    private final PlatformSchemaReadiness schemaReadiness;
 
     public ArtifactUploadSessionService(@Qualifier("dataPlaneJdbcTemplate") JdbcTemplate data,
                                         @Qualifier("dataPlaneTransactionManager") PlatformTransactionManager transactionManager,
@@ -48,19 +45,14 @@ public class ArtifactUploadSessionService {
                                         ArtifactPackageContractResolver contracts,
                                         ArtifactPackageService packages,
                                         ArtifactProperties properties,
-                                        @Value("${platform.schema-migration.enabled:true}") boolean schemaMigrationEnabled) {
+                                        PlatformSchemaReadiness schemaReadiness) {
         this.data = data;
         this.transaction = new TransactionTemplate(transactionManager);
         this.storage = storage.getIfAvailable();
         this.contracts = contracts;
         this.packages = packages;
         this.properties = properties;
-        this.schemaMigrationEnabled = schemaMigrationEnabled;
-    }
-
-    @EventListener(ApplicationReadyEvent.class)
-    void onApplicationReady() {
-        applicationReady = schemaMigrationEnabled;
+        this.schemaReadiness = schemaReadiness;
     }
 
     public SessionReceipt start(StartRequest request, ArtifactUploadIdentityResolver.Identity identity, String idempotencyKey) {
@@ -224,7 +216,7 @@ public class ArtifactUploadSessionService {
 
     @Scheduled(fixedDelayString = "${platform.artifacts.upload-cleanup-delay-ms:60000}")
     public void expireAndClean() {
-        if (!applicationReady) return;
+        if (!schemaReadiness.isReady()) return;
         data.update("UPDATE ingest.artifact_upload_session SET status='RETRYABLE',last_error_code='PROCESSING_LEASE_EXPIRED',updated_at=SYSUTCDATETIME() WHERE status='PROCESSING' AND updated_at<DATEADD(SECOND,?,SYSUTCDATETIME()) AND quota_released=0",
                 -properties.getUploadProcessingLeaseSeconds());
         List<UploadSession> expired = data.query("SELECT TOP (50) " + SESSION_COLUMNS + " FROM ingest.artifact_upload_session WHERE (status IN('OPEN','RETRYABLE') AND expires_at<=SYSUTCDATETIME()) OR (status IN('EXPIRED','CANCELLED','REJECTED','COMMITTED') AND EXISTS(SELECT 1 FROM ingest.artifact_upload_part p WHERE p.upload_session_id=ingest.artifact_upload_session.upload_session_id)) ORDER BY expires_at", SESSION_MAPPER);

@@ -1,0 +1,40 @@
+{
+  "schema": "geostat.platform-schema-readiness-runtime.v1",
+  "recordedAt": "2026-09-18T10:49:27Z",
+  "scope": "dev startup ordering, scheduled SQL worker readiness, and malware scanner endpoint configuration",
+  "change": {
+    "behavior": "PlatformSchemaMigrationRunner publishes PlatformSchemaReadyEvent only after configured migrations complete. SQL-dependent scheduled workers remain gated until they receive the event. JwtTokenUtil now receives TokenRepository through required constructor injection.",
+    "tests": {
+      "command": "./gradlew :api:test --rerun-tasks",
+      "tests": 217,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1,
+      "result": "PASS"
+    }
+  },
+  "runtime": {
+    "environment": "remote dev API 192.168.1.199:8081; production untouched",
+    "startedAt": "2026-09-18T10:46:59Z",
+    "health": {
+      "status": "UP",
+      "primary": "UP",
+      "dataPlane": "UP",
+      "archivePlane": "UP",
+      "objectStorage": "UP",
+      "secondary": "UP"
+    },
+    "logWindow": "2026-09-18T10:46:59Z through 2026-09-18T10:49:27Z",
+    "schemaNameErrors": 0,
+    "jwtTokenRepositoryNullErrors": 0,
+    "schedulerOrArtifactErrors": 0,
+    "malwareScanner": {
+      "hostConfigured": false,
+      "portConfigured": true,
+      "configuredPort": 3310,
+      "tcpReachable": false,
+      "admissionStatus": "BLOCKED_FAIL_CLOSED"
+    }
+  },
+  "status": "SCHEMA_READINESS_TEST_PASS_DEV_HEALTH_PASS_SCANNER_UNAVAILABLE"
+}

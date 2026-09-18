@@ -2,8 +2,7 @@ package org.base.core.service;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.base.core.entity.Permission;
 import org.base.core.entity.Token;
 import org.base.core.entity.User;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.annotation.PostConstruct;
 
 import java.security.Key;
@@ -46,12 +46,11 @@ import java.util.stream.Collectors;
  - Automatic cleanup of expired tokens
  - Efficient queries for token validation
  */
-@AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @Component
 public class JwtTokenUtil {
 
-    private TokenRepository tokenRepository;
+    private final TokenRepository tokenRepository;
 
     @Value("${jwt.secret}")
     private String secret;

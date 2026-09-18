@@ -13,12 +13,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 public class PlatformArchivePayloadRepairService {
     private final JdbcTemplate archive;
     private final ObjectStorageService storage;
-    public PlatformArchivePayloadRepairService(@Qualifier("archivePlaneJdbcTemplate") JdbcTemplate archive, ObjectStorageService storage) {
-        this.archive = archive; this.storage = storage;
+    private final PlatformSchemaReadiness schemaReadiness;
+    public PlatformArchivePayloadRepairService(@Qualifier("archivePlaneJdbcTemplate") JdbcTemplate archive, ObjectStorageService storage,
+                                               PlatformSchemaReadiness schemaReadiness) {
+        this.archive = archive; this.storage = storage; this.schemaReadiness = schemaReadiness;
     }
 
     @Scheduled(initialDelayString="${platform.archive-pointer.initial-delay-ms:15000}", fixedDelayString="${platform.archive-pointer.fixed-delay-ms:3600000}")
     public void reconcile() {
+        if (!schemaReadiness.isReady()) return;
         archive.query("SELECT archive_record_id,archive_snapshot_id,payload_json,payload_hash FROM archive.record", rs -> {
             while (rs.next()) try {
                 long record = rs.getLong(1), snapshot = rs.getLong(2);

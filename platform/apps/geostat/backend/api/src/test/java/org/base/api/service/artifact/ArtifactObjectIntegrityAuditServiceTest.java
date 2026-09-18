@@ -1,5 +1,6 @@
 package org.base.api.service.artifact;
 
+import org.base.api.service.platform.PlatformSchemaReadiness;
 import org.base.api.service.platform.PlatformJobLeaseService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
@@ -22,7 +23,7 @@ class ArtifactObjectIntegrityAuditServiceTest {
 
     @Test
     void successfulPassPersistsVerifiedStateAndRunEvidence() {
-        Fixture f = new Fixture(true);
+        Fixture f = new Fixture();
         when(f.stores.getIfAvailable()).thenReturn(f.storage);
         when(f.lease.acquire(anyString(), anyInt())).thenReturn(true);
         when(f.registry.startAuditRun()).thenReturn(21L);
@@ -30,7 +31,7 @@ class ArtifactObjectIntegrityAuditServiceTest {
         when(f.storage.stat(CANDIDATE_LOCATION)).thenReturn(Optional.of(new ArtifactObjectStore.ObjectStat(3, "application/octet-stream")));
         when(f.storage.sha256(CANDIDATE_LOCATION)).thenReturn(SHA);
 
-        f.service.onApplicationReady();
+        f.schemaReady();
         f.service.auditDueObjects();
 
         verify(f.registry).recordAuditResult(21L, CANDIDATE, VerificationStatus.VERIFIED, 3L, SHA);
@@ -41,14 +42,14 @@ class ArtifactObjectIntegrityAuditServiceTest {
 
     @Test
     void missingObjectBecomesAnExplicitFailClosedIssue() {
-        Fixture f = new Fixture(true);
+        Fixture f = new Fixture();
         when(f.stores.getIfAvailable()).thenReturn(f.storage);
         when(f.lease.acquire(anyString(), anyInt())).thenReturn(true);
         when(f.registry.startAuditRun()).thenReturn(22L);
         when(f.registry.auditCandidates(100, 1440, 10)).thenReturn(List.of(CANDIDATE));
         when(f.storage.stat(CANDIDATE_LOCATION)).thenReturn(Optional.empty());
 
-        f.service.onApplicationReady();
+        f.schemaReady();
         f.service.auditDueObjects();
 
         verify(f.registry).recordAuditResult(22L, CANDIDATE, VerificationStatus.MISSING, null, null);
@@ -58,7 +59,7 @@ class ArtifactObjectIntegrityAuditServiceTest {
 
     @Test
     void sameSizedObjectWithChangedChecksumIsMarkedMismatched() {
-        Fixture f = new Fixture(true);
+        Fixture f = new Fixture();
         when(f.stores.getIfAvailable()).thenReturn(f.storage);
         when(f.lease.acquire(anyString(), anyInt())).thenReturn(true);
         when(f.registry.startAuditRun()).thenReturn(24L);
@@ -66,7 +67,7 @@ class ArtifactObjectIntegrityAuditServiceTest {
         when(f.storage.stat(CANDIDATE_LOCATION)).thenReturn(Optional.of(new ArtifactObjectStore.ObjectStat(3, "application/octet-stream")));
         when(f.storage.sha256(CANDIDATE_LOCATION)).thenReturn("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
-        f.service.onApplicationReady();
+        f.schemaReady();
         f.service.auditDueObjects();
 
         verify(f.registry).recordAuditResult(24L, CANDIDATE, VerificationStatus.CHECKSUM_MISMATCH, 3L,
@@ -76,14 +77,14 @@ class ArtifactObjectIntegrityAuditServiceTest {
 
     @Test
     void providerFailureLeavesObjectDueAndRunRetryable() {
-        Fixture f = new Fixture(true);
+        Fixture f = new Fixture();
         when(f.stores.getIfAvailable()).thenReturn(f.storage);
         when(f.lease.acquire(anyString(), anyInt())).thenReturn(true);
         when(f.registry.startAuditRun()).thenReturn(23L);
         when(f.registry.auditCandidates(100, 1440, 10)).thenReturn(List.of(CANDIDATE));
         when(f.storage.stat(CANDIDATE_LOCATION)).thenThrow(new ArtifactStorageException("offline", null));
 
-        f.service.onApplicationReady();
+        f.schemaReady();
         f.service.auditDueObjects();
 
         verify(f.registry, never()).recordAuditResult(org.mockito.ArgumentMatchers.anyLong(), org.mockito.ArgumentMatchers.eq(CANDIDATE),
@@ -94,22 +95,21 @@ class ArtifactObjectIntegrityAuditServiceTest {
 
     @Test
     void scheduledWorkWaitsForSchemaReadinessAndHonorsDisableFlag() {
-        Fixture waiting = new Fixture(true);
+        Fixture waiting = new Fixture();
         waiting.service.auditDueObjects();
         verifyNoInteractions(waiting.registry, waiting.stores, waiting.lease);
 
-        Fixture disabled = new Fixture(false);
-        disabled.service.onApplicationReady();
+        Fixture disabled = new Fixture();
         disabled.service.auditDueObjects();
         verifyNoInteractions(disabled.registry, disabled.stores, disabled.lease);
     }
 
     @Test
     void anotherReplicaHoldingTheLeasePreventsDuplicateStorageReads() {
-        Fixture f = new Fixture(true);
+        Fixture f = new Fixture();
         when(f.lease.acquire(anyString(), anyInt())).thenReturn(false);
 
-        f.service.onApplicationReady();
+        f.schemaReady();
         f.service.auditDueObjects();
 
         verifyNoInteractions(f.registry, f.stores);
@@ -118,7 +118,7 @@ class ArtifactObjectIntegrityAuditServiceTest {
 
     @Test
     void lostLeaseDuringStorageReadCannotCommitAStaleResult() {
-        Fixture f = new Fixture(true);
+        Fixture f = new Fixture();
         when(f.stores.getIfAvailable()).thenReturn(f.storage);
         when(f.lease.acquire(anyString(), anyInt())).thenReturn(true, true, false);
         when(f.registry.startAuditRun()).thenReturn(25L);
@@ -126,7 +126,7 @@ class ArtifactObjectIntegrityAuditServiceTest {
         when(f.storage.stat(CANDIDATE_LOCATION)).thenReturn(Optional.of(new ArtifactObjectStore.ObjectStat(3, "application/octet-stream")));
         when(f.storage.sha256(CANDIDATE_LOCATION)).thenReturn(SHA);
 
-        f.service.onApplicationReady();
+        f.schemaReady();
         f.service.auditDueObjects();
 
         verify(f.registry, never()).recordAuditResult(25L, CANDIDATE, VerificationStatus.VERIFIED, 3L, SHA);
@@ -143,10 +143,13 @@ class ArtifactObjectIntegrityAuditServiceTest {
         final ArtifactObjectStore storage = mock(ArtifactObjectStore.class);
         final ArtifactMetrics metrics = mock(ArtifactMetrics.class);
         final PlatformJobLeaseService lease = mock(PlatformJobLeaseService.class);
+        final PlatformSchemaReadiness readiness = new PlatformSchemaReadiness();
         final ArtifactObjectIntegrityAuditService service;
 
-        Fixture(boolean migrationEnabled) {
-            service = new ArtifactObjectIntegrityAuditService(registry, stores, metrics, new ArtifactProperties(), lease, migrationEnabled);
+        Fixture() {
+            service = new ArtifactObjectIntegrityAuditService(registry, stores, metrics, new ArtifactProperties(), lease, readiness);
         }
+
+        void schemaReady() { readiness.onMigrationsCompleted(new org.base.api.service.platform.PlatformSchemaReadyEvent()); }
     }
 }

@@ -125,6 +125,7 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 ## 12. Delivery / runtime evidence (remote dev 192.168.1.199)
 
 - [x] 12.1 Deploy current source via remote sync (`geostat.ps1 api dev bootstrap api --no-build`); health all UP; 7 routes — DONE (2026-09-18; remote dev only)
+- [x] 12.8 Scheduled database workers wait for schema migration completion; JWT token repository uses required constructor injection — full API suite PASS (217 tests, 0 failures/errors, 1 skipped); dev restarted 2026-09-18T10:46:59Z and remained healthy, with no schema/JWT/scheduler errors in the subsequent log window. Evidence: `docs/evidence/platform-schema-readiness-runtime-2026-09-18.json`.
 - [x] 12.2 Ledger rows 086–089 read back — DONE (SQL Server ledger checksums read back; 089 applied)
 - [ ] 12.3 `POST manifests/inventory` (`packageCode=KIDS_R8_RESOURCES`, `inventoryKey=kids/r8/resources/kids-files-r8-sanitized/inventory.json`, `objectPrefix=kids/r8/resources/kids-files-r8-sanitized/`) → 532 VERIFIED — READY (needs WRITE_RESOURCE token)
 - [ ] 12.4 Bind (dry-run → write) on the KIDS_RESOURCE REVIEW snapshot + reconciliation PASS — READY (token)
@@ -154,4 +155,4 @@ authority / owner · `N/A` = მიზეზით გამორიცხუ�
 - EXT-3 Production release provenance (B-01)
 - EXT-4 `files.geostat.internal`: TLS SAN + DNS + edge redeploy + `STORAGE_PUBLIC_ENDPOINT` (edge config in repo, `nginx -t` PASS) — AIR-2026-012
 - EXT-5 Token with `contract.write`/`contract.read` roles for 12.3–12.5
-- EXT-6 Private-network `clamd` endpoint with current definitions, `StreamMaxLength >= PLATFORM_ARTIFACT_MALWARE_SCANNER_MAX_BYTES`, and signed-off quarantine retention. No daemon is currently provisioned; remote dev has ~1.2 GiB memory available while ClamAV's official Docker guide recommends at least 3 GiB, so a sidecar cannot be added safely to this shared host without changing its resource envelope.
+- EXT-6 Private-network `clamd` endpoint with current definitions, `StreamMaxLength >= PLATFORM_ARTIFACT_MALWARE_SCANNER_MAX_BYTES`, and signed-off quarantine retention. Runtime recheck 2026-09-18: dev API has no scanner host configured; port 3310 is configured but TCP is unreachable. No daemon is provisioned; remote dev has ~1.2 GiB memory available while ClamAV's official Docker guide recommends at least 3 GiB, so a sidecar cannot be added safely to this shared host without changing its resource envelope. Evidence: `docs/evidence/platform-schema-readiness-runtime-2026-09-18.json`.

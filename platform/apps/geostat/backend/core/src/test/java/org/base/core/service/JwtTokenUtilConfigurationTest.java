@@ -1,11 +1,15 @@
 package org.base.core.service;
 
 import org.junit.jupiter.api.Test;
+import org.base.core.repository.TokenRepository;
+import java.time.Instant;
 
 import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class JwtTokenUtilConfigurationTest {
     @Test
@@ -26,8 +30,15 @@ class JwtTokenUtilConfigurationTest {
         finally { restore(previous); }
     }
 
+    @Test
+    void scheduledCleanupHasAnInjectedRepository() {
+        TokenRepository repository = mock(TokenRepository.class);
+        new JwtTokenUtil(repository).removeExpiredTokens();
+        verify(repository).deleteAllExpiredTokens(org.mockito.ArgumentMatchers.any(Instant.class));
+    }
+
     private static JwtTokenUtil configured(String secret, Long expiration, Long refresh) throws Exception {
-        JwtTokenUtil util = new JwtTokenUtil();
+        JwtTokenUtil util = new JwtTokenUtil(mock(TokenRepository.class));
         set(util, "secret", secret); set(util, "expiration", expiration); set(util, "refreshExpiration", refresh);
         set(util, "issuer", "geostat-api"); set(util, "audience", "geostat-platform");
         return util;

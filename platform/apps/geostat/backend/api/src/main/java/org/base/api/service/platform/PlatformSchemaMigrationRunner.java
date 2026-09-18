@@ -5,12 +5,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.time.Instant;
 
 /** Applies the platform's idempotent SQL Server DDL in deterministic plane order at startup. */
 @Component
@@ -19,15 +21,18 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
     private final JdbcTemplate data;
     private final JdbcTemplate archive;
     private final boolean enabled;
+    private final ApplicationEventPublisher events;
 
     public PlatformSchemaMigrationRunner(@Qualifier("primaryJdbcTemplate") JdbcTemplate control,
                                          @Qualifier("dataPlaneJdbcTemplate") JdbcTemplate data,
                                          @Qualifier("archivePlaneJdbcTemplate") JdbcTemplate archive,
-                                         @Value("${platform.schema-migration.enabled:true}") boolean enabled) {
+                                         @Value("${platform.schema-migration.enabled:true}") boolean enabled,
+                                         ApplicationEventPublisher events) {
         this.control = control;
         this.data = data;
         this.archive = archive;
         this.enabled = enabled;
+        this.events = events;
     }
 
     @Override
@@ -122,6 +127,7 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
         executeAndRecord(data, "db/platform/092_artifact_manifest_contract_binding_integrity.sql");
         executeAndRecord(data, "db/platform/093_artifact_upload_sessions.sql");
         executeAndRecord(data, "db/platform/094_artifact_integrity_audit.sql");
+        events.publishEvent(new PlatformSchemaReadyEvent(Instant.now()));
     }
 
     private void executeAndRecord(JdbcTemplate jdbc, String resource) throws Exception {

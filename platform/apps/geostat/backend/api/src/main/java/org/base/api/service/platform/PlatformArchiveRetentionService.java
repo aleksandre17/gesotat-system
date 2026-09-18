@@ -11,11 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlatformArchiveRetentionService {
     private final JdbcTemplate archive;
     private final PlatformJobLeaseService lease;
-    public PlatformArchiveRetentionService(@Qualifier("archivePlaneJdbcTemplate") JdbcTemplate archive,PlatformJobLeaseService lease){this.archive=archive;this.lease=lease;}
+    private final PlatformSchemaReadiness schemaReadiness;
+    public PlatformArchiveRetentionService(@Qualifier("archivePlaneJdbcTemplate") JdbcTemplate archive,PlatformJobLeaseService lease,PlatformSchemaReadiness schemaReadiness){this.archive=archive;this.lease=lease;this.schemaReadiness=schemaReadiness;}
 
     @Scheduled(cron = "${platform.archive.purge.cron:0 30 3 * * *}")
     @Transactional(transactionManager = "archivePlaneTransactionManager")
     public void purgeExpired() {
+        if (!schemaReadiness.isReady()) return;
         if(!lease.acquire("archive-retention-purge",60))return;
         try {
             archive.update("DELETE ar FROM archive.artifact_reference ar JOIN archive.snapshot s ON s.archive_snapshot_id=ar.archive_snapshot_id WHERE s.status='ACTIVE' AND s.purge_after<=SYSUTCDATETIME()");
