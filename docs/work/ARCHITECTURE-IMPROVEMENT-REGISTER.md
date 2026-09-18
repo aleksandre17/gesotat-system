@@ -391,5 +391,6 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 - **Evidence:** `ArtifactContentTypeVerifierTest` covers generated XLS/XLSX workbooks and DOCX→XLSX
   rejection; ZIP spoof rejection and inventory-import spoof rejection in `ArtifactPackageServiceTest`;
   `:api:test` PASS — 184 tests, 0 failures/errors, 1 skipped (67 artifact-related tests). Tika 4.0.0
-  is present in the remote dev API classpath and health is UP (runtime restart of this last refinement pending).
+  plus workbook structure validation is deployed in remote dev; Tika 4.0.0 is in the API classpath,
+  and API health is UP.
   Malware scanning remains a separate open control and this change does not claim virus-free content.
