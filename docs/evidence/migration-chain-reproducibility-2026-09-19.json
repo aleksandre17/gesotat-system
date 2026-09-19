@@ -1,0 +1,81 @@
+{
+  "schema": "geostat.migration-chain-reproducibility.v1",
+  "recordedAt": "2026-09-19",
+  "environment": "remote dev SQL Server (container geostat-system-mssql); disposable databases zz_replay_* created and dropped per run; application databases untouched by the replay",
+  "tool": "ops/tests/sql/migration-chain-fresh-replay.sh (chain order extracted from PlatformSchemaMigrationRunner)",
+  "before": {
+    "registeredScripts": 95,
+    "applied": 88,
+    "failed": 7,
+    "failures": {
+      "011_contract_stable_identity.sql": "unique index created before ALTER COLUMN ... NOT NULL (Msg 5074/4922)",
+      "020_kids_r4_row_transport_contract.sql": "duplicate (contract_id, source_locator) insert (Msg 2627)",
+      "021_kids_r5_artifact_raw_contract.sql": "duplicate (contract_id, source_locator) insert (Msg 2627)",
+      "079_api_operation_idempotency.sql": "statement names a column added in the same batch (Msg 207)",
+      "080_api_operation_owner_scope.sql": "statement names a column added in the same batch (Msg 207)",
+      "097_site_contract_dataset_table_binding.sql": "statement names a column added in the same batch (Msg 207)",
+      "098_site_contract_dataset_table_binding_backfill.sql": "follows from 097"
+    },
+    "endState": "KIDS_PORTAL_V1 r6 SUPERSEDED, r7 SUPERSEDED, no revision 8: the platform could not be rebuilt from source"
+  },
+  "rootCauses": [
+    "The runner executed each script as one JDBC batch and never drained its results, so the error of any statement after the first was invisible: a script was recorded as applied although part of it never ran. Proof on dev: 011 was recorded, yet platform.ingestion_contract.contract_code was still nullable.",
+    "054 and 055 (the only creator of KIDS_PORTAL_V1 revision 8) were not registered. They were unregistered while the runner still re-executed every script on each start; 055 is not idempotent."
+  ],
+  "devLedgerFacts": {
+    "recorded": [
+      "037",
+      "039",
+      "045",
+      "047",
+      "054",
+      "055"
+    ],
+    "notRecorded": [
+      "056"
+    ],
+    "checksumEqualToRepository": [
+      "045",
+      "047",
+      "054"
+    ],
+    "checksumDiffers": [
+      "037",
+      "039",
+      "055"
+    ],
+    "revision8DocumentEquality": "the @doc literal of the repository 055 hashes (SHA2_256 over NVARCHAR) to 94AFFBA74E3166D5AB2C43C0A4AA37314F4ADBCCF123A316F9A78E0DC59CA72A, the contract_checksum stored on dev; dev holds 15 datasets, 104 fields, 21 relations as the document declares"
+  },
+  "fix": [
+    "SqlScriptExecutor drains every result; any failing statement fails the script before it is recorded (SqlScriptExecutorTest)",
+    "011 reordered; 020/021 insert guarded; 079/080 deferred with EXEC; 097 keeps structure only (098 owns the backfill)",
+    "054 and 055 registered in numeric position; 055 ships an adoption probe (055_....sql.adopt) so an installation that holds revision 8 without the ledger row adopts it instead of executing it again",
+    "corrected files are reconciled once through the runner's existing checksum-reconciliation list; every other drift still fails closed",
+    "103 repairs installations where 011's last statement never ran"
+  ],
+  "after": {
+    "registeredScripts": 98,
+    "applied": 98,
+    "failed": 0,
+    "endState": [
+      "KIDS_PORTAL_V1 r6 SUPERSEDED datasets=12",
+      "KIDS_PORTAL_V1 r7 SUPERSEDED datasets=15",
+      "KIDS_PORTAL_V1 r8 APPROVED datasets=15"
+    ]
+  },
+  "devAfterDeploy": {
+    "health": "ALL UP",
+    "checksumChangedErrors": 0,
+    "migration103Recorded": true,
+    "contractCodeNullable": false,
+    "ledgerRows": 105
+  },
+  "deliberatelyUnregistered": {
+    "000": "creates the databases; operator step before the application starts",
+    "037,039": "r7 source-locator alignments, superseded; the applied versions predate version control and differ from the files",
+    "045,047": "r7-only; the chain reaches an approved revision 8 without them",
+    "056": "identical statements to 058"
+  },
+  "limits": "The replay uses sqlcmd with stand-ins for the ORM-owned tables (users, roles, permissions, role_permissions, page_nodes). Production ledger state was not read; the strict runner and the adoption probe make any mismatch there fail closed instead of corrupting.",
+  "result": "PASS"
+}

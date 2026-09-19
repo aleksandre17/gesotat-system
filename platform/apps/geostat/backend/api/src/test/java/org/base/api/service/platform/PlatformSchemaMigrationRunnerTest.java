@@ -49,9 +49,9 @@ class PlatformSchemaMigrationRunnerTest {
         when(control.query(startsWith("SELECT checksum FROM platform.schema_migration"), any(ResultSetExtractor.class), anyString()))
                 .thenAnswer(call -> checksum(call.getArgument(2)));
         runner().run(null);
-        verify(control, never()).execute(anyString());
-        verify(data, never()).execute(anyString());
-        verify(archive, never()).execute(anyString());
+        verify(control, never()).execute(any(org.springframework.jdbc.core.StatementCallback.class));
+        verify(data, never()).execute(any(org.springframework.jdbc.core.StatementCallback.class));
+        verify(archive, never()).execute(any(org.springframework.jdbc.core.StatementCallback.class));
         verify(control, never()).update(startsWith("INSERT INTO platform.schema_migration"), any(Object[].class));
         verify(events).publishEvent(any(PlatformSchemaReadyEvent.class));
     }
@@ -63,8 +63,8 @@ class PlatformSchemaMigrationRunnerTest {
         when(control.query(startsWith("SELECT checksum FROM platform.schema_migration"), any(ResultSetExtractor.class), anyString()))
                 .thenAnswer(call -> pending.equals(call.getArgument(2)) ? null : checksum(call.getArgument(2)));
         runner().run(null);
-        verify(data, times(1)).execute(anyString());
-        verify(control, never()).execute(anyString());
+        verify(data, times(1)).execute(any(org.springframework.jdbc.core.StatementCallback.class));
+        verify(control, never()).execute(any(org.springframework.jdbc.core.StatementCallback.class));
         verify(control).update(startsWith("INSERT INTO platform.schema_migration"), eq(pending), eq(checksum(pending)));
     }
 

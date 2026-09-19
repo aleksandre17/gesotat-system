@@ -551,7 +551,7 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 
 ### AIR-2026-027 — Registered migration chain cannot rebuild the approved KIDS R8 contract
 
-- **სტატუსი:** `DISCOVERED` / **priority:** `P0` (release invariant: ordered migrations, reproducible build — B-01) / **owner:** Control Plane
+- **სტატუსი:** `VERIFIED` (2026-09-19, see AIR-2026-038) / **priority:** `P0` (release invariant: ordered migrations, reproducible build — B-01) / **owner:** Control Plane
 - **აღმოჩენა (source-verified 2026-09-19):** `PlatformSchemaMigrationRunner` goes `053 → 057`.
   `057` recreates the table of unregistered `054`, and `058` repeats unregistered `056`, but **no
   registered migration replaces `055_kids_final_page_contract_revision.sql`, the only script that
@@ -702,3 +702,27 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   read so preview uses the same projection. No engine branch per site is needed.
 - **Acceptance:** a synthetic package with 1000 rows and 1500 files (§27), shared files and multi-file rows, gives the
   same edges at preview, in the accepted manifest document and after binding.
+
+### AIR-2026-038 — A migration could be recorded as applied although part of it never ran; an empty database could not be built
+
+- **სტატუსი:** `VERIFIED` / **priority:** `P0` / **owner:** Control Plane + Delivery (release invariant: ordered migrations, reproducible build)
+- **აღმოჩენა:** `PlatformSchemaMigrationRunner` executed a script as one JDBC batch and never read its results. A
+  driver reports the error of a later statement only while results are read, so such errors were invisible and the
+  script was written to the ledger. Proof on dev: `011` was recorded while `contract_code` was still nullable (its
+  final `ALTER COLUMN` had failed behind the unique index created just before it). A replay of the registered chain
+  on an empty database failed in 7 of 95 scripts and ended without `KIDS_PORTAL_V1` revision 8 (closes AIR-2026-027:
+  `054`/`055` were unregistered and `055` is the only creator of that revision).
+- **გადაწყვეტა:** `SqlScriptExecutor` drains every result so any failing statement fails the script before it is
+  recorded. `011`, `020`, `021`, `079`, `080`, `097` corrected for an empty database (statement order, guarded
+  insert, deferred compilation; `098` owns the backfill); `054`/`055` registered; `055` ships a generic adoption
+  probe (`<migration>.adopt`: one SELECT returning 1 when the effect exists) so it is never executed twice;
+  corrected files are reconciled once through the existing reconciliation list, all other checksum drift still
+  fails closed; `103` repairs installations where `011` never finished. The repository `055` was proven to create
+  the same revision document dev holds (SHA-256 `94AFFBA7…`, 15/104/21).
+- **Evidence:** `ops/tests/sql/migration-chain-fresh-replay.sh` — before 88/95, after **98/98** with r8 `APPROVED`
+  (15 datasets); dev after deploy: health UP, no checksum errors, `103` recorded, `contract_code` NOT NULL.
+  `docs/evidence/migration-chain-reproducibility-2026-09-19.json`. `SqlScriptExecutorTest`,
+  `PlatformSchemaMigrationRegistrationTest` (every unregistered file now carries its reason); `:api:test` 283 PASS.
+- **Remaining:** the production ledger was not read; its first deploy of this runner must run the replay tool's
+  checks in preflight. Other scripts may hold statements that failed silently on existing databases without
+  breaking an empty build; a ledger-versus-schema audit is the way to find them.

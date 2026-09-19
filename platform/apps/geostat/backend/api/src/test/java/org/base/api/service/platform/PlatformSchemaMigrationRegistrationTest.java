@@ -29,14 +29,22 @@ class PlatformSchemaMigrationRegistrationTest {
     }
 
     /** Pre-existing files outside the runner. Do not extend: register new migrations instead. */
+    /**
+     * Deliberately outside the chain, each for a recorded reason. The chain without them builds an empty
+     * database to an approved contract (ops/tests/sql/migration-chain-fresh-replay.sh).
+     */
     private static final Set<String> KNOWN_UNREGISTERED = Set.of(
+            // creates the databases themselves; run by the operator before the application starts
             "000_create_platform_databases.sql",
+            // r7 source-locator alignments: superseded by 040 (retry) and by the r8 registry (096);
+            // the applied versions predate version control and differ from these files
             "037_prefixed_access_source_locators.sql",
             "039_kids_r7_source_locator_alignment.sql",
+            // r7-only classifier projection/approval; revision 7 is superseded and the chain reaches an
+            // approved revision 8 without them
             "045_kids_r7_classifier_assignment_projection.sql",
             "047_kids_r7_classifier_owner_approval.sql",
-            "054_contract_page_binding.sql",
-            "055_kids_final_page_contract_revision.sql",
+            // identical statements to 058, which the chain runs
             "056_activate_kids_r8_supersede_legacy.sql");
 
     @Test

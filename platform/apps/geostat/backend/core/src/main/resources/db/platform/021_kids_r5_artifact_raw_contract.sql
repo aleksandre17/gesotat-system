@@ -21,5 +21,6 @@ UPDATE platform.contract_source SET active=0 WHERE contract_id=@contract;
 INSERT platform.contract_source(contract_id,source_locator,source_kind,target_dataset_version_id,source_key_expression,row_role,load_order,mapping_spec_json,active)
 SELECT @contract,s.source_locator,'ACCESS_TABLE',v.dataset_version_id,s.source_key,s.row_role,s.load_order,
  CONCAT(N'{"approvalState":"DRAFT","canonicalAccessRevision":5,"datasetCode":"',s.dataset_code,N'","rawArtifactAuthority":"IMMUTABLE_OBJECT_STORAGE","rowLocatorOnly":true}'),1
-FROM @spec s JOIN @versions v ON v.dataset_code=s.dataset_code;
+FROM @spec s JOIN @versions v ON v.dataset_code=s.dataset_code
+WHERE NOT EXISTS(SELECT 1 FROM platform.contract_source x WHERE x.contract_id=@contract AND x.source_locator=s.source_locator);
 UPDATE platform.ingestion_contract SET contract_revision=5,status='REVIEW_REQUIRED',auto_publish=0,raw_ingest_enabled=1 WHERE contract_id=@contract;

@@ -1,0 +1,2 @@
+/* Effect of 055: the revision it creates exists. */
+SELECT CASE WHEN EXISTS(SELECT 1 FROM platform.site_contract_revision WHERE contract_code=N'KIDS_PORTAL_V1' AND revision=8) THEN 1 ELSE 0 END

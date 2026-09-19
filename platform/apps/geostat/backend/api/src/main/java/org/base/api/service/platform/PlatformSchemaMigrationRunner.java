@@ -1,5 +1,7 @@
 package org.base.api.service.platform;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -17,6 +19,8 @@ import java.time.Instant;
 /** Applies the platform's idempotent SQL Server DDL in deterministic plane order at startup. */
 @Component
 public class PlatformSchemaMigrationRunner implements ApplicationRunner {
+    private static final Logger log = LoggerFactory.getLogger(PlatformSchemaMigrationRunner.class);
+    static final String ADOPTION_PROBE_SUFFIX = ".adopt";
     private final JdbcTemplate control;
     private final JdbcTemplate data;
     private final JdbcTemplate archive;
@@ -89,6 +93,8 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
         executeAndRecord(control, "db/platform/051_kids_r7_binding_registry_projection.sql");
         executeAndRecord(data, "db/platform/052_release_gate_audit.sql");
         executeAndRecord(data, "db/platform/053_serving_cache_build.sql");
+        executeAndRecord(control, "db/platform/054_contract_page_binding.sql");
+        executeAndRecord(control, "db/platform/055_kids_final_page_contract_revision.sql");
         executeAndRecord(control, "db/platform/057_contract_page_binding_idempotent_repair.sql");
         executeAndRecord(control, "db/platform/058_activate_kids_r8_existing.sql");
         executeAndRecord(control, "db/platform/059_bind_contract_runtime_page_ids.sql");
@@ -135,6 +141,7 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
         executeAndRecord(data, "db/platform/100_artifact_storage_sweep.sql");
         executeAndRecord(data, "db/platform/101_artifact_package_run.sql");
         executeAndRecord(data, "db/platform/102_artifact_manifest_document.sql");
+        executeAndRecord(control, "db/platform/103_ingestion_contract_code_not_null_repair.sql");
         events.publishEvent(new PlatformSchemaReadyEvent(Instant.now()));
     }
 
@@ -160,14 +167,48 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
             if (resource.endsWith("065_kids_r8_access_locator_bindings.sql")
                     || resource.endsWith("069_kids_r8_release_ready_semantics.sql")
                     || resource.endsWith("070_kids_r8_complete_mapping_specs.sql")
-                    || resource.endsWith("097_site_contract_dataset_table_binding.sql")) {
+                    || resource.endsWith("097_site_contract_dataset_table_binding.sql")
+                    /* Corrected so that an empty database can be built (statement order, deferred
+                       compilation, guarded insert); what they did to databases that already
+                       recorded them is unchanged. Proof: ops/tests/sql/migration-chain-fresh-replay.sh. */
+                    || resource.endsWith("011_contract_stable_identity.sql")
+                    || resource.endsWith("020_kids_r4_row_transport_contract.sql")
+                    || resource.endsWith("021_kids_r5_artifact_raw_contract.sql")
+                    || resource.endsWith("079_api_operation_idempotency.sql")
+                    || resource.endsWith("080_api_operation_owner_scope.sql")
+                    /* The file creates the same revision document that recorded installations hold
+                       (SHA-256 94AFFBA7..., 15 datasets, 104 fields, 21 relations). */
+                    || resource.endsWith("055_kids_final_page_contract_revision.sql")) {
                 control.update("UPDATE platform.schema_migration SET checksum=? WHERE migration_id=?", checksum, resource);
                 return;
             }
             throw new IllegalStateException("Schema migration checksum changed: " + resource + ". Create a new numbered migration instead of rewriting history.");
         }
-        jdbc.execute(text);
+        if (alreadyEffective(jdbc, resource)) {
+            log.info("schema.migration adopted without execution (its effect is already present): {}", resource);
+            control.update("INSERT INTO platform.schema_migration(migration_id,checksum) VALUES(?,?)", resource, checksum);
+            return;
+        }
+        // Every statement must succeed before the script is recorded as applied.
+        SqlScriptExecutor.execute(jdbc, text);
         control.update("INSERT INTO platform.schema_migration(migration_id,checksum) VALUES(?,?)", resource, checksum);
+    }
+
+    /**
+     * A migration that is not idempotent may ship a probe beside it ({@code <migration>.adopt}): one SELECT
+     * returning 1 when the migration's effect already exists. An installation that holds the effect but
+     * not the ledger row then adopts the migration instead of executing it a second time.
+     */
+    private static boolean alreadyEffective(JdbcTemplate jdbc, String resource) throws Exception {
+        ClassPathResource probe = new ClassPathResource(resource + ADOPTION_PROBE_SUFFIX);
+        if (!probe.exists()) return false;
+        String sql = new String(probe.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        try {
+            return Boolean.TRUE.equals(jdbc.query(sql, rs -> rs.next() && rs.getInt(1) == 1));
+        } catch (DataAccessException objectsNotCreatedYet) {
+            // The probe names tables an empty database does not have: nothing to adopt.
+            return false;
+        }
     }
 
     private static String sha256(String text) throws Exception {
