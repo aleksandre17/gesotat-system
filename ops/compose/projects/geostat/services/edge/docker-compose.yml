@@ -12,6 +12,10 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ${GEOSTAT_TLS_DIR:?GEOSTAT_TLS_DIR is required}/tls.crt:/etc/nginx/tls/tls.crt:ro
       - ${GEOSTAT_TLS_DIR:?GEOSTAT_TLS_DIR is required}/tls.key:/etc/nginx/tls/tls.key:ro
+      # Governed artifact distribution keeps its own key pair, issued by the
+      # internal CA, so the shared boundary certificate above is never re-issued.
+      - ${GEOSTAT_TLS_DIR:?GEOSTAT_TLS_DIR is required}/files.crt:/etc/nginx/tls/files.crt:ro
+      - ${GEOSTAT_TLS_DIR:?GEOSTAT_TLS_DIR is required}/files.key:/etc/nginx/tls/files.key:ro
     networks:
       geostat-net:
         aliases:

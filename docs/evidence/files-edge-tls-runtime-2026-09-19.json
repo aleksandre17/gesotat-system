@@ -1,0 +1,118 @@
+{
+  "schema": "geostat.edge-tls-hostname-runtime.v1",
+  "recordedAt": "2026-09-19",
+  "subject": "EXT-4 — publish governed artifact downloads on https://files.geostat.internal through the shared edge",
+  "status": "PASS",
+  "outcome": "The download hostname is live on the shared edge with its own certificate, issued by a new internal CA. The existing edge certificate and key were not modified, so no client that trusts the current boundary lost trust. Signed downloads return 200 with the expected checksum; unsigned, tampered and non-GET requests are refused.",
+  "design": {
+    "decision": "internal CA + a dedicated leaf for the download hostname (lead decision: options 2+3 combined)",
+    "rationale": "Re-issuing the shared self-signed certificate to add a SAN is not transparent: OpenSSL-based clients accept a self-issued certificate only when that exact certificate is in their truststore. A separate leaf under a distributed CA leaves the existing anchor untouched and makes every future hostname a leaf issuance instead of a trust migration.",
+    "keyType": "EC P-256 for both CA and leaf. TLS 1.2 is the configured floor and every client in scope (OpenSSL 3.0, curl, JVM 17, current browsers) supports P-256; it gives smaller handshakes and cheaper signatures than RSA 3072 at equivalent strength. The script exposes --key-type rsa --rsa-bits for a client that ever needs RSA.",
+    "untouched": {
+      "tls.crt": "sha256 0a1554fe9eea85ef84caecbb5ff63fcca3ac226e6231bdcbf87a4a2159b6a808 — identical before and after",
+      "tls.key": "sha256 bacf3ef06bc44a43d657c3bceb7f1824907dc7bd96eeaccf9c64ce81f3d30e53 — identical before and after",
+      "publicTruststore": "edge/tls/public-truststore.p12 not rebuilt; its content did not have to change"
+    }
+  },
+  "history": {
+    "note": "kept because it is the reason for the design; the first attempt followed the original brief and was stopped at its own proof gate",
+    "attempt": "re-issue the deployed self-signed certificate with the same key and subject, SAN + DNS:files.geostat.internal",
+    "gate": "openssl verify -CAfile <old tls.crt> <new.crt>",
+    "result": "FAIL — 'CN = geostat.internal / error 18 at 0 depth lookup: self-signed certificate'; identical with -partial_chain and -trusted",
+    "cause": "OpenSSL treats a self-issued certificate (subject == issuer, AKI == SKI) as a root and accepts it only if that exact certificate is in the truststore; it never chains a re-issued self-signed leaf to a differently-encoded trusted copy, even though the signature verifies.",
+    "realClients": {
+      "curl --cacert <old tls.crt>": "curl: (60) SSL certificate problem: self-signed certificate (exit 60)",
+      "openssl s_client -CAfile <old tls.crt>": "Verify return code: 18 (self-signed certificate)",
+      "java 17, -Djavax.net.ssl.trustStore=<edge/tls/public-truststore.p12>": "HTTP 200 — JVM PKIX DOES accept the re-issued certificate"
+    },
+    "consequence": "a swap would have kept the JVM services working while silently breaking every curl/browser/Go client holding the current certificate — exactly the clients EXT-4 serves. Nothing was installed; the candidate certificate and its scratch directory were deleted."
+  },
+  "certificates": {
+    "ca": {
+      "file": "<edge>/tls/ca.crt (public) + tls/ca.key (mode 0600, never copied or printed)",
+      "subject": "CN=GeoStat Internal CA",
+      "key": "EC prime256v1",
+      "basicConstraints": "critical, CA:TRUE, pathlen:0",
+      "keyUsage": "critical, Certificate Sign, CRL Sign",
+      "validity": "Sep 19 2026 11:51:58 GMT .. Sep 18 2031 11:51:58 GMT (1825 days)",
+      "sha256Fingerprint": "DE:8A:F0:F7:BB:2C:64:2C:5F:4C:9E:45:B1:7D:C9:12:5A:BE:B7:2C:3B:3D:04:9D:74:16:EE:E6:82:1A:5F:F4",
+      "publishedInRepo": "ops/compose/projects/geostat/services/edge/ca/geostat-internal-ca.crt (public material; `grep -c 'PRIVATE KEY'` = 0)"
+    },
+    "leaf": {
+      "file": "<edge>/tls/files.crt (chain: leaf + CA, 2 certificates) + tls/files.key (mode 0600)",
+      "subject": "CN=files.geostat.internal",
+      "issuer": "CN=GeoStat Internal CA",
+      "san": ["DNS:files.geostat.internal"],
+      "basicConstraints": "critical, CA:FALSE",
+      "keyUsage": "critical, Digital Signature, Key Encipherment",
+      "extendedKeyUsage": "TLS Web Server Authentication",
+      "validity": "Sep 19 2026 11:51:58 GMT .. Oct 21 2027 11:51:58 GMT (397 days)",
+      "signatureAlgorithm": "ecdsa-with-SHA256",
+      "sha256Fingerprint": "2A:AE:F2:9F:22:6B:1C:FF:9C:F5:1C:71:E7:61:76:EF:19:DB:C2:5B:A9:A0:F8:DB:44:26:A0:1B:20:74:0A:3D",
+      "verify": "openssl verify -CAfile <ca> <leaf>: OK (proven before installation; the leaf key/certificate match was proven too)"
+    },
+    "issuedBy": "ops/scripts/shell/tls/issue-internal-ca-leaf.sh --dir <edge>/tls --ca-cn 'GeoStat Internal CA' --san DNS:files.geostat.internal --leaf-cert files.crt --leaf-key files.key",
+    "idempotenceProven": "a second identical invocation printed 'leaf: unchanged ... result: unchanged'; a changed SAN list re-issued and backed up the previous pair (verified in a /tmp sandbox, removed afterwards)"
+  },
+  "serverChanges": {
+    "directory": "/home/administrator/geostat/backend/infra/geostat-platform/edge/",
+    "added": ["tls/ca.crt", "tls/ca.key (0600)", "tls/ca.srl", "tls/files.crt", "tls/files.key (0600)"],
+    "modified": ["nginx.conf", "docker-compose.yml"],
+    "backups": [
+      "/home/administrator/geostat/backend/infra/geostat-platform/edge/nginx.conf.bak-20260919T115208Z",
+      "/home/administrator/geostat/backend/infra/geostat-platform/edge/docker-compose.yml.bak-20260919T115208Z"
+    ],
+    "diffApplied": {
+      "nginx.conf": "+31 lines: the files.geostat.internal server block, using /etc/nginx/tls/files.crt and files.key; no other line changed",
+      "docker-compose.yml": "+2 read-only mounts for files.crt/files.key under the same ${GEOSTAT_TLS_DIR}, +1 geostat-net alias files.geostat.internal"
+    },
+    "configTest": "docker run --rm --network geostat-net --add-host host.docker.internal:host-gateway -v <nginx.conf>:ro -v <tls dir>:ro nginx:1.29.1-alpine nginx -t → 'syntax is ok' / 'test is successful' (run BEFORE the restart; the first attempt without --add-host failed on host.docker.internal, which is why the flag mirrors the real container)",
+    "restarts": "exactly one: `docker-compose up -d` in the edge directory (recreate, required for the new alias). Container geostat-edge Recreated/Started."
+  },
+  "postRestartChecks": {
+    "edge": "geostat-edge Up (healthy)",
+    "aliases": ["geostat-edge", "auth.geostat.internal", "api.geostat.internal", "geostat.internal", "files.geostat.internal"],
+    "existingClientsUnaffected": "GET https://auth.geostat.internal/realms/geostat/.well-known/openid-configuration with --cacert <unchanged tls.crt> → HTTP 200, issuer=https://auth.geostat.internal/realms/geostat",
+    "edgeHealthzWithOldCert": "https://geostat.internal/healthz with --cacert <unchanged tls.crt> → HTTP 200",
+    "productionApi": "localhost:8083/health → {\"status\":\"UP\",\"db\":{\"primary\":\"UP\",\"dataPlane\":\"UP\",\"archivePlane\":\"UP\",\"objectStorage\":\"UP\",\"secondary\":\"UP\"}}",
+    "devApi": "localhost:8081/health → same, all UP",
+    "operatorToken": "the operator helper obtained a token and reached the authenticated API immediately after the restart (the dev rate limiter answered 429 while the concurrent load test was running, which is itself proof that authentication through auth.geostat.internal still works)",
+    "rollback": "not needed; no check failed"
+  },
+  "signerConfiguration": {
+    "file": "ops/config/projects/geostat/services/api/.env.dev (gitignored, stays untracked)",
+    "change": "STORAGE_PUBLIC_ENDPOINT: http://minio:9000 → https://files.geostat.internal (STORAGE_ENDPOINT unchanged at http://minio:9000; signing is offline, so the API never reaches or trusts the public endpoint)",
+    "backup": "ops/config/projects/geostat/services/api/.env.dev.bak-20260919T115312Z (also gitignored)",
+    "redeploy": "ops/cli/lifecycle/geostat.ps1 api dev bootstrap api --no-build, then docker restart geostat-api-dev → Up (healthy)",
+    "loadTestCoordination": "the concurrent load test was polled (docker stats geostat-api-dev) and only after CPU fell from ~230% to 1.33% was the dev API redeployed; the load run was never interrupted"
+  },
+  "smoke": {
+    "signedUrlHost": "files.geostat.internal (scheme https) — issued by GET /api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download, HTTP=200; the URL itself is not recorded here",
+    "metadata": {"sha256": "c9a12ec1ffbba230ffa0a08fcfdd2fb3adfed6554ed1ffa3d51c21dca8c1979d", "byteSize": 12879},
+    "download": "curl --resolve files.geostat.internal:443:192.168.1.199 --cacert <ca.crt> → HTTP=200, bytes=12879, sha256=c9a12ec1ffbba230ffa0a08fcfdd2fb3adfed6554ed1ffa3d51c21dca8c1979d (equals the metadata)",
+    "inNetwork": "throwaway curlimages/curl container on geostat-net, no --resolve, CA as the only anchor → HTTP=200, remote_ip=172.23.0.10 (the edge), size=12879, identical sha256 — the docker alias resolves and the chain validates",
+    "negatives": {
+      "sameUrlWithoutQueryString": "HTTP=403 (nginx: no X-Amz-Signature)",
+      "tamperedXAmzSignature": "HTTP=403",
+      "POST": "HTTP=403 (nginx limit_except GET HEAD)",
+      "HEAD": "HTTP=403 — the presigned URL is signed for GET, so MinIO refuses the HEAD; nginx itself permits HEAD"
+    },
+    "unsignedBeforeRedeploy": "HTTP=403 both from the host and from inside geostat-net, confirming the block is fail-closed independently of the signer configuration"
+  },
+  "repositoryChanges": [
+    "ops/scripts/shell/tls/issue-internal-ca-leaf.sh (new; the earlier reissue-edge-certificate.sh was removed — its central claim was disproven)",
+    "ops/compose/projects/geostat/services/edge/nginx.conf (files block now uses files.crt/files.key)",
+    "ops/compose/projects/geostat/services/edge/docker-compose.yml (two read-only mounts)",
+    "ops/compose/projects/geostat/services/edge/ca/geostat-internal-ca.crt (public CA certificate for clients)",
+    "ops/compose/projects/geostat/services/edge/README.md (design rationale, issuance, deployment, client trust, hosts line)",
+    "docs/evidence/files-edge-tls-runtime-2026-09-19.json (this file)"
+  ],
+  "notDone": [
+    "no hosts file was edited on any client machine; clients need '192.168.1.199 geostat.internal api.geostat.internal auth.geostat.internal files.geostat.internal'",
+    "the CA is not installed in any client OS/browser truststore; that is a per-machine one-time step documented in the edge README",
+    "production API endpoints unchanged: geostat-api (:8083) still signs and serves exactly as before; STORAGE_PUBLIC_ENDPOINT was changed only for dev",
+    "public-truststore.p12 not rebuilt (unnecessary — the shared certificate did not change)",
+    "no CRL or OCSP responder for the new CA; revocation would mean re-issuing and redistributing",
+    "nothing committed, staged or pushed; docs/work/* untouched"
+  ]
+}

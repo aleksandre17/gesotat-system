@@ -749,3 +749,30 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   `:api:test` 288 PASS; schema-agnostic preflight 0 violations.
 - **To use it for a site:** approve an `artifact_relation_definition` whose `match_rule_json` has
   `"type":"RELATION_TABLE"`; nothing else changes.
+
+### AIR-2026-040 — Adding a hostname by re-issuing the self-signed edge certificate would have broken non-JVM clients
+
+- **სტატუსი:** `VERIFIED` / **priority:** `P1` / **owner:** Security + Delivery
+- **აღმოჩენა:** the edge used one self-signed certificate as both server certificate and trust anchor. A re-issued
+  certificate with the same key and subject but a longer SAN list is accepted by a JVM that holds the old one
+  (path building by subject and key) but **rejected** by OpenSSL, curl and browsers (a self-issued certificate is
+  trusted only as the exact same DER). Proven in a sandbox before anything was changed on the server.
+- **გადაწყვეტა:** the existing certificate is left byte-identical. An internal CA (`CA:TRUE, pathlen:0`,
+  `keyCertSign, cRLSign`, key 0600 on the server only) issues a dedicated leaf for the download hostname
+  (`serverAuth`, <= 397 days); only that nginx server block uses it. Future hostnames are one more leaf, with no
+  client-side change once the CA is trusted. Generic tool: `ops/scripts/shell/tls/issue-internal-ca-leaf.sh`
+  (idempotent, verifies chain and key match before installing, backs up what it replaces). The CA public
+  certificate is published in `ops/compose/projects/geostat/services/edge/ca/`.
+- **Evidence:** `docs/evidence/files-edge-tls-runtime-2026-09-19.json` (keeps the blocked first attempt as history).
+- **Open:** no CRL/OCSP for the internal CA; clients install the CA and the hosts line themselves; the production
+  API endpoint configuration is unchanged.
+
+### AIR-2026-041 — Load and recovery evidence; rate limit is per client identity and in memory
+
+- **სტატუსი:** `VERIFIED` (dev) / **priority:** `P2` / **owner:** SRE
+- **Finding:** `PlatformRateLimitFilter` admits 120 requests per 60 s per client key from an in-memory store. One
+  operator identity therefore cannot saturate the backend: the test measured bounded admission and the latency of
+  admitted requests, not capacity. Capacity needs several client identities or a dev-only higher limit; fairness
+  across replicas needs the Redis store (already implemented, not enabled).
+- **Evidence:** 1.05 M requests, 0 5xx; production health never degraded; restart recovery 27 s with durable state;
+  concurrent idempotent start. `docs/evidence/storage-line-load-and-recovery-runtime-2026-09-19.json`.

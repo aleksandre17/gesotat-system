@@ -1,0 +1,1159 @@
+{
+  "schema": "geostat.storage-line-load-and-recovery-runtime.v1",
+  "recordedAt": "2026-09-19",
+  "checklistItem": "docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md 14.5 (rollback, replay, load/performance and recovery evidence)",
+  "closes": [
+    "load / performance under concurrency on the deployed dev revision",
+    "recovery of durable state across an API container restart",
+    "replay / idempotency of the governed package run under concurrency"
+  ],
+  "doesNotClose": [
+    "rollback of a publication (publishing snapshot 53 is an owner/steward approval, ADR-007; nothing was published, so nothing was rolled back)",
+    "object storage backup/restore (checklist 4.7, EXT B-06)"
+  ],
+  "environment": {
+    "target": "remote dev API, container geostat-api-dev, http://localhost:8081 on the server, OIDC enforced",
+    "sourceRevision": "branch storage/artifact-line-closure (working tree clean); the dev container runs this source",
+    "authentication": "Keycloak confidential client geostat-artifact-operator, client_credentials; tokens obtained on the server, kept only in process memory, refreshed every 120 s, never printed or persisted",
+    "productionOnSameHost": "container geostat-api on localhost:8083 with shared MinIO, Keycloak and edge; production containers and the production database were never touched",
+    "host": "6 CPU, 7.75 GiB RAM, shared with production and ~40 other containers",
+    "loadOrigin": "the server itself (loopback), so the numbers exclude network transport between client and API"
+  },
+  "tool": {
+    "name": "ops/tests/load/load_probe.py + ops/tests/load/recovery_probe.py driven by ops/tests/load/remote-load-phase.sh",
+    "runtime": "python3 3.12.3 on the server, thread pool over urllib, one probe process per phase",
+    "whyNotAnExistingTool": "ab, hey and wrk are absent on the server and installing system packages is not allowed; pulling a container image (for example grafana/k6) was rejected because the host has ~1 GiB of free memory and is shared with production. python3 with a thread pool gives per-request latency, status codes, response headers, watchdog sampling and the abort logic in one process with no installation.",
+    "siteAgnostic": "base URL, endpoint list, concurrency, duration, watch URLs, expected health substring, abort thresholds, sampled container names and the token command are all arguments; no project, site or endpoint value is hardcoded in the probes"
+  },
+  "admissionControl": {
+    "filter": "PlatformRateLimitFilter",
+    "configuredLimit": "PLATFORM_RATE_LIMIT_REQUESTS=120 per PLATFORM_RATE_LIMIT_WINDOW_MS=60000, per client key, in-memory store (PLATFORM_RATE_LIMIT_REDIS_ENABLED=false)",
+    "observedHeaders": [
+      "RateLimit-Policy: 120;w=60",
+      "RateLimit-Limit: 120",
+      "Retry-After: <seconds to window end>"
+    ],
+    "consequenceForThisTest": "the whole load ran as one OIDC client, therefore one client key, therefore a ceiling of 120 admitted requests per minute regardless of offered load. Every phase above that ceiling is a measurement of bounded admission, not of backend capacity. This is recorded as an observed property of the platform, not as a failure.",
+    "resultShape": "admitted requests were 100% 200; every rejection was a 429 carrying Retry-After and RateLimit-Policy; no 5xx and no transport error occurred in any phase"
+  },
+  "phases": [
+    {
+      "phase": "baseline-c1",
+      "kind": "baseline",
+      "concurrentClients": 1,
+      "plannedDurationSeconds": 60,
+      "measuredDurationSeconds": 60.39,
+      "note": "paced at 600 ms think time per client, deliberately below the 120 req/60 s admission budget so that true service latency is measured",
+      "requests": 98,
+      "offeredRequestsPerSecond": 1.62,
+      "statusCounts": {
+        "200": 98
+      },
+      "shares": {
+        "429": 0.0,
+        "5xx": 0.0,
+        "2xx": 1.0,
+        "transportError": 0.0
+      },
+      "admittedThroughputRequestsPerMinute": 97.4,
+      "admitted2xxLatencyAllEndpoints": {
+        "count": 98,
+        "minMs": 6.25,
+        "p50Ms": 14.54,
+        "p95Ms": 25.17,
+        "p99Ms": 26.47,
+        "maxMs": 40.2,
+        "meanMs": 15.85
+      },
+      "perEndpoint": {
+        "meta": {
+          "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+          "statusCounts": {
+            "200": 25
+          },
+          "admitted2xxLatency": {
+            "count": 25,
+            "minMs": 8.47,
+            "p50Ms": 13.56,
+            "p95Ms": 15.54,
+            "p99Ms": 34.28,
+            "maxMs": 40.2,
+            "meanMs": 14.37
+          },
+          "rejected429Latency": {
+            "count": 0
+          }
+        },
+        "download": {
+          "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download",
+          "statusCounts": {
+            "200": 25
+          },
+          "admitted2xxLatency": {
+            "count": 25,
+            "minMs": 9.47,
+            "p50Ms": 15.75,
+            "p95Ms": 17.6,
+            "p99Ms": 18.22,
+            "maxMs": 18.4,
+            "meanMs": 15.39
+          },
+          "rejected429Latency": {
+            "count": 0
+          }
+        },
+        "packageRun": {
+          "path": "/api/v1/platform/artifacts/package-runs/2",
+          "statusCounts": {
+            "200": 24
+          },
+          "admitted2xxLatency": {
+            "count": 24,
+            "minMs": 6.25,
+            "p50Ms": 11.35,
+            "p95Ms": 12.35,
+            "p99Ms": 14.76,
+            "maxMs": 15.47,
+            "meanMs": 11.27
+          },
+          "rejected429Latency": {
+            "count": 0
+          }
+        },
+        "manifestDocument": {
+          "path": "/api/v1/platform/artifacts/manifests/7/document",
+          "statusCounts": {
+            "200": 24
+          },
+          "admitted2xxLatency": {
+            "count": 24,
+            "minMs": 15.57,
+            "p50Ms": 22.33,
+            "p95Ms": 25.78,
+            "p99Ms": 25.99,
+            "maxMs": 26.05,
+            "meanMs": 22.44
+          },
+          "rejected429Latency": {
+            "count": 0
+          }
+        }
+      },
+      "rateLimitHeaders": {
+        "policy": [
+          "RateLimit-Limit: 120",
+          "RateLimit-Policy: 120;w=60",
+          "RateLimit-Remaining: 100",
+          "RateLimit-Remaining: 101",
+          "RateLimit-Remaining: 102",
+          "RateLimit-Remaining: 103",
+          "RateLimit-Remaining: 104",
+          "RateLimit-Remaining: 105",
+          "RateLimit-Remaining: 106",
+          "RateLimit-Remaining: 107",
+          "RateLimit-Remaining: 108",
+          "RateLimit-Remaining: 109",
+          "RateLimit-Remaining: 110",
+          "RateLimit-Remaining: 111",
+          "RateLimit-Remaining: 112",
+          "RateLimit-Remaining: 113",
+          "RateLimit-Remaining: 114",
+          "RateLimit-Remaining: 115",
+          "RateLimit-Remaining: 116",
+          "RateLimit-Remaining: 117",
+          "RateLimit-Remaining: 118",
+          "RateLimit-Remaining: 119",
+          "RateLimit-Remaining: 22",
+          "RateLimit-Remaining: 23",
+          "RateLimit-Remaining: 24",
+          "RateLimit-Remaining: 25",
+          "RateLimit-Remaining: 26",
+          "RateLimit-Remaining: 27",
+          "RateLimit-Remaining: 28",
+          "RateLimit-Remaining: 29",
+          "RateLimit-Remaining: 30",
+          "RateLimit-Remaining: 31",
+          "RateLimit-Remaining: 32",
+          "RateLimit-Remaining: 33",
+          "RateLimit-Remaining: 34",
+          "RateLimit-Remaining: 35",
+          "RateLimit-Remaining: 36",
+          "RateLimit-Remaining: 37",
+          "RateLimit-Remaining: 38",
+          "RateLimit-Remaining: 39",
+          "RateLimit-Remaining: 40",
+          "RateLimit-Remaining: 41",
+          "RateLimit-Remaining: 42",
+          "RateLimit-Remaining: 43",
+          "RateLimit-Remaining: 44",
+          "RateLimit-Remaining: 45",
+          "RateLimit-Remaining: 46",
+          "RateLimit-Remaining: 47",
+          "RateLimit-Remaining: 48",
+          "RateLimit-Remaining: 49",
+          "RateLimit-Remaining: 50",
+          "RateLimit-Remaining: 51",
+          "RateLimit-Remaining: 52",
+          "RateLimit-Remaining: 53",
+          "RateLimit-Remaining: 54",
+          "RateLimit-Remaining: 55",
+          "RateLimit-Remaining: 56",
+          "RateLimit-Remaining: 57",
+          "RateLimit-Remaining: 58",
+          "RateLimit-Remaining: 59",
+          "RateLimit-Remaining: 60",
+          "RateLimit-Remaining: 61",
+          "RateLimit-Remaining: 62",
+          "RateLimit-Remaining: 63",
+          "RateLimit-Remaining: 64",
+          "RateLimit-Remaining: 65",
+          "RateLimit-Remaining: 66",
+          "RateLimit-Remaining: 67",
+          "RateLimit-Remaining: 68",
+          "RateLimit-Remaining: 69",
+          "RateLimit-Remaining: 70",
+          "RateLimit-Remaining: 71",
+          "RateLimit-Remaining: 72",
+          "RateLimit-Remaining: 73",
+          "RateLimit-Remaining: 74",
+          "RateLimit-Remaining: 75",
+          "RateLimit-Remaining: 76",
+          "RateLimit-Remaining: 77",
+          "RateLimit-Remaining: 78",
+          "RateLimit-Remaining: 79",
+          "RateLimit-Remaining: 80",
+          "RateLimit-Remaining: 81",
+          "RateLimit-Remaining: 82",
+          "RateLimit-Remaining: 83",
+          "RateLimit-Remaining: 84",
+          "RateLimit-Remaining: 85",
+          "RateLimit-Remaining: 86",
+          "RateLimit-Remaining: 87",
+          "RateLimit-Remaining: 88",
+          "RateLimit-Remaining: 89",
+          "RateLimit-Remaining: 90",
+          "RateLimit-Remaining: 91",
+          "RateLimit-Remaining: 92",
+          "RateLimit-Remaining: 93",
+          "RateLimit-Remaining: 94",
+          "RateLimit-Remaining: 95",
+          "RateLimit-Remaining: 96",
+          "RateLimit-Remaining: 97",
+          "RateLimit-Remaining: 98",
+          "RateLimit-Remaining: 99"
+        ],
+        "retryAfter": null
+      },
+      "watch": {
+        "prod": {
+          "url": "http://localhost:8083/health",
+          "samples": 5,
+          "minMs": 15.39,
+          "maxMs": 17.67,
+          "meanMs": 16.41,
+          "notOkSamples": 0
+        },
+        "dev": {
+          "url": "http://localhost:8081/health",
+          "samples": 5,
+          "minMs": 11.96,
+          "maxMs": 20.36,
+          "meanMs": 15.83,
+          "notOkSamples": 0
+        }
+      },
+      "resourceSamples": {
+        "geostat-api-dev": {
+          "samples": 5,
+          "memLast": "1.666GiB / 7.75GiB",
+          "cpuPercMax": 18.07,
+          "cpuPercMean": 7.57,
+          "memPercMax": 21.57
+        },
+        "geostat-api": {
+          "samples": 5,
+          "memLast": "566.8MiB / 7.75GiB",
+          "cpuPercMax": 0.24,
+          "cpuPercMean": 0.18,
+          "memPercMax": 7.14
+        },
+        "geostat-minio": {
+          "samples": 5,
+          "memLast": "124.2MiB / 7.75GiB",
+          "cpuPercMax": 3.46,
+          "cpuPercMean": 0.9,
+          "memPercMax": 1.56
+        },
+        "geostat-system-mssql": {
+          "samples": 5,
+          "memLast": "1.019GiB / 7.75GiB",
+          "cpuPercMax": 7.78,
+          "cpuPercMean": 3.36,
+          "memPercMax": 13.15
+        }
+      },
+      "aborted": null
+    },
+    {
+      "phase": "ramp-c5",
+      "kind": "ramp",
+      "concurrentClients": 5,
+      "plannedDurationSeconds": 180,
+      "measuredDurationSeconds": 182.05,
+      "note": "closed loop, unpaced",
+      "requests": 294907,
+      "offeredRequestsPerSecond": 1619.9,
+      "statusCounts": {
+        "200": 360,
+        "429": 294547
+      },
+      "shares": {
+        "429": 0.9988,
+        "5xx": 0.0,
+        "2xx": 0.0012,
+        "transportError": 0.0
+      },
+      "admittedThroughputRequestsPerMinute": 118.6,
+      "admitted2xxLatencyAllEndpoints": {
+        "count": 360,
+        "minMs": 3.06,
+        "p50Ms": 6.63,
+        "p95Ms": 14.4,
+        "p99Ms": 21.11,
+        "maxMs": 26.85,
+        "meanMs": 8.07
+      },
+      "perEndpoint": {
+        "meta": {
+          "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+          "statusCounts": {
+            "200": 90,
+            "429": 73638
+          },
+          "admitted2xxLatency": {
+            "count": 90,
+            "minMs": 4.06,
+            "p50Ms": 5.83,
+            "p95Ms": 13.17,
+            "p99Ms": 18.03,
+            "maxMs": 18.42,
+            "meanMs": 6.69
+          },
+          "rejected429Latency": {
+            "count": 73638,
+            "minMs": 1.59,
+            "p50Ms": 2.81,
+            "p95Ms": 4.56,
+            "p99Ms": 5.71,
+            "maxMs": 14.72,
+            "meanMs": 2.99
+          }
+        },
+        "download": {
+          "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download",
+          "statusCounts": {
+            "200": 90,
+            "429": 73638
+          },
+          "admitted2xxLatency": {
+            "count": 90,
+            "minMs": 4.51,
+            "p50Ms": 6.59,
+            "p95Ms": 10.88,
+            "p99Ms": 13.3,
+            "maxMs": 14.75,
+            "meanMs": 7.12
+          },
+          "rejected429Latency": {
+            "count": 73638,
+            "minMs": 1.58,
+            "p50Ms": 2.83,
+            "p95Ms": 4.57,
+            "p99Ms": 5.75,
+            "maxMs": 19.44,
+            "meanMs": 3.01
+          }
+        },
+        "packageRun": {
+          "path": "/api/v1/platform/artifacts/package-runs/2",
+          "statusCounts": {
+            "200": 90,
+            "429": 73636
+          },
+          "admitted2xxLatency": {
+            "count": 90,
+            "minMs": 3.06,
+            "p50Ms": 4.96,
+            "p95Ms": 10.35,
+            "p99Ms": 11.92,
+            "maxMs": 11.94,
+            "meanMs": 5.6
+          },
+          "rejected429Latency": {
+            "count": 73636,
+            "minMs": 1.56,
+            "p50Ms": 2.81,
+            "p95Ms": 4.56,
+            "p99Ms": 5.73,
+            "maxMs": 16.85,
+            "meanMs": 2.99
+          }
+        },
+        "manifestDocument": {
+          "path": "/api/v1/platform/artifacts/manifests/7/document",
+          "statusCounts": {
+            "200": 90,
+            "429": 73635
+          },
+          "admitted2xxLatency": {
+            "count": 90,
+            "minMs": 9.06,
+            "p50Ms": 12.09,
+            "p95Ms": 20.91,
+            "p99Ms": 24.88,
+            "maxMs": 26.85,
+            "meanMs": 12.88
+          },
+          "rejected429Latency": {
+            "count": 73635,
+            "minMs": 1.57,
+            "p50Ms": 2.81,
+            "p95Ms": 4.56,
+            "p99Ms": 5.76,
+            "maxMs": 23.55,
+            "meanMs": 2.99
+          }
+        }
+      },
+      "rateLimitHeaders": {
+        "policy": [
+          "RateLimit-Limit: 120",
+          "RateLimit-Policy: 120;w=60"
+        ],
+        "retryAfter": {
+          "minSeconds": 1,
+          "maxSeconds": 60
+        }
+      },
+      "watch": {
+        "prod": {
+          "url": "http://localhost:8083/health",
+          "samples": 16,
+          "minMs": 12.26,
+          "maxMs": 23.5,
+          "meanMs": 15.9,
+          "notOkSamples": 0
+        },
+        "dev": {
+          "url": "http://localhost:8081/health",
+          "samples": 16,
+          "minMs": 8.85,
+          "maxMs": 17.19,
+          "meanMs": 12.68,
+          "notOkSamples": 0
+        }
+      },
+      "resourceSamples": {
+        "geostat-api-dev": {
+          "samples": 16,
+          "memLast": "1.679GiB / 7.75GiB",
+          "cpuPercMax": 232.86,
+          "cpuPercMean": 207.09,
+          "memPercMax": 21.68
+        },
+        "geostat-api": {
+          "samples": 16,
+          "memLast": "567.8MiB / 7.75GiB",
+          "cpuPercMax": 2.74,
+          "cpuPercMean": 0.32,
+          "memPercMax": 7.49
+        },
+        "geostat-minio": {
+          "samples": 16,
+          "memLast": "185.9MiB / 7.75GiB",
+          "cpuPercMax": 5.77,
+          "cpuPercMean": 0.43,
+          "memPercMax": 2.34
+        },
+        "geostat-system-mssql": {
+          "samples": 16,
+          "memLast": "1023MiB / 7.75GiB",
+          "cpuPercMax": 8.46,
+          "cpuPercMean": 1.27,
+          "memPercMax": 13.31
+        }
+      },
+      "aborted": null
+    },
+    {
+      "phase": "ramp-c15",
+      "kind": "ramp",
+      "concurrentClients": 15,
+      "plannedDurationSeconds": 180,
+      "measuredDurationSeconds": 181.78,
+      "note": "closed loop, unpaced",
+      "requests": 304780,
+      "offeredRequestsPerSecond": 1676.64,
+      "statusCounts": {
+        "200": 360,
+        "429": 304420
+      },
+      "shares": {
+        "429": 0.9988,
+        "5xx": 0.0,
+        "2xx": 0.0012,
+        "transportError": 0.0
+      },
+      "admittedThroughputRequestsPerMinute": 118.8,
+      "admitted2xxLatencyAllEndpoints": {
+        "count": 360,
+        "minMs": 4.25,
+        "p50Ms": 15.45,
+        "p95Ms": 33.53,
+        "p99Ms": 40.06,
+        "maxMs": 62.6,
+        "meanMs": 17.08
+      },
+      "perEndpoint": {
+        "meta": {
+          "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+          "statusCounts": {
+            "200": 93,
+            "429": 76107
+          },
+          "admitted2xxLatency": {
+            "count": 93,
+            "minMs": 6.53,
+            "p50Ms": 12.98,
+            "p95Ms": 21.37,
+            "p99Ms": 23.41,
+            "maxMs": 25.5,
+            "meanMs": 13.66
+          },
+          "rejected429Latency": {
+            "count": 76107,
+            "minMs": 1.68,
+            "p50Ms": 8.35,
+            "p95Ms": 14.69,
+            "p99Ms": 18.12,
+            "maxMs": 35.93,
+            "meanMs": 8.8
+          }
+        },
+        "download": {
+          "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download",
+          "statusCounts": {
+            "200": 88,
+            "429": 76108
+          },
+          "admitted2xxLatency": {
+            "count": 88,
+            "minMs": 9.16,
+            "p50Ms": 15.6,
+            "p95Ms": 28.15,
+            "p99Ms": 33.11,
+            "maxMs": 39.45,
+            "meanMs": 16.79
+          },
+          "rejected429Latency": {
+            "count": 76108,
+            "minMs": 1.69,
+            "p50Ms": 8.34,
+            "p95Ms": 14.69,
+            "p99Ms": 18.08,
+            "maxMs": 31.03,
+            "meanMs": 8.8
+          }
+        },
+        "packageRun": {
+          "path": "/api/v1/platform/artifacts/package-runs/2",
+          "statusCounts": {
+            "200": 90,
+            "429": 76103
+          },
+          "admitted2xxLatency": {
+            "count": 90,
+            "minMs": 4.25,
+            "p50Ms": 10.41,
+            "p95Ms": 21.3,
+            "p99Ms": 26.45,
+            "maxMs": 27.37,
+            "meanMs": 12.08
+          },
+          "rejected429Latency": {
+            "count": 76103,
+            "minMs": 1.76,
+            "p50Ms": 8.33,
+            "p95Ms": 14.69,
+            "p99Ms": 18.23,
+            "maxMs": 40.24,
+            "meanMs": 8.79
+          }
+        },
+        "manifestDocument": {
+          "path": "/api/v1/platform/artifacts/manifests/7/document",
+          "statusCounts": {
+            "200": 89,
+            "429": 76102
+          },
+          "admitted2xxLatency": {
+            "count": 89,
+            "minMs": 13.92,
+            "p50Ms": 25.24,
+            "p95Ms": 39.08,
+            "p99Ms": 47.43,
+            "maxMs": 62.6,
+            "meanMs": 25.98
+          },
+          "rejected429Latency": {
+            "count": 76102,
+            "minMs": 1.67,
+            "p50Ms": 8.34,
+            "p95Ms": 14.66,
+            "p99Ms": 18.23,
+            "maxMs": 42.27,
+            "meanMs": 8.79
+          }
+        }
+      },
+      "rateLimitHeaders": {
+        "policy": [
+          "RateLimit-Limit: 120",
+          "RateLimit-Policy: 120;w=60"
+        ],
+        "retryAfter": {
+          "minSeconds": 1,
+          "maxSeconds": 60
+        }
+      },
+      "watch": {
+        "prod": {
+          "url": "http://localhost:8083/health",
+          "samples": 16,
+          "minMs": 15.13,
+          "maxMs": 44.37,
+          "meanMs": 21.73,
+          "notOkSamples": 0
+        },
+        "dev": {
+          "url": "http://localhost:8081/health",
+          "samples": 16,
+          "minMs": 15.38,
+          "maxMs": 35.37,
+          "meanMs": 22.74,
+          "notOkSamples": 0
+        }
+      },
+      "resourceSamples": {
+        "geostat-api-dev": {
+          "samples": 16,
+          "memLast": "1.668GiB / 7.75GiB",
+          "cpuPercMax": 241.73,
+          "cpuPercMean": 218.14,
+          "memPercMax": 21.69
+        },
+        "geostat-api": {
+          "samples": 16,
+          "memLast": "568.1MiB / 7.75GiB",
+          "cpuPercMax": 3.5,
+          "cpuPercMean": 0.52,
+          "memPercMax": 7.16
+        },
+        "geostat-minio": {
+          "samples": 16,
+          "memLast": "172.1MiB / 7.75GiB",
+          "cpuPercMax": 1.08,
+          "cpuPercMean": 0.13,
+          "memPercMax": 2.35
+        },
+        "geostat-system-mssql": {
+          "samples": 16,
+          "memLast": "1006MiB / 7.75GiB",
+          "cpuPercMax": 9.57,
+          "cpuPercMean": 1.57,
+          "memPercMax": 12.97
+        }
+      },
+      "aborted": null
+    },
+    {
+      "phase": "ramp-c30",
+      "kind": "ramp",
+      "concurrentClients": 30,
+      "plannedDurationSeconds": 180,
+      "measuredDurationSeconds": 180.01,
+      "note": "closed loop, unpaced",
+      "requests": 333828,
+      "offeredRequestsPerSecond": 1854.49,
+      "statusCounts": {
+        "200": 360,
+        "429": 333468
+      },
+      "shares": {
+        "429": 0.9989,
+        "5xx": 0.0,
+        "2xx": 0.0011,
+        "transportError": 0.0
+      },
+      "admittedThroughputRequestsPerMinute": 120.0,
+      "admitted2xxLatencyAllEndpoints": {
+        "count": 360,
+        "minMs": 5.67,
+        "p50Ms": 28.25,
+        "p95Ms": 62.86,
+        "p99Ms": 94.5,
+        "maxMs": 145.46,
+        "meanMs": 32.51
+      },
+      "perEndpoint": {
+        "meta": {
+          "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+          "statusCounts": {
+            "200": 99,
+            "429": 83370
+          },
+          "admitted2xxLatency": {
+            "count": 99,
+            "minMs": 8.35,
+            "p50Ms": 25.02,
+            "p95Ms": 49.49,
+            "p99Ms": 61.22,
+            "maxMs": 61.25,
+            "meanMs": 26.65
+          },
+          "rejected429Latency": {
+            "count": 83370,
+            "minMs": 1.74,
+            "p50Ms": 15.23,
+            "p95Ms": 28.56,
+            "p99Ms": 35.74,
+            "maxMs": 63.45,
+            "meanMs": 16.12
+          }
+        },
+        "download": {
+          "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download",
+          "statusCounts": {
+            "200": 95,
+            "429": 83366
+          },
+          "admitted2xxLatency": {
+            "count": 95,
+            "minMs": 11.81,
+            "p50Ms": 28.12,
+            "p95Ms": 52.68,
+            "p99Ms": 59.03,
+            "maxMs": 62.05,
+            "meanMs": 29.89
+          },
+          "rejected429Latency": {
+            "count": 83366,
+            "minMs": 1.76,
+            "p50Ms": 15.2,
+            "p95Ms": 28.42,
+            "p99Ms": 35.41,
+            "maxMs": 60.81,
+            "meanMs": 16.09
+          }
+        },
+        "packageRun": {
+          "path": "/api/v1/platform/artifacts/package-runs/2",
+          "statusCounts": {
+            "200": 81,
+            "429": 83370
+          },
+          "admitted2xxLatency": {
+            "count": 81,
+            "minMs": 5.67,
+            "p50Ms": 21.51,
+            "p95Ms": 45.14,
+            "p99Ms": 59.13,
+            "maxMs": 67.06,
+            "meanMs": 23.34
+          },
+          "rejected429Latency": {
+            "count": 83370,
+            "minMs": 1.77,
+            "p50Ms": 15.17,
+            "p95Ms": 28.44,
+            "p99Ms": 35.6,
+            "maxMs": 65.58,
+            "meanMs": 16.08
+          }
+        },
+        "manifestDocument": {
+          "path": "/api/v1/platform/artifacts/manifests/7/document",
+          "statusCounts": {
+            "200": 85,
+            "429": 83362
+          },
+          "admitted2xxLatency": {
+            "count": 85,
+            "minMs": 15.81,
+            "p50Ms": 46.83,
+            "p95Ms": 91.51,
+            "p99Ms": 116.84,
+            "maxMs": 145.46,
+            "meanMs": 50.99
+          },
+          "rejected429Latency": {
+            "count": 83362,
+            "minMs": 1.74,
+            "p50Ms": 15.21,
+            "p95Ms": 28.57,
+            "p99Ms": 35.81,
+            "maxMs": 67.59,
+            "meanMs": 16.11
+          }
+        }
+      },
+      "rateLimitHeaders": {
+        "policy": [
+          "RateLimit-Limit: 120",
+          "RateLimit-Policy: 120;w=60"
+        ],
+        "retryAfter": {
+          "minSeconds": 1,
+          "maxSeconds": 60
+        }
+      },
+      "watch": {
+        "prod": {
+          "url": "http://localhost:8083/health",
+          "samples": 15,
+          "minMs": 10.93,
+          "maxMs": 32.88,
+          "meanMs": 22.05,
+          "notOkSamples": 0
+        },
+        "dev": {
+          "url": "http://localhost:8081/health",
+          "samples": 15,
+          "minMs": 14.66,
+          "maxMs": 60.32,
+          "meanMs": 28.62,
+          "notOkSamples": 0
+        }
+      },
+      "resourceSamples": {
+        "geostat-api-dev": {
+          "samples": 15,
+          "memLast": "1.673GiB / 7.75GiB",
+          "cpuPercMax": 278.01,
+          "cpuPercMean": 253.16,
+          "memPercMax": 21.64
+        },
+        "geostat-api": {
+          "samples": 15,
+          "memLast": "572.6MiB / 7.75GiB",
+          "cpuPercMax": 2.82,
+          "cpuPercMean": 0.47,
+          "memPercMax": 7.26
+        },
+        "geostat-minio": {
+          "samples": 15,
+          "memLast": "185.1MiB / 7.75GiB",
+          "cpuPercMax": 7.78,
+          "cpuPercMean": 0.54,
+          "memPercMax": 2.41
+        },
+        "geostat-system-mssql": {
+          "samples": 15,
+          "memLast": "1008MiB / 7.75GiB",
+          "cpuPercMax": 3.33,
+          "cpuPercMean": 0.94,
+          "memPercMax": 13.93
+        }
+      },
+      "aborted": null
+    },
+    {
+      "phase": "burst-c60",
+      "kind": "burst",
+      "concurrentClients": 60,
+      "plannedDurationSeconds": 60,
+      "measuredDurationSeconds": 60.04,
+      "note": "closed loop, unpaced",
+      "requests": 120712,
+      "offeredRequestsPerSecond": 2010.67,
+      "statusCounts": {
+        "200": 142,
+        "429": 120570
+      },
+      "shares": {
+        "429": 0.9988,
+        "5xx": 0.0,
+        "2xx": 0.0012,
+        "transportError": 0.0
+      },
+      "admittedThroughputRequestsPerMinute": 141.9,
+      "admitted2xxLatencyAllEndpoints": {
+        "count": 142,
+        "minMs": 16.62,
+        "p50Ms": 42.65,
+        "p95Ms": 76.69,
+        "p99Ms": 96.43,
+        "maxMs": 104.93,
+        "meanMs": 44.5
+      },
+      "perEndpoint": {
+        "meta": {
+          "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+          "statusCounts": {
+            "200": 60,
+            "429": 30141
+          },
+          "admitted2xxLatency": {
+            "count": 60,
+            "minMs": 16.99,
+            "p50Ms": 43.51,
+            "p95Ms": 60.55,
+            "p99Ms": 65.82,
+            "maxMs": 66.85,
+            "meanMs": 41.77
+          },
+          "rejected429Latency": {
+            "count": 30141,
+            "minMs": 1.73,
+            "p50Ms": 27.79,
+            "p95Ms": 55.62,
+            "p99Ms": 70.93,
+            "maxMs": 107.89,
+            "meanMs": 29.72
+          }
+        },
+        "download": {
+          "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download",
+          "statusCounts": {
+            "200": 60,
+            "429": 30125
+          },
+          "admitted2xxLatency": {
+            "count": 60,
+            "minMs": 16.62,
+            "p50Ms": 42.94,
+            "p95Ms": 89.26,
+            "p99Ms": 102.05,
+            "maxMs": 104.93,
+            "meanMs": 47.95
+          },
+          "rejected429Latency": {
+            "count": 30125,
+            "minMs": 1.8,
+            "p50Ms": 27.88,
+            "p95Ms": 55.98,
+            "p99Ms": 71.64,
+            "maxMs": 125.47,
+            "meanMs": 29.75
+          }
+        },
+        "packageRun": {
+          "path": "/api/v1/platform/artifacts/package-runs/2",
+          "statusCounts": {
+            "200": 17,
+            "429": 30153
+          },
+          "admitted2xxLatency": {
+            "count": 17,
+            "minMs": 21.73,
+            "p50Ms": 32.47,
+            "p95Ms": 72.97,
+            "p99Ms": 86.57,
+            "maxMs": 89.97,
+            "meanMs": 42.96
+          },
+          "rejected429Latency": {
+            "count": 30153,
+            "minMs": 1.81,
+            "p50Ms": 27.66,
+            "p95Ms": 55.75,
+            "p99Ms": 70.63,
+            "maxMs": 131.82,
+            "meanMs": 29.72
+          }
+        },
+        "manifestDocument": {
+          "path": "/api/v1/platform/artifacts/manifests/7/document",
+          "statusCounts": {
+            "429": 30151,
+            "200": 5
+          },
+          "admitted2xxLatency": {
+            "count": 5,
+            "minMs": 36.64,
+            "p50Ms": 39.32,
+            "p95Ms": 47.86,
+            "p99Ms": 48.89,
+            "maxMs": 49.15,
+            "meanMs": 40.97
+          },
+          "rejected429Latency": {
+            "count": 30151,
+            "minMs": 1.85,
+            "p50Ms": 27.79,
+            "p95Ms": 56.17,
+            "p99Ms": 71.24,
+            "maxMs": 111.07,
+            "meanMs": 29.81
+          }
+        }
+      },
+      "rateLimitHeaders": {
+        "policy": [
+          "RateLimit-Limit: 120",
+          "RateLimit-Policy: 120;w=60"
+        ],
+        "retryAfter": {
+          "minSeconds": 1,
+          "maxSeconds": 60
+        }
+      },
+      "watch": {
+        "prod": {
+          "url": "http://localhost:8083/health",
+          "samples": 5,
+          "minMs": 30.21,
+          "maxMs": 43.59,
+          "meanMs": 35.14,
+          "notOkSamples": 0
+        },
+        "dev": {
+          "url": "http://localhost:8081/health",
+          "samples": 5,
+          "minMs": 29.41,
+          "maxMs": 63.27,
+          "meanMs": 53.01,
+          "notOkSamples": 0
+        }
+      },
+      "resourceSamples": {
+        "geostat-api-dev": {
+          "samples": 5,
+          "memLast": "1.676GiB / 7.75GiB",
+          "cpuPercMax": 274.39,
+          "cpuPercMean": 269.35,
+          "memPercMax": 21.83
+        },
+        "geostat-api": {
+          "samples": 5,
+          "memLast": "578.7MiB / 7.75GiB",
+          "cpuPercMax": 2.7,
+          "cpuPercMean": 0.6,
+          "memPercMax": 7.29
+        },
+        "geostat-minio": {
+          "samples": 5,
+          "memLast": "164.6MiB / 7.75GiB",
+          "cpuPercMax": 4.96,
+          "cpuPercMean": 1.0,
+          "memPercMax": 2.07
+        },
+        "geostat-system-mssql": {
+          "samples": 5,
+          "memLast": "1008MiB / 7.75GiB",
+          "cpuPercMax": 4.69,
+          "cpuPercMean": 1.61,
+          "memPercMax": 12.75
+        }
+      },
+      "aborted": null
+    }
+  ],
+  "productionHealthDuringTest": {
+    "endpoint": "http://localhost:8083/health",
+    "sampleIntervalSeconds": 10,
+    "expected": "\"status\":\"UP\"",
+    "minLatencyMsAcrossPhases": 10.93,
+    "maxLatencyMsAcrossPhases": 44.37,
+    "abortThresholdMs": 3000,
+    "samplesNotUpOrSlow": 0,
+    "verdict": "production stayed UP in every sample and never came within an order of magnitude of the 3000 ms abort threshold"
+  },
+  "recovery": {
+    "action": "docker restart geostat-api-dev (dev only; no other container was restarted)",
+    "dockerRestartCommandSeconds": 0.8,
+    "secondsUntilDockerReportsHealthy": 27.17,
+    "finalHealth": "healthy",
+    "verifiedAfterRestart": {
+      "packageRun": {
+        "path": "/api/v1/platform/artifacts/package-runs/2",
+        "status": 200,
+        "ms": 84.47,
+        "bytes": 2646,
+        "attempts": 1,
+        "transportError": null,
+        "expected": "COMPLETED",
+        "expectedPresent": true
+      },
+      "manifestDocument": {
+        "path": "/api/v1/platform/artifacts/manifests/7/document",
+        "status": 200,
+        "ms": 61.35,
+        "bytes": 190939,
+        "attempts": 1,
+        "transportError": null
+      },
+      "download": {
+        "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download",
+        "status": 200,
+        "ms": 38.37,
+        "bytes": 1673,
+        "attempts": 1,
+        "transportError": null
+      },
+      "meta": {
+        "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+        "status": 200,
+        "ms": 28.11,
+        "bytes": 943,
+        "attempts": 1,
+        "transportError": null
+      }
+    },
+    "verdict": "all four read paths answered 200 on the first attempt after the restart; the governed package run was still COMPLETED and the manifest document was still read from object storage with its checksum verified, so the state of the storage/artifact line is durable and not process-local"
+  },
+  "replayIdempotencyUnderConcurrency": {
+    "action": "10 simultaneous POST /api/v1/platform/artifacts/package-runs with body {\"manifestId\":7}, released by a thread barrier so they contend",
+    "statusCounts": {
+      "202": 10
+    },
+    "distinctRunIds": {
+      "2": 10
+    },
+    "singleIdentity": true,
+    "afterwards": {
+      "GET /api/v1/platform/artifacts/package-runs/2": "200, runId 2, manifestId 7, datasetVersionId 73, status COMPLETED, attempt 1, datasetSnapshotId 53, attachmentChecksum 0737e9c231985f280ad2245ecff71a8af87111876e26e1b9b8ecf234e287949e",
+      "GET /api/v1/platform/artifacts/package-runs/3": "404 — no second run was created"
+    },
+    "verdict": "one run per manifest holds under concurrency: ten contending callers all received 202 with the same runId 2 and no new run was started"
+  },
+  "aborts": "none — no phase hit a production health failure, a dev health failure or the 5 % 5xx threshold",
+  "limits": [
+    "Single machine shared with production and ~40 other containers; the API, MinIO and SQL Server contend for 6 CPUs and 7.75 GiB of RAM, so absolute latency is a property of this host, not a capacity model.",
+    "Total load time was about 11 minutes across five phases. This is a smoke-level performance check, not a soak test; nothing here says anything about behaviour over hours, memory growth, or GC under sustained load.",
+    "The platform rate limit of 120 requests per minute per client key, combined with a single OIDC client identity, capped admitted work at 120 req/min. Backend saturation was therefore never reached and the backend's real throughput ceiling is unknown; what is demonstrated is that admission stays bounded and admitted latency stays bounded while 99.9 % of offered load is rejected cheaply.",
+    "Read-heavy mix only: four GET endpoints (published metadata, signed-URL issue, package-run view, ~190 KB manifest document). No ingestion, upload, matching or snapshot write was driven under load.",
+    "The signed download endpoint was exercised only up to issuing the signed URL; the object bytes were not fetched from MinIO under load, so MinIO was near idle throughout.",
+    "Load was generated on the server over loopback, so client-side network, TLS termination at the edge and real client geography are excluded.",
+    "No publication and no rollback of a publication were performed: publishing snapshot 53 is an owner decision (ADR-007) and was deliberately not taken, so 14.5's rollback leg remains open.",
+    "Recovery covered one API container restart. Database, object storage and Keycloak restarts were not tested because they are shared with production."
+  ],
+  "safety": {
+    "productionContainersTouched": "none",
+    "productionDatabaseRead": "no",
+    "containersRestarted": [
+      "geostat-api-dev"
+    ],
+    "packageRunsStarted": "none new; the 10 POSTs were absorbed by the existing run 2 for manifest 7 and no run was started for any other manifest",
+    "secretsInThisFile": "none — no token, client secret or signed URL is recorded here",
+    "serverSideTempFiles": "created under /tmp/geostat-load (0700) and removed by `remote-load-phase.sh teardown` after the run"
+  },
+  "reproduce": {
+    "setup": "ops/tests/load/remote-load-phase.sh setup",
+    "baseline": "ops/tests/load/remote-load-phase.sh run baseline-c1 --base-url http://localhost:8081 --endpoint meta=/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128 --endpoint download=/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download --endpoint packageRun=/api/v1/platform/artifacts/package-runs/2 --endpoint manifestDocument=/api/v1/platform/artifacts/manifests/7/document --concurrency 1 --duration 60 --pace-ms 600 --watch-url prod=http://localhost:8083/health --watch-url dev=http://localhost:8081/health --watch-expect '\"status\":\"UP\"' --watch-timeout 3 --abort-watch-latency-ms 3000 --abort-5xx-share 0.05 --sample-interval 10 --keep-samples --docker-container geostat-api-dev --docker-container geostat-api --docker-container geostat-minio --docker-container geostat-system-mssql",
+    "rampAndBurst": "the same invocation with --concurrency 5|15|30|60, --duration 180|180|180|60 and no --pace-ms",
+    "recovery": "ops/tests/load/remote-load-phase.sh run --probe recovery_probe.py recovery-and-idempotency --base-url http://localhost:8081 --restart geostat-api-dev --health-timeout 300 --verify packageRun=/api/v1/platform/artifacts/package-runs/2 --verify manifestDocument=/api/v1/platform/artifacts/manifests/7/document --verify download=/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download --verify meta=/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128 --expect packageRun=COMPLETED --idempotent-post /api/v1/platform/artifacts/package-runs --body '{\"manifestId\":7}' --parallel 10 --identity-key runId",
+    "teardown": "ops/tests/load/remote-load-phase.sh teardown",
+    "rawPhaseOutput": "ops/tests/load/out/*.json (gitignored; per-request percentiles, every 10 s watch sample and every docker stats sample)"
+  }
+}
