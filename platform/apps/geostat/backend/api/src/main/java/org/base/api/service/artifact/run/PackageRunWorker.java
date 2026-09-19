@@ -1,6 +1,7 @@
 package org.base.api.service.artifact.run;
 
 import jakarta.annotation.PostConstruct;
+import org.base.api.security.tenancy.CurrentCaller;
 import org.base.api.service.platform.PlatformJobLeaseService;
 import org.base.api.service.platform.PlatformSchemaReadiness;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ public class PackageRunWorker {
     private final PackageRunRepository repository;
     private final PlatformJobLeaseService lease;
     private final PlatformSchemaReadiness schemaReadiness;
+    private final CurrentCaller callers;
     private final boolean enabled;
     private final int batchSize;
     private final int leaseMinutes;
@@ -26,7 +28,7 @@ public class PackageRunWorker {
     private final int staleRunningSeconds;
 
     public PackageRunWorker(PackageRunService runs, PackageRunRepository repository, PlatformJobLeaseService lease,
-                            PlatformSchemaReadiness schemaReadiness,
+                            PlatformSchemaReadiness schemaReadiness, CurrentCaller callers,
                             @Value("${platform.artifacts.package-run.enabled:true}") boolean enabled,
                             @Value("${platform.artifacts.package-run.batch-size:5}") int batchSize,
                             @Value("${platform.artifacts.package-run.lease-minutes:30}") int leaseMinutes,
@@ -36,6 +38,7 @@ public class PackageRunWorker {
         this.repository = repository;
         this.lease = lease;
         this.schemaReadiness = schemaReadiness;
+        this.callers = callers;
         this.enabled = enabled;
         this.batchSize = batchSize;
         this.leaseMinutes = leaseMinutes;
@@ -57,7 +60,9 @@ public class PackageRunWorker {
                 // Renewed per run: one long stage must not let a second node start the same work.
                 if (!lease.acquire(JOB_NAME, leaseMinutes)) return;
                 try {
-                    runs.advance(runId);
+                    // A worker has no request caller. It runs as the explicit SYSTEM caller, never as an
+                    // absent one, so a stage can never pass a tenancy check by accident.
+                    callers.asSystem(JOB_NAME, () -> runs.advance(runId));
                 } catch (RuntimeException failure) {
                     log.warn("artifact.package_run advance failed run={} exception={}", runId, failure.getClass().getSimpleName());
                 }

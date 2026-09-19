@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.base.api.security.tenancy.TenantScoped;
 
+@TenantScoped
 @Api
 @RestController
 @RequestMapping("/platform/contracts")

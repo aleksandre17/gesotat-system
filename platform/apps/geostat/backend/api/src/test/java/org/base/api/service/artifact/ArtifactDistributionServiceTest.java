@@ -1,5 +1,6 @@
 package org.base.api.service.artifact;
 
+import org.base.api.security.tenancy.TenantAccessGuards;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.ObjectProvider;
 
@@ -31,7 +32,7 @@ class ArtifactDistributionServiceTest {
                 42, "a".repeat(64), "geostat-ingest", "artifacts/sha256/a.xlsx", VerificationStatus.VERIFIED)));
 
         ArtifactDistributionService service = new ArtifactDistributionService(attachments, contracts, store,
-                new ArtifactMetrics(metricsProvider), clockProvider);
+                new ArtifactMetrics(metricsProvider), TenantAccessGuards.permitAll(), clockProvider);
         var response = service.list("KIDS_RESOURCE", "resource|128");
 
         assertEquals("PUBLIC_WHEN_PUBLISHED", response.artifacts().get(0).download().mode());
@@ -54,7 +55,7 @@ class ArtifactDistributionServiceTest {
                 42, "a".repeat(64), "geostat-ingest", "artifacts/sha256/a.xlsx", VerificationStatus.VERIFIED)));
 
         ArtifactDistributionService service = new ArtifactDistributionService(attachments, contracts, store,
-                new ArtifactMetrics(mock(ObjectProvider.class)), clockProvider);
+                new ArtifactMetrics(mock(ObjectProvider.class)), TenantAccessGuards.permitAll(), clockProvider);
 
         assertThrows(IllegalStateException.class, () -> service.list("KIDS_RESOURCE", "resource|128"));
     }

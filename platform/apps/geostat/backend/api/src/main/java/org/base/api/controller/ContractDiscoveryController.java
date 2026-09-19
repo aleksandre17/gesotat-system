@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
+import org.base.api.security.tenancy.TenantScoped;
 
+@TenantScoped
 @Api @RestController @RequestMapping("/platform/contracts")
 public class ContractDiscoveryController {
     private final ContractOpenApiService openApi; private final ContractCompatibilityService compatibility; private final ContractClientGeneratorService clients;

@@ -26,7 +26,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
-import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.base.core.security.OidcAudienceValidator;
 import org.base.core.security.OidcRequiredClaimValidator;
 import org.base.core.security.OidcAuthoritiesConverter;
@@ -44,6 +45,7 @@ import java.util.Locale;
 @Order(1)
 @ConditionalOnProperty(name = "security.type", havingValue = "api")
 public class ApiSecurityConfig {
+    static final long MAX_CLOCK_SKEW_SECONDS = 120;
 
     //private final JwtRequestFilter jwtFilter;
     private final UserDetailsService userDetailsService;
@@ -60,20 +62,30 @@ public class ApiSecurityConfig {
     @Value("${platform.oidc.roles-claim:realm_access.roles}") private String oidcRolesClaim;
     @Value("${platform.oidc.role-authority-map:contract.read=READ_RESOURCE;contract.write=WRITE_RESOURCE;ingest.execute=WRITE_RESOURCE;quality.approve=PUBLISH_RESOURCE;publish.execute=PUBLISH_RESOURCE;raw.read=READ_RESOURCE;admin=ADMIN}") private String oidcRoleAuthorityMap;
     @Value("${platform.oidc.tenant-claim:tenant_id}") private String oidcTenantClaim;
+    /** Tolerated clock difference between the issuer and this API when exp/nbf are checked; an explicit, bounded number. */
+    @Value("${platform.oidc.clock-skew-seconds:60}") private long oidcClockSkewSeconds;
 
     /** Optional standards-based resource-server mode; disabled unless explicitly enabled. */
     @Bean
     @ConditionalOnProperty(name = "platform.oidc.enabled", havingValue = "true")
     public JwtDecoder oidcJwtDecoder() {
         validateOidcSettings(oidcIssuer, oidcAudience);
-        OAuth2TokenValidator<Jwt> issuer = JwtValidators.createDefaultWithIssuer(oidcIssuer);
+        OAuth2TokenValidator<Jwt> issuer = new JwtIssuerValidator(oidcIssuer);
+        OAuth2TokenValidator<Jwt> timestamps = new JwtTimestampValidator(clockSkew(oidcClockSkewSeconds));
         OidcAudienceValidator audience = new OidcAudienceValidator(oidcAudience);
         OidcRequiredClaimValidator tenant = new OidcRequiredClaimValidator(oidcTenantClaim);
         NimbusJwtDecoder decoder = NimbusJwtDecoder.withIssuerLocation(oidcIssuer).build();
-        OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(issuer,
+        OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(timestamps, issuer,
                 audience, tenant);
         decoder.setJwtValidator(validator);
         return decoder;
+    }
+
+    /** Skew is a security parameter: negative, or wider than two minutes, is refused at startup. */
+    static java.time.Duration clockSkew(long seconds) {
+        if (seconds < 0 || seconds > MAX_CLOCK_SKEW_SECONDS)
+            throw new IllegalStateException("platform.oidc.clock-skew-seconds must be between 0 and " + MAX_CLOCK_SKEW_SECONDS);
+        return java.time.Duration.ofSeconds(seconds);
     }
 
     static void validateOidcSettings(String issuer, String audience) {
@@ -144,8 +156,10 @@ public class ApiSecurityConfig {
         if (oidcEnabled) {
             JwtAuthenticationConverter authenticationConverter = new JwtAuthenticationConverter();
             authenticationConverter.setJwtGrantedAuthoritiesConverter(new OidcAuthoritiesConverter(oidcRolesClaim, oidcRoleAuthorityMap));
-            http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(oidcJwtDecoder())
-                    .jwtAuthenticationConverter(authenticationConverter)));
+            http.oauth2ResourceServer(oauth2 -> oauth2
+                    .authenticationEntryPoint(apiAccessDeniedHandler)
+                    .accessDeniedHandler(apiAccessDeniedHandler)
+                    .jwt(jwt -> jwt.decoder(oidcJwtDecoder()).jwtAuthenticationConverter(authenticationConverter)));
         } else {
             http.addFilterBefore(apiFilter, UsernamePasswordAuthenticationFilter.class);
         }

@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import org.base.api.security.tenancy.TenantAccessGuard;
 
 /**
  * The first write boundary of the canonical platform. It only creates a
@@ -21,16 +22,21 @@ import java.util.List;
 public class PlatformIngestionService {
     private final JdbcTemplate controlPlane;
     private final JdbcTemplate dataPlane;
+    private final TenantAccessGuard tenants;
 
     public PlatformIngestionService(@Qualifier("primaryJdbcTemplate") JdbcTemplate controlPlane,
-                                    @Qualifier("dataPlaneJdbcTemplate") JdbcTemplate dataPlane) {
+                                    @Qualifier("dataPlaneJdbcTemplate") JdbcTemplate dataPlane,
+                                    TenantAccessGuard tenants) {
         this.controlPlane = controlPlane;
         this.dataPlane = dataPlane;
+        this.tenants = tenants;
     }
 
     @Transactional(transactionManager = "dataPlaneTransactionManager")
     public PlatformIngestReceipt stage(PlatformIngestRequest request) {
         validate(request);
+        // The body names the product; this is the tenancy enforcement point of the staging route.
+        tenants.requireProductId(request.productId());
         Integer approved = controlPlane.queryForObject("SELECT COUNT(*) FROM platform.ingestion_contract c " +
                 "JOIN platform.dataset d ON d.dataset_id=c.dataset_id JOIN platform.dataset_version v ON v.dataset_id=d.dataset_id " +
                 "WHERE c.contract_id=? AND d.product_id=? AND v.dataset_version_id=? AND c.status='ACTIVE'", Integer.class,

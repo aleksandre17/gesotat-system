@@ -19,7 +19,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.base.api.security.tenancy.TenantNeutral;
 
+@TenantNeutral(reason = "Static demo payloads behind the ADMIN authority; no platform data is read. LEGACY: it is a development stub and should be removed.", legacy = true)
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/test")

@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import org.base.api.security.tenancy.TenantAccessGuards;
 
 class PackageRunServiceTest {
     private final PackageRunRepository runs = mock(PackageRunRepository.class);
@@ -145,7 +146,7 @@ class PackageRunServiceTest {
     private PackageRunService service(PackageRunStage... stages) {
         PlatformTransactionManager transactions = mock(PlatformTransactionManager.class);
         when(transactions.getTransaction(any())).thenReturn(new SimpleTransactionStatus());
-        return new PackageRunService(List.of(stages), runs, transactions);
+        return new PackageRunService(List.of(stages), runs, transactions, TenantAccessGuards.permitAll());
     }
 
     private interface StageBody {

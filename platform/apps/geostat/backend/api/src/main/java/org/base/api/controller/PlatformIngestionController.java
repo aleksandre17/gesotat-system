@@ -18,8 +18,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.base.api.security.tenancy.TenantScoped;
+import org.base.api.security.tenancy.TenantScopeExemption;
 
 /** Staging endpoint for a contract-resolved artifact; publication is a separate governed operation. */
+@TenantScoped
 @Api
 @RestController
 @RequestMapping("/platform/ingestion")
@@ -32,6 +35,7 @@ public class PlatformIngestionController {
 
     @PostMapping("/stage")
     @PreAuthorize("hasAuthority('WRITE_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.SERVICE_ENFORCED, reason = "productId arrives in the request body; PlatformIngestionService.stage enforces it before any staging write.")
     public ResponseEntity<PlatformIngestReceipt> stage(@RequestBody PlatformIngestRequest request) {
         return ResponseEntity.ok(ingestionService.stage(request));
     }
@@ -44,12 +48,14 @@ public class PlatformIngestionController {
 
     @PostMapping("/prepare-snapshot")
     @PreAuthorize("hasAuthority('WRITE_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.SERVICE_ENFORCED, reason = "datasetLoadId arrives in the request body; PlatformSnapshotPreparationService.prepare enforces it.")
     public ResponseEntity<Long> prepareSnapshot(@RequestBody PrepareSnapshotRequest request) {
         return ResponseEntity.ok(snapshotPreparationService.prepare(request));
     }
 
     @PostMapping("/materialize")
     @PreAuthorize("hasAuthority('WRITE_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.SERVICE_ENFORCED, reason = "datasetSnapshotId arrives in the request body; SemanticMaterializationService.materialize enforces it.")
     public ResponseEntity<MaterializationReceipt> materialize(@RequestBody MaterializeRequest request) {
         return ResponseEntity.ok(semanticMaterializationService.materialize(request));
     }

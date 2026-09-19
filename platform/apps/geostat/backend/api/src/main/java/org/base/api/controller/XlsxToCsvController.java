@@ -27,7 +27,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.base.api.security.tenancy.TenantNeutral;
 
+@TenantNeutral(reason = "Stateless spreadsheet-to-CSV conversion of a caller-supplied file or URL; no platform data plane is touched. LEGACY: it also fetches caller-supplied URLs and should be retired or given a dedicated authority and an egress allow-list.", legacy = true)
 @RestController
 @RequestMapping("/xlsx-to-csv")
 @PreAuthorize("hasAuthority('READ_RESOURCE')")

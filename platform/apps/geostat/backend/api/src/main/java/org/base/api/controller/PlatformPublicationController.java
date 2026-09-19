@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.base.api.security.tenancy.TenantScoped;
+import org.base.api.security.tenancy.TenantScopeExemption;
 
+@TenantScoped
 @Api
 @RestController
 @RequestMapping("/platform/publication")
@@ -32,12 +35,14 @@ public class PlatformPublicationController {
 
     @PostMapping("/publish")
     @PreAuthorize("hasAuthority('PUBLISH_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.SERVICE_ENFORCED, reason = "productId arrives in the request body; PlatformPublicationService.publish enforces it at the single point where the product is resolved.")
     public ResponseEntity<PublicationReceipt> publish(@RequestBody PublishSnapshotRequest request) {
         return ResponseEntity.ok(publicationService.publish(request));
     }
 
     @PostMapping("/rollback")
     @PreAuthorize("hasAuthority('PUBLISH_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.SERVICE_ENFORCED, reason = "productId arrives in the request body; PlatformPublicationService.rollback enforces it at the single point where the product is resolved.")
     public ResponseEntity<PublicationReceipt> rollback(@RequestBody RollbackPublicationRequest request) {
         return ResponseEntity.ok(publicationService.rollback(request));
     }

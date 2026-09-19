@@ -8,13 +8,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
+import org.base.api.security.tenancy.TenantScoped;
+import org.base.api.security.tenancy.TenantScopeExemption;
 
+@TenantScoped
 @Api @RestController @RequestMapping("/platform/operations")
 public class PlatformAsyncOperationController {
     private final PlatformAsyncOperationService operations;
     private final ApprovedContractResolver contracts;
     public PlatformAsyncOperationController(PlatformAsyncOperationService operations,ApprovedContractResolver contracts){this.operations=operations;this.contracts=contracts;}
     @PostMapping("/exports") @PreAuthorize("hasAuthority('READ_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.DEFAULT_CONTRACT, reason = "contractCode is optional; the controller falls back to the approved default contract, which the interceptor resolves and enforces.")
     public ResponseEntity<Map<String,Object>> submit(@RequestParam(required=false) String contractCode,@RequestParam int pageId,@RequestHeader(value="Idempotency-Key",required=false) String idempotencyKey,@RequestBody Map<String,Object> request,Authentication authentication){contractCode=(contractCode==null||contractCode.isBlank())?contracts.resolve():contractCode;if(contractCode==null||contractCode.isBlank())throw new IllegalStateException("No approved contract is available");return ResponseEntity.accepted().body(operations.submit(contractCode,pageId,idempotencyKey,request,actor(authentication)));}
     @GetMapping("/{operationId}") @PreAuthorize("hasAuthority('READ_RESOURCE')")
     public ResponseEntity<Map<String,Object>> status(@PathVariable long operationId,Authentication authentication){return ResponseEntity.ok(operations.status(operationId,actor(authentication),admin(authentication)));}

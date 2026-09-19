@@ -5,6 +5,7 @@ import org.base.api.service.publication.gate.ReleaseGateService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.base.api.security.tenancy.TenantAccessGuard;
 
 /** Controlled release boundary. It publishes only a prepared snapshot and emits an archive/outbox event. */
 @Service
@@ -16,11 +17,13 @@ public class PlatformPublicationService {
     private final PlatformClassificationMirrorService classifications;
     private final ArtifactReconciliationService artifactGate;
     private final ReleaseGateService releaseGates;
+    private final TenantAccessGuard tenants;
 
     public PlatformPublicationService(@Qualifier("dataPlaneJdbcTemplate") JdbcTemplate dataPlane,
                                       @Qualifier("primaryJdbcTemplate") JdbcTemplate controlPlane,
                                       DataPlanePublicationWriter dataPlaneWriter, PublicationControlStore controlStore, PlatformClassificationMirrorService classifications,
-                                      ArtifactReconciliationService artifactGate, ReleaseGateService releaseGates) {
+                                      ArtifactReconciliationService artifactGate, ReleaseGateService releaseGates,
+                                      TenantAccessGuard tenants) {
         this.dataPlane = dataPlane;
         this.controlPlane = controlPlane;
         this.dataPlaneWriter = dataPlaneWriter;
@@ -28,10 +31,13 @@ public class PlatformPublicationService {
         this.classifications = classifications;
         this.artifactGate = artifactGate;
         this.releaseGates = releaseGates;
+        this.tenants = tenants;
     }
 
+    /** The body names the product, so this is the tenancy enforcement point of the publish route. */
     public PublicationReceipt publish(PublishSnapshotRequest request) {
         validate(request);
+        tenants.requireProductId(request.productId());
         assertApprovedContract(request.productId());
         Long rowCount = dataPlane.query("SELECT row_count FROM publication.dataset_snapshot WHERE dataset_snapshot_id=? AND dataset_version_id=? AND status='REVIEW_REQUIRED'",
                 rs -> rs.next() ? rs.getLong(1) : null, request.datasetSnapshotId(), request.datasetVersionId());
@@ -56,7 +62,9 @@ public class PlatformPublicationService {
         if (ok == null || ok == 0) throw new IllegalStateException("Publication requires an ACTIVE ingestion contract and APPROVED site/ingestion revision");
     }
 
+    /** The body names the product, so this is the tenancy enforcement point of the rollback route. */
     public PublicationReceipt rollback(RollbackPublicationRequest request) {
+        tenants.requireProductId(request.productId());
         if (request.productId() <= 0 || request.targetPublicationSnapshotId() <= 0)
             throw new IllegalArgumentException("Rollback identifiers must be positive");
         PublicationReceipt receipt = dataPlaneWriter.rollback(request);

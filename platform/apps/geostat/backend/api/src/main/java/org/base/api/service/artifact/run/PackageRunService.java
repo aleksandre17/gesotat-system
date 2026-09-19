@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import org.base.api.security.tenancy.TenantAccessGuard;
 
 /**
  * Governed orchestration facade over the complete package pipeline (artifact contract §26). The
@@ -27,24 +28,29 @@ public class PackageRunService {
     private final List<PackageRunStage> stages;
     private final PackageRunRepository runs;
     private final TransactionTemplate transaction;
+    private final TenantAccessGuard tenants;
 
     /** Progress surface: the run plus its append-only stage history. */
     public record RunView(PackageRun run, List<String> pipeline, List<PackageRunRepository.StageRecord> history) {}
 
     public PackageRunService(List<PackageRunStage> stages, PackageRunRepository runs,
-                             @Qualifier("dataPlaneTransactionManager") PlatformTransactionManager transactionManager) {
+                             @Qualifier("dataPlaneTransactionManager") PlatformTransactionManager transactionManager,
+                             TenantAccessGuard tenants) {
         this.stages = stages.stream().sorted(Comparator.comparingInt(PackageRunStage::order)).toList();
         if (this.stages.isEmpty()) throw new IllegalStateException("A package run needs at least one stage");
         if (this.stages.stream().map(PackageRunStage::code).distinct().count() != this.stages.size()
                 || this.stages.stream().mapToInt(PackageRunStage::order).distinct().count() != this.stages.size())
             throw new IllegalStateException("Package run stages must have unique codes and orders");
         this.runs = runs;
+        this.tenants = tenants;
         this.transaction = new TransactionTemplate(transactionManager);
     }
 
     /** Idempotent per manifest: the same package checksum always maps to the same run. */
     public RunView start(long manifestId, String requestedBy) {
         if (requestedBy == null || requestedBy.isBlank()) throw new IllegalArgumentException("Requester identity is required");
+        // The manifest arrives in the body; this is the tenancy enforcement point of the start route.
+        tenants.requireManifest(manifestId);
         long runId = transaction.execute(status -> runs.lockByManifest(manifestId).map(PackageRun::runId).orElseGet(() -> {
             var manifest = runs.manifest(manifestId).orElseThrow(() -> new ArtifactNotFoundException("Manifest " + manifestId + " not found"));
             if (manifest.datasetVersionId() == null)

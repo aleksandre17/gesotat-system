@@ -4,20 +4,26 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.base.api.security.tenancy.TenantAccessGuard;
 
 /** Materializes validated source rows as an immutable raw dataset snapshot awaiting semantic review. */
 @Service
 public class PlatformSnapshotPreparationService {
     private final JdbcTemplate dataPlane;
+    private final TenantAccessGuard tenants;
 
-    public PlatformSnapshotPreparationService(@Qualifier("dataPlaneJdbcTemplate") JdbcTemplate dataPlane) {
+    public PlatformSnapshotPreparationService(@Qualifier("dataPlaneJdbcTemplate") JdbcTemplate dataPlane,
+                                              TenantAccessGuard tenants) {
         this.dataPlane = dataPlane;
+        this.tenants = tenants;
     }
 
     @Transactional(transactionManager = "dataPlaneTransactionManager")
     public long prepare(PrepareSnapshotRequest request) {
         if (request.datasetLoadId() <= 0 || request.artifactId() <= 0 || request.checksum() == null || !request.checksum().matches("[A-Fa-f0-9]{64}"))
             throw new IllegalArgumentException("Valid datasetLoadId, artifactId and SHA-256 checksum are required");
+        // The body names the dataset load; this is the tenancy enforcement point of the prepare route.
+        tenants.requireDatasetLoad(request.datasetLoadId());
         PreparationContext context = dataPlane.query(
                 "SELECT l.dataset_version_id,l.status,a.checksum FROM ingest.dataset_load l " +
                         "JOIN ingest.artifact a ON a.batch_id=l.batch_id AND a.artifact_id=? WHERE l.dataset_load_id=?",

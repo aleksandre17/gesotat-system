@@ -1,0 +1,389 @@
+{
+  "target": {
+    "name": "remote dev API, container geostat-api-dev, reached on the server itself",
+    "baseUrl": "http://localhost:8081"
+  },
+  "timeoutSeconds": 30,
+  "paceMs": 350,
+  "referenceIdentity": "operator",
+  "forgedIssuer": "https://auth.geostat.internal/realms/zz-sectest-forged",
+  "unsafeCorrelationId": "<script>alert(1)</script> ../../etc/passwd",
+  "correlationHeader": "X-Correlation-Id",
+  "unmappedPath": "/api/v1/zz-sectest-no-such-route",
+  "unmappedExpect": [401, 404],
+
+  "headerContracts": {
+    "unauthenticated401": {
+      "Content-Type": "application/problem+json",
+      "WWW-Authenticate": "Bearer",
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff"
+    },
+    "rejectedToken401": {
+      "Content-Type": "application/problem+json",
+      "WWW-Authenticate": { "startsWith": "Bearer error=\"invalid_token\"" },
+      "Cache-Control": { "contains": "no-store" },
+      "X-Content-Type-Options": "nosniff"
+    },
+    "missingAuthority403": {
+      "Content-Type": "application/problem+json",
+      "WWW-Authenticate": { "startsWith": "Bearer error=\"insufficient_scope\"" },
+      "Cache-Control": { "contains": "no-store" },
+      "X-Content-Type-Options": "nosniff"
+    },
+    "tenantDenied403": {
+      "Content-Type": "application/problem+json",
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff"
+    }
+  },
+  "headerProfiles": {
+    "default": "rejectedToken401",
+    "byCase": {
+      "authn.anonymous": "unauthenticated401",
+      "authn.basic": "unauthenticated401"
+    }
+  },
+
+  "oidc": {
+    "issuer": "https://auth.geostat.internal/realms/geostat",
+    "audience": "geostat-api",
+    "rolesClaim": "realm_access.roles",
+    "tenantClaim": "tenant_id",
+    "discoveryUrl": "https://auth.geostat.internal/realms/geostat/.well-known/openid-configuration",
+    "jwksUrl": "https://auth.geostat.internal/realms/geostat/protocol/openid-connect/certs",
+    "realmUrl": "https://auth.geostat.internal/realms/geostat",
+    "tls": {
+      "caCert": "/home/administrator/geostat/backend/infra/geostat-platform/edge/tls/tls.crt",
+      "resolve": "auth.geostat.internal:443:127.0.0.1"
+    }
+  },
+
+  "identities": [
+    {
+      "name": "operator",
+      "description": "the deployment's confidential service client (read+write+publish roles, home tenant)",
+      "tokenCommand": "curl -sk --max-time 20 --resolve {{TOKEN_RESOLVE}} {{TOKEN_URL}} --data @{{REMOTE_DIR}}/reference.tokenreq | python3 -c 'import sys,json; print(json.load(sys.stdin).get(\"access_token\",\"\"))'"
+    },
+    {
+      "name": "zz-sectest-no-audience",
+      "description": "authority-signed token whose audience does not include the API",
+      "expect": { "group": "authn", "status": 401 },
+      "tokenCommand": "curl -sk --max-time 20 --resolve {{TOKEN_RESOLVE}} {{TOKEN_URL}} --data @{{REMOTE_DIR}}/zz-sectest-no-audience.tokenreq | python3 -c 'import sys,json; print(json.load(sys.stdin).get(\"access_token\",\"\"))'"
+    },
+    {
+      "name": "zz-sectest-no-tenant",
+      "description": "authority-signed token with the right audience but without the required tenant claim",
+      "expect": { "group": "authn", "status": 401 },
+      "tokenCommand": "curl -sk --max-time 20 --resolve {{TOKEN_RESOLVE}} {{TOKEN_URL}} --data @{{REMOTE_DIR}}/zz-sectest-no-tenant.tokenreq | python3 -c 'import sys,json; print(json.load(sys.stdin).get(\"access_token\",\"\"))'"
+    },
+    {
+      "name": "zz-sectest-short-lifespan",
+      "description": "genuine token used 75 s after its one-second lifetime has elapsed",
+      "expect": { "group": "authn", "status": 401 },
+      "sleepBeforeUseSeconds": 75,
+      "tokenCommand": "curl -sk --max-time 20 --resolve {{TOKEN_RESOLVE}} {{TOKEN_URL}} --data @{{REMOTE_DIR}}/zz-sectest-short-lifespan.tokenreq | python3 -c 'import sys,json; print(json.load(sys.stdin).get(\"access_token\",\"\"))'"
+    },
+    {
+      "name": "zz-sectest-short-lifespan-within-skew",
+      "description": "the same one-second token used 5 s after it expired, i.e. inside the deployment's declared clock-skew window (OIDC_CLOCK_SKEW_SECONDS=60)",
+      "expect": {
+        "group": "authn",
+        "status": 401,
+        "toleratedAs": {
+          "verdict": "WITHIN_DECLARED_SKEW",
+          "status": [200],
+          "declaration": "OIDC_CLOCK_SKEW_SECONDS=60 (bounded 0..120); acceptance inside that window is configuration, not an absent control"
+        }
+      },
+      "sleepBeforeUseSeconds": 5,
+      "tokenCommand": "curl -sk --max-time 20 --resolve {{TOKEN_RESOLVE}} {{TOKEN_URL}} --data @{{REMOTE_DIR}}/zz-sectest-short-lifespan.tokenreq | python3 -c 'import sys,json; print(json.load(sys.stdin).get(\"access_token\",\"\"))'"
+    },
+    {
+      "name": "zz-sectest-no-roles",
+      "description": "fully valid token that carries no role at all",
+      "tokenCommand": "curl -sk --max-time 20 --resolve {{TOKEN_RESOLVE}} {{TOKEN_URL}} --data @{{REMOTE_DIR}}/zz-sectest-no-roles.tokenreq | python3 -c 'import sys,json; print(json.load(sys.stdin).get(\"access_token\",\"\"))'"
+    },
+    {
+      "name": "zz-sectest-blank-tenant",
+      "description": "the tenant claim is present but whitespace only",
+      "expect": { "group": "authn", "status": 401 },
+      "tokenCommand": "curl -sk --max-time 20 --resolve {{TOKEN_RESOLVE}} {{TOKEN_URL}} --data @{{REMOTE_DIR}}/zz-sectest-blank-tenant.tokenreq | python3 -c 'import sys,json; print(json.load(sys.stdin).get(\"access_token\",\"\"))'"
+    },
+    {
+      "name": "zz-sectest-foreign-tenant",
+      "description": "valid token with the read role but a tenant value that owns none of the data",
+      "tokenCommand": "curl -sk --max-time 20 --resolve {{TOKEN_RESOLVE}} {{TOKEN_URL}} --data @{{REMOTE_DIR}}/zz-sectest-foreign-tenant.tokenreq | python3 -c 'import sys,json; print(json.load(sys.stdin).get(\"access_token\",\"\"))'"
+    },
+    {
+      "name": "zz-sectest-foreign-tenant-writer",
+      "description": "read+write roles and a foreign tenant, for the id-addressed routes that demand the write authority",
+      "tokenCommand": "curl -sk --max-time 20 --resolve {{TOKEN_RESOLVE}} {{TOKEN_URL}} --data @{{REMOTE_DIR}}/zz-sectest-foreign-tenant-writer.tokenreq | python3 -c 'import sys,json; print(json.load(sys.stdin).get(\"access_token\",\"\"))'"
+    },
+    {
+      "name": "zz-sectest-own-tenant",
+      "description": "POSITIVE CONTROL: read role, the product's own tenant, no cross-tenant authority",
+      "tokenCommand": "curl -sk --max-time 20 --resolve {{TOKEN_RESOLVE}} {{TOKEN_URL}} --data @{{REMOTE_DIR}}/zz-sectest-own-tenant.tokenreq | python3 -c 'import sys,json; print(json.load(sys.stdin).get(\"access_token\",\"\"))'"
+    },
+    {
+      "name": "zz-sectest-own-tenant-writer",
+      "description": "POSITIVE CONTROL: read+write roles, the product's own tenant, no cross-tenant authority",
+      "tokenCommand": "curl -sk --max-time 20 --resolve {{TOKEN_RESOLVE}} {{TOKEN_URL}} --data @{{REMOTE_DIR}}/zz-sectest-own-tenant-writer.tokenreq | python3 -c 'import sys,json; print(json.load(sys.stdin).get(\"access_token\",\"\"))'"
+    }
+  ],
+
+  "endpoints": {
+    "public": { "method": "GET", "path": "/health" },
+    "read": {
+      "method": "GET",
+      "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+      "identityExpectations": [
+        { "identity": "zz-sectest-own-tenant", "status": 200, "requireNonEmpty": "artifacts",
+          "intent": "POSITIVE CONTROL: read role and the product's own tenant, WITHOUT the cross-tenant authority" },
+        { "identity": "operator", "status": 200,
+          "intent": "the reference identity now also holds the cross-tenant authority, so its 200 no longer proves same-tenant access" },
+        { "identity": "zz-sectest-no-roles", "status": 403, "headerProfile": "missingAuthority403",
+          "intent": "no authority at all" },
+        { "identity": "zz-sectest-foreign-tenant", "status": 404,
+          "intent": "a foreign tenant's object is masked as absent on the distribution boundary (no existence oracle)" }
+      ]
+    },
+    "readUnknownKey": {
+      "method": "GET",
+      "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/zz-sectest-unknown-external-key",
+      "identityExpectations": [
+        { "identity": "zz-sectest-own-tenant", "status": 404,
+          "intent": "the same boundary's answer for an object that does not exist at all" }
+      ]
+    },
+    "signedDownload": {
+      "method": "GET",
+      "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download",
+      "identityExpectations": [
+        { "identity": "zz-sectest-own-tenant", "status": 200,
+          "intent": "POSITIVE CONTROL: the own-tenant identity can have a governed download URL issued" },
+        { "identity": "zz-sectest-foreign-tenant", "status": 404,
+          "intent": "the same issue endpoint masks a foreign tenant's entity as absent" }
+      ]
+    },
+    "idAddressedPackageRun": {
+      "method": "GET",
+      "path": "/api/v1/platform/artifacts/package-runs/2",
+      "identityExpectations": [
+        { "identity": "zz-sectest-own-tenant-writer", "status": 200,
+          "intent": "POSITIVE CONTROL: read-only GET on an id-addressed route, own tenant, write authority present" },
+        { "identity": "zz-sectest-foreign-tenant-writer", "status": 403,
+          "headerProfile": "tenantDenied403", "expectProblemCode": "tenant-access-denied",
+          "intent": "same route and authority, foreign tenant" },
+        { "identity": "zz-sectest-no-roles", "status": 403, "headerProfile": "missingAuthority403",
+          "intent": "the write authority is absent, so the tenancy question is never reached" }
+      ]
+    },
+    "idAddressedManifestDocument": {
+      "method": "GET",
+      "path": "/api/v1/platform/artifacts/manifests/7/document",
+      "identityExpectations": [
+        { "identity": "zz-sectest-own-tenant-writer", "status": 200,
+          "intent": "POSITIVE CONTROL: read-only GET on a second id-addressed route, own tenant" },
+        { "identity": "zz-sectest-foreign-tenant-writer", "status": 403,
+          "headerProfile": "tenantDenied403", "expectProblemCode": "tenant-access-denied",
+          "intent": "same route and authority, foreign tenant" }
+      ]
+    },
+    "adminOnly": {
+      "method": "GET",
+      "path": "/api/v1/test/dashboardStats",
+      "identityExpectations": [
+        { "identity": "operator", "status": 403, "headerProfile": "missingAuthority403",
+          "intent": "privileged read/write identity on an endpoint that demands the administrative authority" },
+        { "identity": "zz-sectest-no-roles", "status": 403, "headerProfile": "missingAuthority403",
+          "intent": "no authority at all" }
+      ]
+    },
+    "writeOnly": {
+      "method": "POST",
+      "path": "/api/v1/platform/artifacts/snapshots/52/reconciliation",
+      "body": {},
+      "identityExpectations": [
+        { "identity": "zz-sectest-no-roles", "status": 403, "headerProfile": "missingAuthority403",
+          "intent": "a mutating endpoint is refused before any effect for an identity without the write authority" },
+        { "identity": "zz-sectest-foreign-tenant", "status": 403,
+          "intent": "read role only; the write authority is absent, so nothing is mutated" }
+      ]
+    }
+  },
+
+  "bodyEquivalence": [
+    {
+      "id": "distributionMasking",
+      "intent": "THE existence-oracle test, from the attacker's own position: with the identity held constant, an object that exists but belongs to another tenant must be indistinguishable from one that does not exist at all",
+      "expectStatus": 404,
+      "expectEqual": true,
+      "volatileMembers": ["correlationId", "timestamp", "instance", "path", "traceId"],
+      "left": {
+        "identity": "zz-sectest-foreign-tenant",
+        "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+        "normaliseValues": ["128"],
+        "intent": "an object that exists but belongs to another tenant"
+      },
+      "right": {
+        "identity": "zz-sectest-foreign-tenant",
+        "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/zz-sectest-unknown-external-key",
+        "normaliseValues": ["zz-sectest-unknown-external-key"],
+        "intent": "an object that does not exist at all"
+      }
+    },
+    {
+      "id": "distributionMaskingCrossIdentity",
+      "intent": "the same answer shape also across identities: the foreign tenant's refusal equals what the owning tenant is told about an object that does not exist",
+      "expectStatus": 404,
+      "expectEqual": true,
+      "volatileMembers": ["correlationId", "timestamp", "instance", "path", "traceId"],
+      "left": {
+        "identity": "zz-sectest-foreign-tenant",
+        "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+        "normaliseValues": ["128"],
+        "intent": "an object that exists but belongs to another tenant"
+      },
+      "right": {
+        "identity": "zz-sectest-own-tenant",
+        "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/zz-sectest-unknown-external-key",
+        "normaliseValues": ["zz-sectest-unknown-external-key"],
+        "intent": "an object that does not exist at all, asked by the owning tenant"
+      }
+    },
+    {
+      "id": "signedDownloadMasking",
+      "intent": "the same existence-oracle test on the signed-download issue endpoint, identity held constant",
+      "expectStatus": 404,
+      "expectEqual": true,
+      "volatileMembers": ["correlationId", "timestamp", "instance", "path", "traceId"],
+      "left": {
+        "identity": "zz-sectest-foreign-tenant",
+        "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download",
+        "normaliseValues": ["128"],
+        "intent": "a foreign tenant's existing entity"
+      },
+      "right": {
+        "identity": "zz-sectest-foreign-tenant",
+        "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/zz-sectest-unknown-external-key/PRIMARY_FILE/ka/1/download",
+        "normaliseValues": ["zz-sectest-unknown-external-key"],
+        "intent": "an entity that does not exist at all"
+      }
+    },
+    {
+      "id": "signedDownloadMaskingCrossIdentity",
+      "intent": "the same across identities on the signed-download issue endpoint",
+      "expectStatus": 404,
+      "expectEqual": true,
+      "volatileMembers": ["correlationId", "timestamp", "instance", "path", "traceId"],
+      "left": {
+        "identity": "zz-sectest-foreign-tenant",
+        "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download",
+        "normaliseValues": ["128"],
+        "intent": "a foreign tenant's existing entity"
+      },
+      "right": {
+        "identity": "zz-sectest-own-tenant",
+        "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/zz-sectest-unknown-external-key/PRIMARY_FILE/ka/1/download",
+        "normaliseValues": ["zz-sectest-unknown-external-key"],
+        "intent": "an entity that does not exist at all, asked by the owning tenant"
+      }
+    }
+  ],
+
+  "cors": {
+    "foreignOrigin": "https://zz-sectest-foreign.example.net",
+    "allowedOrigin": "http://192.168.1.199:5176",
+    "expectStatus": [403, 401, 400]
+  },
+
+  "headerChecks": {
+    "onSuccess": ["Cache-Control", "X-Content-Type-Options", "Strict-Transport-Security", "Content-Security-Policy", "Referrer-Policy", "Permissions-Policy", "X-Frame-Options", "Content-Type", "Vary"],
+    "onError": ["Cache-Control", "X-Content-Type-Options", "Strict-Transport-Security", "Content-Security-Policy", "Referrer-Policy", "Permissions-Policy", "X-Frame-Options", "Content-Type", "WWW-Authenticate"]
+  },
+
+  "pages": [
+    {
+      "id": "page8",
+      "steps": [
+        { "name": "introspection", "method": "GET", "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/revisions/8/introspection", "expectStatus": 200 },
+        { "name": "pages", "method": "GET", "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages?revision=8", "expectStatus": 200 },
+        { "name": "capabilities", "method": "GET", "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/8/query-capabilities?revision=8", "expectStatus": 200, "captureIncludesFrom": ["allowedIncludes"] },
+        {
+          "name": "query",
+          "method": "POST",
+          "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/8/query",
+          "expectStatus": 200,
+          "requireNonEmpty": "data",
+          "totalPath": "pagination.total",
+          "body": { "filters": {}, "sort": "source_goal_id", "descending": false, "groupBy": [], "aggregation": null, "page": 1, "limit": 5, "select": [], "include": [], "cursor": null, "where": {}, "orderBy": [], "distinct": false, "includeLimits": {} }
+        }
+      ]
+    },
+    {
+      "id": "page11",
+      "steps": [
+        { "name": "introspection", "method": "GET", "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/revisions/8/introspection", "expectStatus": 200 },
+        { "name": "capabilities", "method": "GET", "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/11/query-capabilities?revision=8", "expectStatus": 200, "captureIncludesFrom": ["allowedIncludes"] },
+        {
+          "name": "query-root-projection",
+          "method": "POST",
+          "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/11/query",
+          "expectStatus": 200,
+          "requireNonEmpty": "data",
+          "totalPath": "pagination.total",
+          "body": { "filters": {}, "sort": "input_key", "descending": false, "groupBy": [], "aggregation": null, "page": 1, "limit": 25, "select": [], "include": [], "cursor": null, "where": {}, "orderBy": [], "distinct": false, "includeLimits": {} }
+        },
+        {
+          "name": "query-with-declared-includes",
+          "method": "POST",
+          "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/11/query",
+          "expectStatus": 200,
+          "requireNonEmpty": "data",
+          "totalPath": "pagination.total",
+          "requireHydratedIncludes": true,
+          "body": { "filters": {}, "sort": "input_key", "descending": false, "groupBy": [], "aggregation": null, "page": 1, "limit": 25, "select": [], "include": "@declaredIncludes", "cursor": null, "where": {}, "orderBy": [], "distinct": false, "includeLimits": {} }
+        }
+      ]
+    },
+    {
+      "id": "page8-own-tenant",
+      "identity": "zz-sectest-own-tenant",
+      "steps": [
+        { "name": "introspection", "method": "GET", "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/revisions/8/introspection", "expectStatus": 200,
+          "intent": "POSITIVE CONTROL: contract introspection for the tenant that owns the product" },
+        { "name": "capabilities", "method": "GET", "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/8/query-capabilities?revision=8", "expectStatus": 200 },
+        {
+          "name": "query",
+          "method": "POST",
+          "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/8/query",
+          "expectStatus": 200,
+          "requireNonEmpty": "data",
+          "totalPath": "pagination.total",
+          "intent": "POSITIVE CONTROL: the owning tenant still reads its own rows",
+          "body": { "filters": {}, "sort": "source_goal_id", "descending": false, "groupBy": [], "aggregation": null, "page": 1, "limit": 5, "select": [], "include": [], "cursor": null, "where": {}, "orderBy": [], "distinct": false, "includeLimits": {} }
+        }
+      ]
+    },
+    {
+      "id": "page8-foreign-tenant",
+      "identity": "zz-sectest-foreign-tenant",
+      "steps": [
+        { "name": "introspection", "method": "GET", "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/revisions/8/introspection",
+          "expectStatus": 403, "headerProfile": "tenantDenied403", "expectProblemCode": "tenant-access-denied",
+          "intent": "a contract route denies a foreign tenant outright, because its unknown-object answer is not a 404" },
+        {
+          "name": "query",
+          "method": "POST",
+          "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/8/query",
+          "expectStatus": 403,
+          "headerProfile": "tenantDenied403",
+          "expectProblemCode": "tenant-access-denied",
+          "intent": "the page query of another tenant's contract is denied",
+          "body": { "filters": {}, "sort": "source_goal_id", "descending": false, "groupBy": [], "aggregation": null, "page": 1, "limit": 5, "select": [], "include": [], "cursor": null, "where": {}, "orderBy": [], "distinct": false, "includeLimits": {} }
+        }
+      ]
+    }
+  ]
+}

@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 import java.util.HashMap;
+import org.base.api.security.tenancy.TenantAccessGuard;
 
 /** Contract-governed conversion from raw snapshot records to a named physical data family. */
 @Service
@@ -25,18 +26,22 @@ public class SemanticMaterializationService {
     private final JdbcTemplate controlPlane;
     private final JdbcTemplate dataPlane;
     private final ObjectMapper json;
+    private final TenantAccessGuard tenants;
 
     public SemanticMaterializationService(@Qualifier("primaryJdbcTemplate") JdbcTemplate controlPlane,
                                           @Qualifier("dataPlaneJdbcTemplate") JdbcTemplate dataPlane,
-                                          ObjectMapper json) {
+                                          ObjectMapper json, TenantAccessGuard tenants) {
         this.controlPlane = controlPlane;
         this.dataPlane = dataPlane;
         this.json = json;
+        this.tenants = tenants;
     }
 
     @Transactional(transactionManager = "dataPlaneTransactionManager")
     public MaterializationReceipt materialize(MaterializeRequest request) {
         if (request.datasetSnapshotId() <= 0) throw new IllegalArgumentException("Snapshot identifier must be positive");
+        // The body names the snapshot; this is the tenancy enforcement point of the materialize route.
+        tenants.requireSnapshot(request.datasetSnapshotId());
         long contractSourceId = request.contractSourceId() > 0 ? request.contractSourceId() : resolveSourceForSnapshot(request.datasetSnapshotId());
         /* IDs live in two independent tables.  Resolve the immutable revision
            binding first (R8 is revision-governed); only fall back to the

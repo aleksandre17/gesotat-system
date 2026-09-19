@@ -161,7 +161,16 @@ platform:
     audience: ${OIDC_AUDIENCE:geostat-api}
     roles-claim: ${OIDC_ROLES_CLAIM:realm_access.roles}
     tenant-claim: ${OIDC_TENANT_CLAIM:tenant_id}
-    role-authority-map: ${OIDC_ROLE_AUTHORITY_MAP:contract.read=READ_RESOURCE;contract.write=WRITE_RESOURCE;ingest.execute=WRITE_RESOURCE;quality.approve=PUBLISH_RESOURCE;publish.execute=PUBLISH_RESOURCE;raw.read=READ_RESOURCE;admin=ADMIN}
+    # Tolerated issuer/API clock difference for exp and nbf (0..120 seconds).
+    clock-skew-seconds: ${OIDC_CLOCK_SKEW_SECONDS:60}
+    role-authority-map: ${OIDC_ROLE_AUTHORITY_MAP:contract.read=READ_RESOURCE;contract.write=WRITE_RESOURCE;ingest.execute=WRITE_RESOURCE;quality.approve=PUBLISH_RESOURCE;publish.execute=PUBLISH_RESOURCE;raw.read=READ_RESOURCE;admin=ADMIN;platform.admin=PLATFORM_CROSS_TENANT}
+  # Tenant-scoped authorization (ABAC). A data product belongs to one tenant; the token's tenant claim
+  # must equal it. Enforcement may only be switched off outside production - a startup guard refuses
+  # a production profile with enforcement off or with OIDC disabled.
+  tenancy:
+    enforcement-enabled: ${PLATFORM_TENANCY_ENFORCEMENT_ENABLED:true}
+    # Platform-wide operator authority that may reach every tenant. Not a business role; its use is audited.
+    cross-tenant-authority: ${PLATFORM_TENANCY_CROSS_TENANT_AUTHORITY:PLATFORM_CROSS_TENANT}
   provider:
     discovery:
       enabled: ${PLATFORM_PROVIDER_DISCOVERY_ENABLED:false}

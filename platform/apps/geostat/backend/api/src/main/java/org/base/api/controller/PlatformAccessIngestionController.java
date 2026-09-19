@@ -19,8 +19,10 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
+import org.base.api.security.tenancy.TenantScoped;
 
 /** New governed Access entry point. Legacy /imports/access endpoints remain untouched. */
+@TenantScoped
 @Api
 @RestController
 @RequestMapping("/platform/access")

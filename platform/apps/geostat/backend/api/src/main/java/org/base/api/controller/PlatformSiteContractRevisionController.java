@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.NoSuchElementException;
+import org.base.api.security.tenancy.TenantScoped;
 
 /** Governed site contract revision approval: validate (no write), then confirm. */
+@TenantScoped
 @Api
 @RestController
 @RequestMapping("/platform/site-contracts/{contractCode}/revisions/{revision}/approval")

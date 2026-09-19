@@ -1,5 +1,6 @@
 package org.base.api.service.artifact;
 
+import org.base.api.security.tenancy.TenantAccessGuard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -29,6 +30,7 @@ public class ArtifactDistributionService {
     private final ArtifactContractResolver contracts;
     private final ObjectProvider<ArtifactObjectStore> store;
     private final ArtifactMetrics metrics;
+    private final TenantAccessGuard tenants;
     private final Clock clock;
 
     public record DownloadPolicy(String mode, int expiresInSeconds) {}
@@ -41,11 +43,13 @@ public class ArtifactDistributionService {
     public record SignedDownload(URI url, Instant expiresAt, String fileName, String mediaType, long byteSize, String sha256) {}
 
     public ArtifactDistributionService(ArtifactAttachmentRepository attachments, ArtifactContractResolver contracts,
-                                       ObjectProvider<ArtifactObjectStore> store, ArtifactMetrics metrics, ObjectProvider<Clock> clock) {
+                                       ObjectProvider<ArtifactObjectStore> store, ArtifactMetrics metrics,
+                                       TenantAccessGuard tenants, ObjectProvider<Clock> clock) {
         this.attachments = attachments;
         this.contracts = contracts;
         this.store = store;
         this.metrics = metrics;
+        this.tenants = tenants;
         this.clock = clock.getIfAvailable(Clock::systemUTC);
     }
 
@@ -88,10 +92,18 @@ public class ArtifactDistributionService {
         return new SignedDownload(url, expiresAt, attached.originalName(), attached.mediaType(), attached.byteSize(), attached.sha256());
     }
 
+    /**
+     * The one object-level authorization point of the distribution boundary (OWASP API1). An entity of
+     * another tenant is reported with the identical {@link ArtifactNotFoundException} an absent entity
+     * produces, so the response is no existence oracle.
+     */
     private ArtifactAttachmentRepository.PublishedEntity published(String recordType, String externalKey) {
         if (recordType == null || !RECORD_TYPE.matcher(recordType).matches()) throw new IllegalArgumentException("Invalid record type");
         if (externalKey == null || externalKey.isBlank() || externalKey.length() > MAX_EXTERNAL_KEY) throw new IllegalArgumentException("Invalid external key");
-        return attachments.newestPublished(recordType, externalKey)
-                .orElseThrow(() -> new ArtifactNotFoundException("No published " + recordType + " with key " + externalKey));
+        String absent = "No published " + recordType + " with key " + externalKey;
+        ArtifactAttachmentRepository.PublishedEntity entity = attachments.newestPublished(recordType, externalKey)
+                .orElseThrow(() -> new ArtifactNotFoundException(absent));
+        if (!tenants.permitsDatasetVersion(entity.datasetVersionId())) throw new ArtifactNotFoundException(absent);
+        return entity;
     }
 }

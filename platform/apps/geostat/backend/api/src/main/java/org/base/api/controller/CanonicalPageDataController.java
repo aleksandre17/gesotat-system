@@ -13,7 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.base.api.service.platform.CursorTokenService;
 import org.base.api.service.platform.ApprovedContractResolver;
+import org.base.api.security.tenancy.TenantScoped;
+import org.base.api.security.tenancy.TenantScopeExemption;
 
+@TenantScoped
 @Api
 @RestController
 @RequestMapping("/platform/pages")
@@ -24,6 +27,7 @@ public class CanonicalPageDataController {
     private final ApprovedContractResolver contracts;
     public CanonicalPageDataController(CanonicalPageDataService pages,ObjectMapper json,CursorTokenService cursors,ApprovedContractResolver contracts){this.pages=pages;this.json=json;this.cursors=cursors;this.contracts=contracts;}
     @GetMapping(value="/{pageId}/data", produces=MediaType.APPLICATION_JSON_VALUE) @PreAuthorize("hasAuthority('READ_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.DEFAULT_CONTRACT, reason = "Without an explicit contractCode the controller serves the platform's approved default contract; the interceptor resolves and enforces that same contract.")
     public ResponseEntity<Map<String,Object>> data(@PathVariable int pageId,
         @RequestParam(defaultValue="1") int page, @RequestParam(defaultValue="100") int limit,
         @RequestParam(required=false) String metricCode, @RequestParam(required=false) String carrierCode,

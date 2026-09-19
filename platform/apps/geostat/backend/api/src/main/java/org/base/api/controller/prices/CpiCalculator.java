@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.base.api.security.tenancy.TenantNeutral;
 
+@TenantNeutral(reason = "Legacy per-domain Access upload that writes through the core profile/page plane and carries no data-product identity. LEGACY: recorded as a gap; migrate onto the governed ingestion line or bind to an explicit operator authority.", legacy = true)
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/cpi-calculator")

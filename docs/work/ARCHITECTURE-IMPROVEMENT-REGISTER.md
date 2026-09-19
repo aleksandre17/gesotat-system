@@ -792,3 +792,39 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   the proxy, unsigned and `POST` → 403. Checklist 17.18.
 - **Open:** the KIDS frontend code still links static `/files/...`; it has to request the download from the API and
   rewrite the origin (AIR-2026-009/013), and the static copies are retired only after that.
+
+### AIR-2026-043 — The tenant claim was required but never compared with the owner of the data
+
+- **სტატუსი:** `VERIFIED` (dev) / **priority:** `P0` / **owner:** Security (OWASP API1 broken object level authorization)
+- **აღმოჩენა:** the resource server validated issuer, audience, expiry, signature and the *presence* of the tenant
+  claim; no data product had a tenant, so any authenticated tenant could read any product. Measured on dev before
+  the fix: a token with a foreign tenant value received 200 with the full body.
+- **გადაწყვეტა:** ADR-010 (`docs/decisions/ADR-tenant-scoped-authorization.md`). A product belongs to one tenant
+  (migration 104, append-only assignment history, trigger 51104); `TenantAccessPolicy` is a pure deny-by-default
+  decision; `CurrentCaller` gives workers an explicit SYSTEM caller so a missing caller can never pass; the product
+  is resolved once per boundary by `TenantScopeResolver` strategies; every controller declares `@TenantScoped` or
+  `@TenantNeutral(reason)` and `TenantScopeCoverageTest` fails the build otherwise; a scoped route whose product
+  cannot be resolved is denied. Distribution endpoints answer a foreign-tenant object exactly like an unknown one.
+  A dedicated authority (`PLATFORM_CROSS_TENANT`, mapped from the identity-provider role `platform.admin`) crosses
+  tenants and is audit-logged; business roles never do. Assignment is a governed, idempotent API; moving a product
+  to another tenant needs an explicit audited transfer (409 otherwise).
+- **Evidence:** runtime suite run 3 on dev (own tenant 200, foreign tenant 404 masked / 403, four body-equality
+  checks); `:api:test` 340. `docs/evidence/security-acceptance-runtime-2026-09-19.json`.
+
+### AIR-2026-044 — Legacy upload and conversion surfaces have no product identity
+
+- **სტატუსი:** `DISCOVERED` / **priority:** `P1` / **owner:** Security + Platform
+- **აღმოჩენა:** `ManagedImportController`, eight per-domain Access upload controllers, `MSSQLToAccess`,
+  `XlsxToCsvController` and the demo `ResponseController` work on the legacy profile/page plane, which has no
+  `platform.data_product`. They cannot be tenant-scoped and are declared `@TenantNeutral` with `LEGACY` reasons.
+  `XlsxToCsvController` fetches caller-supplied URLs (hardened, but still an SSRF surface) and `MSSQLToAccess`
+  accepts caller-supplied database credentials under the broad `WRITE_RESOURCE` authority.
+- **Decision:** they are not part of the governed platform; they get a dedicated operator authority and are
+  disabled by default in the production profile until they are migrated onto the governed ingestion line or
+  retired through the legacy-retirement preflight. Implementation is the next security work item.
+
+### AIR-2026-045 — Page 11 declared includes cannot be served and one of them would expose raw documents
+
+- **სტატუსი:** `TRIAGED` / **priority:** `P1` / **owner:** Serving + Data Protection
+- **აღმოჩენა / decision:** see checklist 17.20. The 400 is correct fail-closed behaviour of the physical query
+  service for `ACCESS`-plane tables; making it pass by re-labelling tables would publish raw source documents.

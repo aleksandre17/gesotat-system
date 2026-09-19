@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import java.security.MessageDigest;
 import java.util.*;
+import org.base.api.security.tenancy.TenantScoped;
+@TenantScoped
 @Api @RestController @RequestMapping("/platform/contracts")
 public class ContractQueryController {
  private final ContractQueryPlanService plans; private final CanonicalPageDataService pages; private final ObjectMapper json; private final CursorTokenService cursors; private final QueryAdmissionBudget admission;

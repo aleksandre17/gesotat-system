@@ -35,8 +35,11 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import jakarta.servlet.http.HttpServletRequest;
+import org.base.api.security.tenancy.TenantScoped;
+import org.base.api.security.tenancy.TenantScopeExemption;
 
 /** Governed artifact lifecycle: package → manifest → attachment → reconciliation → signed distribution. */
+@TenantScoped
 @Api
 @RestController
 @RequestMapping("/platform/artifacts")
@@ -57,6 +60,7 @@ public class PlatformArtifactController {
 
     @PostMapping("/upload-sessions")
     @PreAuthorize("hasAuthority('WRITE_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.SERVICE_ENFORCED, reason = "contractCode arrives in the request body; ArtifactPackageContractResolver.resolve enforces it before a session is opened.")
     public ResponseEntity<ArtifactUploadSessionService.SessionReceipt> startPackageUpload(
             @RequestHeader("Idempotency-Key") String idempotencyKey, @RequestBody StartPackageUploadRequest request,
             Authentication authentication) {
@@ -103,6 +107,7 @@ public class PlatformArtifactController {
 
     @PostMapping("/manifests/inventory")
     @PreAuthorize("hasAuthority('WRITE_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.SERVICE_ENFORCED, reason = "An inventory manifest is not contract-bound at admission and names no product; it becomes reachable only through a contract-bound manifest, which ArtifactPackageContractResolver.resolve enforces.")
     public ResponseEntity<ArtifactPackageService.ManifestReceipt> importInventory(@RequestBody InventoryImportRequest request) {
         return ResponseEntity.ok(packages.importInventory(request.packageCode(), request.inventoryKey(), request.objectPrefix()));
     }
@@ -166,12 +171,14 @@ public class PlatformArtifactController {
 
     @GetMapping("/entities/{recordType}/{externalKey}")
     @PreAuthorize("hasAuthority('READ_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.SERVICE_ENFORCED, reason = "recordType/externalKey resolve to a published snapshot only inside ArtifactDistributionService.published, which masks a foreign entity as an absent one.")
     public ResponseEntity<ArtifactDistributionService.PublishedArtifacts> list(@PathVariable String recordType, @PathVariable String externalKey) {
         return ResponseEntity.ok(distribution.list(recordType, externalKey));
     }
 
     @GetMapping("/entities/{recordType}/{externalKey}/{relationCode}/{language}/{ordinal}/download")
     @PreAuthorize("hasAuthority('READ_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.SERVICE_ENFORCED, reason = "recordType/externalKey resolve to a published snapshot only inside ArtifactDistributionService.published, which masks a foreign entity as an absent one.")
     public ResponseEntity<ArtifactDistributionService.SignedDownload> download(@PathVariable String recordType, @PathVariable String externalKey,
                                                                                @PathVariable String relationCode, @PathVariable String language,
                                                                                @PathVariable int ordinal, Authentication authentication) {

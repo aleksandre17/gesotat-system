@@ -1,0 +1,4056 @@
+{
+  "schema": "geostat.security-acceptance-runtime.v1",
+  "recordedAt": "2026-09-19",
+  "current": "run-2",
+  "gate": [
+    "docs/work/PRODUCTION-OIDC-ACTIVATION-GATE.md (Acceptance gate)",
+    "docs/work/PRODUCTION-OIDC-TLS-PLAN.md (Acceptance gates)"
+  ],
+  "tool": {
+    "suite": "ops/tests/security/",
+    "probe": "ops/tests/security/security_probe.py",
+    "identityProvisioner": "ops/tests/security/keycloak_test_clients.py",
+    "wrapper": "ops/tests/security/remote-security-suite.sh",
+    "configuration": [
+      "ops/tests/security/config/dev-api.json",
+      "ops/tests/security/config/throwaway-clients.json"
+    ],
+    "siteAgnostic": "no host, realm, endpoint, role, claim, tenant, contract or page value appears in the probe, the provisioner or the wrapper; header contracts, problem codes, identities, expected statuses and the existence-oracle comparisons are all configuration",
+    "invocation": [
+      "ops/tests/security/remote-security-suite.sh setup",
+      "ops/tests/security/remote-security-suite.sh run security-acceptance-r2-2026-09-19",
+      "ops/tests/security/remote-security-suite.sh clients-verify",
+      "ops/tests/security/remote-security-suite.sh teardown"
+    ],
+    "rawResults": [
+      "ops/tests/security/out/acceptance-2026-09-19.json (run-1, gitignored)",
+      "ops/tests/security/out/security-acceptance-r2-2026-09-19.json (run-2, gitignored)"
+    ],
+    "resultVocabulary": {
+      "PASS": "status and, where declared, the response header contract and problem code were met",
+      "FAIL": "the status was not the expected one, or an assertion about the body failed",
+      "FAIL_RESPONSE_CONTRACT": "the status was correct but the declared response surface was not",
+      "WITHIN_DECLARED_SKEW": "accepted inside a tolerance the deployment declares in configuration",
+      "FINDING_NOT_ENFORCED": "the deployment answered as if the control does not exist",
+      "AMBIGUOUS": "the observation supports neither verdict",
+      "INCONCLUSIVE_RATE_LIMITED": "the admission guard answered instead of the control under test",
+      "NOT_RUN": "the case could not be executed"
+    }
+  },
+  "runs": [
+    {
+      "id": "run-1",
+      "label": "before tenant enforcement",
+      "state": "HISTORY",
+      "window": {
+        "startedAt": "2026-09-19T12:33:32Z",
+        "finishedAt": "2026-09-19T12:35:08Z"
+      },
+      "summary": {
+        "PASS": 38,
+        "FINDING_NOT_ENFORCED": 2,
+        "FAIL": 1
+      },
+      "environment": {
+        "target": "remote dev API, container geostat-api-dev, http://localhost:8081 reached from the server itself",
+        "springProfile": "prod",
+        "oidcEnforced": true,
+        "bootstrapAuthentication": "PLATFORM_BOOTSTRAP_AUTH_ENABLED=false - no static-token bypass is active on the dev API",
+        "issuerPolicy": "OIDC_ISSUER_URL is an https issuer; OIDC_AUDIENCE, OIDC_ROLES_CLAIM and OIDC_TENANT_CLAIM are set (configuration key names were read; no secret value was read)",
+        "rateLimit": "120 requests / 60 s per client key; the whole run is 41 requests paced at 350 ms; no case returned 429",
+        "sourceRevision": "branch storage/artifact-line-closure; the dev container runs a previously deployed image of this line and was NOT rebuilt or restarted for this run",
+        "productionSafety": "the production API (geostat-api, :8083) was called once, GET /health -> 200; no production container, database or configuration was touched; no container was restarted",
+        "edgeProxyFact": "the deployed edge nginx catch-all server block routes https://api.geostat.internal/api/ to the PRODUCTION container geostat-api:8081, not to the dev API. The suite therefore addresses the dev API directly on the server and never sends test traffic through api.geostat.internal."
+      },
+      "identityInventory": {
+        "reference": "the deployment's existing confidential service client (realm roles contract.read, contract.write, publish.execute; home tenant). Its secret is read from a gitignored env file, sent to the server on stdin only, stored in a 0600 file and removed at teardown.",
+        "throwawayClientsCreated": [
+          "zz-sectest-no-audience",
+          "zz-sectest-no-tenant",
+          "zz-sectest-no-roles",
+          "zz-sectest-short-lifespan",
+          "zz-sectest-foreign-tenant"
+        ],
+        "throwawayClientsDeleted": [
+          {
+            "clientId": "zz-sectest-no-audience",
+            "existedBeforeDelete": true,
+            "existsAfterDelete": false
+          },
+          {
+            "clientId": "zz-sectest-no-tenant",
+            "existedBeforeDelete": true,
+            "existsAfterDelete": false
+          },
+          {
+            "clientId": "zz-sectest-no-roles",
+            "existedBeforeDelete": true,
+            "existsAfterDelete": false
+          },
+          {
+            "clientId": "zz-sectest-short-lifespan",
+            "existedBeforeDelete": true,
+            "existsAfterDelete": false
+          },
+          {
+            "clientId": "zz-sectest-foreign-tenant",
+            "existedBeforeDelete": true,
+            "existsAfterDelete": false
+          }
+        ],
+        "cleanupVerification": {
+          "clientsCarryingThePrefixAfterTeardown": [],
+          "realmUsersMatchingThePrefixAfterTeardown": [],
+          "clientsInRealmBeforeRun": 9,
+          "clientsInRealmAfterTeardown": 9,
+          "preExistingObjectsUnchanged": "no existing client, realm role, protocol mapper, client scope, user or realm setting was modified or deleted; the provisioner refuses any client id that does not carry the zz-sectest- prefix and refuses to touch a client that already exists",
+          "serverSideWorkingDirectory": "/tmp/geostat-sectest removed; verified absent",
+          "secretsInThisEvidence": "none - no token, signature, client secret or administrator credential is recorded here or in the raw result"
+        },
+        "tokenProperties": {
+          "operator": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 6,
+            "lifetimeSeconds": 300
+          },
+          "zz-sectest-no-audience": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": false,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 4,
+            "lifetimeSeconds": 300
+          },
+          "zz-sectest-no-tenant": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": false,
+            "roleCount": 4,
+            "lifetimeSeconds": 300
+          },
+          "zz-sectest-short-lifespan": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 4,
+            "lifetimeSeconds": 1
+          },
+          "zz-sectest-short-lifespan-within-skew": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 4,
+            "lifetimeSeconds": 1
+          },
+          "zz-sectest-no-roles": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 0,
+            "lifetimeSeconds": 300
+          },
+          "zz-sectest-foreign-tenant": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 4,
+            "lifetimeSeconds": 300
+          }
+        }
+      },
+      "matrix": [
+        {
+          "id": "tls.discovery",
+          "group": "transport",
+          "request": {
+            "method": "GET",
+            "target": "discovery",
+            "tls": "explicit trust anchor"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json;charset=UTF-8",
+          "leaksImplementationDetail": false,
+          "issuerMatchesPolicy": true,
+          "issuerScheme": "https",
+          "jwksOverTls": true,
+          "trustAnchor": "tls.crt"
+        },
+        {
+          "id": "tls.jwks",
+          "group": "transport",
+          "request": {
+            "method": "GET",
+            "target": "jwks",
+            "tls": "explicit trust anchor"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "keyCount": 2,
+          "algorithms": [
+            "RS256",
+            "RSA-OAEP"
+          ],
+          "trustAnchor": "tls.crt"
+        },
+        {
+          "id": "tls.discovery.untrusted",
+          "group": "transport",
+          "request": {
+            "method": "GET",
+            "target": "discovery",
+            "tls": "default trust store, no explicit anchor"
+          },
+          "expectedStatus": [
+            0
+          ],
+          "actualStatus": 0,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "note": "curl reports 000 when the TLS handshake is rejected"
+        },
+        {
+          "id": "authn.anonymous",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "no Authorization header"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": "application/json;charset=ISO-8859-1",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": 401
+          },
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json;charset=ISO-8859-1",
+            "WWW-Authenticate": null
+          }
+        },
+        {
+          "id": "authn.malformed",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "Authorization: Bearer not-a-jwt"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Malformed token\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          }
+        },
+        {
+          "id": "authn.emptyBearer",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "Authorization: Bearer with empty value"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"Bearer token is malformed\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          }
+        },
+        {
+          "id": "authn.basic",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "a non-Bearer Authorization scheme"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": "application/json;charset=ISO-8859-1",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": 401
+          },
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json;charset=ISO-8859-1",
+            "WWW-Authenticate": null
+          }
+        },
+        {
+          "id": "authn.tamperedSignature",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "a genuine token whose last signature byte is flipped"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          }
+        },
+        {
+          "id": "authn.unknownKey",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "RS256 signed with an unknown key; issuer, audience and claims correct"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Another algorithm expected, or no matching key(s) found\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          }
+        },
+        {
+          "id": "authn.copiedKid",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "RS256 signed with an unknown key but carrying the authority's kid"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          }
+        },
+        {
+          "id": "authn.algNone",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "alg=none with an empty signature"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"Unsupported algorithm of none\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          }
+        },
+        {
+          "id": "authn.hs256.pem",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "HS256 signed with the authority's public key (pem)"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Another algorithm expected, or no matching key(s) found\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          }
+        },
+        {
+          "id": "authn.hs256.base64Der",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "HS256 signed with the authority's public key (base64Der)"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Another algorithm expected, or no matching key(s) found\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          }
+        },
+        {
+          "id": "authn.wrongIssuer",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "self-signed token asserting a different issuer"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          }
+        },
+        {
+          "id": "authn.expiredForged",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "self-signed token whose exp is in the past"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          }
+        },
+        {
+          "id": "authn.notYetValid",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "self-signed token whose nbf is in the future"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          }
+        },
+        {
+          "id": "authn.zz-sectest-no-audience",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "authority-signed token whose audience does not include the API"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false
+        },
+        {
+          "id": "authn.zz-sectest-no-tenant",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "authority-signed token with the right audience but without the required tenant claim"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false
+        },
+        {
+          "id": "authn.zz-sectest-short-lifespan",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "genuine token used 75 s after its one-second lifetime has elapsed"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "secondsSinceIssue": 75
+        },
+        {
+          "id": "authn.zz-sectest-short-lifespan-within-skew",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "the same one-second token used 5 s after it expired, i.e. inside the resource server's default clock-skew window"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 200,
+          "result": "FINDING_NOT_ENFORCED",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "finding": "expiry is enforced with the resource server's default 60 s clock skew: a token expired by a few seconds is still accepted",
+          "secondsSinceIssue": 5
+        },
+        {
+          "id": "authz.read.operator",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "identity": "operator",
+            "intent": "the authority the endpoint declares is present"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "Vary": "Access-Control-Request-Headers"
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "119"
+          }
+        },
+        {
+          "id": "authz.read.zz-sectest-no-roles",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "identity": "zz-sectest-no-roles",
+            "intent": "no authority at all"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "FORBIDDEN"
+          },
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "WWW-Authenticate": null
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "119"
+          }
+        },
+        {
+          "id": "authz.read.zz-sectest-foreign-tenant",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "identity": "zz-sectest-foreign-tenant",
+            "intent": "correct role, tenant value that owns none of the data"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 200,
+          "result": "FINDING_NOT_ENFORCED",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "Vary": "Access-Control-Request-Headers"
+          },
+          "finding": "tenant VALUE enforcement: the deployment requires the tenant claim to be PRESENT but does not yet compare its value against the data owner",
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "119"
+          }
+        },
+        {
+          "id": "authz.adminOnly.operator",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/test/dashboardStats",
+            "identity": "operator",
+            "intent": "privileged read/write identity on an endpoint that demands the administrative authority"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "FORBIDDEN"
+          },
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "WWW-Authenticate": null
+          },
+          "rateLimit": {
+            "RateLimit-Limit": null,
+            "RateLimit-Remaining": null
+          }
+        },
+        {
+          "id": "authz.adminOnly.zz-sectest-no-roles",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/test/dashboardStats",
+            "identity": "zz-sectest-no-roles",
+            "intent": "no authority at all"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "FORBIDDEN"
+          },
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "WWW-Authenticate": null
+          },
+          "rateLimit": {
+            "RateLimit-Limit": null,
+            "RateLimit-Remaining": null
+          }
+        },
+        {
+          "id": "authz.writeOnly.zz-sectest-no-roles",
+          "group": "authz",
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/platform/artifacts/snapshots/52/reconciliation",
+            "identity": "zz-sectest-no-roles",
+            "intent": "a mutating endpoint is refused before any effect for an identity without the write authority"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "FORBIDDEN"
+          },
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "WWW-Authenticate": null
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "118"
+          }
+        },
+        {
+          "id": "authz.writeOnly.zz-sectest-foreign-tenant",
+          "group": "authz",
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/platform/artifacts/snapshots/52/reconciliation",
+            "identity": "zz-sectest-foreign-tenant",
+            "intent": "read role only; the write authority is absent"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "FORBIDDEN"
+          },
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "WWW-Authenticate": null
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "118"
+          }
+        },
+        {
+          "id": "transport.correlationReflection.authenticated",
+          "group": "transport",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "sent": "X-Correlation-Id with an unsafe value"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "reflectedVerbatim": false,
+          "replacedWithGeneratedValue": true
+        },
+        {
+          "id": "transport.correlationReflection.unauthenticated",
+          "group": "transport",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "sent": "X-Correlation-Id with an unsafe value, no credential"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": "application/json;charset=ISO-8859-1",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": 401
+          },
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json;charset=ISO-8859-1",
+            "WWW-Authenticate": null
+          },
+          "reflectedVerbatim": false
+        },
+        {
+          "id": "transport.corsPreflight.foreignOrigin",
+          "group": "transport",
+          "request": {
+            "method": "OPTIONS",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "origin": "a foreign origin"
+          },
+          "expectedStatus": [
+            403,
+            401,
+            400
+          ],
+          "actualStatus": 403,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "accessControlAllowOrigin": null,
+          "originEchoed": false
+        },
+        {
+          "id": "transport.corsPreflight.configuredOrigin",
+          "group": "transport",
+          "request": {
+            "method": "OPTIONS",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "origin": "an origin the deployment configures as allowed"
+          },
+          "expectedStatus": [
+            200,
+            204
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "accessControlAllowOrigin": "echoed",
+          "allowCredentials": "true"
+        },
+        {
+          "id": "transport.unmappedRoute",
+          "group": "transport",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/zz-sectest-no-such-route",
+            "credential": "none"
+          },
+          "expectedStatus": [
+            401,
+            404
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": "application/json;charset=ISO-8859-1",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": 401
+          },
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json;charset=ISO-8859-1",
+            "WWW-Authenticate": null
+          }
+        },
+        {
+          "id": "transport.publicEndpoint",
+          "group": "transport",
+          "request": {
+            "method": "GET",
+            "path": "/health",
+            "credential": "none"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "UP"
+          }
+        },
+        {
+          "id": "page.page8.introspection",
+          "group": "pages",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/revisions/8/introspection",
+            "identity": "operator"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "APPROVED"
+          }
+        },
+        {
+          "id": "page.page8.pages",
+          "group": "pages",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages?revision=8",
+            "identity": "operator"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false
+        },
+        {
+          "id": "page.page8.capabilities",
+          "group": "pages",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/8/query-capabilities?revision=8",
+            "identity": "operator"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "declaredIncludes": [
+            "GOAL_CATEGORY",
+            "GOAL_RAW_LINEAGE"
+          ]
+        },
+        {
+          "id": "page.page8.query",
+          "group": "pages",
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/8/query",
+            "identity": "operator"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "rowsReturned": 5,
+          "rowsTotal": 72
+        },
+        {
+          "id": "page.page11.introspection",
+          "group": "pages",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/revisions/8/introspection",
+            "identity": "operator"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "APPROVED"
+          }
+        },
+        {
+          "id": "page.page11.capabilities",
+          "group": "pages",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/11/query-capabilities?revision=8",
+            "identity": "operator"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "declaredIncludes": [
+            "INPUT_FOR_CARRIER",
+            "INPUT_RAW_LINEAGE"
+          ]
+        },
+        {
+          "id": "page.page11.query-root-projection",
+          "group": "pages",
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/11/query",
+            "identity": "operator"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "rowsReturned": 25,
+          "rowsTotal": 1760
+        },
+        {
+          "id": "page.page11.query-with-declared-includes",
+          "group": "pages",
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/11/query",
+            "identity": "operator"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 400,
+          "result": "FAIL",
+          "responseMediaType": "application/problem+json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "type": "https://api.geostat.ge/problems/contract-query-invalid",
+            "title": "contract-query-invalid",
+            "status": 400,
+            "code": "contract-query-invalid",
+            "detail": "Only data-plane contract tables are queryable"
+          }
+        }
+      ],
+      "gateAssessment": [
+        {
+          "gateItem": "certificate chain and hostname verification PASS",
+          "state": "PASS",
+          "evidence": "tls.discovery and tls.jwks validate against the edge certificate used as an explicit trust anchor; tls.discovery.untrusted shows the same endpoint is refused without it (the handshake fails before any HTTP status)."
+        },
+        {
+          "gateItem": "OIDC discovery over HTTPS returns 200",
+          "state": "PASS",
+          "evidence": "tls.discovery 200; the issuer in the document equals the configured issuer, its scheme is https and jwks_uri is https."
+        },
+        {
+          "gateItem": "JWKS endpoint reachable from the API container",
+          "state": "PASS",
+          "evidence": "tls.jwks 200 with 2 keys (RS256, RSA-OAEP); separately confirmed from inside geostat-api-dev, which fetched the JWKS URL over HTTPS successfully."
+        },
+        {
+          "gateItem": "valid RS256 token -> 200",
+          "state": "PASS",
+          "evidence": "authz.read.operator 200."
+        },
+        {
+          "gateItem": "wrong issuer / audience / signature / expiry -> 401",
+          "state": "PASS_WITH_FINDING",
+          "evidence": "Eleven negative authentication cases are all 401, including a genuine token with one flipped signature byte, an unknown key carrying the authority's kid, alg=none, HS256 signed with the authority's own public key in two encodings, a forged issuer, a missing audience and a real expired token. Expiry is enforced only outside a 60 s clock-skew window - finding SEC-2026-002."
+        },
+        {
+          "gateItem": "wrong tenant / role -> 403 / deny",
+          "state": "PARTIAL",
+          "evidence": "Role: PASS - an identity with no role is 403 on the read endpoint and on a mutating endpoint, and the privileged identity is 403 on the administrative endpoint. Tenant: the claim must be PRESENT (a token without it is 401), but its VALUE is not enforced - finding SEC-2026-001."
+        },
+        {
+          "gateItem": "pageId=8 introspection/query -> 200",
+          "state": "PASS",
+          "evidence": "page.page8 introspection, pages, capabilities and query are all 200; the query returned 5 of 72 rows."
+        },
+        {
+          "gateItem": "pageId=11 query -> 200 with non-empty rows and both revision-declared relation includes hydrated",
+          "state": "FAIL",
+          "evidence": "The root projection passes (25 of 1760 rows), but both declared includes are refused with HTTP 400 - finding SEC-2026-003."
+        },
+        {
+          "gateItem": "response, checksum and authorization evidence in a signed bundle",
+          "state": "NOT_CLOSED",
+          "evidence": "This file is unsigned machine-readable evidence. No signing authority was exercised."
+        },
+        {
+          "gateItem": "approved deploy authority and rollback plan confirmed",
+          "state": "NOT_CLOSED",
+          "evidence": "Out of scope for a runtime security suite; unchanged from the release invariant in AGENTS.md."
+        }
+      ],
+      "positiveControls": [
+        "authz.read.operator 200 proves the negative cases are not failing for an unrelated reason.",
+        "transport.corsPreflight.configuredOrigin 200 proves the rejection of a foreign origin is a policy decision, not a broken preflight path.",
+        "page.page11.query-root-projection 200 proves the page 11 include failure is specific to relation hydration.",
+        "authn.zz-sectest-short-lifespan 401 proves the expiry path works, so the skew case is a tolerance and not an absence.",
+        "transport.publicEndpoint 200 proves the probe reaches the API at all when no credential is required."
+      ],
+      "limits": [
+        "Only the dev API was exercised. Production was called once for GET /health and is covered by none of these results.",
+        "The dev container was NOT rebuilt or restarted, so the results describe the image the dev container was already running, not the current working tree. Another agent was changing source locally during the run.",
+        "No cross-realm token was obtained: the second realm on this authority is the administrative realm and getting a token from it would have required handling administrator credentials outside the provider container. The wrong-issuer case is therefore a self-signed token asserting a foreign issuer, which exercises the issuer check but not a genuine foreign authority's signature.",
+        "Mutating endpoints were called only with identities that lack the write authority, so the write path is proven to be refused but is not proven to work; nothing was mutated.",
+        "The matrix records the API's own response headers. Anything the edge adds (HSTS) was verified separately on the auth hostname and is not part of the API-path matrix.",
+        "Rate limiting was avoided, not tested: 41 paced requests stayed well inside the 120/60 s budget and no case returned 429. Behaviour under abuse is covered by ops/tests/load, not here.",
+        "Tenant VALUE enforcement is reported as a measured absence (SEC-2026-001). The suite cannot state the correct behaviour until the tenant claims model is decided.",
+        "Refresh-token handling, token revocation, introspection-endpoint behaviour and interactive login flows were not exercised: the deployment uses client_credentials service identities only.",
+        "The include-hydration check asserts that at least one returned row carries a non-empty value under each declared relation code. It never ran to completion here because the request was refused with 400.",
+        "This evidence is not signed."
+      ],
+      "note": "Kept verbatim as the baseline this work started from. Its verdicts describe the image the dev container ran before the lead deployed tenant ABAC and the new security-chain error surface. Read run-2 for the current state."
+    },
+    {
+      "id": "run-2",
+      "label": "tenant enforcement deployed",
+      "state": "CURRENT",
+      "window": {
+        "startedAt": "2026-09-19T13:16:08Z",
+        "finishedAt": "2026-09-19T13:17:53Z"
+      },
+      "summary": {
+        "PASS": 42,
+        "FAIL_RESPONSE_CONTRACT": 16,
+        "WITHIN_DECLARED_SKEW": 1,
+        "FAIL": 1
+      },
+      "environment": {
+        "target": "remote dev API, container geostat-api-dev, http://localhost:8081 reached from the server itself",
+        "springProfile": "prod",
+        "oidcEnforced": true,
+        "deployedByLead": "tenant ABAC enforced; product KIDS_PORTAL assigned to tenant geostat; the reference client geostat-artifact-operator additionally holds realm role platform.admin, mapped to authority PLATFORM_CROSS_TENANT",
+        "clockSkew": "OIDC_CLOCK_SKEW_SECONDS=60 (explicit configuration, bounded 0..120)",
+        "roleAuthorityMap": "contract.read=READ_RESOURCE; contract.write=WRITE_RESOURCE; ingest.execute=WRITE_RESOURCE; quality.approve=PUBLISH_RESOURCE; publish.execute=PUBLISH_RESOURCE; raw.read=READ_RESOURCE; admin=ADMIN; platform.admin=PLATFORM_CROSS_TENANT",
+        "bootstrapAuthentication": "PLATFORM_BOOTSTRAP_AUTH_ENABLED=false - no static-token bypass is active",
+        "rateLimit": "120 requests / 60 s per client key; 60 requests paced at 350 ms across nine identity buckets; no case returned 429",
+        "containerLifecycle": "the container was restarted by the lead before this run and reported healthy; this session restarted nothing",
+        "productionSafety": "the production API (geostat-api, :8083) was called once, GET /health -> 200; no production container, database or configuration was touched",
+        "edgeProxyFact": "unchanged: the edge nginx catch-all server block routes https://api.geostat.internal/api/ to the PRODUCTION container, so the suite addresses the dev API directly and never sends test traffic through that hostname"
+      },
+      "identityInventory": {
+        "reference": "geostat-artifact-operator - now a CROSS-TENANT identity. Its 200 no longer proves same-tenant access, which is why run-2 adds dedicated own-tenant identities.",
+        "throwawayClientsCreated": [
+          "zz-sectest-no-audience",
+          "zz-sectest-no-tenant",
+          "zz-sectest-no-roles",
+          "zz-sectest-short-lifespan",
+          "zz-sectest-own-tenant",
+          "zz-sectest-own-tenant-writer",
+          "zz-sectest-foreign-tenant-writer",
+          "zz-sectest-blank-tenant",
+          "zz-sectest-foreign-tenant"
+        ],
+        "throwawayClientsDeleted": [
+          {
+            "clientId": "zz-sectest-no-audience",
+            "existedBeforeDelete": true,
+            "existsAfterDelete": false
+          },
+          {
+            "clientId": "zz-sectest-no-tenant",
+            "existedBeforeDelete": true,
+            "existsAfterDelete": false
+          },
+          {
+            "clientId": "zz-sectest-no-roles",
+            "existedBeforeDelete": true,
+            "existsAfterDelete": false
+          },
+          {
+            "clientId": "zz-sectest-short-lifespan",
+            "existedBeforeDelete": true,
+            "existsAfterDelete": false
+          },
+          {
+            "clientId": "zz-sectest-own-tenant",
+            "existedBeforeDelete": true,
+            "existsAfterDelete": false
+          },
+          {
+            "clientId": "zz-sectest-own-tenant-writer",
+            "existedBeforeDelete": true,
+            "existsAfterDelete": false
+          },
+          {
+            "clientId": "zz-sectest-foreign-tenant-writer",
+            "existedBeforeDelete": true,
+            "existsAfterDelete": false
+          },
+          {
+            "clientId": "zz-sectest-blank-tenant",
+            "existedBeforeDelete": true,
+            "existsAfterDelete": false
+          },
+          {
+            "clientId": "zz-sectest-foreign-tenant",
+            "existedBeforeDelete": true,
+            "existsAfterDelete": false
+          }
+        ],
+        "cleanupVerification": {
+          "clientsCarryingThePrefixBeforeTeardown": 9,
+          "clientsCarryingThePrefixAfterTeardown": [],
+          "realmUsersMatchingThePrefixAfterTeardown": [],
+          "clientsInRealmBeforeRun": 9,
+          "clientsInRealmDuringRun": 18,
+          "clientsInRealmAfterTeardown": 9,
+          "preExistingObjectsUnchanged": "no existing client, realm role, protocol mapper, client scope, user or realm setting was modified or deleted; the provisioner refuses any client id without the zz-sectest- prefix and refuses to touch a client that already exists",
+          "serverSideWorkingDirectory": "/tmp/geostat-sectest removed; verified absent",
+          "secretsInThisEvidence": "none - no token, signature, client secret or administrator credential is recorded"
+        },
+        "tokenProperties": {
+          "operator": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 7,
+            "lifetimeSeconds": 300
+          },
+          "zz-sectest-no-audience": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": false,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 4,
+            "lifetimeSeconds": 300
+          },
+          "zz-sectest-no-tenant": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": false,
+            "roleCount": 4,
+            "lifetimeSeconds": 300
+          },
+          "zz-sectest-short-lifespan": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 4,
+            "lifetimeSeconds": 1
+          },
+          "zz-sectest-short-lifespan-within-skew": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 4,
+            "lifetimeSeconds": 1
+          },
+          "zz-sectest-no-roles": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 0,
+            "lifetimeSeconds": 300
+          },
+          "zz-sectest-blank-tenant": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 4,
+            "lifetimeSeconds": 300
+          },
+          "zz-sectest-foreign-tenant": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 4,
+            "lifetimeSeconds": 300
+          },
+          "zz-sectest-foreign-tenant-writer": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 5,
+            "lifetimeSeconds": 300
+          },
+          "zz-sectest-own-tenant": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 4,
+            "lifetimeSeconds": 300
+          },
+          "zz-sectest-own-tenant-writer": {
+            "obtained": true,
+            "alg": "RS256",
+            "hasKid": true,
+            "audienceMatchesPolicy": true,
+            "issuerMatchesPolicy": true,
+            "requiredClaimPresent": true,
+            "roleCount": 5,
+            "lifetimeSeconds": 300
+          }
+        }
+      },
+      "matrix": [
+        {
+          "id": "tls.discovery",
+          "group": "transport",
+          "request": {
+            "method": "GET",
+            "target": "discovery",
+            "tls": "explicit trust anchor"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json;charset=UTF-8",
+          "leaksImplementationDetail": false,
+          "issuerMatchesPolicy": true,
+          "issuerScheme": "https",
+          "jwksOverTls": true,
+          "trustAnchor": "tls.crt"
+        },
+        {
+          "id": "tls.jwks",
+          "group": "transport",
+          "request": {
+            "method": "GET",
+            "target": "jwks",
+            "tls": "explicit trust anchor"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "keyCount": 2,
+          "algorithms": [
+            "RS256",
+            "RSA-OAEP"
+          ],
+          "trustAnchor": "tls.crt"
+        },
+        {
+          "id": "tls.discovery.untrusted",
+          "group": "transport",
+          "request": {
+            "method": "GET",
+            "target": "discovery",
+            "tls": "default trust store, no explicit anchor"
+          },
+          "expectedStatus": [
+            0
+          ],
+          "actualStatus": 0,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "note": "curl reports 000 when the TLS handshake is rejected"
+        },
+        {
+          "id": "authn.anonymous",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "no Authorization header"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json;charset=ISO-8859-1",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "type": "about:blank",
+            "title": "Unauthorized",
+            "status": 401
+          },
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/problem+json;charset=ISO-8859-1",
+            "WWW-Authenticate": "Bearer"
+          },
+          "headerContract": {
+            "profile": "unauthenticated401",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": "application/problem+json;charset=ISO-8859-1",
+                "matches": true
+              },
+              "WWW-Authenticate": {
+                "expected": "Bearer",
+                "actual": "Bearer",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": "no-store",
+                "actual": "no-store",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": true
+          }
+        },
+        {
+          "id": "authn.malformed",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "Authorization: Bearer not-a-jwt"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Malformed token\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          },
+          "headerContract": {
+            "profile": "rejectedToken401",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": null,
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"invalid_token\""
+                },
+                "actual": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Malformed token\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\"",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          }
+        },
+        {
+          "id": "authn.emptyBearer",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "Authorization: Bearer with empty value"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"Bearer token is malformed\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          },
+          "headerContract": {
+            "profile": "rejectedToken401",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": null,
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"invalid_token\""
+                },
+                "actual": "Bearer error=\"invalid_token\", error_description=\"Bearer token is malformed\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\"",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          }
+        },
+        {
+          "id": "authn.basic",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "a non-Bearer Authorization scheme"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json;charset=ISO-8859-1",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "type": "about:blank",
+            "title": "Unauthorized",
+            "status": 401
+          },
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/problem+json;charset=ISO-8859-1",
+            "WWW-Authenticate": "Bearer"
+          },
+          "headerContract": {
+            "profile": "unauthenticated401",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": "application/problem+json;charset=ISO-8859-1",
+                "matches": true
+              },
+              "WWW-Authenticate": {
+                "expected": "Bearer",
+                "actual": "Bearer",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": "no-store",
+                "actual": "no-store",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": true
+          }
+        },
+        {
+          "id": "authn.tamperedSignature",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "a genuine token whose last signature byte is flipped"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          },
+          "headerContract": {
+            "profile": "rejectedToken401",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": null,
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"invalid_token\""
+                },
+                "actual": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\"",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          }
+        },
+        {
+          "id": "authn.unknownKey",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "RS256 signed with an unknown key; issuer, audience and claims correct"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Another algorithm expected, or no matching key(s) found\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          },
+          "headerContract": {
+            "profile": "rejectedToken401",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": null,
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"invalid_token\""
+                },
+                "actual": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Another algorithm expected, or no matching key(s) found\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\"",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          }
+        },
+        {
+          "id": "authn.copiedKid",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "RS256 signed with an unknown key but carrying the authority's kid"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          },
+          "headerContract": {
+            "profile": "rejectedToken401",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": null,
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"invalid_token\""
+                },
+                "actual": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\"",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          }
+        },
+        {
+          "id": "authn.algNone",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "alg=none with an empty signature"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"Unsupported algorithm of none\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          },
+          "headerContract": {
+            "profile": "rejectedToken401",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": null,
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"invalid_token\""
+                },
+                "actual": "Bearer error=\"invalid_token\", error_description=\"Unsupported algorithm of none\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\"",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          }
+        },
+        {
+          "id": "authn.hs256.pem",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "HS256 signed with the authority's public key (pem)"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Another algorithm expected, or no matching key(s) found\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          },
+          "headerContract": {
+            "profile": "rejectedToken401",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": null,
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"invalid_token\""
+                },
+                "actual": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Another algorithm expected, or no matching key(s) found\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\"",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          }
+        },
+        {
+          "id": "authn.hs256.base64Der",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "HS256 signed with the authority's public key (base64Der)"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Another algorithm expected, or no matching key(s) found\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          },
+          "headerContract": {
+            "profile": "rejectedToken401",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": null,
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"invalid_token\""
+                },
+                "actual": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Another algorithm expected, or no matching key(s) found\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\"",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          }
+        },
+        {
+          "id": "authn.wrongIssuer",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "self-signed token asserting a different issuer"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          },
+          "headerContract": {
+            "profile": "rejectedToken401",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": null,
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"invalid_token\""
+                },
+                "actual": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\"",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          }
+        },
+        {
+          "id": "authn.expiredForged",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "self-signed token whose exp is in the past"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          },
+          "headerContract": {
+            "profile": "rejectedToken401",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": null,
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"invalid_token\""
+                },
+                "actual": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\"",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          }
+        },
+        {
+          "id": "authn.notYetValid",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "self-signed token whose nbf is in the future"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": null,
+            "WWW-Authenticate": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\""
+          },
+          "headerContract": {
+            "profile": "rejectedToken401",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": null,
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"invalid_token\""
+                },
+                "actual": "Bearer error=\"invalid_token\", error_description=\"An error occurred while attempting to decode the Jwt: Signed JWT rejected: Invalid signature\", error_uri=\"https://tools.ietf.org/html/rfc6750#section-3.1\"",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          }
+        },
+        {
+          "id": "authn.zz-sectest-no-audience",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "authority-signed token whose audience does not include the API"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false
+        },
+        {
+          "id": "authn.zz-sectest-no-tenant",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "authority-signed token with the right audience but without the required tenant claim"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false
+        },
+        {
+          "id": "authn.zz-sectest-short-lifespan",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "genuine token used 75 s after its one-second lifetime has elapsed"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "secondsSinceIssue": 75
+        },
+        {
+          "id": "authn.zz-sectest-short-lifespan-within-skew",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "the same one-second token used 5 s after it expired, i.e. inside the deployment's declared clock-skew window (OIDC_CLOCK_SKEW_SECONDS=60)"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 200,
+          "result": "WITHIN_DECLARED_SKEW",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "declaredTolerance": {
+            "verdict": "WITHIN_DECLARED_SKEW",
+            "status": [
+              200
+            ],
+            "declaration": "OIDC_CLOCK_SKEW_SECONDS=60 (bounded 0..120); acceptance inside that window is configuration, not an absent control"
+          },
+          "secondsSinceIssue": 5
+        },
+        {
+          "id": "authn.zz-sectest-blank-tenant",
+          "group": "authn",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "credential": "the tenant claim is present but whitespace only"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false
+        },
+        {
+          "id": "authz.read.zz-sectest-own-tenant",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "identity": "zz-sectest-own-tenant",
+            "intent": "POSITIVE CONTROL: read role and the product's own tenant, WITHOUT the cross-tenant authority"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "Vary": "Access-Control-Request-Headers"
+          },
+          "itemsReturned": 2,
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "119"
+          }
+        },
+        {
+          "id": "authz.read.operator",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "identity": "operator",
+            "intent": "the reference identity now also holds the cross-tenant authority, so its 200 no longer proves same-tenant access"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "Vary": "Access-Control-Request-Headers"
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "119"
+          }
+        },
+        {
+          "id": "authz.read.zz-sectest-no-roles",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "identity": "zz-sectest-no-roles",
+            "intent": "no authority at all"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "FORBIDDEN"
+          },
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "WWW-Authenticate": null
+          },
+          "headerContract": {
+            "profile": "missingAuthority403",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": "application/json",
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"insufficient_scope\""
+                },
+                "actual": null,
+                "matches": false
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "119"
+          }
+        },
+        {
+          "id": "authz.read.zz-sectest-foreign-tenant",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "identity": "zz-sectest-foreign-tenant",
+            "intent": "a foreign tenant's object is masked as absent on the distribution boundary (no existence oracle)"
+          },
+          "expectedStatus": [
+            404
+          ],
+          "actualStatus": 404,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "type": "https://api.geostat.ge/problems/artifact-not-found",
+            "title": "artifact-not-found",
+            "status": 404,
+            "code": "artifact-not-found",
+            "detail": "No published KIDS_RESOURCE with key 128"
+          },
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/problem+json",
+            "WWW-Authenticate": null
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "119"
+          }
+        },
+        {
+          "id": "authz.readUnknownKey.zz-sectest-own-tenant",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/zz-sectest-unknown-external-key",
+            "identity": "zz-sectest-own-tenant",
+            "intent": "the same boundary's answer for an object that does not exist at all"
+          },
+          "expectedStatus": [
+            404
+          ],
+          "actualStatus": 404,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "type": "https://api.geostat.ge/problems/artifact-not-found",
+            "title": "artifact-not-found",
+            "status": 404,
+            "code": "artifact-not-found",
+            "detail": "No published KIDS_RESOURCE with key zz-sectest-unknown-external-key"
+          },
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/problem+json",
+            "WWW-Authenticate": null
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "118"
+          }
+        },
+        {
+          "id": "authz.signedDownload.zz-sectest-own-tenant",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download",
+            "identity": "zz-sectest-own-tenant",
+            "intent": "POSITIVE CONTROL: the own-tenant identity can have a governed download URL issued"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "Vary": "Access-Control-Request-Headers"
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "117"
+          }
+        },
+        {
+          "id": "authz.signedDownload.zz-sectest-foreign-tenant",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download",
+            "identity": "zz-sectest-foreign-tenant",
+            "intent": "the same issue endpoint masks a foreign tenant's entity as absent"
+          },
+          "expectedStatus": [
+            404
+          ],
+          "actualStatus": 404,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "type": "https://api.geostat.ge/problems/artifact-not-found",
+            "title": "artifact-not-found",
+            "status": 404,
+            "code": "artifact-not-found",
+            "detail": "No published KIDS_RESOURCE with key 128"
+          },
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/problem+json",
+            "WWW-Authenticate": null
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "118"
+          }
+        },
+        {
+          "id": "authz.idAddressedPackageRun.zz-sectest-own-tenant-writer",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/package-runs/2",
+            "identity": "zz-sectest-own-tenant-writer",
+            "intent": "POSITIVE CONTROL: read-only GET on an id-addressed route, own tenant, write authority present"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "Vary": "Access-Control-Request-Headers"
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "119"
+          }
+        },
+        {
+          "id": "authz.idAddressedPackageRun.zz-sectest-foreign-tenant-writer",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/package-runs/2",
+            "identity": "zz-sectest-foreign-tenant-writer",
+            "intent": "same route and authority, foreign tenant"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "type": "https://api.geostat.ge/problems/tenant-access-denied",
+            "title": "tenant-access-denied",
+            "status": 403,
+            "code": "tenant-access-denied",
+            "detail": "This resource is not available to the caller's tenant"
+          },
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/problem+json",
+            "WWW-Authenticate": null
+          },
+          "headerContract": {
+            "profile": "tenantDenied403",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": "application/problem+json",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": "no-store",
+                "actual": "no-store",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": true
+          },
+          "problemCode": {
+            "expected": "tenant-access-denied",
+            "actual": "tenant-access-denied",
+            "matches": true
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "119"
+          }
+        },
+        {
+          "id": "authz.idAddressedPackageRun.zz-sectest-no-roles",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/package-runs/2",
+            "identity": "zz-sectest-no-roles",
+            "intent": "the write authority is absent, so the tenancy question is never reached"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "FORBIDDEN"
+          },
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "WWW-Authenticate": null
+          },
+          "headerContract": {
+            "profile": "missingAuthority403",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": "application/json",
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"insufficient_scope\""
+                },
+                "actual": null,
+                "matches": false
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "118"
+          }
+        },
+        {
+          "id": "authz.idAddressedManifestDocument.zz-sectest-own-tenant-writer",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/manifests/7/document",
+            "identity": "zz-sectest-own-tenant-writer",
+            "intent": "POSITIVE CONTROL: read-only GET on a second id-addressed route, own tenant"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "Vary": "Access-Control-Request-Headers"
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "118"
+          }
+        },
+        {
+          "id": "authz.idAddressedManifestDocument.zz-sectest-foreign-tenant-writer",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/manifests/7/document",
+            "identity": "zz-sectest-foreign-tenant-writer",
+            "intent": "same route and authority, foreign tenant"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "type": "https://api.geostat.ge/problems/tenant-access-denied",
+            "title": "tenant-access-denied",
+            "status": 403,
+            "code": "tenant-access-denied",
+            "detail": "This resource is not available to the caller's tenant"
+          },
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/problem+json",
+            "WWW-Authenticate": null
+          },
+          "headerContract": {
+            "profile": "tenantDenied403",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": "application/problem+json",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": "no-store",
+                "actual": "no-store",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": true
+          },
+          "problemCode": {
+            "expected": "tenant-access-denied",
+            "actual": "tenant-access-denied",
+            "matches": true
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "118"
+          }
+        },
+        {
+          "id": "authz.adminOnly.operator",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/test/dashboardStats",
+            "identity": "operator",
+            "intent": "privileged read/write identity on an endpoint that demands the administrative authority"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "FORBIDDEN"
+          },
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "WWW-Authenticate": null
+          },
+          "headerContract": {
+            "profile": "missingAuthority403",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": "application/json",
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"insufficient_scope\""
+                },
+                "actual": null,
+                "matches": false
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          },
+          "rateLimit": {
+            "RateLimit-Limit": null,
+            "RateLimit-Remaining": null
+          }
+        },
+        {
+          "id": "authz.adminOnly.zz-sectest-no-roles",
+          "group": "authz",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/test/dashboardStats",
+            "identity": "zz-sectest-no-roles",
+            "intent": "no authority at all"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "FORBIDDEN"
+          },
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "WWW-Authenticate": null
+          },
+          "headerContract": {
+            "profile": "missingAuthority403",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": "application/json",
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"insufficient_scope\""
+                },
+                "actual": null,
+                "matches": false
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          },
+          "rateLimit": {
+            "RateLimit-Limit": null,
+            "RateLimit-Remaining": null
+          }
+        },
+        {
+          "id": "authz.writeOnly.zz-sectest-no-roles",
+          "group": "authz",
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/platform/artifacts/snapshots/52/reconciliation",
+            "identity": "zz-sectest-no-roles",
+            "intent": "a mutating endpoint is refused before any effect for an identity without the write authority"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "FAIL_RESPONSE_CONTRACT",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "FORBIDDEN"
+          },
+          "headers": {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/json",
+            "WWW-Authenticate": null
+          },
+          "headerContract": {
+            "profile": "missingAuthority403",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": "application/json",
+                "matches": false
+              },
+              "WWW-Authenticate": {
+                "expected": {
+                  "startsWith": "Bearer error=\"insufficient_scope\""
+                },
+                "actual": null,
+                "matches": false
+              },
+              "Cache-Control": {
+                "expected": {
+                  "contains": "no-store"
+                },
+                "actual": "no-cache, no-store, max-age=0, must-revalidate",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": false
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "117"
+          }
+        },
+        {
+          "id": "authz.writeOnly.zz-sectest-foreign-tenant",
+          "group": "authz",
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/platform/artifacts/snapshots/52/reconciliation",
+            "identity": "zz-sectest-foreign-tenant",
+            "intent": "read role only; the write authority is absent, so nothing is mutated"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "type": "https://api.geostat.ge/problems/tenant-access-denied",
+            "title": "tenant-access-denied",
+            "status": 403,
+            "code": "tenant-access-denied",
+            "detail": "This resource is not available to the caller's tenant"
+          },
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/problem+json",
+            "WWW-Authenticate": null
+          },
+          "rateLimit": {
+            "RateLimit-Limit": "120",
+            "RateLimit-Remaining": "117"
+          }
+        },
+        {
+          "id": "transport.correlationReflection.authenticated",
+          "group": "transport",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "sent": "X-Correlation-Id with an unsafe value"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "reflectedVerbatim": false,
+          "replacedWithGeneratedValue": true
+        },
+        {
+          "id": "transport.correlationReflection.unauthenticated",
+          "group": "transport",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "sent": "X-Correlation-Id with an unsafe value, no credential"
+          },
+          "expectedStatus": [
+            401
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json;charset=ISO-8859-1",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "type": "about:blank",
+            "title": "Unauthorized",
+            "status": 401
+          },
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/problem+json;charset=ISO-8859-1",
+            "WWW-Authenticate": "Bearer"
+          },
+          "reflectedVerbatim": false
+        },
+        {
+          "id": "transport.corsPreflight.foreignOrigin",
+          "group": "transport",
+          "request": {
+            "method": "OPTIONS",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "origin": "a foreign origin"
+          },
+          "expectedStatus": [
+            403,
+            401,
+            400
+          ],
+          "actualStatus": 403,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "accessControlAllowOrigin": null,
+          "originEchoed": false
+        },
+        {
+          "id": "transport.corsPreflight.configuredOrigin",
+          "group": "transport",
+          "request": {
+            "method": "OPTIONS",
+            "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+            "origin": "an origin the deployment configures as allowed"
+          },
+          "expectedStatus": [
+            200,
+            204
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": null,
+          "leaksImplementationDetail": false,
+          "accessControlAllowOrigin": "echoed",
+          "allowCredentials": "true"
+        },
+        {
+          "id": "transport.unmappedRoute",
+          "group": "transport",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/zz-sectest-no-such-route",
+            "credential": "none"
+          },
+          "expectedStatus": [
+            401,
+            404
+          ],
+          "actualStatus": 401,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json;charset=ISO-8859-1",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "type": "about:blank",
+            "title": "Unauthorized",
+            "status": 401
+          },
+          "headers": {
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": null,
+            "Content-Security-Policy": "default-src 'none'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'",
+            "Referrer-Policy": "no-referrer",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+            "X-Frame-Options": "SAMEORIGIN",
+            "Content-Type": "application/problem+json;charset=ISO-8859-1",
+            "WWW-Authenticate": "Bearer"
+          }
+        },
+        {
+          "id": "transport.publicEndpoint",
+          "group": "transport",
+          "request": {
+            "method": "GET",
+            "path": "/health",
+            "credential": "none"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "UP"
+          }
+        },
+        {
+          "id": "page.page8.introspection",
+          "group": "pages",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/revisions/8/introspection",
+            "identity": "operator",
+            "intent": ""
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "APPROVED"
+          },
+          "identity": "operator"
+        },
+        {
+          "id": "page.page8.pages",
+          "group": "pages",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages?revision=8",
+            "identity": "operator",
+            "intent": ""
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "identity": "operator"
+        },
+        {
+          "id": "page.page8.capabilities",
+          "group": "pages",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/8/query-capabilities?revision=8",
+            "identity": "operator",
+            "intent": ""
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "declaredIncludes": [
+            "GOAL_CATEGORY",
+            "GOAL_RAW_LINEAGE"
+          ],
+          "identity": "operator"
+        },
+        {
+          "id": "page.page8.query",
+          "group": "pages",
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/8/query",
+            "identity": "operator",
+            "intent": ""
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "rowsReturned": 5,
+          "rowsTotal": 72,
+          "identity": "operator"
+        },
+        {
+          "id": "page.page11.introspection",
+          "group": "pages",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/revisions/8/introspection",
+            "identity": "operator",
+            "intent": ""
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "APPROVED"
+          },
+          "identity": "operator"
+        },
+        {
+          "id": "page.page11.capabilities",
+          "group": "pages",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/11/query-capabilities?revision=8",
+            "identity": "operator",
+            "intent": ""
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "declaredIncludes": [
+            "INPUT_FOR_CARRIER",
+            "INPUT_RAW_LINEAGE"
+          ],
+          "identity": "operator"
+        },
+        {
+          "id": "page.page11.query-root-projection",
+          "group": "pages",
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/11/query",
+            "identity": "operator",
+            "intent": ""
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "rowsReturned": 25,
+          "rowsTotal": 1760,
+          "identity": "operator"
+        },
+        {
+          "id": "page.page11.query-with-declared-includes",
+          "group": "pages",
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/11/query",
+            "identity": "operator",
+            "intent": ""
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 400,
+          "result": "FAIL",
+          "responseMediaType": "application/problem+json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "type": "https://api.geostat.ge/problems/contract-query-invalid",
+            "title": "contract-query-invalid",
+            "status": 400,
+            "code": "contract-query-invalid",
+            "detail": "Only data-plane contract tables are queryable"
+          },
+          "identity": "operator"
+        },
+        {
+          "id": "page.page8-own-tenant.introspection",
+          "group": "pages",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/revisions/8/introspection",
+            "identity": "zz-sectest-own-tenant",
+            "intent": "POSITIVE CONTROL: contract introspection for the tenant that owns the product"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "status": "APPROVED"
+          },
+          "identity": "zz-sectest-own-tenant"
+        },
+        {
+          "id": "page.page8-own-tenant.capabilities",
+          "group": "pages",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/8/query-capabilities?revision=8",
+            "identity": "zz-sectest-own-tenant",
+            "intent": ""
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "identity": "zz-sectest-own-tenant"
+        },
+        {
+          "id": "page.page8-own-tenant.query",
+          "group": "pages",
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/8/query",
+            "identity": "zz-sectest-own-tenant",
+            "intent": "POSITIVE CONTROL: the owning tenant still reads its own rows"
+          },
+          "expectedStatus": [
+            200
+          ],
+          "actualStatus": 200,
+          "result": "PASS",
+          "responseMediaType": "application/json",
+          "leaksImplementationDetail": false,
+          "rowsReturned": 5,
+          "rowsTotal": 72,
+          "identity": "zz-sectest-own-tenant"
+        },
+        {
+          "id": "page.page8-foreign-tenant.introspection",
+          "group": "pages",
+          "request": {
+            "method": "GET",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/revisions/8/introspection",
+            "identity": "zz-sectest-foreign-tenant",
+            "intent": "a contract route denies a foreign tenant outright, because its unknown-object answer is not a 404"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "type": "https://api.geostat.ge/problems/tenant-access-denied",
+            "title": "tenant-access-denied",
+            "status": 403,
+            "code": "tenant-access-denied",
+            "detail": "This resource is not available to the caller's tenant"
+          },
+          "headerContract": {
+            "profile": "tenantDenied403",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": "application/problem+json",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": "no-store",
+                "actual": "no-store",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": true
+          },
+          "problemCode": {
+            "expected": "tenant-access-denied",
+            "actual": "tenant-access-denied",
+            "matches": true
+          },
+          "identity": "zz-sectest-foreign-tenant"
+        },
+        {
+          "id": "page.page8-foreign-tenant.query",
+          "group": "pages",
+          "request": {
+            "method": "POST",
+            "path": "/api/v1/platform/contracts/KIDS_PORTAL_V1/pages/8/query",
+            "identity": "zz-sectest-foreign-tenant",
+            "intent": "the page query of another tenant's contract is denied"
+          },
+          "expectedStatus": [
+            403
+          ],
+          "actualStatus": 403,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json",
+          "leaksImplementationDetail": false,
+          "problem": {
+            "type": "https://api.geostat.ge/problems/tenant-access-denied",
+            "title": "tenant-access-denied",
+            "status": 403,
+            "code": "tenant-access-denied",
+            "detail": "This resource is not available to the caller's tenant"
+          },
+          "headerContract": {
+            "profile": "tenantDenied403",
+            "checks": {
+              "Content-Type": {
+                "expected": "application/problem+json",
+                "actual": "application/problem+json",
+                "matches": true
+              },
+              "Cache-Control": {
+                "expected": "no-store",
+                "actual": "no-store",
+                "matches": true
+              },
+              "X-Content-Type-Options": {
+                "expected": "nosniff",
+                "actual": "nosniff",
+                "matches": true
+              }
+            },
+            "satisfied": true
+          },
+          "problemCode": {
+            "expected": "tenant-access-denied",
+            "actual": "tenant-access-denied",
+            "matches": true
+          },
+          "identity": "zz-sectest-foreign-tenant"
+        },
+        {
+          "id": "oracle.distributionMasking",
+          "group": "oracle",
+          "request": {
+            "check": "THE existence-oracle test, from the attacker's own position: with the identity held constant, an object that exists but belongs to another tenant must be indistinguishable from one that does not exist at all",
+            "volatileMembersRemoved": [
+              "correlationId",
+              "timestamp",
+              "instance",
+              "path",
+              "traceId"
+            ]
+          },
+          "expectedStatus": [
+            404
+          ],
+          "actualStatus": 404,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json",
+          "leaksImplementationDetail": false,
+          "bodiesEqualAfterRedaction": true,
+          "expectedEqual": true,
+          "sameStatus": true,
+          "sides": {
+            "left": {
+              "identity": "zz-sectest-foreign-tenant",
+              "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+              "status": 404,
+              "intent": "an object that exists but belongs to another tenant",
+              "callerSuppliedValuesNormalised": [
+                "128"
+              ],
+              "redactedBody": {
+                "code": "artifact-not-found",
+                "detail": "No published KIDS_RESOURCE with key <caller-supplied>",
+                "status": 404,
+                "title": "artifact-not-found",
+                "type": "https://api.geostat.ge/problems/artifact-not-found"
+              },
+              "mediaType": "application/problem+json"
+            },
+            "right": {
+              "identity": "zz-sectest-foreign-tenant",
+              "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/zz-sectest-unknown-external-key",
+              "status": 404,
+              "intent": "an object that does not exist at all",
+              "callerSuppliedValuesNormalised": [
+                "zz-sectest-unknown-external-key"
+              ],
+              "redactedBody": {
+                "code": "artifact-not-found",
+                "detail": "No published KIDS_RESOURCE with key <caller-supplied>",
+                "status": 404,
+                "title": "artifact-not-found",
+                "type": "https://api.geostat.ge/problems/artifact-not-found"
+              },
+              "mediaType": "application/problem+json"
+            }
+          }
+        },
+        {
+          "id": "oracle.distributionMaskingCrossIdentity",
+          "group": "oracle",
+          "request": {
+            "check": "the same answer shape also across identities: the foreign tenant's refusal equals what the owning tenant is told about an object that does not exist",
+            "volatileMembersRemoved": [
+              "correlationId",
+              "timestamp",
+              "instance",
+              "path",
+              "traceId"
+            ]
+          },
+          "expectedStatus": [
+            404
+          ],
+          "actualStatus": 404,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json",
+          "leaksImplementationDetail": false,
+          "bodiesEqualAfterRedaction": true,
+          "expectedEqual": true,
+          "sameStatus": true,
+          "sides": {
+            "left": {
+              "identity": "zz-sectest-foreign-tenant",
+              "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128",
+              "status": 404,
+              "intent": "an object that exists but belongs to another tenant",
+              "callerSuppliedValuesNormalised": [
+                "128"
+              ],
+              "redactedBody": {
+                "code": "artifact-not-found",
+                "detail": "No published KIDS_RESOURCE with key <caller-supplied>",
+                "status": 404,
+                "title": "artifact-not-found",
+                "type": "https://api.geostat.ge/problems/artifact-not-found"
+              },
+              "mediaType": "application/problem+json"
+            },
+            "right": {
+              "identity": "zz-sectest-own-tenant",
+              "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/zz-sectest-unknown-external-key",
+              "status": 404,
+              "intent": "an object that does not exist at all, asked by the owning tenant",
+              "callerSuppliedValuesNormalised": [
+                "zz-sectest-unknown-external-key"
+              ],
+              "redactedBody": {
+                "code": "artifact-not-found",
+                "detail": "No published KIDS_RESOURCE with key <caller-supplied>",
+                "status": 404,
+                "title": "artifact-not-found",
+                "type": "https://api.geostat.ge/problems/artifact-not-found"
+              },
+              "mediaType": "application/problem+json"
+            }
+          }
+        },
+        {
+          "id": "oracle.signedDownloadMasking",
+          "group": "oracle",
+          "request": {
+            "check": "the same existence-oracle test on the signed-download issue endpoint, identity held constant",
+            "volatileMembersRemoved": [
+              "correlationId",
+              "timestamp",
+              "instance",
+              "path",
+              "traceId"
+            ]
+          },
+          "expectedStatus": [
+            404
+          ],
+          "actualStatus": 404,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json",
+          "leaksImplementationDetail": false,
+          "bodiesEqualAfterRedaction": true,
+          "expectedEqual": true,
+          "sameStatus": true,
+          "sides": {
+            "left": {
+              "identity": "zz-sectest-foreign-tenant",
+              "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download",
+              "status": 404,
+              "intent": "a foreign tenant's existing entity",
+              "callerSuppliedValuesNormalised": [
+                "128"
+              ],
+              "redactedBody": {
+                "code": "artifact-not-found",
+                "detail": "No published KIDS_RESOURCE with key <caller-supplied>",
+                "status": 404,
+                "title": "artifact-not-found",
+                "type": "https://api.geostat.ge/problems/artifact-not-found"
+              },
+              "mediaType": "application/problem+json"
+            },
+            "right": {
+              "identity": "zz-sectest-foreign-tenant",
+              "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/zz-sectest-unknown-external-key/PRIMARY_FILE/ka/1/download",
+              "status": 404,
+              "intent": "an entity that does not exist at all",
+              "callerSuppliedValuesNormalised": [
+                "zz-sectest-unknown-external-key"
+              ],
+              "redactedBody": {
+                "code": "artifact-not-found",
+                "detail": "No published KIDS_RESOURCE with key <caller-supplied>",
+                "status": 404,
+                "title": "artifact-not-found",
+                "type": "https://api.geostat.ge/problems/artifact-not-found"
+              },
+              "mediaType": "application/problem+json"
+            }
+          }
+        },
+        {
+          "id": "oracle.signedDownloadMaskingCrossIdentity",
+          "group": "oracle",
+          "request": {
+            "check": "the same across identities on the signed-download issue endpoint",
+            "volatileMembersRemoved": [
+              "correlationId",
+              "timestamp",
+              "instance",
+              "path",
+              "traceId"
+            ]
+          },
+          "expectedStatus": [
+            404
+          ],
+          "actualStatus": 404,
+          "result": "PASS",
+          "responseMediaType": "application/problem+json",
+          "leaksImplementationDetail": false,
+          "bodiesEqualAfterRedaction": true,
+          "expectedEqual": true,
+          "sameStatus": true,
+          "sides": {
+            "left": {
+              "identity": "zz-sectest-foreign-tenant",
+              "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/128/PRIMARY_FILE/ka/1/download",
+              "status": 404,
+              "intent": "a foreign tenant's existing entity",
+              "callerSuppliedValuesNormalised": [
+                "128"
+              ],
+              "redactedBody": {
+                "code": "artifact-not-found",
+                "detail": "No published KIDS_RESOURCE with key <caller-supplied>",
+                "status": 404,
+                "title": "artifact-not-found",
+                "type": "https://api.geostat.ge/problems/artifact-not-found"
+              },
+              "mediaType": "application/problem+json"
+            },
+            "right": {
+              "identity": "zz-sectest-own-tenant",
+              "path": "/api/v1/platform/artifacts/entities/KIDS_RESOURCE/zz-sectest-unknown-external-key/PRIMARY_FILE/ka/1/download",
+              "status": 404,
+              "intent": "an entity that does not exist at all, asked by the owning tenant",
+              "callerSuppliedValuesNormalised": [
+                "zz-sectest-unknown-external-key"
+              ],
+              "redactedBody": {
+                "code": "artifact-not-found",
+                "detail": "No published KIDS_RESOURCE with key <caller-supplied>",
+                "status": 404,
+                "title": "artifact-not-found",
+                "type": "https://api.geostat.ge/problems/artifact-not-found"
+              },
+              "mediaType": "application/problem+json"
+            }
+          }
+        }
+      ],
+      "gateAssessment": [
+        {
+          "gateItem": "certificate chain and hostname verification PASS",
+          "state": "PASS",
+          "evidence": "tls.discovery and tls.jwks validate against the edge certificate as an explicit trust anchor; the same endpoint without it fails the handshake."
+        },
+        {
+          "gateItem": "OIDC discovery over HTTPS returns 200",
+          "state": "PASS",
+          "evidence": "tls.discovery 200; issuer equals the configured issuer, scheme https, jwks_uri https."
+        },
+        {
+          "gateItem": "JWKS endpoint reachable from the API container",
+          "state": "PASS",
+          "evidence": "tls.jwks 200 with 2 keys (RS256, RSA-OAEP); reachability from inside geostat-api-dev confirmed in run-1 and unchanged."
+        },
+        {
+          "gateItem": "valid RS256 token -> 200",
+          "state": "PASS",
+          "evidence": "authz.read.zz-sectest-own-tenant 200 with 2 artifacts - an identity holding ONLY the read role and the owning tenant, without the cross-tenant authority."
+        },
+        {
+          "gateItem": "wrong issuer / audience / signature / expiry -> 401",
+          "state": "PASS",
+          "evidence": "Twelve negative authentication cases are 401, including a flipped signature byte, an unknown key with the authority's kid, alg=none, HS256 with the authority's public key in two encodings, a forged issuer, nbf in the future, a missing audience, a missing tenant claim, a BLANK tenant claim and a real token 75 s past expiry. Acceptance 5 s past expiry is the declared OIDC_CLOCK_SKEW_SECONDS=60 tolerance, recorded as WITHIN_DECLARED_SKEW."
+        },
+        {
+          "gateItem": "wrong tenant / role -> 403 / deny",
+          "state": "PASS",
+          "evidence": "Role: an identity with no role is 403 on the read, mutating and id-addressed routes; the cross-tenant reference identity is 403 on the administrative endpoint. Tenant: a foreign tenant is masked as 404 on the distribution boundary (four existence-oracle comparisons PASS) and refused with 403 problem+json code tenant-access-denied on contract, page and id-addressed routes. Positive controls prove this is not 'deny everyone but admins'."
+        },
+        {
+          "gateItem": "pageId=8 introspection/query -> 200",
+          "state": "PASS",
+          "evidence": "page.page8.* 200 for the cross-tenant reference identity AND page.page8-own-tenant.* 200 for the owning tenant with no cross-tenant authority."
+        },
+        {
+          "gateItem": "pageId=11 query -> 200 with non-empty rows and both revision-declared relation includes hydrated",
+          "state": "FAIL",
+          "evidence": "Unchanged from run-1: the root projection passes (25 of 1760 rows) and both declared includes are refused with HTTP 400. See SEC-2026-003."
+        },
+        {
+          "gateItem": "response, checksum and authorization evidence in a signed bundle",
+          "state": "NOT_CLOSED",
+          "evidence": "This file is unsigned machine-readable evidence."
+        },
+        {
+          "gateItem": "approved deploy authority and rollback plan confirmed",
+          "state": "NOT_CLOSED",
+          "evidence": "Out of scope for a runtime security suite."
+        }
+      ],
+      "positiveControls": [
+        "authz.read.zz-sectest-own-tenant 200 with 2 artifacts - read role, owning tenant, NO cross-tenant authority. This is the control that proves enforcement is not a blanket deny.",
+        "authz.signedDownload.zz-sectest-own-tenant 200 - the own-tenant identity can still have a governed download URL issued.",
+        "authz.idAddressedPackageRun / idAddressedManifestDocument .zz-sectest-own-tenant-writer 200 - read-only GETs on id-addressed routes succeed for the owning tenant with the write authority.",
+        "page.page8-own-tenant.introspection / capabilities / query 200 - contract and page routes answer the owning tenant.",
+        "transport.corsPreflight.configuredOrigin 200 - the foreign-origin rejection is a policy decision, not a broken preflight path.",
+        "page.page11.query-root-projection 200 - the page 11 failure is specific to relation hydration.",
+        "authn.zz-sectest-short-lifespan 401 at +75 s - the expiry path works, so the +5 s acceptance is a configured window and not an absent control."
+      ],
+      "limits": [
+        "Only the dev API was exercised. Production was called once for GET /health.",
+        "The dev container was deployed and restarted by the lead before this run; this session restarted nothing and rebuilt nothing. The results describe that deployed image.",
+        "The unassigned-product default (a product with no owning tenant is reachable only by the cross-tenant authority, TenantAccessOutcome.DENIED_PRODUCT_UNASSIGNED) was NOT exercised at runtime: creating a product is not available to this session. It is covered by the source-level TenantAccessPolicyTest.",
+        "Only one foreign tenant value and one owning tenant value were used. Tenant separation between two DIFFERENT assigned products was not exercised, because only one product is assigned on dev.",
+        "No cross-realm token was obtained; the wrong-issuer case remains a self-signed token asserting a foreign issuer.",
+        "Mutating endpoints were called only with identities lacking the write authority. The id-addressed routes exercised with the write authority are read-only GETs. Nothing was mutated.",
+        "The matrix records the API's own response headers; HSTS is added by the edge and is not part of the API-path matrix (SEC-2026-005).",
+        "Rate limiting was avoided, not tested: 60 paced requests across nine identity buckets, no 429.",
+        "The existence-oracle comparison normalises the identifier the caller itself supplied (it is echoed in the problem detail) before comparing. Echoing a caller's own input back is not information the caller lacked; everything else in the body is compared verbatim, including type, title, code, detail template, status and media type.",
+        "Refresh-token handling, token revocation, introspection-endpoint behaviour and interactive login flows were not exercised: the deployment uses client_credentials service identities only.",
+        "This evidence is not signed."
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "SEC-2026-001",
+      "severity": "HIGH",
+      "status": "CLOSED",
+      "title": "The tenant claim must be present, but its value is never compared to the data owner",
+      "observedInRun1": "zz-sectest-foreign-tenant - authority-signed, correct audience, contract.read role, tenant_id=zz-sectest-foreign-tenant - received HTTP 200 with the full resource body on the read endpoint.",
+      "closedBy": "run-2. The same identity now receives 404 on the distribution boundary, indistinguishable from an object that does not exist (oracle.distributionMasking, oracle.distributionMaskingCrossIdentity, oracle.signedDownloadMasking, oracle.signedDownloadMaskingCrossIdentity all PASS), and 403 problem+json with code tenant-access-denied on contract, page and id-addressed routes. The closure is load-bearing only because of the positive controls: an identity with the read role and the OWNING tenant, holding no cross-tenant authority, still receives 200 on the read endpoint (2 artifacts), on the signed-download issue endpoint, on both id-addressed routes and on page 8 introspection, capabilities and query.",
+      "cases": [
+        "authz.read.zz-sectest-own-tenant",
+        "authz.read.zz-sectest-foreign-tenant",
+        "authz.idAddressedPackageRun.zz-sectest-foreign-tenant-writer",
+        "page.page8-foreign-tenant.introspection",
+        "oracle.distributionMasking"
+      ]
+    },
+    {
+      "id": "SEC-2026-002",
+      "severity": "INFORMATIONAL",
+      "status": "DECLARED_TOLERANCE",
+      "title": "Token expiry carries a declared 60 s clock skew",
+      "observed": "A one-second token was accepted 5 s after expiry and refused 75 s after expiry.",
+      "resolution": "The skew is now explicit configuration, OIDC_CLOCK_SKEW_SECONDS (default 60, bounded 0..120), so the tolerated window is an approved, written number rather than an unexamined library default. The suite records the case as WITHIN_DECLARED_SKEW and keeps the +75 s case as the proof that expiry is enforced at all.",
+      "cases": [
+        "authn.zz-sectest-short-lifespan-within-skew",
+        "authn.zz-sectest-short-lifespan"
+      ]
+    },
+    {
+      "id": "SEC-2026-003",
+      "severity": "HIGH",
+      "status": "OPEN",
+      "title": "Page 11 cannot hydrate either relation the approved revision declares",
+      "observed": "Unchanged in run-2. The capabilities document for page 11 revision 8 declares allowedIncludes INPUT_FOR_CARRIER and INPUT_RAW_LINEAGE. Requesting either, alone or together, returns HTTP 400 application/problem+json code contract-query-invalid, detail 'Only data-plane contract tables are queryable'. Without includes the same query returns 200 and 25 of 1760 rows.",
+      "cause": "In revision 8 the root dataset KIDS_STATISTICAL_INPUT is registered with storage_plane DATA, while both relation targets KIDS_STATISTICAL_CARRIER and KIDS_RAW_DOCUMENT are registered with storage_plane ACCESS; the physical query service refuses any non-DATA plane and the include path uses that same service.",
+      "owner": "the lead handles this as a contract migration; no source was changed by this session",
+      "case": "page.page11.query-with-declared-includes"
+    },
+    {
+      "id": "SEC-2026-004",
+      "severity": "LOW",
+      "status": "PARTIALLY_CLOSED",
+      "title": "RFC 9457 and RFC 6750 on the error surface",
+      "closedPart": "The anonymous 401 is now application/problem+json with WWW-Authenticate: Bearer, Cache-Control: no-store and nosniff, and the tenancy 403 is application/problem+json with code tenant-access-denied, no-store and nosniff. Both were asserted as header contracts in run-2 and PASS.",
+      "remainingPart": "see SEC-2026-007 and SEC-2026-008, which run-2 measured for the first time",
+      "cases": [
+        "authn.anonymous",
+        "authz.idAddressedPackageRun.zz-sectest-foreign-tenant-writer"
+      ]
+    },
+    {
+      "id": "SEC-2026-005",
+      "severity": "INFORMATIONAL",
+      "status": "OPEN",
+      "title": "HSTS comes from the edge, not from the API, and the published API hostname points at production",
+      "observed": "Unchanged. The API emits Cache-Control, nosniff, CSP, Referrer-Policy, Permissions-Policy and X-Frame-Options: SAMEORIGIN but no Strict-Transport-Security, because it is reached over plain HTTP inside the host. The edge adds HSTS. The edge's catch-all server block proxies /api/ to the PRODUCTION container, so no TLS hostname currently fronts the dev API."
+    },
+    {
+      "id": "SEC-2026-006",
+      "severity": "INFORMATIONAL",
+      "status": "OPEN",
+      "title": "The existing page 11 replay script cannot pass against the approved revision",
+      "observed": "ops/scripts/kids-page11-runtime-replay.ps1 requests include ['lineage','dimensions'] and asserts pagination.total == 880. The approved revision declares INPUT_FOR_CARRIER and INPUT_RAW_LINEAGE and the live total is 1760."
+    },
+    {
+      "id": "SEC-2026-007",
+      "severity": "LOW",
+      "status": "OPEN",
+      "title": "A 401 for a REJECTED bearer token carries no body at all, so it is not an RFC 9457 document",
+      "observed": "Twelve run-2 cases: every 401 caused by a token that was presented and refused (malformed, empty bearer value, tampered signature, unknown key, copied kid, alg=none, HS256 confusion x2, forged issuer, expired, not-yet-valid, blank tenant claim) returns a zero-byte body with NO Content-Type header. The RFC 6750 challenge is correct - WWW-Authenticate begins Bearer error=\"invalid_token\" - and Cache-Control contains no-store and nosniff is present, but there is no problem document. The anonymous 401, which takes a different path, IS problem+json.",
+      "consequence": "The stated design 'refused bearer token 401 -> RFC 9457 problem+json' holds only for the no-credential path. A client cannot parse a uniform error document across the two 401 paths.",
+      "secondaryObservation": "The challenge also carries error_description text produced by the token decoder, for example 'An error occurred while attempting to decode the Jwt: Malformed token'. It leaks no secret and no data, but it describes an internal component to an unauthenticated caller.",
+      "verdictUsed": "FAIL_RESPONSE_CONTRACT (the status is correct; the declared response surface is not)",
+      "cases": [
+        "authn.malformed",
+        "authn.emptyBearer",
+        "authn.tamperedSignature",
+        "authn.unknownKey",
+        "authn.copiedKid",
+        "authn.algNone",
+        "authn.hs256.pem",
+        "authn.hs256.base64Der",
+        "authn.wrongIssuer",
+        "authn.expiredForged",
+        "authn.notYetValid"
+      ]
+    },
+    {
+      "id": "SEC-2026-008",
+      "severity": "LOW",
+      "status": "OPEN",
+      "title": "A 403 for a MISSING AUTHORITY is still the legacy JSON shape and carries no insufficient_scope challenge",
+      "observed": "Five run-2 cases: a 403 caused by a missing authority (no role at all on the read, mutating and id-addressed routes; the cross-tenant reference identity on the administrative endpoint) returns Content-Type: application/json with a {timestamp,status,error,message,path,correlationId} body and NO WWW-Authenticate header. Cache-Control contains no-store and nosniff is present.",
+      "contrast": "The TENANCY 403 on the same routes is correct: application/problem+json, code tenant-access-denied, no-store, nosniff. Only the missing-authority branch was not migrated.",
+      "consequence": "The stated design '403 missing authority -> Bearer error=\"insufficient_scope\"' is not met.",
+      "verdictUsed": "FAIL_RESPONSE_CONTRACT",
+      "cases": [
+        "authz.read.zz-sectest-no-roles",
+        "authz.adminOnly.operator",
+        "authz.adminOnly.zz-sectest-no-roles",
+        "authz.writeOnly.zz-sectest-no-roles",
+        "authz.idAddressedPackageRun.zz-sectest-no-roles"
+      ]
+    },
+    {
+      "id": "SEC-2026-009",
+      "severity": "INFORMATIONAL",
+      "status": "OPEN",
+      "title": "problem+json responses declare charset=ISO-8859-1",
+      "observed": "The anonymous 401 and the 404/403 problem documents are served as application/problem+json;charset=ISO-8859-1. RFC 9457 documents are JSON and therefore UTF-8; a non-ASCII detail would be mis-encoded for a client that honours the declared charset.",
+      "note": "No non-ASCII detail text was produced by any case in either run, so no mis-encoding was observed."
+    }
+  ],
+  "coveredBySourceTestsNotRuntime": [
+    {
+      "behaviour": "a product with no owning tenant is reachable only by the cross-tenant authority (TenantAccessOutcome.DENIED_PRODUCT_UNASSIGNED)",
+      "reason": "creating a data product is not available to this session, so the state cannot be produced at runtime on dev",
+      "sourceTest": "TenantAccessPolicyTest"
+    }
+  ]
+}

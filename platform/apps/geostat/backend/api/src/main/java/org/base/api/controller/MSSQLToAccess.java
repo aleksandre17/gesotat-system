@@ -17,7 +17,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.*;
 import java.util.*;
+import org.base.api.security.tenancy.TenantNeutral;
 
+@TenantNeutral(reason = "Operator tool that exports from a database the caller supplies credentials for; it carries no data-product identity at all. LEGACY: it should be retired or bound to an explicit operator authority rather than WRITE_RESOURCE.", legacy = true)
 @RequiredArgsConstructor
 @Slf4j
 @RestController

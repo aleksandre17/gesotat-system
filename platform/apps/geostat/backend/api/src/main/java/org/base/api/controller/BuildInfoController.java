@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.base.api.security.tenancy.TenantNeutral;
 
 /** Authenticated, non-sensitive build identity used by release/provenance acceptance. */
+@TenantNeutral(reason = "Build and revision metadata of the running artifact; it reads no data product.")
 @Api
 @RestController
 public final class BuildInfoController {

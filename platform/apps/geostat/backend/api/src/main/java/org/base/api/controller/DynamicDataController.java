@@ -21,9 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import org.base.api.security.tenancy.TenantScoped;
+import org.base.api.security.tenancy.TenantScopeExemption;
 
 /** Read-only dynamic data endpoint. Legacy profile mode remains for compatibility;
  * callers may pass contractCode to use the governed canonical contract engine. */
+@TenantScoped
 @Api
 @RestController
 @RequestMapping("/dynamic/pages")
@@ -56,6 +59,7 @@ public class DynamicDataController {
 
     @GetMapping("/{pageId}/data")
     @PreAuthorize("hasAuthority('READ_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.DEFAULT_CONTRACT, reason = "Without an explicit contractCode the route serves the approved default contract; the legacy profile fallback behind it carries no product identity and is scheduled for retirement.")
     public ResponseEntity<?> data(@PathVariable Long pageId,
                                                      @RequestParam(defaultValue = "1") int page,
                                                      @RequestParam(defaultValue = "100") int limit,
@@ -82,6 +86,7 @@ public class DynamicDataController {
 
     @GetMapping("/{pageId}/charts/{chartCode}")
     @PreAuthorize("hasAuthority('READ_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.DEFAULT_CONTRACT, reason = "Legacy chart definitions are addressed by page id and carry no product identity; the route is enforced against the approved default contract's product.")
     public ResponseEntity<DynamicChartResponse> chart(@PathVariable Long pageId, @PathVariable String chartCode) {
         return ResponseEntity.ok(dynamicChartService.read(pageId, chartCode));
     }

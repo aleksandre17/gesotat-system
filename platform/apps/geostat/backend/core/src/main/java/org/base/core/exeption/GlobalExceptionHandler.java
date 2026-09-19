@@ -42,6 +42,16 @@ import java.util.stream.Collectors;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private final org.base.core.exeption.api.ApiAccessDeniedHandler apiAccessDeniedHandler;
+
+    public GlobalExceptionHandler() {
+        this(new org.base.core.exeption.api.ApiAccessDeniedHandler());
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public GlobalExceptionHandler(org.base.core.exeption.api.ApiAccessDeniedHandler apiAccessDeniedHandler) {
+        this.apiAccessDeniedHandler = apiAccessDeniedHandler;
+    }
 
     public static class ResponseEntityBuilder {
         public static ResponseEntity<?> build(ApiExceptionResponse apiError) {
@@ -117,7 +127,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             return redirectWeb(ex, request, httpServletResponse, response);
         }
 
-        return ResponseEntityBuilder.build(response);
+        try {
+            // One 403 for the API boundary, whether the filter chain or method security refused the call.
+            apiAccessDeniedHandler.handle(request, httpServletResponse, ex);
+            return null;
+        } catch (java.io.IOException unwritable) {
+            return ResponseEntityBuilder.build(response);
+        }
     }
 
 

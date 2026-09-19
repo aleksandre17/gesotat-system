@@ -7,7 +7,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import org.base.api.security.tenancy.TenantScoped;
 
+@TenantScoped
 @Api
 @RestController
 @RequestMapping("/platform/contracts")

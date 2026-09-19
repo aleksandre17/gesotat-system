@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.base.api.security.tenancy.TenantNeutral;
 
 /** New-mode preflight endpoint. It never imports rows into a child database. */
+@TenantNeutral(reason = "Legacy managed import over the core profile/page metadata plane (DataProfile, PageLeafNode, per-page credentials); those rows have no data-product identity, so the route cannot be tenant-scoped without migrating the profile plane onto platform.data_product. LEGACY: recorded as a gap, not as safe; it must be migrated or bound to an explicit operator authority.", legacy = true)
 @Api
 @RestController
 @RequestMapping("/imports/access")

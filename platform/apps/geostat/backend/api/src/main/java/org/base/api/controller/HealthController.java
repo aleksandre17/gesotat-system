@@ -11,11 +11,13 @@ import org.base.api.service.storage.ObjectStorageService;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.base.api.security.tenancy.TenantNeutral;
 
 /**
  * Health check endpoint for Docker and monitoring.
  * GET /health → {"status":"UP","db":{"primary":"UP","secondary":"UP"}}
  */
+@TenantNeutral(reason = "Liveness and readiness probe; it exposes no data product and is the sole intentional unauthenticated surface.")
 @RestController
 @NoApiPrefix
 public class HealthController {

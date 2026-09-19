@@ -75,7 +75,8 @@ class ArtifactRelationIntegrityAuditServiceTest {
         final ArtifactRelationIntegrityAuditService service;
 
         Fixture() {
-            service = new ArtifactRelationIntegrityAuditService(contracts, attachments, reconciliation, metrics, properties, lease, readiness);
+            service = new ArtifactRelationIntegrityAuditService(contracts, attachments, reconciliation, metrics, properties, lease, readiness,
+                    org.base.api.security.tenancy.TenantAccessGuards.callerPort(org.base.api.security.tenancy.Caller.system("TEST")));
         }
 
         void schemaReady() { readiness.onMigrationsCompleted(new org.base.api.service.platform.PlatformSchemaReadyEvent()); }

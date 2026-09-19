@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.base.api.service.platform.PlatformSchemaReadiness;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.base.api.security.tenancy.CurrentCaller;
 
 /** Reconciles approved artifact relations for snapshots in bounded, distributed batches. */
 @Service
@@ -20,11 +21,12 @@ public class ArtifactRelationIntegrityAuditService {
     private final ArtifactProperties properties;
     private final PlatformJobLeaseService lease;
     private final PlatformSchemaReadiness schemaReadiness;
+    private final CurrentCaller callers;
 
     public ArtifactRelationIntegrityAuditService(ArtifactContractResolver contracts, ArtifactAttachmentRepository attachments,
                                                  ArtifactReconciliationService reconciliation, ArtifactMetrics metrics,
                                                  ArtifactProperties properties, PlatformJobLeaseService lease,
-                                                 PlatformSchemaReadiness schemaReadiness) {
+                                                 PlatformSchemaReadiness schemaReadiness, CurrentCaller callers) {
         this.contracts = contracts;
         this.attachments = attachments;
         this.reconciliation = reconciliation;
@@ -32,6 +34,7 @@ public class ArtifactRelationIntegrityAuditService {
         this.properties = properties;
         this.lease = lease;
         this.schemaReadiness = schemaReadiness;
+        this.callers = callers;
     }
 
     @Scheduled(fixedDelayString = "${platform.artifacts.integrity-audit-delay-millis:60000}")
@@ -47,7 +50,8 @@ public class ArtifactRelationIntegrityAuditService {
                     metrics.relationAudit("RETRYABLE");
                     return;
                 }
-                reconciliation.reconcile(snapshotId);
+                // No request caller: the audit runs as the explicit SYSTEM caller, never as an absent one.
+                callers.asSystem(JOB_NAME, () -> reconciliation.reconcile(snapshotId));
             }
             metrics.relationAudit("COMPLETED");
         } catch (RuntimeException failure) {

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import org.base.api.security.tenancy.CurrentCaller;
 
 /** Monthly controlled source polling; it never executes drafts or duplicates a successful monthly batch. */
 @Service
@@ -19,11 +20,17 @@ public class PlatformScheduledImportWorker {
     private final ObjectProvider<ObjectStorageService> storage;
     private final PlatformJobLeaseService lease;
     private final PlatformSchemaReadiness schemaReadiness;
-    public PlatformScheduledImportWorker(@Qualifier("primaryJdbcTemplate") JdbcTemplate control,@Qualifier("dataPlaneJdbcTemplate") JdbcTemplate data,PlatformSqlIngestionService sql,ObjectProvider<ObjectStorageService> storage,PlatformJobLeaseService lease,PlatformSchemaReadiness schemaReadiness){this.control=control;this.data=data;this.sql=sql;this.storage=storage;this.lease=lease;this.schemaReadiness=schemaReadiness;}
+    private final CurrentCaller callers;
+    public PlatformScheduledImportWorker(@Qualifier("primaryJdbcTemplate") JdbcTemplate control,@Qualifier("dataPlaneJdbcTemplate") JdbcTemplate data,PlatformSqlIngestionService sql,ObjectProvider<ObjectStorageService> storage,PlatformJobLeaseService lease,PlatformSchemaReadiness schemaReadiness,CurrentCaller callers){this.control=control;this.data=data;this.sql=sql;this.storage=storage;this.lease=lease;this.schemaReadiness=schemaReadiness;this.callers=callers;}
 
     @Scheduled(cron = "${platform.import.schedule.cron:0 0 3 1 * *}")
     public void runMonthly() {
         if(!schemaReadiness.isReady())return;
+        // No request caller: the monthly import runs as the explicit SYSTEM caller.
+        callers.asSystem("monthly-platform-import", this::importDueContracts);
+    }
+
+    private void importDueContracts() {
         if(!lease.acquire("monthly-platform-import",180))return;
         try {
         ObjectStorageService configured=storage.getIfAvailable();

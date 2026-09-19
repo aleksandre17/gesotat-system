@@ -27,6 +27,7 @@ import java.util.Map;
 import org.base.api.service.platform.access.SemanticAccessMetadataAssertion;
 import org.base.api.service.platform.access.SemanticAccessMetadataSchema;
 import org.base.api.service.platform.access.SemanticAccessPackage;
+import org.base.api.security.tenancy.TenantAccessGuard;
 
 /** Access ingestion with independently committed, idempotent staging chunks. */
 @Service
@@ -38,14 +39,16 @@ public class PlatformAccessIngestionService {
     private final JdbcTemplate dataPlane;
     private final ObjectMapper json;
     private final TransactionTemplate tx;
+    private final TenantAccessGuard tenants;
 
     public PlatformAccessIngestionService(@Qualifier("primaryJdbcTemplate") JdbcTemplate controlPlane,
                                           @Qualifier("dataPlaneJdbcTemplate") JdbcTemplate dataPlane,
                                           @Qualifier("dataPlaneTransactionManager") PlatformTransactionManager dataTransactionManager,
-                                          ObjectMapper json) {
+                                          ObjectMapper json, TenantAccessGuard tenants) {
         this.controlPlane = controlPlane;
         this.dataPlane = dataPlane;
         this.json = json;
+        this.tenants = tenants;
         this.tx = new TransactionTemplate(dataTransactionManager);
     }
 
@@ -74,6 +77,9 @@ public class PlatformAccessIngestionService {
      */
     public PlatformPackageIngestReceipt ingestPackage(File accessFile, String contractCode, int contractRevision, StoredArtifact artifact) throws Exception {
         if (contractCode == null || contractCode.isBlank()) throw new IllegalArgumentException("contractCode is required");
+        /* The contract identity comes out of the uploaded package, not off the route: this is the
+           tenancy enforcement point of the semantic Access package ingestion boundary. */
+        tenants.requireContract(contractCode);
         List<Source> sources = packageSources(contractCode, contractRevision);
         if (sources.isEmpty()) throw new IllegalArgumentException("No active Access sources exist for contract " + contractCode);
         BatchScope scope = tx.execute(status -> createOrReuseBatch(contractCode, artifact));

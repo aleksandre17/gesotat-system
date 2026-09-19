@@ -1,5 +1,6 @@
 package org.base.api.service.artifact;
 
+import org.base.api.security.tenancy.TenantAccessGuard;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -10,14 +11,22 @@ import java.util.List;
 @Component
 public class ArtifactPackageContractResolver {
     private final JdbcTemplate controlPlane;
+    private final TenantAccessGuard tenants;
 
-    public ArtifactPackageContractResolver(@Qualifier("primaryJdbcTemplate") JdbcTemplate controlPlane) {
+    public ArtifactPackageContractResolver(@Qualifier("primaryJdbcTemplate") JdbcTemplate controlPlane, TenantAccessGuard tenants) {
         this.controlPlane = controlPlane;
+        this.tenants = tenants;
     }
 
+    /**
+     * The one authorization point of the package admission boundary: package upload and preview,
+     * descriptor lookup and resumable upload sessions all name their dataset through this resolver,
+     * including the routes that carry the contract code in a request body.
+     */
     public DatasetContract resolve(String contractCode, int revision, String datasetCode) {
         if (contractCode == null || contractCode.isBlank() || revision < 1 || datasetCode == null || datasetCode.isBlank())
             throw new IllegalArgumentException("Approved contract code, revision, and dataset code are required");
+        tenants.requireContract(contractCode);
         List<DatasetContract> matches = controlPlane.query(
                 "SELECT r.contract_code,r.revision,r.contract_checksum,d.dataset_version_id,d.dataset_code,t.access_table_name " +
                         "FROM platform.site_contract_revision r JOIN platform.site_contract_dataset d ON d.site_contract_revision_id=r.site_contract_revision_id " +

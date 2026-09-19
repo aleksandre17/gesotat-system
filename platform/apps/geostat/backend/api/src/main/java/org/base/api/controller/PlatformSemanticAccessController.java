@@ -18,8 +18,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.base.api.security.tenancy.TenantScoped;
+import org.base.api.security.tenancy.TenantScopeExemption;
 
 /** The package preflight endpoint intentionally has no import side effect. */
+@TenantScoped
 @Api
 @RestController
 @RequestMapping("/platform/access/semantic")
@@ -31,11 +34,13 @@ public class PlatformSemanticAccessController {
 
     @PostMapping(value="/preview",consumes="multipart/form-data")
     @PreAuthorize("hasAuthority('WRITE_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.SERVICE_ENFORCED, reason = "The contract identity is inside the uploaded Access package; SemanticAccessPreviewService reads no governed data and writes nothing, and ingestion of the same package is enforced in PlatformAccessIngestionService.ingestPackage.")
     public ResponseEntity<SemanticAccessPreview> preview(@RequestParam MultipartFile file) throws Exception { return ResponseEntity.ok(previews.preview(file)); }
 
     /** One artifact creates one batch and stages every contract-bound Access table with independent checkpoints. */
     @PostMapping(value="/ingest",consumes="multipart/form-data")
     @PreAuthorize("hasAuthority('WRITE_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.SERVICE_ENFORCED, reason = "The contract identity is inside the uploaded Access package; PlatformAccessIngestionService.ingestPackage enforces it once the contract code is resolved.")
     public ResponseEntity<PlatformPackageIngestReceipt> ingest(@RequestParam MultipartFile file) throws Exception {
         if(file==null||file.isEmpty()) throw new IllegalArgumentException("Access package must not be empty");
         ObjectStorageService storage=storageProvider.getIfAvailable();

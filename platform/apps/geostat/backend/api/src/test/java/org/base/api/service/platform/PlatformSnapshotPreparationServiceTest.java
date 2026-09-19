@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import org.base.api.security.tenancy.TenantAccessGuards;
 
 class PlatformSnapshotPreparationServiceTest {
     @Test
@@ -23,7 +24,7 @@ class PlatformSnapshotPreparationServiceTest {
         JdbcTemplate dataPlane = mock(JdbcTemplate.class);
         when(dataPlane.query(contains("JOIN ingest.artifact"), any(ResultSetExtractor.class), eq(900L), eq(73L)))
                 .thenReturn(null);
-        PlatformSnapshotPreparationService service = new PlatformSnapshotPreparationService(dataPlane);
+        PlatformSnapshotPreparationService service = new PlatformSnapshotPreparationService(dataPlane, TenantAccessGuards.permitAll());
 
         assertThrows(IllegalArgumentException.class,
                 () -> service.prepare(new PrepareSnapshotRequest(73L, 900L, "a".repeat(64))));
@@ -34,7 +35,7 @@ class PlatformSnapshotPreparationServiceTest {
     @Test
     void rejectsMalformedChecksumBeforeDatabaseAccess() {
         JdbcTemplate dataPlane = mock(JdbcTemplate.class);
-        PlatformSnapshotPreparationService service = new PlatformSnapshotPreparationService(dataPlane);
+        PlatformSnapshotPreparationService service = new PlatformSnapshotPreparationService(dataPlane, TenantAccessGuards.permitAll());
 
         assertThrows(IllegalArgumentException.class,
                 () -> service.prepare(new PrepareSnapshotRequest(73L, 900L, "not-a-checksum")));
@@ -49,7 +50,7 @@ class PlatformSnapshotPreparationServiceTest {
         String storedChecksum = "b".repeat(64);
         when(dataPlane.query(contains("JOIN ingest.artifact"), any(ResultSetExtractor.class), eq(900L), eq(73L)))
                 .thenAnswer(call -> extract(call.getArgument(1), contextRow(73L, "VALIDATED", storedChecksum)));
-        PlatformSnapshotPreparationService service = new PlatformSnapshotPreparationService(dataPlane);
+        PlatformSnapshotPreparationService service = new PlatformSnapshotPreparationService(dataPlane, TenantAccessGuards.permitAll());
 
         assertThrows(IllegalArgumentException.class,
                 () -> service.prepare(new PrepareSnapshotRequest(73L, 900L, "a".repeat(64))));
@@ -69,7 +70,7 @@ class PlatformSnapshotPreparationServiceTest {
         when(dataPlane.queryForObject(contains("AND artifact_id<>?"), eq(Long.class), eq(990L), eq(900L))).thenReturn(0L);
         when(dataPlane.queryForObject(contains("raw.source_record WHERE dataset_snapshot_id=?"), eq(Long.class), eq(990L))).thenReturn(2L);
 
-        long result = new PlatformSnapshotPreparationService(dataPlane)
+        long result = new PlatformSnapshotPreparationService(dataPlane, TenantAccessGuards.permitAll())
                 .prepare(new PrepareSnapshotRequest(73L, 900L, checksum));
 
         assertEquals(990L, result);
@@ -85,7 +86,7 @@ class PlatformSnapshotPreparationServiceTest {
     void replayRejectsRowsFromAnotherArtifact() throws Exception {
         JdbcTemplate dataPlane = replayFixture("b".repeat(64), 73L, 2L);
         when(dataPlane.queryForObject(contains("AND artifact_id<>?"), eq(Long.class), eq(990L), eq(900L))).thenReturn(1L);
-        assertThrows(IllegalStateException.class, () -> new PlatformSnapshotPreparationService(dataPlane)
+        assertThrows(IllegalStateException.class, () -> new PlatformSnapshotPreparationService(dataPlane, TenantAccessGuards.permitAll())
                 .prepare(new PrepareSnapshotRequest(73L, 900L, "b".repeat(64))));
     }
 
@@ -93,13 +94,13 @@ class PlatformSnapshotPreparationServiceTest {
     @SuppressWarnings({"unchecked", "rawtypes"})
     void replayRejectsRowCountDriftAndVersionOrChecksumConflict() throws Exception {
         JdbcTemplate drift = replayFixture("b".repeat(64), 73L, 3L);
-        assertThrows(IllegalStateException.class, () -> new PlatformSnapshotPreparationService(drift)
+        assertThrows(IllegalStateException.class, () -> new PlatformSnapshotPreparationService(drift, TenantAccessGuards.permitAll())
                 .prepare(new PrepareSnapshotRequest(73L, 900L, "b".repeat(64))));
         JdbcTemplate version = replayFixture("b".repeat(64), 74L, 2L);
-        assertThrows(IllegalStateException.class, () -> new PlatformSnapshotPreparationService(version)
+        assertThrows(IllegalStateException.class, () -> new PlatformSnapshotPreparationService(version, TenantAccessGuards.permitAll())
                 .prepare(new PrepareSnapshotRequest(73L, 900L, "b".repeat(64))));
         JdbcTemplate checksum = replayFixture("c".repeat(64), 73L, 2L);
-        assertThrows(IllegalStateException.class, () -> new PlatformSnapshotPreparationService(checksum)
+        assertThrows(IllegalStateException.class, () -> new PlatformSnapshotPreparationService(checksum, TenantAccessGuards.permitAll())
                 .prepare(new PrepareSnapshotRequest(73L, 900L, "b".repeat(64))));
     }
 
@@ -107,7 +108,7 @@ class PlatformSnapshotPreparationServiceTest {
     @SuppressWarnings({"unchecked", "rawtypes"})
     void freshPrepareRequiresValidatedLoad() throws Exception {
         JdbcTemplate dataPlane = freshFixture("STAGING");
-        assertThrows(IllegalStateException.class, () -> new PlatformSnapshotPreparationService(dataPlane)
+        assertThrows(IllegalStateException.class, () -> new PlatformSnapshotPreparationService(dataPlane, TenantAccessGuards.permitAll())
                 .prepare(new PrepareSnapshotRequest(73L, 900L, "b".repeat(64))));
         verify(dataPlane, org.mockito.Mockito.never()).queryForObject(contains("INSERT INTO publication.dataset_snapshot"), eq(Long.class), any(), any(), any(), any());
     }
@@ -118,24 +119,24 @@ class PlatformSnapshotPreparationServiceTest {
         JdbcTemplate ok = freshFixture("VALIDATED");
         when(ok.update(contains("INSERT INTO raw.source_record"), any(), any(), any())).thenReturn(2);
         when(ok.update(contains("SET status='PREPARED'"), any(Object[].class))).thenReturn(1);
-        assertEquals(990L, new PlatformSnapshotPreparationService(ok).prepare(new PrepareSnapshotRequest(73L, 900L, "B".repeat(64))));
+        assertEquals(990L, new PlatformSnapshotPreparationService(ok, TenantAccessGuards.permitAll()).prepare(new PrepareSnapshotRequest(73L, 900L, "B".repeat(64))));
         verify(ok).queryForObject(contains("INSERT INTO publication.dataset_snapshot"), eq(Long.class), eq(73L), eq(73L), eq(2L), eq("b".repeat(64)));
 
         JdbcTemplate partial = freshFixture("VALIDATED");
         when(partial.update(contains("INSERT INTO raw.source_record"), any(), any(), any())).thenReturn(1);
-        assertThrows(IllegalStateException.class, () -> new PlatformSnapshotPreparationService(partial).prepare(new PrepareSnapshotRequest(73L, 900L, "b".repeat(64))));
+        assertThrows(IllegalStateException.class, () -> new PlatformSnapshotPreparationService(partial, TenantAccessGuards.permitAll()).prepare(new PrepareSnapshotRequest(73L, 900L, "b".repeat(64))));
 
         JdbcTemplate raced = freshFixture("VALIDATED");
         when(raced.update(contains("INSERT INTO raw.source_record"), any(), any(), any())).thenReturn(2);
         when(raced.update(contains("SET status='PREPARED'"), any(Object[].class))).thenReturn(0);
-        assertThrows(IllegalStateException.class, () -> new PlatformSnapshotPreparationService(raced).prepare(new PrepareSnapshotRequest(73L, 900L, "b".repeat(64))));
+        assertThrows(IllegalStateException.class, () -> new PlatformSnapshotPreparationService(raced, TenantAccessGuards.permitAll()).prepare(new PrepareSnapshotRequest(73L, 900L, "b".repeat(64))));
     }
 
     @Test
     @SuppressWarnings({"unchecked", "rawtypes"})
     void existingSnapshotLookupHoldsARangeLock() throws Exception {
         JdbcTemplate dataPlane = replayFixture("b".repeat(64), 73L, 2L);
-        new PlatformSnapshotPreparationService(dataPlane).prepare(new PrepareSnapshotRequest(73L, 900L, "b".repeat(64)));
+        new PlatformSnapshotPreparationService(dataPlane, TenantAccessGuards.permitAll()).prepare(new PrepareSnapshotRequest(73L, 900L, "b".repeat(64)));
         verify(dataPlane).query(contains("WITH (UPDLOCK,HOLDLOCK) WHERE dataset_load_id=?"), any(ResultSetExtractor.class), eq(73L));
     }
 

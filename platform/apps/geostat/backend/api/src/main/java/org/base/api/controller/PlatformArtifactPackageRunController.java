@@ -14,11 +14,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.base.api.security.tenancy.TenantScoped;
+import org.base.api.security.tenancy.TenantScopeExemption;
 
 /**
  * One-click package experience (artifact contract §26): confirm an admitted manifest, track progress,
  * retry. A run stops at steward review; it never publishes.
  */
+@TenantScoped
 @Api
 @RestController
 @RequestMapping("/platform/artifacts/package-runs")
@@ -31,6 +34,7 @@ public class PlatformArtifactPackageRunController {
     /** Accepted for asynchronous execution; starting the same manifest again returns the same run. */
     @PostMapping
     @PreAuthorize("hasAuthority('WRITE_RESOURCE')")
+    @TenantScopeExemption(value = TenantScopeExemption.Kind.SERVICE_ENFORCED, reason = "manifestId arrives in the request body; PackageRunService.start enforces it before a run is created.")
     public ResponseEntity<PackageRunService.RunView> start(@RequestBody StartRequest request, Authentication authentication) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).cacheControl(CacheControl.noStore()).body(runs.start(request.manifestId(), authentication.getName()));
     }

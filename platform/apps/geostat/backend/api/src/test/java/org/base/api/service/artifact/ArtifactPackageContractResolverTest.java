@@ -1,5 +1,6 @@
 package org.base.api.service.artifact;
 
+import org.base.api.security.tenancy.TenantAccessGuards;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -29,7 +30,7 @@ class ArtifactPackageContractResolverTest {
                 new ArtifactPackageContractResolver.DeclaredField("resource_id", true, "NATURAL"),
                 new ArtifactPackageContractResolver.DeclaredField("title", false, null)));
 
-        var resolved = new ArtifactPackageContractResolver(control).resolve("SITE_A", 8, "RESOURCE");
+        var resolved = new ArtifactPackageContractResolver(control, TenantAccessGuards.permitAll()).resolve("SITE_A", 8, "RESOURCE");
 
         assertEquals("__ent_resource", resolved.accessTableName());
         assertEquals(List.of("resource_id"), resolved.fields());
@@ -45,6 +46,6 @@ class ArtifactPackageContractResolverTest {
                 eq("SITE_A"), eq(8), eq("RESOURCE"))).thenReturn(List.of());
 
         assertThrows(IllegalArgumentException.class,
-                () -> new ArtifactPackageContractResolver(control).resolve("SITE_A", 8, "RESOURCE"));
+                () -> new ArtifactPackageContractResolver(control, TenantAccessGuards.permitAll()).resolve("SITE_A", 8, "RESOURCE"));
     }
 }
