@@ -776,3 +776,19 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   across replicas needs the Redis store (already implemented, not enabled).
 - **Evidence:** 1.05 M requests, 0 5xx; production health never degraded; restart recovery 27 s with durable state;
   concurrent idempotent start. `docs/evidence/storage-line-load-and-recovery-runtime-2026-09-19.json`.
+
+### AIR-2026-042 — The real download client is the visitor's browser, which cannot use an internal name or CA
+
+- **სტატუსი:** `READY` / **priority:** `P1` / **owner:** Delivery + Frontend
+- **აღმოჩენა:** the download endpoint is an internal hostname behind an internal CA. The owner clarified that the
+  site frontend is deployed on the platform server itself. The file, however, is fetched by the visitor's browser,
+  which resolves no internal name and trusts no internal CA; installing hosts lines and CAs on visitors' machines
+  is not an option.
+- **გადაწყვეტა:** the site's own web server, attached to the platform network, forwards the API-issued signed URL
+  to the internal endpoint (`governed-files-proxy.conf`): signed GET/HEAD only, path and query untouched, upstream
+  Host = the hostname the API signed for, upstream TLS verified against the internal CA. The browser talks only to
+  the site's public origin; buckets stay private and every download is still governed by the API.
+- **Evidence:** `ops/tests/edge/governed-files-proxy-smoke.sh` on the platform host: 200 + matching SHA-256 through
+  the proxy, unsigned and `POST` → 403. Checklist 17.18.
+- **Open:** the KIDS frontend code still links static `/files/...`; it has to request the download from the API and
+  rewrite the origin (AIR-2026-009/013), and the static copies are retired only after that.
