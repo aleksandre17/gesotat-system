@@ -3,12 +3,15 @@ package org.base.core.exeption;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.base.core.exeption.extend.ApiException;
 import org.base.core.exeption.extend.ResourceNotFoundException;
 import org.base.core.model.response.ApiExceptionResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
@@ -38,6 +41,7 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     public static class ResponseEntityBuilder {
         public static ResponseEntity<?> build(ApiExceptionResponse apiError) {
@@ -79,6 +83,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpServletResponse httpServletResponse,
             ApiExceptionResponse response
     ) {
+        // A failure raised while already forwarding or rendering an error must end here;
+        // forwarding again would re-enter the error path without bound.
+        if (request.getDispatcherType() != DispatcherType.REQUEST) {
+            return ResponseEntityBuilder.build(response);
+        }
         try {
             request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, response.getStatus().value());
             request.setAttribute(RequestDispatcher.ERROR_MESSAGE, response.getMessage());
@@ -280,6 +289,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpServletResponse httpServletResponse,
             HandlerMethod handlerMethod
     ) {
+        log.error("Unhandled runtime exception for {} {}", request.getMethod(), request.getRequestURI(), ex);
 
         ApiExceptionResponse response = new ApiExceptionResponse(
                 HttpStatus.BAD_REQUEST,
@@ -303,6 +313,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpServletResponse httpServletResponse,
             HandlerMethod handlerMethod
     ) {
+        // The client gets a sanitized body; the cause must still be diagnosable on the server.
+        log.error("Unhandled exception for {} {}", request.getMethod(), request.getRequestURI(), ex);
         ApiExceptionResponse response = new ApiExceptionResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected error occurred",
