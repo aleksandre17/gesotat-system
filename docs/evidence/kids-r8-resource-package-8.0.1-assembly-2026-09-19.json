@@ -1,0 +1,4112 @@
+{
+  "schema" : "geostat.artifact-package-assembly.v1",
+  "descriptorSchema" : "geostat.artifact-package-descriptor.v1",
+  "contract" : {
+    "contractCode" : "KIDS_PORTAL_V1",
+    "revision" : 8,
+    "contractChecksum" : "94AFFBA74E3166D5AB2C43C0A4AA37314F4ADBCCF123A316F9A78E0DC59CA72A",
+    "datasetCode" : "KIDS_RESOURCE",
+    "datasetVersionId" : 73,
+    "accessTableName" : "__ent_kids_resource",
+    "keyFields" : [ "source_resource_id" ]
+  },
+  "relations" : [ {
+    "datasetVersionId" : 73,
+    "relationCode" : "PRIMARY_FILE",
+    "artifactRole" : "PRIMARY",
+    "minPerRow" : 1,
+    "maxPerRow" : 1,
+    "ordered" : false,
+    "matchRule" : {
+      "type" : "SOURCE_PATH",
+      "normalization" : "NFC",
+      "stripPrefix" : "files/",
+      "packageRoot" : "mainstat/",
+      "bindings" : [ {
+        "language" : "ka",
+        "field" : "path_ka",
+        "required" : true
+      }, {
+        "language" : "en",
+        "field" : "path_en",
+        "required" : true
+      } ]
+    },
+    "policy" : {
+      "policyCode" : "KIDS_PUBLIC_STATISTICAL_FILE",
+      "revision" : 1,
+      "accessMode" : "PUBLIC_WHEN_PUBLISHED",
+      "requiredAuthority" : null,
+      "allowedMediaTypes" : [ "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel" ],
+      "maxBytes" : 52428800,
+      "signedUrlTtlSeconds" : 300,
+      "retentionClass" : "RETAIN_INDEFINITE"
+    }
+  } ],
+  "archive" : {
+    "fileName" : "kids-r8-resource-package-8.0.1.zip",
+    "sha256" : "427d12e96d448577b242d4cedcfebaf58daff840a4b4576774ffaa5f5414f4cc",
+    "bytes" : 7629698,
+    "entryCount" : 451,
+    "datasetEntry" : "kids-portal-v1-canonical-r8-build-8.0.1.accdb",
+    "shippedManifest" : "manifest.json"
+  },
+  "preview" : [ {
+    "relationCode" : "PRIMARY_FILE",
+    "edgeCount" : 450,
+    "orphanCount" : 0,
+    "issues" : [ ]
+  } ],
+  "edges" : [ {
+    "rowKey" : "128",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_01_მოსახლეობის რიცხოვნობა ასაკისა და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12879,
+    "sha256" : "c9a12ec1ffbba230ffa0a08fcfdd2fb3adfed6554ed1ffa3d51c21dca8c1979d"
+  }, {
+    "rowKey" : "128",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_01_Number of population by age and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12776,
+    "sha256" : "63d9a2369598f278e308074ed317d244ed790f7c0f75965ec8f4bf40fe65e17d"
+  }, {
+    "rowKey" : "129",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_02_მოსახლეობის რიცხოვნობა ასაკისა და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 15165,
+    "sha256" : "c0cfaaf19500abd69f9719645f834961cd3a9990806a842ed31e49fa0a764001"
+  }, {
+    "rowKey" : "129",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_02-Number of population by age and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 14995,
+    "sha256" : "2f4f107461e597695d0201d276a33c9e2c65f56007357009ad7f8b10c27f261d"
+  }, {
+    "rowKey" : "130",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_03_სქესთა რაოდენობრივი თანაფარდობა ასაკის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11435,
+    "sha256" : "033d82eee1c0d06bb79c2e16572d3be725854870549e53fa4b97c0029be77751"
+  }, {
+    "rowKey" : "130",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_03_Sex ratio by age.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11356,
+    "sha256" : "7ec53e219901487f8f7c7ebb128fd29ff8b5098bf9f494ee5da96d58de520210"
+  }, {
+    "rowKey" : "131",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_04_ახალგაზრდა ასაკის დატვირთვის კოეფიციენტი.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11668,
+    "sha256" : "5a3807669925f195ed7d1ce89bf757c2ef2a4791d23b3780f94cc2e6dc85c4cb"
+  }, {
+    "rowKey" : "131",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_04_Child dependency ratio.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11558,
+    "sha256" : "4ce17a3601bc0a3ffc3fe233d3a25d86173c5a3c1a86d679ebdc9443a498d0ca"
+  }, {
+    "rowKey" : "132",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_05_მოსახლეობის რიცხოვნობა რეგიონების, ასაკის და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13407,
+    "sha256" : "2a0586f4acb18d5fda3a6ab5df537aa7ffb0634168ebe63a4f6b73eefb17ea37"
+  }, {
+    "rowKey" : "132",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_05_Number of population by regions, age and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13399,
+    "sha256" : "6b05b9f60008cc459fe79a367f4cce64eb4fd6e7c10430f9442283ceb6b31a23"
+  }, {
+    "rowKey" : "133",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_06_ცოცხლად დაბადებულთა რიცხოვნობა რეგიონების მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12024,
+    "sha256" : "cbc2a251a680927b9bb4d3dad14575287fe0e79a3b9989b0777ecc11a9057bd7"
+  }, {
+    "rowKey" : "133",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_06_Number of live births by regions.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12701,
+    "sha256" : "e71e4da6f97574f7e311407554ba56996c0c5508e422b7f56b63c772c9c1c687"
+  }, {
+    "rowKey" : "134",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_07_ცოცხლად დაბადებულთა რიცხოვნობა რეგიონების, სქესის და დედის ასაკის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 20997,
+    "sha256" : "87bba87baa3b1d1081b3e3c1c7bb8680d15ac8a103fd1d7fa1a5eb13b235bbc4"
+  }, {
+    "rowKey" : "134",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_07_Number of live births by regions, sex and age of mother.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 21009,
+    "sha256" : "fcc7f6500c8ada2c07ef5cccf40379297eb99b35e407b9c6c0bad11df024650a"
+  }, {
+    "rowKey" : "135",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_08_ცოცხლად დაბადებულთა რიცხოვნობა რეგიონების, მშობლების ქორწინებითი მდგომარეობის და დედის ასაკის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 20177,
+    "sha256" : "061cfc9ef598fdc39abfb10497613e246864d8c812812b3a47e1957989246207"
+  }, {
+    "rowKey" : "135",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_08_Number of live births by regions, legitimacy status and age of mother.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 21374,
+    "sha256" : "82e2b0039fe9900d052a40a5f82cc0740d7ab68e88dfc2cc250fc32bc5de32de"
+  }, {
+    "rowKey" : "136",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_09_ცოცხლად დაბადებულთა რიცხოვნობა რიგითობის და დედის ასაკის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11792,
+    "sha256" : "efac97a6c1ab1f814ee86588afa19bba93ba5e12204301418c254ea902753a69"
+  }, {
+    "rowKey" : "136",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_09_Live births by order and age of mother.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12382,
+    "sha256" : "04bd66cf0990911f04dce8fb3bb41f72a4f230a91e347778085a8b682f91f1f8"
+  }, {
+    "rowKey" : "137",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_10_შობადობის ასაკობრივი კოეფიციენტები.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10637,
+    "sha256" : "92e2b08bd34f256ea7c1f7fb3eedf4d104ce61593bf3f44fba6a3cd06125a998"
+  }, {
+    "rowKey" : "137",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_10_Age specific fertility rates.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10608,
+    "sha256" : "2e2bf12351e65d2711d2392a8256e6a9c4967140afb21723f4790d31161886f3"
+  }, {
+    "rowKey" : "138",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_11_მკვდრადშობილთა რიცხოვნობა დედის ასაკის და ბავშვის სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11994,
+    "sha256" : "8ca387861f2e5e7e4ddc30628e3545bc0a388bff2f0f1bc44e16e9256051a8e7"
+  }, {
+    "rowKey" : "138",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_11_Number of stillbirths by age of mother and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11681,
+    "sha256" : "5b7ee44874690479a1e14caf9cdbaf4785404615ca4ae61ec918f45e0c329ccd"
+  }, {
+    "rowKey" : "139",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_12_გარდაცვლილთა რიცხოვნობა რეგიონების, ასაკის და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 20154,
+    "sha256" : "3e42a66258a43af6a0e8972d775b8d32ed6685056856e38bfb49a75569a0f4a8"
+  }, {
+    "rowKey" : "139",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_12_Number of deaths by regions, age and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 19917,
+    "sha256" : "57258742d920370075e9ecdbc003413634fba8f560b4ac12e40f39c96592b2b1"
+  }, {
+    "rowKey" : "140",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_13_დაქორწინებულთა რიცხოვნობა ასაკის და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11501,
+    "sha256" : "a42eec4f6a2c1e6265033171b9fbf01df47dce6692320b7b5bc35572ff4691e5"
+  }, {
+    "rowKey" : "140",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_13_Number of married people by age and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12038,
+    "sha256" : "919d2c80ed3bd28342ed307fc194bef52fccc7a583a60b0bd2d24a8d2cd34642"
+  }, {
+    "rowKey" : "141",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_14_დაქორწინებულთა რიცხოვნობა ქორწინების რიგითობის, ასაკის და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12784,
+    "sha256" : "b470a19f91caa37cc01d4912643ed0621f9008bae720af719789629ef3c68792"
+  }, {
+    "rowKey" : "141",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_14_Number of married people by order of marriages, age and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13305,
+    "sha256" : "b71fc0d42360a69cab501b28406d0849d1584695335ff3ebde948eb3b70529c5"
+  }, {
+    "rowKey" : "142",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_15_დაქორწინებულთა რიცხოვნობა  წინა ქორწინებითი მდგომარეობის, ასაკისა და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12731,
+    "sha256" : "2ac6e161be535e739c13a11b7fa9958eb9d0203895895de3f91808e27cd43bd9"
+  }, {
+    "rowKey" : "142",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_15_Number of married people by previous marital status, age and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13852,
+    "sha256" : "4bbc0e4c008596ee8db7a3fcec137141d3c8e9dede0f35ddd1f25d27e3213a2e"
+  }, {
+    "rowKey" : "143",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_16_დაქორწინებულთა რიცხოვნობა კაცის და ქალის ასაკის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12181,
+    "sha256" : "c2eb2dba5cf50149a4cf4ee8ccf406a34d2821c571707ba59da68eda5ce54f33"
+  }, {
+    "rowKey" : "143",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_16_Number of married people by age of spouses.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12747,
+    "sha256" : "d0f142664e96e33f3e5567b6038d3875a02d61e34b8ff51cd7017d6c2af4e80d"
+  }, {
+    "rowKey" : "144",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_17_განქორწინებულთა რიცხოვნობა ასაკის და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10591,
+    "sha256" : "a2283fd92eab9a176be4cfc3a82a1ad5a8b9a36486e1d11f7895bda626b02bc6"
+  }, {
+    "rowKey" : "144",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_17_Number of divorced people by age and sexთ.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11866,
+    "sha256" : "0bde125b3ea5e7eb5f49b58db2ae757538cc3c30e04dbecc8ce22a729ef453b2"
+  }, {
+    "rowKey" : "145",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_18_25 წლამდე ასაკის განქორწინებულთა რიცხოვნობა სქესის და ქორწინების ხანგრძლივობის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10796,
+    "sha256" : "b4565d850d4a29a76127b43d37022f87c2e0883098e67069e965f92ed3b53a49"
+  }, {
+    "rowKey" : "145",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_18_Number of divorced people under 25 by sex and duration of marriage (year).xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10687,
+    "sha256" : "f5129124c66c5c5e087ddea32d32b3e783bea03809b8a358c5d4362f623e2836"
+  }, {
+    "rowKey" : "146",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_19_25-29 წლის ასაკის განქორწინებულთა რიცხოვნობა სქესის და ქორწინების ხანგრძლივობის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10284,
+    "sha256" : "ccf7c513ec2cb4a6eb644c580498a58c437fd6217947a8d9c8144825b279dc88"
+  }, {
+    "rowKey" : "146",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_19_Number of divorced people aged 25-29 by sex and duration of marriage (year).xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9661,
+    "sha256" : "e3f3c8e3dbc8ee33bd74cc50179fef1188444f49018aa45e2b51a613d7fb9565"
+  }, {
+    "rowKey" : "147",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_20_ემიგრანტების რიცხოვნობა ასაკის და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13800,
+    "sha256" : "db4d6ad858ecb25f287f4fbfd51ae356d431170f7a5f0576ab413a3b17dd4cd4"
+  }, {
+    "rowKey" : "147",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_20_Number of emigrants by age and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13636,
+    "sha256" : "396c98dd15f6165e2a19e15db221cca479a7dfe6ac6973f40b0c6be3f68b34c0"
+  }, {
+    "rowKey" : "148",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_21_იმიგრანტების რიცხოვნობა ასაკის და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13119,
+    "sha256" : "0f77bfc69f0662b51128eb039a58739d720fdabf0df4216ef5eb00426eadce84"
+  }, {
+    "rowKey" : "148",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_21_Number of immigrants by age and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12952,
+    "sha256" : "1ce4240de4fc7844286f020a13c5a3e960811bb61d20b049656f61e69b0f863e"
+  }, {
+    "rowKey" : "149",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_22_ემიგრანტების რიცხოვნობა ასაკის და მოქალაქეობის ქვეყნის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 14395,
+    "sha256" : "f158f0604bff8dc39e5b36bdc5203a31c2e1e0474acdae97c2c0abd0de22325c"
+  }, {
+    "rowKey" : "149",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_22_Number of emigrants by age and citizenship.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 14949,
+    "sha256" : "66c43cedc8a551afaa96d17d2c01542187b7de79f0f79e88755fee5e54047292"
+  }, {
+    "rowKey" : "150",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_23_იმიგრანტების რიცხოვნობა ასაკის და მოქალაქეობის ქვეყნის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 14865,
+    "sha256" : "d359fa0a57a5369784301e4704e956dc86fe7877ba68ebf65d5ae68a04cfc451"
+  }, {
+    "rowKey" : "150",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_23_Number of imigrants by age and citizenshipთ.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 14281,
+    "sha256" : "6a743c89a2cb5e7db9154b6f27f964281977b3cb4eecd9e62ce47bfda6a6cc60"
+  }, {
+    "rowKey" : "151",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_24_მოსახლეობის რიცხოვნობა საქართველოში დაბადების ადგილის, ასაკისა და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13155,
+    "sha256" : "e4adc7214949ebd8f3261fb4265af57c5262e64553463287765c461a0829880f"
+  }, {
+    "rowKey" : "151",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_24_Number of population by place of birth, age and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13523,
+    "sha256" : "84371f18cf867de4b3d524c7128164e4c89cd4a7811cb8fab51effb7cbf834f2"
+  }, {
+    "rowKey" : "152",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_25_25 წლამდე შიდა მიგრანტების რიცხოვნობა წინა და ამჟამინდელი მუდმივი საცხოვრებელი ადგილის და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 15786,
+    "sha256" : "6c7cf1b3c53d97a333a5036a5cd9fa08fbe79271ade3d7a0d0b819cc54c7a794"
+  }, {
+    "rowKey" : "152",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_25_Internal migrants under 25 by previous and current usual place of residence and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 15386,
+    "sha256" : "79ccf4acd7f1478ef35ad3885d0d19b950ee43e709c4ba95b20e473b54135968"
+  }, {
+    "rowKey" : "153",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_26_მოსახლეობის რიცხოვნობა ასაკის და ეროვნებების-ეთნიკური წარმომავლობის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12038,
+    "sha256" : "8c2282f9b90f9bc4d9fc58ff66f73bfa10117f536224f7c9fcf65afba505f988"
+  }, {
+    "rowKey" : "153",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_26_Number of population by ethnicity and age.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11843,
+    "sha256" : "23eadc5b6bb861c0f1f9d0d786a96a293f635d74458fa272ad9e71ab07661eb5"
+  }, {
+    "rowKey" : "154",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_27_მოსახლეობის რიცხოვნობა ასაკის და აღმსარებლობის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10472,
+    "sha256" : "807f099b2772dee7f6616a68b9d115aedb0f5273e8ca951806f40406b74dd11c"
+  }, {
+    "rowKey" : "154",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_27_Numbers of population by religion and age.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11609,
+    "sha256" : "5d12110af54569b0d2eda83e98b97375ba31d0bcddf580aab10485345eba0dd0"
+  }, {
+    "rowKey" : "155",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_28_მოსახლეობის რიცხოვნობა ასაკის, მშობლიური ენისა და ქართული ენის თავისუფლად ფლობის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11884,
+    "sha256" : "0e581a970c9197266801e6b968f7556e12e4c94cc4c66d49b31eff81dbd8de92"
+  }, {
+    "rowKey" : "155",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_28_Number of population by native languages and fluently speak Georgian language and age.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13016,
+    "sha256" : "521f1918bc9937f5873f26c4ba5a8b47ed2aa4a78380be06cbee882d6add7705"
+  }, {
+    "rowKey" : "156",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_29_0-24 წლის ასაკის მოსახლეობის რიცხოვნობა რეგიონების და  ქართული ენის თავისუფლად ფლობის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10568,
+    "sha256" : "5da0cff4732c758f8a32aafa3ffe177e132297c475c3952221a49dde4f999664"
+  }, {
+    "rowKey" : "156",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_29_Number of population under 25 by regions, native languages and fluently speak Georgian language.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11815,
+    "sha256" : "e715c661dc22920bd1d23f9bd241fcedeed07b1579f5da6ba1d009ac0fb6afaf"
+  }, {
+    "rowKey" : "157",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_30_0-29 წლის ასაკის მოსახლეობის რიცხოვნობა რეგიონების და  ქართული ენის თავისუფლად ფლობის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10498,
+    "sha256" : "3470439a0be51706b44d589b58f10bf39fe108652f1ec7ea39276206a467e719"
+  }, {
+    "rowKey" : "157",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_30_Number of population under 30 by regions, native languages and fluently speak Georgian language.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10419,
+    "sha256" : "5966e5fbdadc7410f77ef707e9e11d1e6ef12e6a8d4f0a2f25b82b07f49179e0"
+  }, {
+    "rowKey" : "158",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_31_მოსახლეობის რიცხოვნობა ასაკის და ჯანმრთელობასთან დაკავშირებული პრობლემების მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11710,
+    "sha256" : "a2c253d2d846d369408de965cc7c7e51c6b9bc14b8f354a55a08a7ccd44055f3"
+  }, {
+    "rowKey" : "158",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_31_Number of population by health related limitations and age.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12671,
+    "sha256" : "8c624efecd85d50ace74241cc55755d55646cc9f11e9756c703c2b3fca9435b4"
+  }, {
+    "rowKey" : "159",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_32_25 წლამდე ასაკის მოსახლეობის რიცხოვნობა ჯანმრთელობასთან დაკავშირებული პრობლემების (მნიშვნელოვანი ან სრული ფუნქციური სირთულეები) და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10243,
+    "sha256" : "c986bebe77af4074e4951da0d6faa650ab3586364448d32d59311eba10468882"
+  }, {
+    "rowKey" : "159",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_32_Number of population under 25 by health related limitations (with a lot of difficulty or cannot do it at all) and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11270,
+    "sha256" : "956d10b27a8fd845bdcfc8b0cc08b14e860fdf9d0a2ae6b2d33edd0627d3a735"
+  }, {
+    "rowKey" : "160",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_33_მოსახლეობის რიცხოვნობა ასაკის და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 32001,
+    "sha256" : "a2d39532b88a881269ba83f5d02eda24a92a8097f492db1ff33beecabc1ca213"
+  }, {
+    "rowKey" : "160",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_33_Number of population  by age and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 31739,
+    "sha256" : "ae86ac8d547202a39f8331b3d8ca9cee37026f005230b66a41b774eea46fa74f"
+  }, {
+    "rowKey" : "161",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_34_მოსახლეობა ასაკით რეგიონი.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 45054,
+    "sha256" : "b2d5deaf8413ff8914b3e480e43fb65eef31e22e6d92d4f5ee911be07bf44ebf"
+  }, {
+    "rowKey" : "161",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_34_Population by regions, age and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 44849,
+    "sha256" : "caf6f70fb5faf256f3e0a1c4e86626e6f208755ed22a26773d1d9b6a7d658ea5"
+  }, {
+    "rowKey" : "162",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_01_Abortebi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10755,
+    "sha256" : "6dc294e70c94db6ef4333cadad1b33b9102fc084821fd7148cc2b3257666ad95"
+  }, {
+    "rowKey" : "162",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_01_Abortions.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10298,
+    "sha256" : "1fd34d7525e9e6ee2407715ddcbfe5a9f899b8b3f2cb1077b39248d32e513a7e"
+  }, {
+    "rowKey" : "163",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_02_Simsivneebi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11392,
+    "sha256" : "b0f6f4d469744d0ac5b2c783de310fd55779e9f7e8363b19af1effeb905a8760"
+  }, {
+    "rowKey" : "163",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_02_Malignant Neoplasms.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11187,
+    "sha256" : "7ae5744549a20cfa3ed5622a4effd62db8f312e2cccf038c34c8664ebbb7d78c"
+  }, {
+    "rowKey" : "164",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_03_sggd.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11498,
+    "sha256" : "77c5c34dd996d47602b5afaf0362da683403476c96e1feee43a3c5adf78c44d8"
+  }, {
+    "rowKey" : "164",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_03_std.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11367,
+    "sha256" : "34af25c63abbf1772a715419847bbeb1fbe6a665969bfdec18aadd190c8792d8"
+  }, {
+    "rowKey" : "165",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_04_Shaqriani_diabeti.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 17212,
+    "sha256" : "9846844fa2d748dd1cfd5cbd145be63d88c8e0d26b1793a3152476f6c119f115"
+  }, {
+    "rowKey" : "165",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_04_Diabetes Mellitus.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 17608,
+    "sha256" : "cc3fda024d2c512683d19327161ced42b49484154684a93324bc11d222d12634"
+  }, {
+    "rowKey" : "166",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_05_Suntqvis_organota_tuberkulozi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13010,
+    "sha256" : "6a05a0710112172416aaa70b1a1f440345e7d2a83ddec1c000bd0a4eaf29577b"
+  }, {
+    "rowKey" : "166",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_05_respiratory systems_tuberculosis.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12606,
+    "sha256" : "f5c82efbfc740710d605471a0cd229ec4d2c3baad2d1ced82e3593903b79748e"
+  }, {
+    "rowKey" : "167",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_06_Nervuli_tuberkulozi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12399,
+    "sha256" : "4d802b8d321e8a916d05c73640f7e397f032ef329911378d4ff216731f48d04b"
+  }, {
+    "rowKey" : "167",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_06_nervous system_tuberculosis.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12007,
+    "sha256" : "a6615e5239ca9133db2deec0e85be05501f7f4a81456986d3f2e011df9ff440d"
+  }, {
+    "rowKey" : "168",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_07_Dzval_saxsarta_tuberkulozi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12357,
+    "sha256" : "f21983b1b49d07dcf57d6dca6d3441293e0a101aa09fde1219963e3e8af0be59"
+  }, {
+    "rowKey" : "168",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_07_musculosceletal system_tuberculosis.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11993,
+    "sha256" : "14b5824737c0f0ccaa2f745aae83467ac85d93bb09cb2db679c08e70a641816b"
+  }, {
+    "rowKey" : "169",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_08_Infeqciuri.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12111,
+    "sha256" : "4424ef91f068c35b2c10436a18b3471837fb406bb547478ae45543a8da9bdde2"
+  }, {
+    "rowKey" : "169",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_08_infectious.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11869,
+    "sha256" : "b51dd735d37a5baee103708e5bc7bbd1a4f00cf8d4b4c427acf51b4dc052186b"
+  }, {
+    "rowKey" : "170",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_09_Sisxlmbadi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12157,
+    "sha256" : "a87b8530baa9843c3cbff3b5020c8e37416e042c4d31c599f4f77fbc72771126"
+  }, {
+    "rowKey" : "170",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_09_blood and blood-forming.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11846,
+    "sha256" : "66efecb755aa8cca453d756df9f647ea245dc56439eee1c84c901f6c34bd6e95"
+  }, {
+    "rowKey" : "171",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_10_Endokrinuli.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12088,
+    "sha256" : "fb505584903a5b67d674287d1b1711dab4ba9c2d0553abc908c564f7bf10bda9"
+  }, {
+    "rowKey" : "171",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_10_endocrin system.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11940,
+    "sha256" : "6c81faa60b01152ce1a4df79a33f94fb766c639badece46f56b3f5726a0a8966"
+  }, {
+    "rowKey" : "172",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_11_Fsiqikuri.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12000,
+    "sha256" : "96814183765ef9c0948cd9afaffa86df54fd886f3bf68ec864f50da17455919f"
+  }, {
+    "rowKey" : "172",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_11_psychic.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11846,
+    "sha256" : "b2ac499d4884c568e2eda703ed4ec01994ea032ae6bfbf6f1f7bb0e20234cf15"
+  }, {
+    "rowKey" : "173",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_12_Nervuli.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12029,
+    "sha256" : "6bc1b9524cd237b5b9d03a11f4c14e3c6af964ec54d7b9385ec574521fd86e76"
+  }, {
+    "rowKey" : "173",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_12_Nervous.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11889,
+    "sha256" : "eeff8d6cac3338c08b120b6b0d76847f61dc1e6e0f6eb3ddb95e0d7f7d7e2f9b"
+  }, {
+    "rowKey" : "174",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_13_Tvali.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12149,
+    "sha256" : "804f03eb6e53d0dbf346dc07c96e2ca449d377ec639de4919821437a947c8e0e"
+  }, {
+    "rowKey" : "174",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_13_Eye.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11893,
+    "sha256" : "0fd99eb16e434fb7f4ad2b688889a266132c12d952a491f245a18c6d3228a80e"
+  }, {
+    "rowKey" : "175",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_14_Yuris.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12345,
+    "sha256" : "5ffa2c0e2658f99ca1345e274e8c17d0b04b01b7c68f0167914fbfc198c3f70c"
+  }, {
+    "rowKey" : "175",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_14_Ear.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12067,
+    "sha256" : "a199ebd7c8dbc2ca8a903ca76cc5b83209f8370b45271a63c656252a16eeb5e3"
+  }, {
+    "rowKey" : "176",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_15_Sisxlis_mimoqcevis.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12273,
+    "sha256" : "45cbad9c19482512cdb08ffc430b5bbe5a2c21b1f2c546694a4549f2838c4ce4"
+  }, {
+    "rowKey" : "176",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_15_circulatory system.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11802,
+    "sha256" : "35ddb3d5de04eb5c55c6bb94ad09dd874f1ccebd23fab4f9a61256da9fe21f2c"
+  }, {
+    "rowKey" : "177",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_16_Suntqvis_organota.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12394,
+    "sha256" : "21a3e2d2443007272d24735d073ee04daa39d6e878c3cc9527f3192e541ce127"
+  }, {
+    "rowKey" : "177",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_16_respiratory system.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12077,
+    "sha256" : "330b0752a5284cd37bab3b4c4065d78a2987a0d62e6322f93048f4593912adac"
+  }, {
+    "rowKey" : "178",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_17_Sachmlis_momnelebeli.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11999,
+    "sha256" : "84c92ac2bc49fbba800b626de3174981873b6b027403a4e4fbf4fb263f2a2218"
+  }, {
+    "rowKey" : "178",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_17_digestive organs.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11813,
+    "sha256" : "d5b1afe479b87ca1caf83266ebe1e7025a8a1d7005c032701d6c6face25b34e6"
+  }, {
+    "rowKey" : "179",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_18_Kani_da_Kanqvesha.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12239,
+    "sha256" : "6bfb8660599071c4132fe2b5b7d4e21d8f7b84ae3cd093ac6ea8ae85c7d5e827"
+  }, {
+    "rowKey" : "179",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_18_skin and subcutaneous.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11857,
+    "sha256" : "6a10943dc18227e9f08175f174e64cc1f5c9e0f1b66632d571fcb01fa049c59f"
+  }, {
+    "rowKey" : "180",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_19_Dzval_saxsarta.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11953,
+    "sha256" : "09ff8c1cfdd6e82a13765df57cf26e810e28deb280bf99c9717a605473f79f77"
+  }, {
+    "rowKey" : "180",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_19_musculosceletal.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11806,
+    "sha256" : "b4b5b7cd707979a1255e4f344ba5ec0be9035156747425147f811657b3c67eac"
+  }, {
+    "rowKey" : "181",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_20_Shard_sasqeso.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12155,
+    "sha256" : "3d8164f75296023e26b30fed039ef9fad6ccb54b0dc0dc8675d95fca9174ba9c"
+  }, {
+    "rowKey" : "181",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_20_urogenital.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11818,
+    "sha256" : "1992545f8ebb4f99e183af48963018a651c2c66774172c73d947d4469c6f10a8"
+  }, {
+    "rowKey" : "182",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_21_Perinataluri.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10809,
+    "sha256" : "9b9f9f507ecd8424d375ae31a3ade33633355969106e8ca817c084f1f9f92bf4"
+  }, {
+    "rowKey" : "182",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_21_Perinatal.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10610,
+    "sha256" : "d1007458c784e1b439b6cf508532faf754f190b3f1349e120f586ff53eed5535"
+  }, {
+    "rowKey" : "183",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_22_Tandayolili_anomaliebi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13370,
+    "sha256" : "f52eb824aabdab83e185bef7fdccab53dd2f9a76b45702f45bc4754cdb914b3c"
+  }, {
+    "rowKey" : "183",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_22_congenital malformations.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13110,
+    "sha256" : "54fdc5bbb352faa661eb4716757e0f0adb6eb4fba412b4421992dd708369127f"
+  }, {
+    "rowKey" : "184",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_23_janmrtelobis dazghvevis dafarva.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 71613,
+    "sha256" : "395aa4e0d88f42ee0f8d9e2c2012e70ca005ce0a2ed0b7ce804711223ff4afc9"
+  }, {
+    "rowKey" : "184",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_23_Health insurance coverage.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 69388,
+    "sha256" : "cbe600dc4a19a2bbebd9d468fde43bddc94b9b083d5b3e6f4ec7814c152d18aa"
+  }, {
+    "rowKey" : "185",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_24_xelovnuri abortis koeficienti da mkvdardshobadobis koeficienti.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 242156,
+    "sha256" : "65ec10b87c475c60940f3524991ced5bc24f59f65a63b7d92cd6e568e5e5df3e"
+  }, {
+    "rowKey" : "185",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_24_abortion rate and stillbirth rate.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 240842,
+    "sha256" : "64b75c3ac7150ced3626b21084c8c9fc422928eb115c6e12f4cf2b9e92ba944c"
+  }, {
+    "rowKey" : "186",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_25_adreuli shvilosnoba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 89144,
+    "sha256" : "6e543d43b32264cedada94db590ae193be4cce62079119221a892a51e204a637"
+  }, {
+    "rowKey" : "186",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_25_ Early childbearing.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 88610,
+    "sha256" : "93b19ff5d3dfeb6f26fed0fe1061659f242f34c2e215aa036ad8a5b12668af74"
+  }, {
+    "rowKey" : "187",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_26_mshobiarobis adgili.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 36447,
+    "sha256" : "aa5606de06daa3f4eb946ab3270855373577d164d3b3a7594ca098a13eadff81"
+  }, {
+    "rowKey" : "187",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_26_Place of delivery.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 29746,
+    "sha256" : "c21974278c3000ef78c8589efa8a1890db8f38876e0883c388f70ad9dca1ab09"
+  }, {
+    "rowKey" : "188",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_27_sakeisro kveta.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 30719,
+    "sha256" : "6e270a03a46d40ff47894d5c08cfa75a591750b437276868dab785e12f4668ec"
+  }, {
+    "rowKey" : "188",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_27_Caesarean section.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 30598,
+    "sha256" : "f81c32db821b90837dffafea97b72cdd60507d0f3f4f884bdd520f004c62096a"
+  }, {
+    "rowKey" : "189",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_28_axalshobilisa da dedis mshobiarobis shemdgomi shemowmeba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 39833,
+    "sha256" : "53dfbf726ecb32153e0aabdeacc389ded9906aa14929c6d840d8e4f2f3b1eb3f"
+  }, {
+    "rowKey" : "189",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_28_Post-natal health checks for newborns and mothers.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 39659,
+    "sha256" : "e31730cd1cdf70090cb6ec311d918da5ff2d9c659970d88552bad8c03ae418da"
+  }, {
+    "rowKey" : "190",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_29_adreuli dzudzuti kveba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 25948,
+    "sha256" : "8c32de0ba8ed1ce59c853568e682b2a4bffd076b33f6f65f62f086c7187a6e85"
+  }, {
+    "rowKey" : "190",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_29_Initial breastfeeding.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 25534,
+    "sha256" : "18b1d85dd83b0f4616a08f2c1bb28d9c5227d082157c5f11d11dd6908dbb6980"
+  }, {
+    "rowKey" : "191",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_30_dzudzuti kvebis statusi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13708,
+    "sha256" : "10ee0e4860935ae79795258ed284d67a53fbcab154e0151c70e296a2d0866393"
+  }, {
+    "rowKey" : "191",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_30_Breastfeeding status.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13651,
+    "sha256" : "b461cb6d5cd90329163d1c947a5b477d1823811b5c0fbd883acbe4e98da41d90"
+  }, {
+    "rowKey" : "192",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_31_bavshvebis da axalshobilebis kvebis gamocdileba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 22566,
+    "sha256" : "a97e3135faebf3dd47e7a1ae2ac00dfb7cafa1996c9809803e25b83c29e44623"
+  }, {
+    "rowKey" : "192",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_31_Infant and young child feeding (IYCF) practices.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 21720,
+    "sha256" : "199f3a149419aa1df3b5f7bc99337b793fc3534b90c2a719b90f1d0080a17909"
+  }, {
+    "rowKey" : "193",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_32_bavshvis funqcionireba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 39103,
+    "sha256" : "a0650651adc1cbdc53c6c6a519350b2f3f2c523fffa48d2b5da9df3f34b67e98"
+  }, {
+    "rowKey" : "193",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_32_Child functioning.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 37358,
+    "sha256" : "a51d84da40fa7622a5de10f382c6c0357639c91aec7362b091b9d39fcd7dab01"
+  }, {
+    "rowKey" : "194",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_33_HIV gadacema.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 75567,
+    "sha256" : "4ddf4b4befa242c05cc3dfa3cb8915f150674c8db0300fbc70571e6c6f65670a"
+  }, {
+    "rowKey" : "194",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_33_HIV transmission.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 75262,
+    "sha256" : "6525591ae71365f07c12ae39c13f908c0a68d69fc77d31f5edbd0fbc99b3ef7a"
+  }, {
+    "rowKey" : "195",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_34_bavshvebis nutriciuli statusi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 25205,
+    "sha256" : "0fe12dfb6368efff6f0cc861d3edd469429d958780bdf64b7490a5b1108d8708"
+  }, {
+    "rowKey" : "195",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_34_Nutritional status of children.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 24946,
+    "sha256" : "78fd13878779d9b65b04e6a6eb32069fe1789921401d4a10d6e536a3bea20eb0"
+  }, {
+    "rowKey" : "196",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_35_bavshvis funqcionireba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 22443,
+    "sha256" : "0b66b318d834b32adf58a1594107f2b4b63b98455e6b1e0104d3f465cec1d3f2"
+  }, {
+    "rowKey" : "196",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_35_Child functioning.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 21375,
+    "sha256" : "a114cab893f5aa664b1a7304cf590f4aea19ec6b74f029def46b1b049db75019"
+  }, {
+    "rowKey" : "197",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_36_informaciuli, nebayoflobiti gadawyvetileba reproduqciuli janmrtelobis shesaxeb.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 255019,
+    "sha256" : "746ea37b6b35a891d7e25274d633ff1a7c8968a5edf0086d0e6817e9c1426c3f"
+  }, {
+    "rowKey" : "197",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_36_Informed decision on reproductive health care.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 255490,
+    "sha256" : "8f726f22cd65cf1d1698819361881f99e377270388c454d5d42b14133ca1813f"
+  }, {
+    "rowKey" : "261",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_01_skolamdeli-dawesebulebebi-municipalitetebis-mixedviT.XLSX",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 26289,
+    "sha256" : "69d7e4050564245a5d5351965375a61386281e6765ba3c3d8a23308d6bcce02f"
+  }, {
+    "rowKey" : "261",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_01_PEC-institutions-by-Municipalities.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 25287,
+    "sha256" : "2f82cb839b24fe1e2ca738f9d53465b2bf91890784a125a37ee1d9cb17017ab0"
+  }, {
+    "rowKey" : "262",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_02_zogadsaganmanaTleblo-dawesebulebebi-da-maTSi-moswavleTa-ricxovnoba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13355,
+    "sha256" : "ac718148f8359e3b74be02a6979e22c7663ecb615794b60345ffbdead992af57"
+  }, {
+    "rowKey" : "262",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_02_Number-of-General-Education-Schools-and-Pupils-in-them.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12977,
+    "sha256" : "81e5c472322967528ad2453da4ff43506a72ad4bb9b8c602dafa65309fe4aaf5"
+  }, {
+    "rowKey" : "264",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_04_moswavleTa ganawileba safexurebis da klasebis mixedviT.XLSX",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 24997,
+    "sha256" : "f6c9978bd16ddb0da7683ea9f16a91b7d1efaf515dfad53b61924300df322985"
+  }, {
+    "rowKey" : "264",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_04_Distribution of Public and Private General School  Pupils by Level....xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 24917,
+    "sha256" : "55ce30cf3fb08a05966aad9b60c1c1c6f64907b477e5880f627a2421f885ac10"
+  }, {
+    "rowKey" : "265",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_05_moswavleebi  asakisa da sqesis mixedviT.XLSX",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 16164,
+    "sha256" : "f3ed88b9ffd1424ce2314506672c6fab1d3f9bda6fb645624e039208f27a443f"
+  }, {
+    "rowKey" : "265",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_05_Number-of-general-Education-School-Pupils-by-grades-and-ages.XLSX",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 15540,
+    "sha256" : "490ac5b54bac75178c7d90980d0dff8a8470c1f3ff87829a0895600236dc9eca"
+  }, {
+    "rowKey" : "266",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_06_ICT_geo.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13114,
+    "sha256" : "312bb442234de37ef7bf2fd3e1c3cadcfbc7b9fb69995546d29f6e9cd92433c5"
+  }, {
+    "rowKey" : "266",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_06_ICT.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12772,
+    "sha256" : "7b55130f6f2c209a4b80f2d080d3427f3d16c310b32d981a5d6fb0fa53167edf"
+  }, {
+    "rowKey" : "267",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_07_sssm moswavleebi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 17192,
+    "sha256" : "6c87dd15fbce43a5023cfa043fd2fbc6770e89b5ed604f81c6b4cfe54373aba6"
+  }, {
+    "rowKey" : "267",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_07_with Special needs.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 17008,
+    "sha256" : "92b8f3306b4125bc55defa61cfc92f40b5b799c115ffec3949e00db929a29793"
+  }, {
+    "rowKey" : "268",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_08_SeuCerdat statusi_Seuwydat statusi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 21241,
+    "sha256" : "3bd57237522696cc2fbc3335323f93fa86a0c6e32edb9be1bfc5f8036c239bb2"
+  }, {
+    "rowKey" : "268",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_08_suspended or terminated out studying.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 20893,
+    "sha256" : "75498a2d143c489a9244ba18715905ecfb3b05702d655769edd57dae6c1cc32d"
+  }, {
+    "rowKey" : "269",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_09_skolis-damtavreba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13141,
+    "sha256" : "228be33ccba75dbdc30b8f8557a15da2448ec1129e247e56372adbc51fec9daa"
+  }, {
+    "rowKey" : "269",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_09_Graduation.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13714,
+    "sha256" : "037f2f84b6d45765e47674653f3ef86a819ab1a91c9e26d6ce17bae14246cf16"
+  }, {
+    "rowKey" : "270",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_10_skolebis-tipebis-da-regionebis-mixedviT.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 39023,
+    "sha256" : "eca1727b28bfde5d8fc117a540e3d26d0686c04793b27b04a1d73db2b3ffc4f1"
+  }, {
+    "rowKey" : "270",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_10_Number-of-schools-by-stages-and-regions.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 37957,
+    "sha256" : "a69d5f290e3c24630fe370dbb1c526950ba616dff36b3818b1bef969d8ce05eb"
+  }, {
+    "rowKey" : "271",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_11_skolebisa-da-moswavleebis-raodenoba-regionebis-mixedviT.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 50077,
+    "sha256" : "7e261e85ecb82990cdd63b3e425c0a0c2b9ec0368a8fa229f35b41233ae96fa3"
+  }, {
+    "rowKey" : "271",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_11_Number-of-schools_Pupils_Teachers by Municipalities.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 50213,
+    "sha256" : "33ed896b7003486e91d818f054ab71b93c4f338356f5bdd832fcccdd705b1537"
+  }, {
+    "rowKey" : "272",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_12_maswavleblebis ricxovnoba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12524,
+    "sha256" : "e34754037623baa6daa6e4d74b702d0a92885c31a448d49e00150ede87f84779"
+  }, {
+    "rowKey" : "272",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_12_Number-of-General-Education-School-Teachers.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12228,
+    "sha256" : "50dfe5e605a8286e00a779a92458480d2494e1b4f7ef1e116639c91b3c54d88f"
+  }, {
+    "rowKey" : "274",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_14_profesiuli-saganmanaTleblo-dawesebulebebis-raodenoba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13554,
+    "sha256" : "42473906dc7a16de06e2cdaab246c126069b97d1b902900f445efd316f0e4dcd"
+  }, {
+    "rowKey" : "274",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_14_Number-of-educational-institutions,-that-conducted-admission-of-students-in-vocational-education-programs.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13486,
+    "sha256" : "76fa8a59827542fd1435563baaf72d702d4c7f9ef7500afb8ef7e85ee0b56eea"
+  }, {
+    "rowKey" : "275",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_15_studentebis-ricxovnoba-saganmanasTleblo-dawesebulebebis-profesiul-saganm....xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 27011,
+    "sha256" : "8a404bbda87e2586d756b7883c9bc1a172604b0ba493b8ade13ba71a1d89058e"
+  }, {
+    "rowKey" : "275",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_15_Number-of-students-in-Public-and-Private-Vocational-Education-Institutions'-Education-Programs.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 26455,
+    "sha256" : "9814f37c9da9ac9de9a0faf1f9da6d257937a36333a905c5a1d3fd739c55b338"
+  }, {
+    "rowKey" : "276",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_16_profesiuli ganaTlebis maCveneblebi regionebis da sqesis mixedviT.XLSX",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 21204,
+    "sha256" : "4f0cce8b0757d5f0030a9a0b6210654296692669333aeea1f6cc34e44511b9f6"
+  }, {
+    "rowKey" : "276",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_16_Indicators of Vocational Education by Regions and Sex.XLSX",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 21014,
+    "sha256" : "840de3a9f51fe5e18fb7758448384c5068dda2a92ec4fba9f4a64e5272b74cb9"
+  }, {
+    "rowKey" : "277",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_17_sssm studentebis ricxovnoba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12132,
+    "sha256" : "27f477417b97f3ed772768d378e3549f75cf33ee80e305651205fe9f0b460671"
+  }, {
+    "rowKey" : "277",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_17_Disabled Student.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12233,
+    "sha256" : "1ffc991f8f1b9e3279709c8b894423a9ea49643e8ccd98b91a46c84b14f24fbb"
+  }, {
+    "rowKey" : "278",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_18_umaRlesi-saganmanaTleblo-dawesebulebebis-raodenoba-regionebis-mixedviT.xls",
+    "mediaType" : "application/vnd.ms-excel",
+    "bytes" : 32256,
+    "sha256" : "5d5ea3e5f2fa0fb0a30af77fb4bbf39ab2b49ca95304e980e2be8b75d7c562a1"
+  }, {
+    "rowKey" : "278",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_18_Number-of-Higher-Education-Institutions-by-Form-of-Ownership-and-Regions-of-Georgia.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12053,
+    "sha256" : "a9d43b17926f58cfd87d7a69f647552e18123e4c87a97be5eb533a23e685a9a6"
+  }, {
+    "rowKey" : "279",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_19_studentTa-miReba-saxelmwifo da kerzo-saganmanaTleblo-dawesebulebebSi-programebis-mixedviT.xls",
+    "mediaType" : "application/vnd.ms-excel",
+    "bytes" : 66048,
+    "sha256" : "378378ad9be79c326038ed10754a08b38d4758a00a2eb85e9b15cbf69c7110d4"
+  }, {
+    "rowKey" : "279",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_19_Number of Students Admitted in Public and Private Institutions by Programmes and Sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 32380,
+    "sha256" : "0702a94b571c31ad8ab5e9e4152b3947d2b833f028f7c2e1512e90dac9646fdc"
+  }, {
+    "rowKey" : "280",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_20_studentTa-ricxovnoba-saxelmwifo da kerZo-saganmanaTleblo-dawesebulebebSi-programebis-mixedviT.xls",
+    "mediaType" : "application/vnd.ms-excel",
+    "bytes" : 66048,
+    "sha256" : "aed118ad2d53f9471915012b86532ff2fb4720610bdb06f589e5174a5d881ad8"
+  }, {
+    "rowKey" : "280",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_20_Number of Students in Public and Private Institutions by Programmes and Sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 32909,
+    "sha256" : "1ed8ebe4d0c87985bd950340ddeb403287b43f6a193b3130ee75ddd67df045d1"
+  }, {
+    "rowKey" : "281",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_21_studentTa-ganawileba-asakis_da_sqesis_mixedviT.xls",
+    "mediaType" : "application/vnd.ms-excel",
+    "bytes" : 563712,
+    "sha256" : "a7b2aebd46cc49925e11043fdf14c4e1e29621866745ed0135d72b3ea0ee9844"
+  }, {
+    "rowKey" : "281",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_21_Number of Students in Institutions by Age and Sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 95077,
+    "sha256" : "c3552590b629c39773cb2fb3aa9af712dd00f051f734adba8ac4022b1c4c5c8e"
+  }, {
+    "rowKey" : "282",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_22_kursdamTavrebulTa-raodenoba-saxelmwifo-da kerdzo saganmanaTleblo-dawesebulebebidan-programebis-mixedviT.xls",
+    "mediaType" : "application/vnd.ms-excel",
+    "bytes" : 68608,
+    "sha256" : "1af730ba08cf71baa0386b28e7e007ec43ae319772f791fe296711abf89b99ac"
+  }, {
+    "rowKey" : "282",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_22_Graduates of Public and Private Institutions by Programmes and Sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 34352,
+    "sha256" : "81aaca839ced2fb0618fe0a51c1cd101f1d90f58282c5c14005906d3161e4fcc"
+  }, {
+    "rowKey" : "283",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_23_doqt. miReba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13813,
+    "sha256" : "d7411594a1df432b8ed8815adeec7f53f3263c826675206efe21d4746e19b6f2"
+  }, {
+    "rowKey" : "283",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_23_doqtoral admission.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13892,
+    "sha256" : "3aa6fba7fd40e8dd9a3a98b4ead67439026bd46837b0895bd40768bf575de3be"
+  }, {
+    "rowKey" : "284",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_24_doqt. ricxovnoba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 14048,
+    "sha256" : "58c089b00f99cb0c2754924ab253236631b288242ce9af5c36aebe4583bc7c19"
+  }, {
+    "rowKey" : "284",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_24_doqtoral number.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 14190,
+    "sha256" : "68bd7dc0ccdac77fa53a26a077eb0f45ea4d991582dde3abba695e7127039dd1"
+  }, {
+    "rowKey" : "285",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_25_doqt. kursdamt..xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13586,
+    "sha256" : "717e193c512147268b35e84f150856e2e0f35896a81868b8dbb9e9b356b2305b"
+  }, {
+    "rowKey" : "285",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_25_doqtoral completed.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 14370,
+    "sha256" : "dc46915ffbaada2761f9f4564e167bf3cb10d8d1a75ff6a899f1ec25acda605c"
+  }, {
+    "rowKey" : "286",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_26_doqtorantebi asakit.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12342,
+    "sha256" : "8cb9b82e88cc23cd1456bfc56a208093f6f48ff349d560b77b52bb3e88ed43b9"
+  }, {
+    "rowKey" : "286",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_26_doqtoral age.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11388,
+    "sha256" : "8ee68bad14a362fa558c0aa917d3d22e5414dc21383914e197030ae4efe0d3c4"
+  }, {
+    "rowKey" : "287",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_27_sabavshvo baghi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 36465,
+    "sha256" : "d8c2457ad04ab8f39a282e1a02709fd281480c0084995a261968f7a4074703e7"
+  }, {
+    "rowKey" : "287",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_27_Kindergarten.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 35767,
+    "sha256" : "0fa3b35cb0d469a15b6792015e1afc23173a54f4c36dda8fd82eb36fa9d32dca"
+  }, {
+    "rowKey" : "288",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_28_skolis shesabamis safexurze shesvlis saerto, safexuris dasrulebisa da efeqturi gadasvlis doneebi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 20576,
+    "sha256" : "365f7bb45216ab4d4180466f0b6acb4092a97b4bb19c3e29a352276c0633dbb1"
+  }, {
+    "rowKey" : "288",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_28_Gross intake, completion and effective transition rates.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 19836,
+    "sha256" : "f28664123d76be15fec3311cc2200e8c8948b46e87dbb2a4c602d8ea8a5f29a5"
+  }, {
+    "rowKey" : "289",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_29_formaluri ganatlebis mighma darchenili bavshvebis machvenebeli dawyebiti da sabaziso ganatlebis safexurebistvis.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 45259,
+    "sha256" : "7f38fc16d7edd16f41ddd338312a39699177d622005de6d471d7143648262ae1"
+  }, {
+    "rowKey" : "289",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_29_Children left beyond formal education at the primary and lower secondary levels of education.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 43661,
+    "sha256" : "0719ead17940aff51dd5eae5e3593d8cc6657fc7345dd5997950c54ec5e28eb7"
+  }, {
+    "rowKey" : "290",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_30_tanasworobis indeqsi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 20865,
+    "sha256" : "60f6fdca0290dd47318f020fbbadf91ad87931c5ed54d9f634fb83d357286a33"
+  }, {
+    "rowKey" : "290",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_30_Parity indices.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 20305,
+    "sha256" : "8d9fdb2dbebbe1eef08505acd90c56d85581a3204b22b8b540bc5095448cd459"
+  }, {
+    "rowKey" : "291",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_31_swavlashi xelshewyoba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 49936,
+    "sha256" : "ca7dc08c68c36c7eb658d9b741edf5aa785c24fd5d4a43fce6b92bdd4a1bb9d5"
+  }, {
+    "rowKey" : "291",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_31_Support for learning.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 47971,
+    "sha256" : "196d7dfeca658a9f5d4faee55a8754ca5b74ad10ac32292690bb2ea8570e7f5c"
+  }, {
+    "rowKey" : "292",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_32_fizikuri dasjis mimart damokidebuleba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 20338,
+    "sha256" : "278c2752ec8e95812bdae5f42785abd7f0169961f80284218a9283d75723c0a0"
+  }, {
+    "rowKey" : "292",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_32_Attitudes toward physical punishment.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 21509,
+    "sha256" : "2b5e569fcae9b6df6734f680ed2a23cbf9ccbbfdc154acc921c0bcfd757960a3"
+  }, {
+    "rowKey" : "294",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_34_bavshvta adreuli ganvitarebis indeqsi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 19525,
+    "sha256" : "93be804a8b2a7d2a4719f4f920e84b3f6779a54ba932d1d0b6c1699069530cc5"
+  }, {
+    "rowKey" : "294",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_34_Early child development index.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 19284,
+    "sha256" : "bbbeaa2788f50d1f7dd2e0c856b130fa0f454fc46b8c9f8326a7386d29139fad"
+  }, {
+    "rowKey" : "295",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_35_organizebul swavlebashi chartulobis machvenebeli.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 17781,
+    "sha256" : "5a9ee82cdef60eb8543a0b7de663bc12dbff4053ffecdf735b7831a2e08b4c36"
+  }, {
+    "rowKey" : "295",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_35_Participation rate in organised learning.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 17509,
+    "sha256" : "ef91c812c14d1849b1eac74ce07c4707e6da32dbe43bed30c0f91787d608c241"
+  }, {
+    "rowKey" : "296",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_36_bavshvis aghzrda.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 28322,
+    "sha256" : "da0c580bdd3ce86c51b513f1897893070026e4e239d759608140cb57b7049107"
+  }, {
+    "rowKey" : "296",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_36_Child discipline.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 27171,
+    "sha256" : "bd921bf2db83475d2c92ff2d3ab310f055dc2a316dfc5b7d13512f2a3902d8a9"
+  }, {
+    "rowKey" : "297",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_01_SSm socpaketi sul.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11092,
+    "sha256" : "95906b0ac2094d3edfe2b935f64bd16dc6d0a9d51090e9ae4d326d8a22085052"
+  }, {
+    "rowKey" : "297",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_01_disability socpak by age and sex;.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10914,
+    "sha256" : "47d0ecb04192658c74a68c657be02d9f8b9f8ba22c0c470d2200aa81b278ab0a"
+  }, {
+    "rowKey" : "298",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_02_SSm socpak. reg..xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 18278,
+    "sha256" : "489216a8550fb29b943d9af292b4d11e41ee46123330d1b95934c4483dcaddfd"
+  }, {
+    "rowKey" : "298",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_02_disability socpak by sex and regions.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 18206,
+    "sha256" : "4e4928beb7d2b5e57c91f08e99ab403809e5ad4a2d38f7a0ec5b75f28fd297b2"
+  }, {
+    "rowKey" : "299",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_03_marCenali sul.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10426,
+    "sha256" : "dbea2a9129db0312338914adcf87c88763e92dd389d2ea9af6ce091cfb2bcb79"
+  }, {
+    "rowKey" : "299",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_03_survivors receiving socpak by sex;.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10242,
+    "sha256" : "e5d09a290c6fdc0061435ae29833e9852350c821d3341b4720008de5fb30dabb"
+  }, {
+    "rowKey" : "300",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_04_marCenali reg..xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12766,
+    "sha256" : "89c147032cbc2e8759f60d93e81900aaa3ec45b65c43a3bd9fddbc9548b2196f"
+  }, {
+    "rowKey" : "300",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_04_survivors receiving socpak by sex and regions;.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12604,
+    "sha256" : "5bf610759fcd0a359f334d908c8a72febb2229e77cd085218e09fd5df44f68bb"
+  }, {
+    "rowKey" : "301",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_05_saarsebo sul.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11564,
+    "sha256" : "ad9cdb21f837232ac24cf9faf980ecded6899aa7d541547be11abb8027fd5bad"
+  }, {
+    "rowKey" : "301",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_05_subsistence allowance by age and sex;.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11395,
+    "sha256" : "a83d90640a54bbc2c9f955fea760d6014b6db7aaa644ecf24aac3a46afa264ae"
+  }, {
+    "rowKey" : "302",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_06_saarsebo reg..xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 25481,
+    "sha256" : "98c5045801ebb1dbe0b3dc0441e99378be5e3c4eaf606e082382a4abcadf5086"
+  }, {
+    "rowKey" : "302",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_06_subsistence allowance by sex adn regions.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 25637,
+    "sha256" : "c056c926fb87df3d263ed6d2b681b291f5e79c9ef8688957827d3b82c65191f4"
+  }, {
+    "rowKey" : "303",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_07_gegmiuri ambulatoria sul.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12010,
+    "sha256" : "cbb96ffa986ab633a9ac6da63261e578662b0a357554d87989d4080c4920f3a0"
+  }, {
+    "rowKey" : "303",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_07_planned outpatient services by age and sex;.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11660,
+    "sha256" : "4e2fef86ce3b6d62f346fe7ea4c0d9b86b1f3599b625d70dfeef2c9f8a9ffeef"
+  }, {
+    "rowKey" : "304",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_08_gegmiuri ambulatoria reg..xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 20210,
+    "sha256" : "7da72fe5c1a4cac7b18a7ae65ce5449abe111ccfb39fea0cc11ac70d8bef5c86"
+  }, {
+    "rowKey" : "304",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_08_planned outpatient services by sex and regions;.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 20298,
+    "sha256" : "289b53a1ffef6079f313751be041d831dfe282061b7251a7ee561d5211bdd844"
+  }, {
+    "rowKey" : "305",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_09_qronikuli daavadebebi sul.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11444,
+    "sha256" : "0288a8b73c7e089c639b22a2718fb866b11f541c0f934114c4b6644ad87e4829"
+  }, {
+    "rowKey" : "305",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_09_beneficiaries of chronic diseases by age and sex;.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11220,
+    "sha256" : "750bc4811e626f955976b60a662ee36c3de6b99ae4746ae8756afd790729a4cf"
+  }, {
+    "rowKey" : "306",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_10_gaSvilebuli sul.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10341,
+    "sha256" : "e350a537e3f6f3ce445cb46b7d50e49575de1c500da030afb37d5242ec632c47"
+  }, {
+    "rowKey" : "306",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_10_adopted children by age and sex;.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10270,
+    "sha256" : "3dd68da67c29a7ef1cb7dc19fbecaf66aa4277f72cb4b0587b53a324f03b2585"
+  }, {
+    "rowKey" : "307",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_11_gaSvilebuli reg..xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 18747,
+    "sha256" : "28ad2288085e4bb023019716e1ee6fcd1414351f9500a34eea4dc2db9daf7dca"
+  }, {
+    "rowKey" : "307",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_11_adopted children by sex and regions;.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 18546,
+    "sha256" : "11abab3cd36f8e7d48877fa09a2e09b415dda32b71a1eb905ab2b1d2375d4da1"
+  }, {
+    "rowKey" : "308",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_12_statusi sul.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10363,
+    "sha256" : "255832fee3840dc6e2208331dbe796cc0052fdd50357137a8b00454c708d170f"
+  }, {
+    "rowKey" : "308",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_12_granting adoption status by age and sex;.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10443,
+    "sha256" : "2e6aefd84a99447c76dfa839ddc93495f428392e02a1cc90daea88932b3fb6e8"
+  }, {
+    "rowKey" : "309",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_13_statusi reg..xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 19105,
+    "sha256" : "e7dc982b00772b65b67adfa916038babdb372ae93bc617283dc0678c2898917e"
+  }, {
+    "rowKey" : "309",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_13_grantimg adoption status by sex and regions;.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 19147,
+    "sha256" : "cf41f2ea8895a5414a86fdd7891b767ac32900edb014117fa13cf66b879b6758"
+  }, {
+    "rowKey" : "310",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_14_devnilebi sul.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11384,
+    "sha256" : "8c588c74b7b5d5575986b772b9aec7c4fb5f4e961bee540c6b02956a5a1b18c1"
+  }, {
+    "rowKey" : "310",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_14_IDPs from the occupied territories by age and sex;.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11376,
+    "sha256" : "df9d1172bed4d0a715d70072d4bb8751d6cab501a3c1205ac4ecd6ac39f6dfe3"
+  }, {
+    "rowKey" : "311",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_15_devnilebi reg..xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 21654,
+    "sha256" : "ee711aa68c6cc580909a074f09682f6ecb675702a7c4310bdd2d9bba17dcc278"
+  }, {
+    "rowKey" : "311",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/04_15_IDPs from the occupied territories by sex and regions..xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 21565,
+    "sha256" : "8f0ffcb8521055450a89171a8017be9758f04af8db0d009304ae461d0ee6307c"
+  }, {
+    "rowKey" : "312",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_01_ginis-koeficientebi.xls",
+    "mediaType" : "application/vnd.ms-excel",
+    "bytes" : 38912,
+    "sha256" : "587fab4042226a9a95ad9ce206b5e35df06d54ba17cdd00459df194fad0af94e"
+  }, {
+    "rowKey" : "312",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_01_GINI COEFFICIENTS.xls",
+    "mediaType" : "application/vnd.ms-excel",
+    "bytes" : 37888,
+    "sha256" : "9a0b8bc9534f607ee791d22d7333788c46ff5cd871cdd3d8bfedb2d3bbc36020"
+  }, {
+    "rowKey" : "313",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_02_absoluturi-sigaribe.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10445,
+    "sha256" : "d8afa609f7415ee3ceb14c2d405474a897f1be9f37000ffd1636b118ba87b863"
+  }, {
+    "rowKey" : "313",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_02_Absolute Poverty.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9882,
+    "sha256" : "dfabae6a22d7d4f7becb0948e6e24c243e80137f6d674288f11bc53c71a4c1c5"
+  }, {
+    "rowKey" : "314",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_03_bavshvis materialuri da socialuri danaklisi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 21538,
+    "sha256" : "718b7b4d2fc146ca76c66d10a89b475f346d9646e4a9e8f371fc5a60dffc5331"
+  }, {
+    "rowKey" : "314",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_03_Material and social deprivation of child.XLSX",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 21884,
+    "sha256" : "d3454337058abb67a3a4cb3406bff028a081430ab13c9eb43cc145a9cf9b9bc1"
+  }, {
+    "rowKey" : "315",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_04_sasmeli wylis dziritadi da shezguduli momsaxurebebis gamoyeneba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 44275,
+    "sha256" : "891667a9aa330f008f5b7ef1a7fde48fdce63568b576bcdfc0e1fab813af232a"
+  }, {
+    "rowKey" : "315",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_04_Use of basic and limited drinking water services.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 43122,
+    "sha256" : "8144cc34908eeeb013f37791c391ca09a18419e6f9fe79cdea740c6ef939d649"
+  }, {
+    "rowKey" : "316",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_05_gaumjobesebuli da gasaumjobesebeli sanitaruli kvandzit sargebloba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 95563,
+    "sha256" : "d0a65d46e34b3619fcfc254145072904caa43f4dd0965dd7ac2c6c7db923a8fa"
+  }, {
+    "rowKey" : "316",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_05_Use of improved and unimproved sanitation facilities.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 95253,
+    "sha256" : "7b57f299b75a5d5fb6a993d575aad57475a8afd99705fcec51807fc3520f935e"
+  }, {
+    "rowKey" : "317",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_06_sacxovreblis maxasiateblebi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 49613,
+    "sha256" : "69891b62d15bd0350f57d9cbe8b17298254060508cd2afc45b5c5078cd047e52"
+  }, {
+    "rowKey" : "317",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_06_Housing characteristics.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 48371,
+    "sha256" : "742a3c43011a9346297ebfb652db34f8e81ca7056e8aa42a5fd7b617fcb4e86a"
+  }, {
+    "rowKey" : "318",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_07_usafrtxod martuli sasmeli wylis momsaxurebebi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 40779,
+    "sha256" : "902b56aba6b665e50797cbd696710b487095db3c9765055738cc1c255b10d323"
+  }, {
+    "rowKey" : "318",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_07_Safely managed drinking water services.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 38928,
+    "sha256" : "7c55c8030b1407e66c255340dad849ee2a7b9c36586a1eb73c7a0bba2c2dbcad"
+  }, {
+    "rowKey" : "319",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_08_dziritadi da shezghuduli sanitaruli momsaxurebebit sargebloba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 43887,
+    "sha256" : "d735caf1a098b2b7ef5762003206c8255dd1661c949a2d8e2c844c02f9ab681f"
+  }, {
+    "rowKey" : "319",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_08_Use of basic and limited sanitation services.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 43425,
+    "sha256" : "87f3573c035895b1d6a5ea2905f20cd2e5cc7fd1598bc34ae54e2a6e27ee6a63"
+  }, {
+    "rowKey" : "320",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_09_xelsabani mowyobilobebi sapnita da wylit sacxovrisis teritoriaze.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 43999,
+    "sha256" : "06dddd401a55feb7ca3390d00d42c5c435999d6b7ca251a6c92575ee34adc95f"
+  }, {
+    "rowKey" : "320",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_09_Handwashing facility with soap and water on premises.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 42998,
+    "sha256" : "c6a035d3c383e72537f3f7da88704c5f6334fc207b51f240e896ea50cb376455"
+  }, {
+    "rowKey" : "321",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_10_dziritadad sufta sawvavisa da teqnologiebis gamoyeneba sakvebis mosamzadeblad, sacxovrisis gasatbobad da ganatebistvis.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 42875,
+    "sha256" : "2517f769a82c45a6bc4ca64a85e22c632b21dd39779d3c4bf6a91c4ba572b520"
+  }, {
+    "rowKey" : "321",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_10_Primary reliance on clean fuels and technologies for cooking, space heating, and lighting.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 51155,
+    "sha256" : "1fe64214dfef97f79bc279c2bab5c6e57884c4bed5140aaaba961030f62bf176"
+  }, {
+    "rowKey" : "322",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_11_medianuri shemosavlis 50 procentze qvemot mcxovrebi adamianebis proporciuli odenoba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13517,
+    "sha256" : "a50ac3aa493da01df1c72db844bd0cbad1f313043dda17f4db9fb51b784d1229"
+  }, {
+    "rowKey" : "322",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_11_Proportion of people living below 50 per cent of median income.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12829,
+    "sha256" : "2bd6ed8b995b33a426cc4f29193310a511b85105ede3612fd9f3daa0162bd5b5"
+  }, {
+    "rowKey" : "323",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_12_usafrtxoebis shegrzneba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 78969,
+    "sha256" : "1b16666ee7501bc6d2d12e1d11a52d0dd26bcb5b5b9f7265efbd9df6b9de6b38"
+  }, {
+    "rowKey" : "323",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_12_Feelings of safety.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 77189,
+    "sha256" : "b44cc1455c873fd6608f10a164e32dd7398a32bb4eb44c88e3a6e945dce18241"
+  }, {
+    "rowKey" : "372",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_13_bavshvebis sacxovrebeli pirobebi da obloba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 20978,
+    "sha256" : "1b06045181b5431f0732f2e63683e6f420d63b267d37b76ce7beb8e0be794af3"
+  }, {
+    "rowKey" : "372",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/cxovrebisdone/05_13_Children's living arrangements and orphanhood.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 22112,
+    "sha256" : "38d8291b1c9d46943e2c151a832646dba61acb7d36d863469a2377ba13c462c1"
+  }, {
+    "rowKey" : "373",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_01_samushao-dzalis-machveneblebi-sqesis-mixedvit.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 19459,
+    "sha256" : "01bcd887ed0c17811ab5c722e154926c54a048d6827b3a18fdaabe5118d5a861"
+  }, {
+    "rowKey" : "373",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_01_Labour-Force-Indicators-by-sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 18588,
+    "sha256" : "0fad11443cf586d459221d3a62c8f0eb755d82ec85a91821c7f8438b67ccb67f"
+  }, {
+    "rowKey" : "374",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_02_samushao-dzalis-machveneblebi-qalaq-soflis-mixedvit.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 19248,
+    "sha256" : "c297153fa96a4b4c54f61e7356d8677076cfe92f0140572c59c79c7f9507936b"
+  }, {
+    "rowKey" : "374",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_02_Labour-Force-Indicators-in-urban-rural-areas.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 18563,
+    "sha256" : "e05f398f8e297f60d7811db584e1b8a075db720998c03f53602c018f29c85da0"
+  }, {
+    "rowKey" : "375",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_03_samushao-dzalis-machveneblebi-ganatleba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 23120,
+    "sha256" : "31157fca78c7521178590f8de1725f33d9ea8ce2dd91051bcd677ae8f8440cd1"
+  }, {
+    "rowKey" : "375",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_03_Labour-force-indicators-by-education.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 22457,
+    "sha256" : "ce3d015a78136a7b05e80d4d2f0c12cc0defa219d606786dd41250619f11ee18"
+  }, {
+    "rowKey" : "376",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_04_dasaqmeba-saqmianobis_saxe.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11851,
+    "sha256" : "cc375ad250cf6cede4ea0f91f750cc504a51376dbfb984f2e93534dfe5576361"
+  }, {
+    "rowKey" : "376",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_04_Distribution-of-Employed-by-Main-Economic Activity.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11695,
+    "sha256" : "37bf9fc35632047399f1d27819131d92b0e07ed4c86998dbc91d398c369f4640"
+  }, {
+    "rowKey" : "377",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_05_faqtiurad-namushevari_saatebi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13056,
+    "sha256" : "a122d045f73d6c3834c4a5dca6a0910abf3f669275b7a0d05f358979e390b48c"
+  }, {
+    "rowKey" : "377",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_05_Hours-Actually-Worked.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12867,
+    "sha256" : "c2335251a38c97485a824bf903f01682bcbbd203261333165bbd5aa2d5f26075"
+  }, {
+    "rowKey" : "378",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_06_araformaluri-dasaqmeba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10888,
+    "sha256" : "fb0e12ac2478b039ff1aed41e5ea338009e291cadb3a7f35d69eed6b876def78"
+  }, {
+    "rowKey" : "378",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_06_Informal-Employment.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10734,
+    "sha256" : "13a036614faa5b6e8b2efa69523a43a8c8c60f1ed85602f2b2fc921c501bc48b"
+  }, {
+    "rowKey" : "382",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/ICT/07_01_internetis gamoyeneba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 30430,
+    "sha256" : "ad2ea968e0ea279240b2ba97ed1e4bda6c7b7ebf512472badf7dc88d03376b15"
+  }, {
+    "rowKey" : "382",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/ICT/07_01_Last internet usage.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 33262,
+    "sha256" : "d178c3d4efd2eb82ce0be64f40667d71fbe82e77f9fdbf7f08086290f131c2fa"
+  }, {
+    "rowKey" : "384",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/ICT/07_03_mobiluri telefonis ploba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 30364,
+    "sha256" : "3aa0e6f22642193b199eb3cf73c0326a62317258677dc16f5432259c5e20dc31"
+  }, {
+    "rowKey" : "384",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/ICT/07_03_Mobile phone ownership.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 30245,
+    "sha256" : "98c658b1b5e6fa4daea1706afa7a5e791a03d67314834fb10f6d5b703e0f658e"
+  }, {
+    "rowKey" : "385",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/turizmi/08_01-ადგილობრივი_ვიზიტორები.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12688,
+    "sha256" : "1f02b61162df927b50b46c283eb723e2b156690718a562789c73f4fe4d53d37a"
+  }, {
+    "rowKey" : "385",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/turizmi/08_01-Domestic_Visitors.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12472,
+    "sha256" : "82d78d6618e31bdf59c19854e2739f6f2b12e81f2698b16f355e47bf1e5ad7e6"
+  }, {
+    "rowKey" : "386",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/turizmi/08_02-ადგილობრივი_ვიზიტები.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12718,
+    "sha256" : "51414b55194a0418fec873f76fdd06681294d271a222f0a804e67c11a1fcc1a7"
+  }, {
+    "rowKey" : "386",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/turizmi/08_02-Domestic_Visits.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12510,
+    "sha256" : "933e85572ffee3be67ba5e17d64b5ed9f3f8a44eebe47700141d77643833e850"
+  }, {
+    "rowKey" : "387",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/turizmi/08_03-ადგილობრივი_ღამეები.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11434,
+    "sha256" : "0d2d54ac6aa47cf395be007a3a992dab46a380014ace047fe428b7a3e815b0b7"
+  }, {
+    "rowKey" : "387",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/turizmi/08_03-Domestic_Nights.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11252,
+    "sha256" : "5df708582d9975fd1ba5b253285d4e8e63c7200eaf8f4ac5a0b234ea8364242a"
+  }, {
+    "rowKey" : "388",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/turizmi/08_04-რეზიდენტები_გასვლა.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12410,
+    "sha256" : "512cbd3a00b1c301d215fe73ea89fff6f79616234dc17647240f5b226df24de1"
+  }, {
+    "rowKey" : "388",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/turizmi/08_04-Residents_Trips.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12188,
+    "sha256" : "add68a668cf1ed021868b348259f4e396fd1b081aa29576e496ba824f8fff801"
+  }, {
+    "rowKey" : "389",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/turizmi/08_05-რეზიდენტები_ღამეები.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13172,
+    "sha256" : "14daecc0b1847a82f6389f43bc57611098fa506cb16845652ce2d7bdc2d79c62"
+  }, {
+    "rowKey" : "389",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/turizmi/08_05-Residents_Nights.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12926,
+    "sha256" : "b2dccfb7cdb1b6dca7bab58757007e2827b4f933cd226073e14325947472dd6f"
+  }, {
+    "rowKey" : "390",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_01_devna.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13835,
+    "sha256" : "57b7bbb1ec20d0afccf4cc54c8638dd94ca0b87f729a19eef79d51263ae5c85d"
+  }, {
+    "rowKey" : "390",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_01_prosecut.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13835,
+    "sha256" : "32348d5c58b70b5d7b507d380019fc6af5150da08072f678f6ee602c765f521f"
+  }, {
+    "rowKey" : "391",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_02_devna_asaki.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 27737,
+    "sha256" : "fbfb340240f670a8a5e201306eb32e8c95cbf9054d734520747be6f17b71c865"
+  }, {
+    "rowKey" : "391",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_02_prosecut_ages.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 27610,
+    "sha256" : "7c5be62cf5a00cb5ee4b1c0fe4f73c2137e822c3ac7c17277e0f0329a8951ea2"
+  }, {
+    "rowKey" : "392",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_03_dazaralebuli.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13377,
+    "sha256" : "7ecfe816c5c2284f4293881157a494fbbca83e8c406281e6b453cbb80844f542"
+  }, {
+    "rowKey" : "392",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_03_victim.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13260,
+    "sha256" : "9bd5bf85d48ad598ce4c8099ccf2a34ef5b1945390535f059a256634a85a26b7"
+  }, {
+    "rowKey" : "393",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_04_dazaralebuli_asaki.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 28264,
+    "sha256" : "b2b35a266b5007b37f063025ce7e8214d55cee657d3a386bc3a68d37c0a9467f"
+  }, {
+    "rowKey" : "393",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_04_victim_ages.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 27996,
+    "sha256" : "40655b0470ca137d7ce8c0d03953db00e993525bf5bcd4decabe48e88cb1c9b9"
+  }, {
+    "rowKey" : "394",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_05_danaSauli.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 39571,
+    "sha256" : "33ac7a71f5859cbf8ab2b6fc48647d6549427a2bf86bdcdf5335b5086c1dbaf2"
+  }, {
+    "rowKey" : "394",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_05_convicted.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 39255,
+    "sha256" : "d2c9d2988e3dc2d48dc95b47dd73dac3f155c05c1a23781b7154419b94a57090"
+  }, {
+    "rowKey" : "395",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_06_sasjelebi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 20184,
+    "sha256" : "5d8f7f2906ea7b27206365d8a005e68c91f90d3f719b21e42089e9ff4417452a"
+  }, {
+    "rowKey" : "395",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_06_sentence.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 20126,
+    "sha256" : "4a4567a8adfcf09676fd80769f9ddb2652d5a8ba9794c61ec9edf4546e37ee33"
+  }, {
+    "rowKey" : "396",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_07_ganaTlebis done.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 21192,
+    "sha256" : "10d9815f7a21b0c6d359667781226e217edce201d1a38991d207876bd086524a"
+  }, {
+    "rowKey" : "396",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_07_edu level.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 20628,
+    "sha256" : "4d62ad9419099a4aa589e6801de19b94b9fbb932184656bc3a39e9dd36bc9eac"
+  }, {
+    "rowKey" : "397",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_08_car.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 37438,
+    "sha256" : "ab41ebd49b4b6ff7f641c93f625149ae4cbd60ff4e530acebdf22baf62f162ed"
+  }, {
+    "rowKey" : "397",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_08_car_ENG.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 36817,
+    "sha256" : "00071ab2297d4ee4612a19ed63536f6cd335e94dfef950cb903d7585e38a7762"
+  }, {
+    "rowKey" : "398",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_09_drive.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 36553,
+    "sha256" : "4463f3ad58bfbb5c446eb362ae9e1228726a572273a1b072a961b1f95ea284fa"
+  }, {
+    "rowKey" : "398",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_09_drive_ENG.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 36209,
+    "sha256" : "a5e21b6c51640d9fbe6e2edb8982a891654e2b9accc914f3b3afb2c2195558d3"
+  }, {
+    "rowKey" : "399",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_10_DV.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 38333,
+    "sha256" : "9352a4b31dd21dbd81e0bbb7b2719e64605fb9c3e4bb0bc773f56b7d9b208f8a"
+  }, {
+    "rowKey" : "399",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_10_DV_en.XLSX",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 37631,
+    "sha256" : "9ef081382e086d2b454c1bb12abfbe12389a2686b8f8da9543054fa2a1cf1446"
+  }, {
+    "rowKey" : "400",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_11_dagupuli.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13284,
+    "sha256" : "11b8083dbac1fa3ebedeba911a34880a9cec352dcbea700143d3beb557abe23b"
+  }, {
+    "rowKey" : "400",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_11_accidents_killed.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13079,
+    "sha256" : "935a8f46ac8650f94620d7c9a13bbfdb245af4aea13a4d881ed212db849baf9b"
+  }, {
+    "rowKey" : "401",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_12_daSavebuli.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13852,
+    "sha256" : "0714ddd101f7481c0b31c9f92a0ea841d772bb56cbe3379a2893d874b9c60f50"
+  }, {
+    "rowKey" : "401",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_12_injured.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13290,
+    "sha256" : "c7d457006270506e24db5828b0ed1605aa6a51a18841226cf3fcde4678a99719"
+  }, {
+    "rowKey" : "402",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_13_diskriminacia da sheviwroeba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 61948,
+    "sha256" : "7c70c80c84e027c592747781833d96d40060ec3348efc1ce78e3cff6b0b41b6b"
+  }, {
+    "rowKey" : "402",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_13_Discrimination and harassment.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 59684,
+    "sha256" : "716c8614f7bd44a6edf844c7024da5ca4de0be8c40dd7bfd42b61c898d80aac6"
+  }, {
+    "rowKey" : "403",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_14_dzarcvis da tavdasxmis shemtxvevis shetyobineba bolo erti wlis ganmavlobashi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13828,
+    "sha256" : "a6ae4841c78d6067017261363dfefb4a788a41830f5169ba33c89802a5354577"
+  }, {
+    "rowKey" : "403",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/09_14_Reporting of robbery and assault in the last one year.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11707,
+    "sha256" : "d92d8e991e2286728816dcff9534f533ce00d4e57f0043172f17e8a02f55129f"
+  }, {
+    "rowKey" : "404",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_37_SDG_3.1.1_დედათა მოკვდაობის კოეფიციენტი.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10386,
+    "sha256" : "9600ca5087ac9b1ef39fb53c3e6023ac7d4b681cc26f73d858a515f6291d22cd"
+  }, {
+    "rowKey" : "404",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_37_Maternal mortality ratio.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10295,
+    "sha256" : "ec4100da4ab38a6ab3f26cc2878f5ef123d44f8d6e5c25d26b60be379ffc3f93"
+  }, {
+    "rowKey" : "405",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_38_SDG_3.1.2_კვალიფიციური სამედიცინო პერსონალის მიერ მიღებული მშობიარობები.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9869,
+    "sha256" : "b41c13c672a71ce3eadd51d3f6c15cd8c2e2fe32d08166cf15056b69c7646496"
+  }, {
+    "rowKey" : "405",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_38_Skilled birth attendant.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9783,
+    "sha256" : "e40971bafd0ced85dc1f26c4a945d1c8bb00467ebf11829c36a2be35493ea695"
+  }, {
+    "rowKey" : "406",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_39_SDG_3.2.1_5 წლამდე ასაკის ბავშვთა მოკვდაობის.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9916,
+    "sha256" : "166bcdfaaf2cef429ece2fe9fd85a2fac87eef489011ad9d9cc17fd444a8a69e"
+  }, {
+    "rowKey" : "406",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_39_Under-5 mortality rate.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9890,
+    "sha256" : "93180f752548a29e0df4c6fdff20ecf922b51e8865d9ea613624ace3891d1b09"
+  }, {
+    "rowKey" : "407",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_40_SDG_3.3.1_შიდსის შემთხვევათა რაოდენობა სიცოცხლეში პირველად.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10332,
+    "sha256" : "d4911b21e776093a6d10e7171b44dd87e435f435002f22041db6b01e95537bc4"
+  }, {
+    "rowKey" : "407",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_40_Estimated incidence rate (new HIV infection per 1,000 uninfected population).xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10188,
+    "sha256" : "dcfda0c819464be43416a4ca41ee5437981c76e81a7e5479d485047471a6d6cc"
+  }, {
+    "rowKey" : "408",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_41_SDG_3.2.2_ნეონატალური სიკვდილიანობის მაჩვენებელი.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9928,
+    "sha256" : "2e5ae627a456fbe3bf5393d05e52fd0f644dc82d79c48271bff8fe8d9bdcd8f1"
+  }, {
+    "rowKey" : "408",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_41_Neonatal mortality rate.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9846,
+    "sha256" : "8929a30a96180c36e92d65715862b9c5bab6802a7e613e3d4ffbedf39d89930e"
+  }, {
+    "rowKey" : "409",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_42_SDG_2.2.3_ანემიის გავრცელება.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10577,
+    "sha256" : "6cce41a8b03c5b8d338b8df2543a42d39d62aedb5cb39bfa5154a81a6235dd6f"
+  }, {
+    "rowKey" : "409",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_42_Prevalence of anaemia.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10008,
+    "sha256" : "c40deb7870bc0e7f7ef779165330c39742ecdd9b2dc40a87c16d47325953f89e"
+  }, {
+    "rowKey" : "410",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_43_SDG_3.2.2_ჩვილ ბავშვთა მოკვდაობის კოეფიციენტი.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9957,
+    "sha256" : "8f0795c1858b22deb1add6fcb4430190adbd4c31ba2b93fb9cbb81675b9db548"
+  }, {
+    "rowKey" : "410",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_43_Infant mortality rate (per 1,000 live births).xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9874,
+    "sha256" : "3b7739ac8e058e9a223701f8cbeef00d2fa74cba494e4a1ae9a727626cef6fad"
+  }, {
+    "rowKey" : "411",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_44_ნეონატალური სიკვდილიანობის წილი.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10094,
+    "sha256" : "f78333876d37c1e92de965edafaf54f8278738620286351da3ac187c41df932d"
+  }, {
+    "rowKey" : "411",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_44_Neonatal deaths as a percentage of under-5 deaths.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9897,
+    "sha256" : "1b2361658d7afa6e43f9de033974b58fd14556607f0fd414bae72f3cf09be2b2"
+  }, {
+    "rowKey" : "412",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_45_მკვდრადშობადობის კოეფიციენტი.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9858,
+    "sha256" : "352f101ac944d2b9b5288d0bcbce91205b4fd43843cfd71f114de155d014e5f6"
+  }, {
+    "rowKey" : "412",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_45_Stillbirth rate.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9767,
+    "sha256" : "2fe53e8aa958333e5c57cf17546e4a87172ded735241e5ba2c419b4a106b8436"
+  }, {
+    "rowKey" : "413",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_46_მოზარდების (10-19 წლის) მოკვდაობის კოეფიციენტი.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9867,
+    "sha256" : "a6e7164ef178d3f99e19e82b9a3ddfab19a09dc8d63579f84a2d42aeab7489de"
+  }, {
+    "rowKey" : "413",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_46_Adolescent (aged 10-19 years) mortality rate.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9791,
+    "sha256" : "ec9f8da78439f99339e9f7e19642563178bd9dc577be89c69bcc76eb33b8f993"
+  }, {
+    "rowKey" : "414",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_47_დაბალი წონის გავრცელება ახალშობილებში.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10376,
+    "sha256" : "da102769998cac9668746e1b6d0f5cced441156d177a6515a458380b265f7d5e"
+  }, {
+    "rowKey" : "414",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_47_Prevalence of low birth weight among new-borns.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9816,
+    "sha256" : "fd17e81c00df09f04aedbf2c88bb7d4e32597fdcc75669a948adcfc83119b010"
+  }, {
+    "rowKey" : "415",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_48_შიდსი 0-14 წლის ბავშვებში და 10-19 წლის მოზარდებში.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10016,
+    "sha256" : "923d97f90fada3b9eb6f246c33be8cc8cc5c58dccd4d0c1503feceedf4ae2b96"
+  }, {
+    "rowKey" : "415",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_48_Estimated incidence rate (new HIV infection per 1,000 uninfected population, children aged 0-14.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9885,
+    "sha256" : "17490183c7b23762b1b2f93872d6cb81a2154ac4d8d493d6611e5257a6df8fa2"
+  }, {
+    "rowKey" : "416",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_49_შიდსი 15-24 წლის მოზარდებში.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10026,
+    "sha256" : "b16dcb86cd3c4bdac9efa382b26fec5d0de218f640fbd8ac5bba06968e9c0b3c"
+  }, {
+    "rowKey" : "416",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_49_Estimated number of new HIV infections among adolescents and young people aged 15-24 years.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9862,
+    "sha256" : "98786b5aed9cdac21175cf8ae343e877df0476a310eae118f3557d17be25d9d1"
+  }, {
+    "rowKey" : "417",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_50_Tvitmkvlelobebi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11223,
+    "sha256" : "9c887b550265ee4c1e4f7e69248b641c41ff07baddb782a07d88420726edb35b"
+  }, {
+    "rowKey" : "417",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_50_Suicide.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10913,
+    "sha256" : "dc34a06b1b332e4c54f2328d3bf302b1ca07f3baafc4a83504a965f4ee5f2037"
+  }, {
+    "rowKey" : "418",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_51_SDG_3.4.2_tvitmkvlelobis koeficienti.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11312,
+    "sha256" : "0658f040872b7b0608db67d46fb583e48957cc9fc0a3937ef8e2f5cf6e5465e4"
+  }, {
+    "rowKey" : "418",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_51_Suicide rate.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11135,
+    "sha256" : "8caa22c3c0c1452010cd153390352578d9e01968d6ce7cfa54309a58d35f7082"
+  }, {
+    "rowKey" : "419",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_35_იმიგრანტები და ემიგრანტები ასაკით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 42683,
+    "sha256" : "fb99e3c42b0fd91e8daaba16fe12722a27b64b89c1e94f02c2ba93388f2facf9"
+  }, {
+    "rowKey" : "419",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_35_Number of immigrants and emigrants.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 42925,
+    "sha256" : "4248abc6db670363d8ba35909ca3c827c3874c2a3f4f321e9bf4d91d7278d8fa"
+  }, {
+    "rowKey" : "420",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_36_მიგრაციული სალდო.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9650,
+    "sha256" : "4252b01b09c938bc55089efa49ef89e8ca33290f4c1119eebd5e3856e1c5a78e"
+  }, {
+    "rowKey" : "420",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_36_Net migration.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9640,
+    "sha256" : "32fc91d1d564711c12c04e3af9af97e762e2c9bc36a7cddffefc7d850180c654"
+  }, {
+    "rowKey" : "421",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_37_adreuli qorwineba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 125145,
+    "sha256" : "9c9408a21dcbd97114f07dc0f669b01b9a22ba8710351da40756ca700f02d2ea"
+  }, {
+    "rowKey" : "421",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_37_Child marriage.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 124511,
+    "sha256" : "2f48f3007b8bb3f683ce580bb4b5200b86f4aa3487d467970def101b8a841ef0"
+  }, {
+    "rowKey" : "422",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_01_mshp.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12250,
+    "sha256" : "050b3c4922c8a65e7f4d6329ea01a868fda15244c17af95e7fe84cfff382d98a"
+  }, {
+    "rowKey" : "422",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_01_GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11545,
+    "sha256" : "8660bf99a82c248c6c3d0af995e98909c355c042884a23ba98eacbf1d46f55db"
+  }, {
+    "rowKey" : "423",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_02_erovnuli Semosavali.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11499,
+    "sha256" : "6bf1e5dc5b861ad190bb95df9495235ca93695fd100fad499114fdf0529b048f"
+  }, {
+    "rowKey" : "423",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_02_GNI per capita.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10110,
+    "sha256" : "2ad0a1d84360c7c0d2cee926a8788a48a846c59c05fe879972773aac9dc1849f"
+  }, {
+    "rowKey" : "424",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_03_ rate to GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11400,
+    "sha256" : "7d66f500e71de78b49d6e929e31acd9c81e9e1b9750960ea97a2306316e45e46"
+  }, {
+    "rowKey" : "424",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_03_budget revenue share in GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11417,
+    "sha256" : "df6eece0705beb92b78a116e8850e4702c24be97a3898eee651d2c3df881edf8"
+  }, {
+    "rowKey" : "425",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_04_budget rate to GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11388,
+    "sha256" : "bce1031846e97d6fbbca3f192146568bdb4e15e40b4a03840c830664799b9a69"
+  }, {
+    "rowKey" : "425",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_04_budget expenditure to GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11313,
+    "sha256" : "51903a3f7b37cd493483e2c536ad45309145341f49597b1d8080a7226a0a4fb9"
+  }, {
+    "rowKey" : "426",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_05_vali to GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11404,
+    "sha256" : "d2fd29f11b185f063c8cbcfb981052e1adf700deb3b395cb19b96271b18c0a6c"
+  }, {
+    "rowKey" : "426",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_05_debt to GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11311,
+    "sha256" : "16d589315d72ecf93b86e2a92ee9069dffde3a266b657381a3d6e34b61221829"
+  }, {
+    "rowKey" : "427",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_06_education to GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11396,
+    "sha256" : "0e1533af4003a910fb5b8543a13be3887ad939f88873c3939db824dc415f7e5c"
+  }, {
+    "rowKey" : "427",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_06_education expenditure to GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11330,
+    "sha256" : "08862a12790d0c931c9b3cd212f2cd3c2de9e1ac1c572d6afb475a9f224b335f"
+  }, {
+    "rowKey" : "428",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_07_soc. dacva to GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11416,
+    "sha256" : "156e884124a38dd36d991a69cf112baa0767baa97a3a3edb3453ef07a499aaf9"
+  }, {
+    "rowKey" : "428",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_07_social expenditures to GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11458,
+    "sha256" : "5586c4ce344fcc243f2b3d47c5ebdabd94349f04d3075fc407601603ce0a1a0f"
+  }, {
+    "rowKey" : "429",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_08_ojaxebis socdacva to GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11611,
+    "sha256" : "8dd9bd5ece1bd8e0884e9655d1a47beac4963a24ede8e100817b7adeab722b2a"
+  }, {
+    "rowKey" : "429",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_08_family-children benefits to GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11542,
+    "sha256" : "dc200e3d9c979cb71df8a6e6fc601cfbd48ecf35e84f4a354936ff98a2d297bf"
+  }, {
+    "rowKey" : "430",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_09_jandacva to GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11229,
+    "sha256" : "82928eeaa69b35374937db47b93629406a6ddcedfd1f0e0cb418164c8f8b7d7d"
+  }, {
+    "rowKey" : "430",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_09_current health expenditures to GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11272,
+    "sha256" : "a510bbcc29006ac5397bdb8110b26cfd798a415992ad1ec2069e4c1e7cdfa661"
+  }, {
+    "rowKey" : "431",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_10_naerTi biujetis wili.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11425,
+    "sha256" : "288e10116fb94dc5434d355105e89e645ff31743fbb739cac814a9e72aa1fe6e"
+  }, {
+    "rowKey" : "431",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_10_budget health expenditures to GDP.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11346,
+    "sha256" : "e0ea701ea338c65a95a67afdfa7a5ae78cf1bb8fcaa5dbef741ea5ab828f82b4"
+  }, {
+    "rowKey" : "432",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_11_naerti biujetis Sesruleba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13467,
+    "sha256" : "d1d0e186fb305a1c6a2b8d51d125899e1ad0fb2acf0f543f525088261a091784"
+  }, {
+    "rowKey" : "432",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_11_expenditure by functions of general government.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12415,
+    "sha256" : "736f186a3a7baff56930de3290f0b188cace83bf211a55e9f106f4a96cb9d271"
+  }, {
+    "rowKey" : "433",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_12_jandacvis xarjebi ert sulze.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11217,
+    "sha256" : "ea88438685a306169587a51acd9ba219f18d4daf43db990836844be019ad367f"
+  }, {
+    "rowKey" : "433",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_12_current health expenditure per capita.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11257,
+    "sha256" : "7098d4606b3f7a11afa15dd3688197e649aa3db0fb6040e1733fb3575b45d0f3"
+  }, {
+    "rowKey" : "434",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_13_HH gadaxda jandacvaze.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11231,
+    "sha256" : "006f147424a02b5e52b7eb54eb072a75e03d3df38a7a4565d44956cc0286f266"
+  }, {
+    "rowKey" : "434",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_13_HH out-of-pocket expenditure on health.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11143,
+    "sha256" : "4aed99264385b9258cecd323d98bc7ac0e96aea804c7aa3bd632b694b3734c66"
+  }, {
+    "rowKey" : "435",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_14_adgxarji jandacvaze.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11239,
+    "sha256" : "ef7424919cc4096e437eb06dfab476627fd7cf441253a4f950e88e366449534e"
+  }, {
+    "rowKey" : "435",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_14_domestic private health expenditure.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11150,
+    "sha256" : "c8d446d56b6b3422a352c87561577d2e4ba416dd875859b019f3103c9781da51"
+  }, {
+    "rowKey" : "436",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_15_martvis xarji jandacvaze.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11696,
+    "sha256" : "63ccecc9d356d7b5f04f8d9d4aadb5b8d8205558f0067b1ce493f48582facada"
+  }, {
+    "rowKey" : "436",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_15_general government health expenditure.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11495,
+    "sha256" : "d35b940539a111e7f74087f19d41314f4148b5f9b28487e880ff0a130ec25fc3"
+  }, {
+    "rowKey" : "438",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/ICT/07_04_internetis gamoyenebis sixshire.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 36119,
+    "sha256" : "ed85f9630fe44b4f59748d95e651a0ee2911dc0b9bc1953df9f2c3ef1ed10623"
+  }, {
+    "rowKey" : "438",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/ICT/07_04_Frequency of internet usage.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 36008,
+    "sha256" : "9a9c594abf4e4a63d29664d2ed2ae63608f654750beb476b97cf338768e1ebf7"
+  }, {
+    "rowKey" : "439",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/ICT/07_05_kompiuteris gamoyeneba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 27059,
+    "sha256" : "6503b808efa01cfff00275e63590ab8cd50282f4a8f79ceb0c139b06ad1fd2a2"
+  }, {
+    "rowKey" : "439",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/ICT/07_05_Last computer usage.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 26920,
+    "sha256" : "cebe2837d2cccd74573e3a45dce6ecd89bbda19c26110cb81b5b596631fb6a54"
+  }, {
+    "rowKey" : "440",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/ICT/07_06_mobiluri telefonis gamoyeneba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 26689,
+    "sha256" : "9df4272b4e59b9836835771c6b5417b18c372b1e61c498d5932a153d2a7758a6"
+  }, {
+    "rowKey" : "440",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/ICT/07_06_Mobile phone usage.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 26628,
+    "sha256" : "a971c6d6e96af02c7bfe10e74172e8c407788c7ad39b7f650b25b49843f6fec3"
+  }, {
+    "rowKey" : "441",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_37_კვალიფიცირებულ მასწავლებელთა წილი.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 14352,
+    "sha256" : "b3ed871c900381cdeee9b01ada17ca8d55ffe202bb300ceff1027c1856649953"
+  }, {
+    "rowKey" : "441",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_37_Proportion of teachers qualified.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13731,
+    "sha256" : "6a931c22c02e6ba0acee548b4574a326c212c71bef8eca5b8459ab3d7f9793e0"
+  }, {
+    "rowKey" : "442",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_38_მოსწავლეთა რაოდენობა სკოლებში.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11176,
+    "sha256" : "9f0332056f873697de1e8082f5bcb120cb10d996aa5f203841dcc1823047c174"
+  }, {
+    "rowKey" : "442",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_38_Number of children with disabilities in education.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11078,
+    "sha256" : "923eaba4136d8802f3ae70d3a61a0e59748e0f234ee8faacb9783a95f6d73f4a"
+  }, {
+    "rowKey" : "443",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_39_სწავლის მიტოვება.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10165,
+    "sha256" : "5a8499d4e299af6ea4f034f9f388ebf84533cc06dfe62cb66336ac41e48d79be"
+  }, {
+    "rowKey" : "443",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_39_Number of early school leavers.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9990,
+    "sha256" : "484363fb186f294d79761435039c8fb3ed559f0a30a3583a352edb61151b623e"
+  }, {
+    "rowKey" : "444",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_07_umushevrobis done.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10752,
+    "sha256" : "801e2ae23f7d0fd2203eb9dc29939f7dc888252cafc4e570ffebbaae221485db"
+  }, {
+    "rowKey" : "444",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_07_Unemployment rate.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10648,
+    "sha256" : "c7b8ff2ccd2d384d87e1d266ba404947f0d1595edd190a6c828a38ab62867e8f"
+  }, {
+    "rowKey" : "446",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_09_NEET_GEO.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10872,
+    "sha256" : "f82cbf87b302c75566e53f2b3db93838d2fa7699cb9e2b702e484e6746c570f1"
+  }, {
+    "rowKey" : "446",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_09_NEET_ENG.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10772,
+    "sha256" : "983db54d33e4d563aa16b9e369d8a5a6eede70e29bb6e46a494c3873512e4cc4"
+  }, {
+    "rowKey" : "449",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_12_bavshvta shroma.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10191,
+    "sha256" : "ebb81b831082003c23320e8b86d08e5ad0635f028806b83742003cd86a9651cb"
+  }, {
+    "rowKey" : "449",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/06_12_Child Labour.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10069,
+    "sha256" : "3d55dfcae72cbd0a5c66cf1c02cd033d89ebb48e8f3d8dce671e33f24fb3518f"
+  }, {
+    "rowKey" : "450",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_40_ganatlebashi chartuloba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10983,
+    "sha256" : "f16ee35c174be6524096acda29fd9e1eb8c0395b18a27b780c691c4ac5ed40b5"
+  }, {
+    "rowKey" : "450",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_40_Participation in education.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10888,
+    "sha256" : "29d97c1d672b5e346073331bdce69a3098ff87f4a621bbcb0fb97d8ff43c35b8"
+  }, {
+    "rowKey" : "451",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_41_wera-kitxvis codna.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10845,
+    "sha256" : "b36064e10ecf5c7b88d73f8f8bd67ab122c9909c9a52c75c745d3a64d805cfe9"
+  }, {
+    "rowKey" : "451",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_41_Literacy rate.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10694,
+    "sha256" : "6efae8b0858d8373f3f4a6e2d42830a26d82b7c0e3ed2ac5a4c98c27f261eb2c"
+  }, {
+    "rowKey" : "452",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_42_18-24_swavla adre miatova.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9573,
+    "sha256" : "6830dd028f52346dd330d0fe1c32d92677586116d1f16a7c12401219f953f002"
+  }, {
+    "rowKey" : "452",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_42_18-24- early leavers.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9978,
+    "sha256" : "8f1a488c2781514ceb6219fc2f28831fcb79e85105e89d45876ac476dfeb7dd5"
+  }, {
+    "rowKey" : "453",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_38_თავშესაფრის მაძიებლად რეგისტრირებულ პირთა რაოდენობა.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10353,
+    "sha256" : "b03585f4fd8d4318cbabee3dcfaf33c845f3704df362c060d4bd177189adbb0c"
+  }, {
+    "rowKey" : "453",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_38_Registered asylum applications.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10243,
+    "sha256" : "97838d5c0ed34b70b114743c11f95a98218195ffec58bdccd2f1089f4744e6cc"
+  }, {
+    "rowKey" : "454",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_16_ganaTlebis xarjebis struqtura.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11108,
+    "sha256" : "6e48e7b0d24b42f333f5e533a450c7a232c67e68af2e9907cef8f26d48f51bda"
+  }, {
+    "rowKey" : "454",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mshp/10_16_structure of budget expenditure on education.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10992,
+    "sha256" : "c4b7c75ccdfba47226be220ef4ce576618fef412f16fb21f86b08758a7b2ff31"
+  }, {
+    "rowKey" : "455",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_43_mkvlevarebis ricxovnoba.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11337,
+    "sha256" : "8d4359b3be68c97fb482ac5ca49aad5ee91f395b36a4c38af79356d47e8201fb"
+  }, {
+    "rowKey" : "455",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03_43_Researchers.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11136,
+    "sha256" : "65159853de409ee73e960d3d519141fbf112c5f0fabe3e7f88287c64e9b7f80c"
+  }, {
+    "rowKey" : "456",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_53_imunizacia.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10577,
+    "sha256" : "015b8d890f527cca0e2df14d23d976a14b2e5f49a8a4c35896c187f85c0ab131"
+  }, {
+    "rowKey" : "456",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/02_53_Immunization.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10749,
+    "sha256" : "a15c17140b99a8e29c1eb1c1847415de3eb9bd65a40eb81c1478ea3be62fcf88"
+  }, {
+    "rowKey" : "457",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_07_1_სქესთა რაოდენობრივი თანაფარდობა დაბადებისას რეგიონების მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 12134,
+    "sha256" : "96c40d9cefee4fd4f738c6ed0b3f3aa257cf5b98c3689785d0a3efb303fc0821"
+  }, {
+    "rowKey" : "457",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_07_1_Sex ratio at birth by regions.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10413,
+    "sha256" : "b74229575c7decd5f54fbb0dfac5df3743a400be8b1bdeae0f3bf845328b3c0b"
+  }, {
+    "rowKey" : "458",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_10_1_მოზარდების შობადობის კოეფიციენტები.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10124,
+    "sha256" : "91c2be4bbc3b0d1893211d994f0fc91aaeabd27f60401e06f73c0c23216d0aaa"
+  }, {
+    "rowKey" : "458",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_10_1_Adolescent birth rate.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10082,
+    "sha256" : "d195f4749a2e832f8f292aede835ea421dfe8c8ae5b499818eb5b541e14a9c3b"
+  }, {
+    "rowKey" : "459",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_12_1_5 წლამდე ასაკის გარდაცვლილთა რიცხოვნობა გარდაცვალების მიზეზების და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 14915,
+    "sha256" : "b1631b5ca59da5cd1fe083bb9cf3c8e7875ff3fe900c242946583440c4dc9beb"
+  }, {
+    "rowKey" : "459",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_12_1_Number of under-5 deaths by ICD-10 chapters and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 14340,
+    "sha256" : "4c1bb94670d4cf7dac7a3563a0e0d6ba7f04c983971931e946d5ff2f872de7b0"
+  }, {
+    "rowKey" : "460",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_12_2_სიცოცხლის მოსალოდნელი ხანგრძლივობა ასაკის და სქესის მიხედვით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 23597,
+    "sha256" : "6e6dbea07503fa7d332ddd2d4fb4d1e95cdb7d7736208561a45f12c424029ec0"
+  }, {
+    "rowKey" : "460",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/01_12_2_Life expectancy by age and sex.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 23475,
+    "sha256" : "3f980cebfc83f6f865cf2b97993b4496f5272b037511cb1ef96d8b8dc00fb591"
+  }, {
+    "rowKey" : "461",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03-44_განათლების მიღწევის_მიტოვების მაჩვენებლები.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11989,
+    "sha256" : "ec463f35d21e270ab63c481781d9d277246b6998bd6487eb66d80234cf231e63"
+  }, {
+    "rowKey" : "461",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03-44_Survival rate_dropout.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11826,
+    "sha256" : "b1c168fa9c3fcd6ce5d9fa4f510d84f93493d62433055de535ab45640a15dc86"
+  }, {
+    "rowKey" : "462",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03-45_სკოლების უზრუნველყოფა ინფრასტრუქტურით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11385,
+    "sha256" : "b298c5fa1714d6474727860e908980ae94a5186895d7e88511a3162c37dd7491"
+  }, {
+    "rowKey" : "462",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03-45_Infrastructure.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10985,
+    "sha256" : "d40750326ae9c93aee88faa6c17cf597f8fb42c64c3b9b11faa3f0b252633845"
+  }, {
+    "rowKey" : "463",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03-46_შესწორებული წმინდა ჩაბმის მაჩვენებელი დაწყებით და საბაზო განათლებაში.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11471,
+    "sha256" : "7d6fadcc6c0d73f0de318364fde79f208b2dc31d2e8d5db3e98432512beac41e"
+  }, {
+    "rowKey" : "463",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/education/03-46_Adjusted enrolment.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11265,
+    "sha256" : "fb06a16b2a1a735d27dc0020ed051d5b0092e398adcf03e3a9ceceacc1556ae8"
+  }, {
+    "rowKey" : "464",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/ანტენატალური ვიზიტი.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10856,
+    "sha256" : "a4c63be09d4b4045fbcf313eeca5d9ef66e53b311865833ccca6815bf1e04c63"
+  }, {
+    "rowKey" : "464",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/Antenatal care 4+.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 11158,
+    "sha256" : "416f556ca7e3aeaab49d15621cde53b1b9d50682c643acb852fcae347cc02642"
+  }, {
+    "rowKey" : "465",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/HPV_ვაქცინა.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10335,
+    "sha256" : "1d90af615089eeb6e1f87bad92a4f9956f186fe034426bd0a83750312638e73f"
+  }, {
+    "rowKey" : "465",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/HPV_Vaccine.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9277,
+    "sha256" : "b888f506cc7b867deb63874f5ff17c4c659365b2014bcf96935bfc26c00d36be"
+  }, {
+    "rowKey" : "466",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/შშმპ ახალი შემთხვევები.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10873,
+    "sha256" : "269caf0eccb0fc1b95d92bd4f3bb475342a1772e67ba6310f212b65328a4e01f"
+  }, {
+    "rowKey" : "466",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/New Cases of Disabilities.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 10811,
+    "sha256" : "85d9307f6b472d3c77665b1ab833abfd050cf5ce32ce826663ac51869c6030e3"
+  }, {
+    "rowKey" : "467",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/ადრეული ქორწინება (მამაკაცები).xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 19764,
+    "sha256" : "626de3d862ecba4d34c5c7a77ce8cc7773e6112c362d7fa08f77c5c15e63d1d4"
+  }, {
+    "rowKey" : "467",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/mosaxleoba/Child marriage (men).xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 19267,
+    "sha256" : "34d7c41609f9ff833911cda28bc15a44fa6b63e28f081a7676b3a2a7b630d788"
+  }, {
+    "rowKey" : "468",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/ქალებისა და გოგოების მიმართ ძალადობა ბოლო 12 თვის მანძილზე.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 8836,
+    "sha256" : "c2a9ebe44af753162e4bfeab8b7d3dd5bf0e09644ec4f47464b77bdd8c629665"
+  }, {
+    "rowKey" : "468",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/Experiences of violence against women and girls in the last 12 month.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 8718,
+    "sha256" : "67c06ef2abf1aeb46d72caaffb92c731312715a90882b6c0c5c80b5be6cab42c"
+  }, {
+    "rowKey" : "469",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/ძალადობა პარტნიორის მხრიდან.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 8983,
+    "sha256" : "568874baab6cc48046c47b42f07d050b967bb56c7ad88596d28c38e341a90a76"
+  }, {
+    "rowKey" : "469",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/crime/Prevalence of intimate partner violence.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9056,
+    "sha256" : "17695f05bbd45859633a2ee02a1f623fb829b882e12591ad55500ffc27c78be9"
+  }, {
+    "rowKey" : "470",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/ტყვიის შემცველობის გავრცელება.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 16210,
+    "sha256" : "95e001b4054ba7f8ce33c00cf31099b76c3767ffffd743a083070b3b5e3ff1c1"
+  }, {
+    "rowKey" : "470",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/jandacva/Lead-test.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 15759,
+    "sha256" : "4306594f18de6a4c88222a6ac2ce2b8738259cd2de487db2d07053506fd7b74e"
+  }, {
+    "rowKey" : "471",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/შინამეურნეობების დაფარვა სოციალური გადარიცხვებით და სარგებლით.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 18191,
+    "sha256" : "227464fa8120d1edebdb55c66f3f487e14ababe56831cbd678348c6884ed5f77"
+  }, {
+    "rowKey" : "471",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/Coverage of households with social transfers and benefits.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 17034,
+    "sha256" : "beb73a98bf7fcfe48d7371c890457b7247197b98e4839050af60bfb1e85a968a"
+  }, {
+    "rowKey" : "472",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/ICT/07_07_cifruli unarebi.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 17924,
+    "sha256" : "e8c8db5127785e12f77ad9ba6181f362cbabed14e2baad7054090f553da4b626"
+  }, {
+    "rowKey" : "472",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/ICT/07_07_ICT skills.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 17362,
+    "sha256" : "5f82c52022a965accd8bb1e48a7ba4f98693defd858d34929270cd39afd4871c"
+  }, {
+    "rowKey" : "473",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/არაანაზღაურებად საოჯახო საქმეებზე დახარჯული დრო.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9853,
+    "sha256" : "19dfb78f8eee6cfbd1e5540f207af0d1f685a551df3725813fbf063096c197eb"
+  }, {
+    "rowKey" : "473",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/labour/time spent on unpaid domestic work.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 9733,
+    "sha256" : "661d49939aa0d657adc4b84d8cc6a48f003731b44ce33c025403d6c4da17cc07"
+  }, {
+    "rowKey" : "474",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "ka",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/მოსახლეობის რიცხოვნობა, რომელიც იღებს ერთ დახმარებას მაინც.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13013,
+    "sha256" : "d8daef3dc1d971e1e5f9ea73f4eaddb5be0f5b61bf4bfd4d3a2e3c677781279b"
+  }, {
+    "rowKey" : "474",
+    "relationCode" : "PRIMARY_FILE",
+    "language" : "en",
+    "ordinal" : 1,
+    "packagePath" : "mainstat/social/The_number_of_the_population_receiving_social_assistence.xlsx",
+    "mediaType" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "bytes" : 13076,
+    "sha256" : "54109b745ce7a8336493761d60dda856251514c4eed6de8be920fcbb64ffb017"
+  } ],
+  "result" : "PASS"
+}

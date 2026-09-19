@@ -1,0 +1,46 @@
+{
+  "schema": "geostat.kids-r8-contract-bound-package-admission-runtime.v1",
+  "recordedAt": "2026-09-18",
+  "environment": "remote dev 192.168.1.199 geostat-api-dev:8081; production untouched",
+  "canonicalTableBinding": {
+    "contractCode": "KIDS_PORTAL_V1",
+    "revision": 8,
+    "datasetCode": "KIDS_RESOURCE",
+    "legacyLogicalTableName": "kids_resource",
+    "approvedPhysicalAccessTableName": "__ent_kids_resource",
+    "approvedPhysicalTableName": "__ent_kids_resource",
+    "directSiteDatasetTableDefinitionBinding": "PASS",
+    "controlPlaneReadback": "PASS; site_contract_dataset.contract_table_definition_id resolves to the approved revision-8 physical definition"
+  },
+  "package": {
+    "source": "samples/kids-portal-v1-canonical-r8-final.accdb",
+    "sourceBytes": 2953216,
+    "sourceSha256": "746487cedee93c73b99492038321c138a1bcd7f2e1d9d49fe165332be6cb8211",
+    "archive": "samples/kids-r8-resource-package.zip",
+    "entryCount": 1,
+    "entry": "kids-portal-v1-canonical-r8-final.accdb",
+    "entrySha256": "746487cedee93c73b99492038321c138a1bcd7f2e1d9d49fe165332be6cb8211",
+    "archiveBytes": 264762,
+    "archiveSha256": "ab2b2acf6af983cb1b6ba13310d0095eb17c64a2078ca4ff5254d1298cd65f76"
+  },
+  "admission": {
+    "endpoint": "POST /api/v1/platform/artifacts/manifests/package",
+    "identity": { "contractCode": "KIDS_PORTAL_V1", "revision": 8, "datasetCode": "KIDS_RESOURCE" },
+    "firstResult": { "httpStatus": 200, "manifestId": 5, "created": true, "packageChecksum": "7099d966ccb5eb140ff902fe30def04ae639afaec9979f2696902bbc56f1f0a9", "entryCount": 1, "objectCount": 1, "verified": 1, "missing": 0, "checksumMismatch": 0 },
+    "identicalReplay": { "httpStatus": 200, "manifestId": 5, "created": false, "packageChecksum": "7099d966ccb5eb140ff902fe30def04ae639afaec9979f2696902bbc56f1f0a9" },
+    "failedPreFixAdmission": { "httpStatus": 400, "reason": "legacy logical table name was incorrectly used as the physical Access table name; validation failed before object/manifest writes" }
+  },
+  "publicationAndDownload": {
+    "snapshotId": 52,
+    "publication": { "httpStatus": 200, "releaseId": 4, "publicationSnapshotId": 14, "status": "PUBLISHED" },
+    "signedDownload": { "httpStatus": 200, "entity": "KIDS_RESOURCE/128", "language": "ka", "expectedBytes": 12879, "expectedSha256": "c9a12ec1ffbba230ffa0a08fcfdd2fb3adfed6554ed1ffa3d51c21dca8c1979d", "downloadedSha256": "c9a12ec1ffbba230ffa0a08fcfdd2fb3adfed6554ed1ffa3d51c21dca8c1979d", "result": "PASS" }
+  },
+  "sourceTests": { "suite": ":api:test", "targetedTests": ["ArtifactPackageContractResolverTest", "ArtifactAccessPackageValidatorTest", "SiteContractDatasetTableBindingMigrationTest"], "result": "PASS" },
+  "scope": {
+    "packageManifestBoundToSnapshot": false,
+    "reason": "Package admission is a separate lifecycle step; snapshot attachment and reconciliation remain governed by the existing resource inventory manifest.",
+    "productionChanged": false,
+    "browserHostname": "pending EXT-4"
+  },
+  "status": "PACKAGE_ADMITTED_AND_REPLAY_IDEMPOTENT"
+}

@@ -37,15 +37,40 @@ public class ArtifactPackageService {
     private final ArtifactProperties properties;
     private final ArtifactContentTypeVerifier contentTypes;
     private final ArtifactPackageContractResolver packageContracts;
-    private final ArtifactAccessPackageValidator accessPackageValidator;
+    private final PackageDatasetCarriers datasetCarriers;
+    private final ArtifactContractResolver relationContracts;
+    private final ArtifactManifestDocuments documents;
 
+    /** Admission receipt; {@code relations} is the package-time relation preview (empty for inventory imports). */
     public record ManifestReceipt(long manifestId, boolean created, String packageChecksum, int entryCount, int objectCount,
-                                  int verified, int missing, int checksumMismatch) {}
+                                  int verified, int missing, int checksumMismatch, List<ArtifactRelationPreview.RelationResult> relations) {
+        public ManifestReceipt(long manifestId, boolean created, String packageChecksum, int entryCount, int objectCount,
+                               int verified, int missing, int checksumMismatch) {
+            this(manifestId, created, packageChecksum, entryCount, objectCount, verified, missing, checksumMismatch, List.of());
+        }
+
+        public ManifestReceipt {
+            relations = List.copyOf(relations);
+        }
+
+        ManifestReceipt withRelations(List<ArtifactRelationPreview.RelationResult> evaluated) {
+            return new ManifestReceipt(manifestId, created, packageChecksum, entryCount, objectCount, verified, missing, checksumMismatch, evaluated);
+        }
+    }
+
+    /** Result of a validate-only admission; nothing was stored or registered. */
+    public record PackagePreview(String packageChecksum, int entryCount, boolean blocked, List<ArtifactRelationPreview.RelationResult> relations) {
+        public PackagePreview {
+            relations = List.copyOf(relations);
+        }
+    }
 
     public ArtifactPackageService(ObjectProvider<ArtifactObjectStore> store, ArtifactRegistry registry, ObjectMapper json, ArtifactMetrics metrics,
                                   ArtifactProperties properties, ArtifactContentTypeVerifier contentTypes,
                                   ArtifactPackageContractResolver packageContracts,
-                                  ArtifactAccessPackageValidator accessPackageValidator) {
+                                  PackageDatasetCarriers datasetCarriers,
+                                  ArtifactContractResolver relationContracts,
+                                  ArtifactManifestDocuments documents) {
         this.store = store;
         this.registry = registry;
         this.json = json;
@@ -53,7 +78,9 @@ public class ArtifactPackageService {
         this.properties = properties;
         this.contentTypes = contentTypes;
         this.packageContracts = packageContracts;
-        this.accessPackageValidator = accessPackageValidator;
+        this.datasetCarriers = datasetCarriers;
+        this.relationContracts = relationContracts;
+        this.documents = documents;
     }
 
     /**
@@ -85,19 +112,68 @@ public class ArtifactPackageService {
         return uploadPackage(packageCode, zip, null);
     }
 
-    /** Canonical contract-bound upload; the contract determines the Access table/field structure. */
+    /** Canonical contract-bound upload; the contract determines the dataset structure. */
     public ManifestReceipt uploadPackage(String packageCode, String contractCode, int revision, String datasetCode, InputStream zip) {
         ArtifactPackageContractResolver.DatasetContract contract = packageContracts.resolve(contractCode, revision, datasetCode);
         return uploadPackage(packageCode, zip, contract);
     }
 
+    /**
+     * Validate-only admission (contract §26 "Validate → Confirm"): stages and checks the package, generates
+     * its manifest and evaluates every approved relation, but writes no object and registers nothing.
+     */
+    public PackagePreview previewPackage(String packageCode, String contractCode, int revision, String datasetCode, InputStream zip) {
+        ArtifactPackageContractResolver.DatasetContract contract = packageContracts.resolve(contractCode, revision, datasetCode);
+        StagedPackage staged = stage(zip, contract);
+        try {
+            ArtifactManifest manifest = manifest(packageCode, staged.inventory(), contract);
+            ArtifactRelationPreview.Report report = preview(staged, manifest, contract);
+            return new PackagePreview(manifest.packageChecksum(), manifest.entries().size(), report.blocked(), report.relations());
+        } finally {
+            deleteStagingDirectory(staged.directory());
+        }
+    }
+
     private ManifestReceipt uploadPackage(String packageCode, InputStream zip, ArtifactPackageContractResolver.DatasetContract contract) {
         ArtifactObjectStore objects = requireStore();
-        String objectPrefix = properties.getUploadPrefix();
+        StagedPackage staged = stage(zip, contract);
+        try {
+            ArtifactManifest manifest = manifest(packageCode, staged.inventory(), contract);
+            List<ArtifactRelationPreview.RelationResult> relations = List.of();
+            PackageManifestDocument accepted = null;
+            if (contract == null && staged.suppliedManifest() != null)
+                throw new IllegalArgumentException("A supplied " + PackageManifestDocument.ENTRY_NAME + " can only be verified by a contract-bound admission");
+            if (contract != null) {
+                // Relation ambiguity is rejected before any byte is written (contract §6/§12).
+                ArtifactRelationPreview.Report report = preview(staged, manifest, contract);
+                if (report.blocked()) throw new ArtifactRelationPreviewException(report.relations(), report.errors().size());
+                relations = report.relations();
+                accepted = PackageManifestDocument.describe(contract, staged.dataset().originalPath(), manifest.entries(), report.plans());
+            }
+            for (StagedEntry entry : staged.entries()) {
+                try (InputStream content = Files.newInputStream(entry.path())) {
+                    objects.putContentAddressed(properties.getUploadPrefix(), entry.sha256(), entry.extension(),
+                            MediaTypes.forFileName(entry.originalPath()), content, entry.byteSize());
+                }
+            }
+            ManifestReceipt receipt = registerAndVerify(manifest, false).withRelations(relations);
+            // Persisted once per manifest; a replayed admission finds it already recorded (contract §25).
+            if (accepted != null) documents.record(receipt.manifestId(), accepted);
+            return receipt;
+        } catch (IOException failure) {
+            throw new ArtifactStorageException("Validated package content could not be stored", failure);
+        } finally {
+            deleteStagingDirectory(staged.directory());
+        }
+    }
+
+    /** Expands the archive into bounded private staging; path, type, size and contract structure are checked per entry. */
+    private StagedPackage stage(InputStream zip, ArtifactPackageContractResolver.DatasetContract contract) {
         List<ArtifactManifestGenerator.InventoryEntry> inventory = new ArrayList<>();
         List<StagedEntry> stagedEntries = new ArrayList<>();
         long packageBytes = 0;
-        int accessDatasets = 0;
+        StagedDataset dataset = null;
+        PackageManifestDocument suppliedManifest = null;
         Path stagingDirectory = null;
         try (ZipInputStream entries = new ZipInputStream(zip)) {
             stagingDirectory = Files.createTempDirectory("artifact-package-");
@@ -105,24 +181,34 @@ public class ArtifactPackageService {
                 if (entry.isDirectory()) continue;
                 if (inventory.size() >= properties.getMaxPackageEntries()) throw new IllegalArgumentException("Package exceeds " + properties.getMaxPackageEntries() + " entries");
                 String path = ArtifactManifestGenerator.normalizePath(entry.getName());
+                if (PackageManifestDocument.ENTRY_NAME.equals(path)) {
+                    if (suppliedManifest != null) throw new IllegalArgumentException("Package contains more than one " + PackageManifestDocument.ENTRY_NAME);
+                    suppliedManifest = readSuppliedManifest(entries);
+                    continue;
+                }
                 String extension = ArtifactKeys.extensionOf(path);
                 Path staged = Files.createTempFile(stagingDirectory, "entry-", ".bin");
-                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                MessageDigest digest = Sha256.newDigest();
                 long size;
                 try (OutputStream out = new DigestOutputStream(Files.newOutputStream(staged), digest)) {
                     size = copyBounded(entries, out, properties.getMaxEntryBytes());
                 }
                 packageBytes += size;
                 if (packageBytes > properties.getMaxPackageBytes()) throw new IllegalArgumentException("Package exceeds " + properties.getMaxPackageBytes() + " uncompressed bytes");
-                String sha = hex(digest.digest());
+                String sha = Sha256.hex(digest);
                 contentTypes.verify(path, staged);
-                if (contract != null && extension.equals("accdb")) {
-                    accessPackageValidator.validate(staged.toFile(), contract);
-                    accessDatasets++;
+                var carrier = contract == null ? java.util.Optional.<PackageDatasetCarrier>empty() : datasetCarriers.forExtension(extension);
+                if (carrier.isPresent()) {
+                    if (dataset != null) throw new IllegalArgumentException("Contract-bound package must contain exactly one dataset file");
+                    carrier.get().validate(staged.toFile(), contract);
+                    dataset = new StagedDataset(path, staged, carrier.get());
                 }
                 inventory.add(new ArtifactManifestGenerator.InventoryEntry(path, sha, size));
                 stagedEntries.add(new StagedEntry(path, extension, sha, size, staged));
             }
+            if (contract != null && dataset == null)
+                throw new IllegalArgumentException("Contract-bound package must contain exactly one dataset file");
+            return new StagedPackage(stagingDirectory, List.copyOf(inventory), List.copyOf(stagedEntries), dataset, suppliedManifest);
         } catch (IllegalArgumentException | ArtifactStorageException error) {
             deleteStagingDirectory(stagingDirectory);
             throw error;
@@ -130,25 +216,56 @@ public class ArtifactPackageService {
             deleteStagingDirectory(stagingDirectory);
             throw new IllegalArgumentException("Package is not a readable ZIP archive", error);
         }
+    }
+
+    private ArtifactManifest manifest(String packageCode, List<ArtifactManifestGenerator.InventoryEntry> inventory,
+                                      ArtifactPackageContractResolver.DatasetContract contract) {
+        ArtifactObjectStore objects = requireStore();
+        return contract == null
+                ? ArtifactManifestGenerator.generate(packageCode, objects.ingestBucket(), properties.getUploadPrefix(), "upload:" + packageCode, inventory)
+                : ArtifactManifestGenerator.generate(packageCode, objects.ingestBucket(), properties.getUploadPrefix(), "upload:" + packageCode,
+                    inventory, contract.contractCode(), contract.revision(), contract.datasetVersionId());
+    }
+
+    /** Evaluates the dataset's approved relations over the package's own Access rows and entries. */
+    private ArtifactRelationPreview.Report preview(StagedPackage staged, ArtifactManifest manifest,
+                                                   ArtifactPackageContractResolver.DatasetContract contract) {
+        List<ArtifactRelationDefinition> definitions = relationContracts.approved(contract.datasetVersionId());
+        ArtifactRelationPreview.Report report;
         try {
-            if (contract != null && accessDatasets != 1)
-                throw new IllegalArgumentException("Contract-bound package must contain exactly one Access dataset file");
-            for (StagedEntry entry : stagedEntries) {
-                try (InputStream content = Files.newInputStream(entry.path())) {
-                    objects.putContentAddressed(objectPrefix, entry.sha256(), entry.extension(), MediaTypes.forFileName(entry.originalPath()), content, entry.byteSize());
-                }
-            }
-            ArtifactManifest manifest = contract == null
-                    ? ArtifactManifestGenerator.generate(packageCode, objects.ingestBucket(), objectPrefix, "upload:" + packageCode, inventory)
-                    : ArtifactManifestGenerator.generate(packageCode, objects.ingestBucket(), objectPrefix, "upload:" + packageCode,
-                        inventory, contract.contractCode(), contract.revision(), contract.datasetVersionId());
-            return registerAndVerify(manifest, false);
-        } catch (IOException failure) {
-            throw new ArtifactStorageException("Validated package content could not be stored", failure);
-        } finally {
-            deleteStagingDirectory(stagingDirectory);
+            report = definitions.isEmpty() ? ArtifactRelationPreview.evaluate(List.of(), List.of(), manifest.entries())
+                    : ArtifactRelationPreview.evaluate(definitions, staged.dataset().carrier().rows(staged.dataset().path().toFile(), contract), manifest.entries());
+        } catch (IOException unreadable) {
+            throw new IllegalArgumentException("Package dataset rows could not be read", unreadable);
+        }
+        requireExactSuppliedManifest(staged, manifest, contract, report);
+        return report;
+    }
+
+    /** A shipped manifest is a claim: it is accepted only when it is exactly what the platform derived (contract §25). */
+    private static void requireExactSuppliedManifest(StagedPackage staged, ArtifactManifest manifest,
+                                                     ArtifactPackageContractResolver.DatasetContract contract, ArtifactRelationPreview.Report report) {
+        if (staged.suppliedManifest() == null) return;
+        PackageManifestDocument derived = PackageManifestDocument.describe(contract, staged.dataset().originalPath(), manifest.entries(), report.plans());
+        List<String> differences = staged.suppliedManifest().differencesFrom(derived);
+        if (!differences.isEmpty())
+            throw new IllegalArgumentException("Supplied " + PackageManifestDocument.ENTRY_NAME + " does not describe this package: " + String.join("; ", differences));
+    }
+
+    private PackageManifestDocument readSuppliedManifest(InputStream entry) throws IOException {
+        byte[] bytes = entry.readNBytes(properties.getMaxInventoryBytes() + 1);
+        if (bytes.length > properties.getMaxInventoryBytes())
+            throw new IllegalArgumentException(PackageManifestDocument.ENTRY_NAME + " exceeds " + properties.getMaxInventoryBytes() + " bytes");
+        try {
+            return json.readValue(bytes, PackageManifestDocument.class);
+        } catch (IOException | IllegalArgumentException invalid) {
+            throw new IllegalArgumentException(PackageManifestDocument.ENTRY_NAME + " is not a valid package manifest", invalid);
         }
     }
+
+    private record StagedPackage(Path directory, List<ArtifactManifestGenerator.InventoryEntry> inventory, List<StagedEntry> entries, StagedDataset dataset, PackageManifestDocument suppliedManifest) {}
+
+    private record StagedDataset(String originalPath, Path path, PackageDatasetCarrier carrier) {}
 
     private record StagedEntry(String originalPath, String extension, String sha256, long byteSize, Path path) {}
 
@@ -184,7 +301,7 @@ public class ArtifactPackageService {
                     try (InputStream content = objects.open(location); OutputStream out = Files.newOutputStream(staged)) {
                         copied = copyBounded(content, out, properties.getMaxEntryBytes());
                     }
-                    if (copied != entry.byteSize() || !sha256(staged).equals(entry.sha256()))
+                    if (copied != entry.byteSize() || !Sha256.of(staged).equals(entry.sha256()))
                         throw new IllegalArgumentException("Inventory object checksum or size does not match: " + entry.originalPath());
                     contentTypes.verify(entry.originalPath(), staged);
                 } catch (IOException error) {
@@ -241,33 +358,4 @@ public class ArtifactPackageService {
         }
         return total;
     }
-
-    private static String hex(byte[] digest) {
-        StringBuilder out = new StringBuilder(64);
-        for (byte b : digest) out.append(String.format("%02x", b));
-        return out.toString();
-    }
-
-    private static String sha256(Path path) throws IOException {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            try (InputStream input = Files.newInputStream(path)) {
-                byte[] bytes = new byte[64 * 1024];
-                for (int read; (read = input.read(bytes)) > 0; ) digest.update(bytes, 0, read);
-            }
-            return hex(digest.digest());
-        } catch (java.security.NoSuchAlgorithmException impossible) {
-            throw new IllegalStateException("SHA-256 is unavailable", impossible);
-        }
-    }
-
-    private static String sha256(byte[] bytes) {
-        try {
-            return hex(MessageDigest.getInstance("SHA-256").digest(bytes));
-        } catch (java.security.NoSuchAlgorithmException impossible) {
-            throw new IllegalStateException("SHA-256 is unavailable", impossible);
-        }
-    }
-
-
 }

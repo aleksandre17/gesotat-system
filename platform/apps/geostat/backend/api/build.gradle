@@ -123,6 +123,8 @@ sourceSets {
         java.include 'KidsResourceScopeReconciliationAudit.java'
         java.include 'KidsGoalsCapabilityAudit.java'
         java.include 'ContractRegistryAccessPackageGenerator.java'
+        java.include 'ArtifactPackageAssembler.java'
+        java.include 'AccessPackageVersionStamper.java'
         compileClasspath += sourceSets.main.runtimeClasspath
         runtimeClasspath += output + compileClasspath
     }
@@ -220,5 +222,36 @@ tasks.register('generateContractRegistryAccess', JavaExec) {
         def output = project.findProperty('contractOutput') ?: '../artifacts/kids-contract-generated.accdb'
         if ([host,db,user,pass].any { it == null || it.toString().isBlank() }) throw new GradleException('Provide -PcontractHost -PcontractDatabase -PcontractUser -PcontractPassword')
         args host, db, user, pass, revision.toString(), output
+    }
+}
+
+// Contract-driven artifact package producer (any contract/dataset). Inputs come from the approved
+// package descriptor endpoint; see ops/scripts/shell/artifact-package-assemble.sh.
+tasks.register('stampAccessPackageVersion', JavaExec) {
+    group = 'geostat'
+    description = 'Copy an Access package and set its declared package version (a new build of the same rows)'
+    dependsOn tasks.named('compileKidsCanonicalToolJava')
+    classpath = sourceSets.kidsCanonicalTool.runtimeClasspath
+    mainClass = 'AccessPackageVersionStamper'
+    doFirst {
+        def names = ['stampSource', 'stampTarget', 'stampVersion']
+        def values = names.collect { n -> project.findProperty(n) }
+        if (values.any { it == null }) throw new GradleException("Required: " + names.collect { "-P${it}=..." }.join(' '))
+        args values
+    }
+}
+
+tasks.register('assembleArtifactPackage', JavaExec) {
+    group = 'geostat'
+    description = 'Assemble a deterministic contract-bound artifact package from an approved package descriptor'
+    dependsOn tasks.named('compileKidsCanonicalToolJava')
+    classpath = sourceSets.kidsCanonicalTool.runtimeClasspath
+    mainClass = 'ArtifactPackageAssembler'
+    doFirst {
+        def names = ['packageDescriptor', 'packageDataset', 'packageResources', 'packageOutput', 'packageEvidence']
+        def values = names.collect { n -> project.findProperty(n) }
+        if (values.any { it == null || it.toString().isBlank() })
+            throw new GradleException('Provide ' + names.collect { "-P${it}" }.join(' '))
+        args values.collect { file(it).absolutePath }
     }
 }

@@ -3,6 +3,7 @@ package org.base.api.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import org.base.api.service.artifact.ArtifactAccessDeniedException;
 import org.base.api.service.artifact.ArtifactNotFoundException;
+import org.base.api.service.artifact.ArtifactRelationPreviewException;
 import org.base.api.service.artifact.ArtifactStorageException;
 import org.base.api.service.artifact.ArtifactUploadQuotaExceededException;
 import org.base.api.service.artifact.ArtifactUploadTooLargeException;
@@ -11,19 +12,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.net.URI;
-import java.util.UUID;
 
 /** RFC 9457 problem details for the artifact boundary. Storage internals never reach the response. */
-@RestControllerAdvice(assignableTypes = PlatformArtifactController.class)
+@RestControllerAdvice(assignableTypes = {PlatformArtifactController.class, PlatformArtifactPackageRunController.class})
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ArtifactApiExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(ArtifactApiExceptionHandler.class);
@@ -46,6 +43,13 @@ public class ArtifactApiExceptionHandler {
     @ExceptionHandler(ArtifactUploadTooLargeException.class)
     public ResponseEntity<ProblemDetail> tooLarge(ArtifactUploadTooLargeException ex, HttpServletRequest request) {
         return problem(HttpStatus.PAYLOAD_TOO_LARGE, "artifact-upload-too-large", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(ArtifactRelationPreviewException.class)
+    public ResponseEntity<ProblemDetail> relationPreview(ArtifactRelationPreviewException ex, HttpServletRequest request) {
+        ResponseEntity<ProblemDetail> response = problem(HttpStatus.UNPROCESSABLE_ENTITY, "artifact-relation-preview-blocked", ex.getMessage(), request);
+        response.getBody().setProperty("relations", ex.relations());
+        return response;
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -71,13 +75,6 @@ public class ArtifactApiExceptionHandler {
     }
 
     static ResponseEntity<ProblemDetail> problem(HttpStatus status, String code, String detail, HttpServletRequest request) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, detail == null ? status.getReasonPhrase() : detail);
-        problem.setType(URI.create("https://api.geostat.ge/problems/" + code));
-        problem.setTitle(code);
-        problem.setProperty("code", code);
-        problem.setProperty("instance", request.getRequestURI());
-        String correlation = request.getHeader("X-Correlation-Id");
-        problem.setProperty("correlationId", correlation != null ? correlation : UUID.randomUUID().toString());
-        return ResponseEntity.status(status).contentType(MediaType.APPLICATION_PROBLEM_JSON).header(HttpHeaders.CACHE_CONTROL, "no-store").body(problem);
+        return ApiProblems.problem(status, code, detail, request);
     }
 }

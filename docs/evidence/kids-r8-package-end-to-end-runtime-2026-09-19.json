@@ -1,0 +1,125 @@
+{
+  "schema": "geostat.package-end-to-end-runtime.v1",
+  "recordedAt": "2026-09-19",
+  "environment": "remote dev 192.168.1.199 geostat-api-dev:8081; production untouched",
+  "identity": "Keycloak client geostat-artifact-operator; token per call, never printed",
+  "package": {
+    "file": "samples/kids-r8-resource-package-8.0.1.zip",
+    "sha256": "427d12e96d448577b242d4cedcfebaf58daff840a4b4576774ffaa5f5414f4cc",
+    "bytes": 7629698,
+    "zipEntries": 452,
+    "contentEntries": 451,
+    "dataset": "kids-portal-v1-canonical-r8-build-8.0.1.accdb (same rows as 8.0.0; __gs_package.package_version 8.0.0 -> 8.0.1 via :api:stampAccessPackageVersion)",
+    "datasetSha256": "99840f3f830fad3f241ab2cb175c29d8172813bb4564729bbddfab3e00c17469",
+    "rowBoundFiles": 450,
+    "shippedManifest": "manifest.json, schema geostat.artifact-package-manifest.v1: 451 file claims + 450 row-to-file edge claims",
+    "assembly": "ops/scripts/shell/artifact-package-assemble.sh KIDS_PORTAL_V1 8 KIDS_RESOURCE ... (structure read from the approved package descriptor)",
+    "assemblyEvidence": "docs/evidence/kids-r8-resource-package-8.0.1-assembly-2026-09-19.json"
+  },
+  "steps": [
+    {
+      "step": "preview",
+      "request": "POST /api/v1/platform/artifacts/manifests/package/preview",
+      "httpStatus": 200,
+      "blocked": false,
+      "edges": 450,
+      "orphans": 0,
+      "issues": 0,
+      "note": "the shipped manifest was compared with the server-derived manifest and relation plan and was exact; nothing written"
+    },
+    {
+      "step": "admit",
+      "request": "POST /api/v1/platform/artifacts/manifests/package",
+      "httpStatus": 200,
+      "manifestId": 7,
+      "created": true,
+      "packageChecksum": "eef71d5603c9cc2a9c28b663e982f1d4351cc01ff3943ca0cf6d9d6178efc6e7",
+      "entryCount": 451,
+      "verified": 451,
+      "missing": 0,
+      "checksumMismatch": 0
+    },
+    {
+      "step": "run",
+      "request": "POST /api/v1/platform/artifacts/package-runs {\"manifestId\":7}",
+      "httpStatus": 202,
+      "runId": 2
+    }
+  ],
+  "run": {
+    "status": "COMPLETED",
+    "attempt": 1,
+    "stages": [
+      {
+        "stage": "INGEST_DATASET",
+        "outcome": "COMPLETED",
+        "batchId": 9,
+        "datasetLoadId": 142,
+        "datasetLoads": 15
+      },
+      {
+        "stage": "VALIDATE_LOAD",
+        "outcome": "COMPLETED",
+        "acceptedRows": 225,
+        "rejectedRows": 0
+      },
+      {
+        "stage": "PREPARE_SNAPSHOT",
+        "outcome": "COMPLETED",
+        "datasetSnapshotId": 53
+      },
+      {
+        "stage": "MATERIALIZE",
+        "outcome": "COMPLETED",
+        "family": "ENTITY",
+        "writtenRows": 225
+      },
+      {
+        "stage": "BIND_ATTACHMENTS",
+        "outcome": "COMPLETED",
+        "relation": "PRIMARY_FILE",
+        "plannedEdges": 450,
+        "written": 450,
+        "orphanArtifacts": 0
+      },
+      {
+        "stage": "RECONCILE",
+        "outcome": "COMPLETED",
+        "result": "PASS",
+        "entities": 225,
+        "attachments": 450,
+        "attachmentChecksum": "0737e9c231985f280ad2245ecff71a8af87111876e26e1b9b8ecf234e287949e"
+      },
+      {
+        "stage": "EVALUATE_RELEASE_GATES",
+        "outcome": "COMPLETED",
+        "releasable": true,
+        "snapshotStatus": "REVIEW_REQUIRED",
+        "factsDigest": "7a2122715b800f66991441969c4dad3c3f6ad6dbdd968e8a29ec07246c91d379"
+      }
+    ]
+  },
+  "equivalence": "The attachment-set checksum of new snapshot 53 (0737e9c2...) equals the checksum recorded for published snapshot 52 on 2026-09-18: the same 225 rows are bound to the same 450 files.",
+  "boundary": "The run ended at steward review (REVIEW_REQUIRED). Snapshot 53 was not published; publication is a separate human-approved operation (ADR-007).",
+  "result": "PASS",
+  "acceptedManifestDocument": {
+    "migration": "102_artifact_manifest_document.sql applied at startup",
+    "replayedAdmission": {
+      "manifestId": 7,
+      "created": false,
+      "note": "idempotent replay recorded the document for the existing manifest"
+    },
+    "request": "GET /api/v1/platform/artifacts/manifests/7/document",
+    "httpStatus": 200,
+    "schema": "geostat.artifact-package-manifest.v1",
+    "files": 451,
+    "edges": 450,
+    "firstEdge": {
+      "rowKey": "128",
+      "relationCode": "PRIMARY_FILE",
+      "language": "en",
+      "ordinal": 1
+    },
+    "result": "PASS - contract §25: derived file claims and row-to-file edges are persisted immutably at admission, content-addressed in Object Storage, checksum-verified on read"
+  }
+}

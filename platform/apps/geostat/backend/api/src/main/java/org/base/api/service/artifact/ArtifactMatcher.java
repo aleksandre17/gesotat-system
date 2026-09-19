@@ -47,7 +47,7 @@ public final class ArtifactMatcher {
         for (SourceRow row : ordered) {
             for (ArtifactMatchRule.Binding binding : rule.bindings()) {
                 String subject = row.externalKey() + "/" + definition.relationCode() + "/" + binding.language();
-                List<String> values = new ArrayList<>(values(row.payload().path(binding.field())));
+                List<String> values = new ArrayList<>(sourceValues(row.payload().path(binding.field())));
                 if (!definition.ordered())
                     values.sort(Comparator.comparing(value -> canonicalSortKey(rule, value)));
                 if (values.isEmpty()) {
@@ -95,7 +95,7 @@ public final class ArtifactMatcher {
     }
 
     /** A scalar field yields one value; a JSON array yields its non-blank elements in source order. */
-    private static List<String> values(JsonNode node) {
+    public static List<String> sourceValues(JsonNode node) {
         if (node.isMissingNode() || node.isNull()) return List.of();
         if (!node.isArray()) return node.asText().isBlank() ? List.of() : List.of(node.asText());
         List<String> values = new ArrayList<>();

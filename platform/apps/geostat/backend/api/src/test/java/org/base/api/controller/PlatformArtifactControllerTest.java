@@ -47,7 +47,8 @@ class PlatformArtifactControllerTest {
     void setUp() {
         mvc = MockMvcBuilders.standaloneSetup(new PlatformArtifactController(mock(ArtifactPackageService.class), attachments,
                         mock(ArtifactReconciliationService.class), distribution, mock(ArtifactUploadSessionService.class),
-                        mock(ArtifactUploadIdentityResolver.class)))
+                        mock(ArtifactUploadIdentityResolver.class), mock(org.base.api.service.artifact.ArtifactPackageDescriptors.class),
+                        mock(org.base.api.service.artifact.ArtifactManifestDocuments.class)))
                 .setControllerAdvice(new ArtifactApiExceptionHandler()).build();
     }
 

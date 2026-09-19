@@ -34,6 +34,12 @@ public class ArtifactMetrics {
         count("geostat.artifact.relation_audit", "result", result);
     }
 
+    public void storageSweep(String result, int orphans) {
+        count("geostat.artifact.storage_sweep", "result", result);
+        MeterRegistry meters = registry.getIfAvailable();
+        if (meters != null && orphans > 0) meters.counter("geostat.artifact.storage_sweep.orphans").increment(orphans);
+    }
+
     public void download(String relationCode, String outcome) {
         MeterRegistry meters = registry.getIfAvailable();
         if (meters != null) meters.counter("geostat.artifact.download", "relation", relationCode, "outcome", outcome).increment();

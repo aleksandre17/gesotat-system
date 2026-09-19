@@ -1,0 +1,62 @@
+{
+  "schema": "geostat.kids-r8-full-package-admission-runtime.v1",
+  "recordedAt": "2026-09-18",
+  "environment": "remote dev 192.168.1.199 geostat-api-dev:8081 (restarted with this source); production untouched",
+  "identity": "Keycloak client geostat-artifact-operator; token per call, never printed",
+  "principle": "Package structure comes only from the approved Control Plane package descriptor; producer and API share one matcher (ArtifactMatcher) so preview, admission and snapshot binding cannot disagree.",
+  "steps": {
+    "descriptor": {
+      "endpoint": "GET /api/v1/platform/artifacts/contracts/KIDS_PORTAL_V1/revisions/8/datasets/KIDS_RESOURCE/package-descriptor",
+      "httpStatus": 200,
+      "datasetVersionId": 73,
+      "accessTableName": "__ent_kids_resource",
+      "keyFields": ["source_resource_id"],
+      "relations": ["PRIMARY_FILE SOURCE_PATH stripPrefix=files/ packageRoot=mainstat/ bindings ka:path_ka en:path_en, 1..1, policy KIDS_PUBLIC_STATISTICAL_FILE r1"]
+    },
+    "assembly": {
+      "command": "ops/scripts/shell/artifact-package-assemble.sh KIDS_PORTAL_V1 8 KIDS_RESOURCE samples/kids-portal-v1-canonical-r8-final.accdb platform/apps/geostat/frontend/kids/public/files samples/kids-r8-resource-package.zip docs/evidence/kids-r8-resource-package-assembly-2026-09-18.json",
+      "evidence": "docs/evidence/kids-r8-resource-package-assembly-2026-09-18.json",
+      "preview": { "relation": "PRIMARY_FILE", "edges": 450, "orphans": 0, "issues": 0 },
+      "entries": 451,
+      "archiveSha256": "2b98cf737c192da67a819acd85a5c4a04c06bf6561bc287d4edc295c210548aa",
+      "archiveBytes": 7589462,
+      "deterministicRebuild": "PASS (identical SHA-256 on second build)",
+      "excludedUnreferenced": "files present under the resource root but referenced by no row are not packaged (they would be ORPHAN_ARTIFACT)"
+    },
+    "serverPreview": {
+      "endpoint": "POST /api/v1/platform/artifacts/manifests/package/preview",
+      "httpStatus": 200,
+      "packageChecksum": "a7092c70b04a6df6c034a4370faea1f150e525c01e075c09acc8eed0d9820efa",
+      "entryCount": 451,
+      "blocked": false,
+      "relations": [{ "relationCode": "PRIMARY_FILE", "edgeCount": 450, "orphanCount": 0, "issues": [] }],
+      "writes": "none"
+    },
+    "admission": {
+      "endpoint": "POST /api/v1/platform/artifacts/manifests/package",
+      "first": { "httpStatus": 200, "manifestId": 6, "created": true, "entryCount": 451, "objectCount": 451, "verified": 451, "missing": 0, "checksumMismatch": 0 },
+      "identicalReplay": { "httpStatus": 200, "manifestId": 6, "created": false, "verified": 451 },
+      "relationPreviewInReceipt": { "relationCode": "PRIMARY_FILE", "edgeCount": 450, "orphanCount": 0, "issues": [] }
+    },
+    "snapshotBinding": {
+      "request": "POST /api/v1/platform/artifacts/snapshots/52/attachments?manifestId=6&dryRun=true",
+      "httpStatus": 409,
+      "reason": "Snapshot 52 is PUBLISHED; attachments bind only before publication (immutable snapshot, contract §13)",
+      "decision": "No new snapshot was created: the Access source is byte-identical (SHA-256 746487ce…), so the doctrine 'new content creates a new version' yields no new version. Equivalence with the published state is proven instead."
+    },
+    "publishedEquivalence": {
+      "method": "GET /api/v1/platform/artifacts/entities/KIDS_RESOURCE/{key} for every row key of the package; compare (rowKey, relation, language, ordinal) -> (sha256, bytes)",
+      "packageSlots": 450,
+      "publishedSlots": 450,
+      "servingSnapshot": 52,
+      "mismatches": 0,
+      "result": "PASS"
+    }
+  },
+  "controlsObserved": {
+    "rateLimit": "bulk read loop received 429 rate-limit-exceeded; retried with Retry-After pacing",
+    "defectFound": "an unmapped route before restart produced /error/error/404 recursion and StackOverflowError in the servlet error path (not part of the storage line; open)"
+  },
+  "sourceTests": { "suite": ":api:test", "tests": 243, "failures": 0, "skipped": 1, "new": "ArtifactPackageRelationPreviewTest (6)" },
+  "result": "PASS"
+}

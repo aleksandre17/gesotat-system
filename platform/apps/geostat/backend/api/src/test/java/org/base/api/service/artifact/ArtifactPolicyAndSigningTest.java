@@ -1,6 +1,8 @@
 package org.base.api.service.artifact;
 
-import org.base.api.service.storage.ObjectStorageService;
+import org.base.api.service.storage.s3.S3ArtifactObjectStore;
+import org.base.api.service.storage.s3.S3Clients;
+import org.base.api.service.storage.s3.S3StorageProperties;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
@@ -16,9 +18,10 @@ class ArtifactPolicyAndSigningTest {
     private static final String SHA = "ef3e90d0e211c4998ef0607132d40fd24302d5dede2ec1ef817ad181d39be8cb";
     private static final ArtifactObjectStore.ObjectLocation LOCATION = new ArtifactObjectStore.ObjectLocation("geostat-ingest", "kids/r8/resources/" + SHA + ".xlsx");
 
-    private static ObjectStorageService storage(String publicEndpoint) {
-        return new ObjectStorageService("http://127.0.0.1:1", "test-access", "test-secret", "geostat-ingest", "geostat-quarantine",
-                "geostat-archive", "geostat-export", publicEndpoint, "us-east-1");
+    private static ArtifactObjectStore storage(String publicEndpoint) {
+        S3StorageProperties properties = new S3StorageProperties("http://127.0.0.1:1", "test-access", "test-secret", "geostat-ingest",
+                "geostat-quarantine", "geostat-archive", "geostat-export", publicEndpoint, "us-east-1", "artifacts/staging/");
+        return new S3ArtifactObjectStore(S3Clients.from(properties), properties.ingestBucket());
     }
 
     @Test

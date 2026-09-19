@@ -1,0 +1,145 @@
+{
+  "schema": "geostat.storage-line-runtime-acceptance.v1",
+  "recordedAt": "2026-09-19",
+  "environment": "remote dev 192.168.1.199 geostat-api-dev:8081, redeployed from the working tree; production API (8083) and production database untouched",
+  "identity": "Keycloak client geostat-artifact-operator; fresh token per call, never printed",
+  "source": {
+    "apiTests": "274→276 tests, 0 failures, 0 errors, 1 skipped (:api:test); :core:test 25 PASS",
+    "committed": false
+  },
+  "startup": {
+    "health": {
+      "status": "UP",
+      "primary": "UP",
+      "dataPlane": "UP",
+      "archivePlane": "UP",
+      "objectStorage": "UP",
+      "secondary": "UP"
+    },
+    "migrationsAppliedByRunner": [
+      "099_site_contract_revision_governance.sql",
+      "100_artifact_storage_sweep.sql",
+      "101_artifact_package_run.sql"
+    ],
+    "note": "startup completed without a migration failure; the tables are exercised by the calls below. A direct ledger read-back was not performed (no database credentials were read)."
+  },
+  "errorPath": {
+    "request": "GET /api/v1/no-such-route (authenticated)",
+    "httpStatus": 404,
+    "contentType": "application/problem+json",
+    "cacheControl": "no-store",
+    "body": {
+      "type": "about:blank",
+      "title": "Not Found",
+      "status": 404,
+      "instance": "/error"
+    },
+    "result": "PASS — the former /error/error/404 recursion and StackOverflowError no longer occur (AIR-2026-024)"
+  },
+  "siteContractRevisionApprovalPreview": {
+    "request": "POST /api/v1/platform/site-contracts/KIDS_PORTAL_V1/revisions/8/approval/preview",
+    "httpStatus": 422,
+    "compatibility": "BACKWARD_COMPATIBLE",
+    "currentApprovedRevision": 8,
+    "checks": {
+      "BREAKING_CHANGE_ACKNOWLEDGEMENT": "PASS",
+      "CHECKSUM_INTEGRITY": "PASS",
+      "LIFECYCLE_TRANSITION": "FAIL (already APPROVED)",
+      "STRUCTURAL_BINDING": "PASS"
+    },
+    "result": "PASS — checks run on the persisted revision; CHECKSUM_INTEGRITY confirms the stored checksum still describes the stored document; an approved revision is correctly not approvable again; nothing was written"
+  },
+  "packageRun": {
+    "start": {
+      "request": "POST /api/v1/platform/artifacts/package-runs {\"manifestId\":6}",
+      "httpStatus": 202,
+      "runId": 1,
+      "datasetVersionId": 73,
+      "pipeline": [
+        "INGEST_DATASET",
+        "VALIDATE_LOAD",
+        "PREPARE_SNAPSHOT",
+        "MATERIALIZE",
+        "BIND_ATTACHMENTS",
+        "RECONCILE",
+        "EVALUATE_RELEASE_GATES"
+      ]
+    },
+    "startReplay": {
+      "httpStatus": 202,
+      "runId": 1,
+      "result": "same run returned; one run per manifest"
+    },
+    "attempt1": [
+      {
+        "stage": "INGEST_DATASET",
+        "outcome": "COMPLETED",
+        "detail": {
+          "batchId": 8,
+          "datasetLoadId": 127,
+          "datasetLoads": 15
+        },
+        "note": "dataset read back from its content address; identical bytes replayed the existing ingestion batch"
+      },
+      {
+        "stage": "VALIDATE_LOAD",
+        "outcome": "COMPLETED",
+        "detail": {
+          "replayed": true
+        },
+        "note": "settled load was not moved backwards"
+      },
+      {
+        "stage": "PREPARE_SNAPSHOT",
+        "outcome": "COMPLETED",
+        "detail": {
+          "datasetSnapshotId": 52
+        }
+      },
+      {
+        "stage": "MATERIALIZE",
+        "outcome": "BLOCKED",
+        "issue": "STAGE_REJECTED"
+      }
+    ],
+    "operatorRetry": {
+      "request": "POST /api/v1/platform/artifacts/package-runs/1/retry",
+      "httpStatus": 202,
+      "attempt2": [
+        {
+          "stage": "MATERIALIZE",
+          "outcome": "BLOCKED",
+          "issue": "SNAPSHOT_NOT_MATERIALIZABLE",
+          "detail": {
+            "datasetSnapshotId": 52,
+            "snapshotStatus": "PUBLISHED"
+          }
+        }
+      ],
+      "result": "the retry resumed at the blocked stage only; stages 1–3 were not executed again"
+    },
+    "interpretation": "Manifest 6 carries exactly the dataset bytes that produced published snapshot 52. By contract §13 identical content resolves to its existing snapshot, and a published snapshot is never rewritten, so the run is correctly BLOCKED and changed nothing. Stages 5–7 wrap services proven at runtime on 2026-09-18 (bind 450, reconciliation PASS, gate evaluation) and are unit-tested in the pipeline; an end-to-end COMPLETED run needs a package with new dataset content and was not fabricated.",
+    "result": "PASS for idempotent start, durable progress, stage history, fail-closed block and operator retry; COMPLETED path OPEN pending a package with new content"
+  },
+  "defectsFoundByThisAcceptance": [
+    {
+      "id": "AIR-2026-034",
+      "summary": "GlobalExceptionHandler returned a sanitized 500 without logging the cause; unexpected failures were undiagnosable",
+      "fixed": true
+    },
+    {
+      "id": "AIR-2026-035",
+      "summary": "JacksonConfig tested type.isAssignableFrom(PageNode) instead of the reverse, so the PageNode deserializer captured every untyped JSON value on the application ObjectMapper and recursed into itself (StackOverflowError on any Map<String,Object> read)",
+      "fixed": true,
+      "regressionTest": "JacksonConfigTest (fails with StackOverflowError before the fix)"
+    }
+  ],
+  "open": [
+    "ops/tests/sql/site-contract-revision-governance.sql (trigger fixture) not run — requires database credentials",
+    "package run COMPLETED path with new dataset content"
+  ],
+  "storageSweep": {
+    "logLine": "artifact.storage_sweep cycle completed scope=2 lastPageObjects=451 lastPageOrphans=0",
+    "result": "PASS - one full cycle over a registry-derived scope: 451 objects listed, 451 known to the registry, 0 orphans; nothing deleted"
+  }
+}

@@ -487,3 +487,218 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   evidence-ის ჩანაცვლება; tests (PASS/FAIL თითო gate-ზე, replay, checksum-drift).
 - **დამოკიდებულება:** publish-ისთვის `PUBLISH_RESOURCE` identity — operator client-ზე `publish.execute` როლის
   მინიჭება auto-mode-მა დაბლოკა (permission grant); საჭიროა მომხმარებლის ცალსახა ნებართვა ან მისი მიერ მინიჭება.
+
+### AIR-2026-024 — Servlet error path re-entered itself without bound
+
+- **სტატუსი:** `READY` / **priority:** `P1` / **owner:** Serving
+- **აღმოჩენა:** shared `ErrorController` returned view names (`error/404`). The API host has no template
+  engine, so the name became a relative forward (`/error` → `/error/404` → `/error/error/404`); the
+  resulting 404 was forwarded to `/error` again by `GlobalExceptionHandler.redirectWeb`. Observed on
+  dev as `StackOverflowError` for an unmapped route (checklist 16.15).
+- **გადაწყვეტა:** the error endpoint is terminal — a host that ships the template gets its page, any
+  other host gets an RFC 9457 `no-store` body; exception text and failing URI are never exposed.
+  `redirectWeb` does not forward from a non-`REQUEST` dispatch. The legacy web host keeps its pages.
+- **Evidence:** `ErrorPathTerminationTest` (6); `:core:test` 25 PASS, `:api:test` PASS. Dev redeploy
+  and unmapped-route smoke pending.
+
+### AIR-2026-025 — Persisted semantic compatibility was never evaluated
+
+- **სტატუსი:** `READY` / **priority:** `P0` / **owner:** Control Plane
+- **აღმოჩენა:** `ContractCompatibilityService.compare` read `contract_document_json` from a row whose
+  SELECT did not include that column. Both documents were always empty, so metric/unit/aggregation/
+  dimension/response breaking changes between persisted revisions were reported as compatible. The
+  unit test returned the column from its stub regardless of the SQL, which hid the defect
+  (documentation-only claim in completion plan C-01/C-08: "persisted-contract integration").
+- **გადაწყვეტა:** the statement selects the document; the test stub now returns only the columns
+  the statement asks for, so the defect cannot recur unnoticed.
+- **Evidence:** `ContractCompatibilityServiceTest`; full `:api:test` PASS.
+
+### AIR-2026-026 — Site contract revisions had no governed approval and no immutability
+
+- **სტატუსი:** `READY` / **priority:** `P0` / **owner:** Control Plane
+- **აღმოჩენა:** a site contract revision became `APPROVED` only by SQL migration. `ContractApprovalGate`,
+  `ContractLifecycleOrchestrator` and `persistApprovalEvidence` were tested but never called from a
+  runtime path; nothing blocked a breaking revision, and an `APPROVED` row's document/checksum could be
+  updated or deleted. C-01 acceptance ("breaking change იბლოკება") was not enforced anywhere.
+- **გადაწყვეტა (layer: Control; authority: completion plan C-01, AGENTS.md gate):**
+  - migration `099_site_contract_revision_governance.sql`: append-only
+    `platform.site_contract_revision_approval` (one checksum-bound row per revision; `BREAKING`
+    requires an acknowledgement), trigger `51041` (approved/superseded revisions immutable, only
+    `APPROVED→SUPERSEDED`), trigger `51042` (a *new* approval may not leave two `APPROVED` revisions;
+    pre-existing rows never block startup or their own repair);
+  - `service/contract/approval`: `ContractApprovalCheck` strategies discovered as beans
+    (`LIFECYCLE_TRANSITION`, `CHECKSUM_INTEGRITY`, `STRUCTURAL_BINDING`,
+    `BREAKING_CHANGE_ACKNOWLEDGEMENT`) over measured `RevisionFacts`; a new rule is a new bean, the
+    service and API do not change. `SiteContractRevisionApprovalService` serializes approvals per
+    contract (`UPDLOCK,HOLDLOCK`), supersedes then approves in one transaction, appends evidence
+    `geostat.contract-approval.v1` and an outbox event; replay of the same checksum is idempotent;
+  - API: `POST /api/v1/platform/site-contracts/{code}/revisions/{revision}/approval/preview`
+    (no write, 200/422) and `POST …/approval` (`PUBLISH_RESOURCE`; 200/400/404/409/422 RFC 9457).
+  - Revision state has one authority: `site_contract_revision.status`. The parallel
+    `platform.contract_revision_lifecycle` table (084) is not written by this path.
+- **Failure/idempotency/rollback:** any failing check writes nothing; lost race → 409; a wrong approval
+  is corrected by a new revision (approved rows are immutable by design).
+- **Evidence:** `SiteContractRevisionApprovalServiceTest` (8), `SiteContractRevisionGovernanceMigrationTest`;
+  `:api:test` PASS; authorization-surface preflight PASS. SQL Server trigger fixture
+  `ops/tests/sql/site-contract-revision-governance.sql` (rollback-only) — **not yet run**; migration 099
+  not yet applied on dev.
+- **Open follow-ups:** (1) child rows of an approved revision (dataset/field/relation) are not yet
+  immutable — migrations 097/098 legitimately backfilled them; needs a bounded decision. (2) revisions
+  are still authored only by migration; a governed authoring API must reuse the SQL checksum convention
+  (`SHA2_256` over `NVARCHAR`), which differs from `ContractChecksumBinding` (UTF-8). (3) approver ≠
+  author segregation needs an author column. (4) this register repeats ids AIR-2026-014…017 for
+  different findings — C-14 documentation reconciliation.
+
+### AIR-2026-027 — Registered migration chain cannot rebuild the approved KIDS R8 contract
+
+- **სტატუსი:** `DISCOVERED` / **priority:** `P0` (release invariant: ordered migrations, reproducible build — B-01) / **owner:** Control Plane
+- **აღმოჩენა (source-verified 2026-09-19):** `PlatformSchemaMigrationRunner` goes `053 → 057`.
+  `057` recreates the table of unregistered `054`, and `058` repeats unregistered `056`, but **no
+  registered migration replaces `055_kids_final_page_contract_revision.sql`, the only script that
+  inserts `KIDS_PORTAL_V1` revision 8** (and its datasets/fields/relations/nodes/page bindings).
+  On a fresh Control Plane `058` points the ingestion contract at revision 8 and `059…096` bind
+  runtime pages, projections, governance and artifact relations to a revision that does not exist.
+  Existing dev/prod databases work only because `055` was applied to them earlier; the platform is
+  therefore not reproducible from source. `PlatformSchemaMigrationRegistrationTest.KNOWN_UNREGISTERED`
+  documents the gap but does not close it.
+- **Why it is not simply registered:** the revision insert in `055` is guarded, its child inserts are
+  not. On a database that has revision 8 but no ledger row for `055`, executing it fails on
+  `uq_site_contract_dataset` and blocks startup. (The file was presumably unregistered while the runner
+  still re-executed every script on each start — AIR-2026-015, now fixed.)
+- **Proposed fix (needs one ledger read per environment first):**
+  `SELECT migration_id FROM platform.schema_migration WHERE migration_id LIKE '%05[4-6]%'`.
+  If `055` is recorded everywhere → register `054/055/056` in numeric position unchanged (run-once
+  makes this a no-op there, and a fresh install becomes complete). If not recorded → add an adoption
+  step that records an already-present effect without executing, then register. Acceptance: a disposable
+  empty Control Plane bootstraps to `APPROVED` revision 8 with 15 datasets, and `KNOWN_UNREGISTERED`
+  shrinks to `000` plus the r7-only scripts `037/039/045/047` (each with a written retirement reason).
+- **Not changed blind:** no SQL Server is available locally and a wrong guess blocks startup of a shared
+  environment; the change waits for the ledger read and a disposable-database replay.
+
+### AIR-2026-028 — Object Storage adapter mixed four responsibilities behind a port with refused methods
+
+- **სტატუსი:** `READY` / **priority:** `P1` / **owner:** Data Platform (layer: Archive/Ingestion storage boundary)
+- **აღმოჩენა:** `ObjectStorageService` was at once the legacy ingest store, quarantine/archive writer, bucket
+  provisioner, readiness probe and the artifact byte port (SRP). `ArtifactObjectStore` declared resumable-staging
+  methods as `default` bodies that throw "not supported" (ISP/LSP: a provider could satisfy the type and fail at
+  runtime). The staging namespace `artifacts/staging/` was a literal in the adapter. The port had no listing
+  capability, so storage could never be reconciled against the registry (checklist 14.3).
+- **გადაწყვეტა:** three narrow ports — `ArtifactObjectStore` (immutable bytes + presign), `ArtifactUploadStagingStore`
+  (checkpoints), `ArtifactObjectInventory` (paged listing); S3 adapters `S3ArtifactObjectStore`,
+  `S3ArtifactUploadStagingStore`, `S3ArtifactObjectInventory` wired by `S3StorageConfiguration` from typed
+  `S3StorageProperties`. A second provider is a second configuration class; no consumer changes. Behaviour and
+  object keys are unchanged (staging prefix default equals the former literal), so existing objects stay valid.
+- **Evidence:** `ArtifactPolicyAndSigningTest` (signing against the new adapter), `ApiApplicationTests.contextLoads`,
+  full `:api:test` PASS. Runtime: dev redeploy pending.
+
+### AIR-2026-029 — Package engine named one dataset format
+
+- **სტატუსი:** `READY` / **priority:** `P1` / **owner:** Ingestion
+- **აღმოჩენა:** `ArtifactPackageService` detected the dataset by `extension.equals("accdb")` and called the Access
+  validator and row reader directly — a format branch inside the generic engine (AGENTS.md: no hardcoded branching;
+  OCP).
+- **გადაწყვეტა:** `PackageDatasetCarrier` port (`carries/validate/rows`), `AccessDatasetCarrier` bean, registry
+  `PackageDatasetCarriers`; ingestion of the carried rows is the sibling port `PackageDatasetIngestor`. Supporting
+  another carrier (CSV bundle, SQLite, Parquet) is a new bean pair.
+- **Evidence:** `ArtifactPackageServiceTest`, `ArtifactPackageRelationPreviewTest` PASS through the registry.
+
+### AIR-2026-030 — The package pipeline existed only as seven manual API calls
+
+- **სტატუსი:** `READY` / **priority:** `P1` / **owner:** Ingestion (authority: ARTIFACT-ATTACHMENT-CONTRACT §7, §12, §26)
+- **აღმოჩენა:** after admission an operator had to call ingest, validate, prepare-snapshot, materialize, bind,
+  reconcile and gates by hand, carrying ids between calls; there was no durable progress, no retry semantics and no
+  single idempotency key for one package (checklist 14.1/14.4).
+- **გადაწყვეტა:** migration `101_artifact_package_run.sql` (`ingest.artifact_package_run`, unique per manifest;
+  append-only `…_run_stage`, trigger 51101). `PackageRunService` executes ordered `PackageRunStage` beans and
+  persists state after each; stages exchange named values (`PackageRunState`), so a new stage needs no schema or
+  service change. Failure classes: infrastructure → `RETRYABLE` (worker resumes the same stage), pipeline/package
+  refusal → `BLOCKED` (operator `retry`), removed stage → `STAGE_NOT_DEPLOYED`. `PackageRunWorker` is lease-guarded
+  and renews the lease per run. Publication is deliberately not a stage (ADR-007).
+- **Idempotency notes:** every wrapped service is replay-safe except load validation, which would move a `PREPARED`
+  load back to `VALIDATED`; `ValidateLoadStage` skips a settled load.
+- **Evidence:** `PackageRunServiceTest` (7), full `:api:test` 264 PASS, authorization-surface preflight PASS (36
+  policy-bound controllers), schema-agnostic preflight: 0 violations. Runtime acceptance: checklist 17.4.
+
+### AIR-2026-031 — Storage was never reconciled against the registry
+
+- **სტატუსი:** `READY` / **priority:** `P2` / **owner:** Observability/Data Platform
+- **გადაწყვეტა:** migration `100_artifact_storage_sweep.sql` + `ArtifactStorageSweepService`: one bounded page per
+  tick, cursor per `(bucket,prefix)` scope, scopes derived from registered object keys plus the configured upload
+  pool, grace period for in-flight admissions, binary key ordering equal to the listing order, orphan rows resolved
+  as `REGISTERED` or `ABSENT`. Evidence only — deletion stays an explicit, backed-up operator decision (AGENTS.md).
+- **Evidence:** `ArtifactStorageSweepServiceTest` (5). Runtime: checklist 17.4.
+
+### AIR-2026-032 — Upload session service fused SQL, state rules and orchestration, with no unit test
+
+- **სტატუსი:** `READY` / **priority:** `P1` / **owner:** Ingestion
+- **აღმოჩენა:** `ArtifactUploadSessionService` (328 lines) held every SQL statement, compared lifecycle states as string
+  literals in eleven places (`"OPEN"`, `"RETRYABLE"`, …), used the wall clock directly and therefore could only be
+  exercised against a database. Checklist 7.5 cited the whole suite as its evidence; no test targeted the class
+  apart from a schema-readiness check.
+- **გადაწყვეტა:** `service/artifact/upload`: `UploadSessionStatus` owns the state rules (`active()`,
+  `releasesQuota()`), `UploadSession` owns part geometry (`partStart`, `partLength`, `expiredAt`),
+  `UploadSessionRepository` owns persistence with the original statements and lock hints. The service keeps
+  orchestration and transaction boundaries and takes an injected `Clock`. Public API, SQL, idempotency fingerprint
+  bytes and lazy one-part-at-a-time assembly are unchanged.
+- **Evidence:** `ArtifactUploadSessionServiceTest` (11 cases); full `:api:test` 273 PASS.
+
+### AIR-2026-033 — Residual format literal and duplicated digest code
+
+- **სტატუსი:** `READY` / **priority:** `P2` / **owner:** Ingestion
+- **გადაწყვეტა:** `MediaTypes` reads types missing from the standard registry from `artifact-media-types.properties`
+  (data; append-only because a media type is part of the manifest checksum). `Sha256` is the single digest
+  implementation for the artifact line (package staging, S3 adapter, identity pseudonymisation, upload fingerprint).
+- **Evidence:** `ArtifactConfigurationTest`, `ArtifactContentTypeVerifierTest`, manifest/package tests PASS unchanged
+  (checksums identical).
+
+### AIR-2026-034 — Unexpected exceptions were sanitized for the client and lost for the operator
+
+- **სტატუსი:** `VERIFIED` / **priority:** `P1` / **owner:** Observability
+- **აღმოჩენა:** `GlobalExceptionHandler` answered unexpected `Exception`/`RuntimeException` with a generic body and
+  wrote nothing to the log. A 500 on dev could not be diagnosed until logging was added.
+- **გადაწყვეტა:** both catch-all handlers log method, URI and the exception server-side; the client body is unchanged.
+- **Evidence:** the added log line located AIR-2026-035 on dev within one request.
+
+### AIR-2026-035 — Application ObjectMapper routed every untyped value into a self-recursive PageNode deserializer
+
+- **სტატუსი:** `VERIFIED` / **priority:** `P0` / **owner:** Serving
+- **აღმოჩენა:** `JacksonConfig` tested `type.getRawClass().isAssignableFrom(PageNode.class)` — true for every
+  supertype of `PageNode`, including `Object`. Any `Map<String,Object>` read through the Spring-managed
+  `ObjectMapper` therefore used the PageNode deserializer, which calls `mapper.treeToValue(node, PageNode.class)`
+  and re-enters itself: `StackOverflowError`. `PageNode` is abstract and is never bound from a request body
+  (`NodeRequest` is), so the deserializer could not work for its own type either. The serializer had the same
+  reversed test.
+- **გადაწყვეტა:** the dead deserializer is removed; the serializer matches `PageNode` and its subtypes only.
+- **Evidence:** `JacksonConfigTest` fails with `StackOverflowError` on the old code and passes on the fix; on dev
+  `GET /platform/artifacts/package-runs/1` went from 500 to 200. Full `:api:test` 276 PASS.
+- **Blast radius:** every service that injects the application `ObjectMapper` and reads untyped JSON was exposed.
+
+### AIR-2026-036 — A shipped manifest was ordinary content and the accepted manifest kept no row lineage
+
+- **სტატუსი:** `VERIFIED` / **priority:** `P1` / **owner:** Ingestion (authority: ARTIFACT-ATTACHMENT-CONTRACT §2, §25)
+- **აღმოჩენა:** a `manifest.json` inside a package was stored and manifested like any file and never compared with
+  anything; the registered manifest held file identity only, so the row-to-file candidates §25 requires existed
+  nowhere until snapshot binding.
+- **გადაწყვეტა:** `PackageManifestDocument` (`geostat.artifact-package-manifest.v1`) is shared by the producer tool and
+  the API. The assembler ships it; admission treats the root entry as a reserved claim and accepts the package only
+  when the claim equals the server-derived manifest and relation plan (no write otherwise). The derived document is
+  persisted once per manifest by `ArtifactManifestDocuments` (migration 102) and served by
+  `GET /platform/artifacts/manifests/{id}/document`.
+- **Evidence:** `ArtifactPackageRelationPreviewTest` (exact / wrong edge / ghost file / wrong schema),
+  `ArtifactManifestDocumentsTest`; dev: manifest 7, 451 files, 450 edges
+  (`docs/evidence/kids-r8-package-end-to-end-runtime-2026-09-19.json`).
+
+### AIR-2026-037 — Explicit relation-table attachments need a multi-dataset package run
+
+- **სტატუსი:** `DISCOVERED` / **priority:** `P1` / **owner:** Ingestion + Data Platform
+- **აღმოჩენა:** contract §4.2/§4.3 describes attachments declared in package tables (`__raw_document`,
+  `__rel_entity_artifact`: N:M, role, ordinal, primary). Only `SOURCE_PATH` exists. The matcher already supports
+  ordered 1:N values, so the missing part is not matching but **where the edges come from**: they are rows of another
+  dataset of the same package. Preview reads the package file, snapshot binding reads materialized snapshot rows; a
+  rule that works in only one of them would let preview and binding disagree, which the line forbids.
+- **Decision to make before code:** (1) a relation declares its edge dataset and artifact-envelope dataset by dataset
+  code in the match rule; (2) a package run covers every dataset the relation names, from one ingestion batch, and
+  binding resolves the sibling snapshots through that batch; (3) the carrier port gains a generic "rows of dataset X"
+  read so preview uses the same projection. No engine branch per site is needed.
+- **Acceptance:** a synthetic package with 1000 rows and 1500 files (§27), shared files and multi-file rows, gives the
+  same edges at preview, in the accepted manifest document and after binding.

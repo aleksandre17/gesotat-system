@@ -33,6 +33,16 @@ public final class ContractLifecycle {
         this.state = Objects.requireNonNull(initialState, "initial state");
     }
 
+    /** Whether a persisted status may move to {@code next}; an unknown status permits nothing. */
+    public static boolean permits(String persistedStatus, State next) {
+        Objects.requireNonNull(next, "next state");
+        try {
+            return TRANSITIONS.getOrDefault(State.valueOf(persistedStatus), Set.of()).contains(next);
+        } catch (IllegalArgumentException | NullPointerException unknown) {
+            return false;
+        }
+    }
+
     public String revisionKey() { return revisionKey; }
     public synchronized State state() { return state; }
 

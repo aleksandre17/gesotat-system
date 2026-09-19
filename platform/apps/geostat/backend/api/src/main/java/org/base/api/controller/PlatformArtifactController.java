@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.base.api.service.artifact.ArtifactAttachmentService;
 import org.base.api.service.artifact.BindingStatus;
 import org.base.api.service.artifact.ArtifactDistributionService;
+import org.base.api.service.artifact.ArtifactPackageDescriptor;
+import org.base.api.service.artifact.ArtifactPackageDescriptors;
 import org.base.api.service.artifact.ArtifactPackageService;
 import org.base.api.service.artifact.ArtifactReconciliationService;
 import org.base.api.service.artifact.ArtifactUploadIdentityResolver;
@@ -46,6 +48,8 @@ public class PlatformArtifactController {
     private final ArtifactDistributionService distribution;
     private final ArtifactUploadSessionService uploadSessions;
     private final ArtifactUploadIdentityResolver uploadIdentity;
+    private final ArtifactPackageDescriptors descriptors;
+    private final org.base.api.service.artifact.ArtifactManifestDocuments manifestDocuments;
     private static final Pattern CONTENT_RANGE = Pattern.compile("bytes (\\d+)-(\\d+)/(\\d+)");
 
     public record InventoryImportRequest(String packageCode, String inventoryKey, String objectPrefix) {}
@@ -111,6 +115,33 @@ public class PlatformArtifactController {
                                                                                 @RequestParam String datasetCode,
                                                                                 @RequestPart("package") MultipartFile archive) throws IOException {
         return ResponseEntity.ok(packages.uploadPackage(packageCode, contractCode, revision, datasetCode, archive.getInputStream()));
+    }
+
+    /** Validate-only admission: preview of structure, manifest and relations; nothing is stored. */
+    @PostMapping(value = "/manifests/package/preview", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('WRITE_RESOURCE')")
+    public ResponseEntity<ArtifactPackageService.PackagePreview> previewPackage(@RequestParam String packageCode,
+                                                                                @RequestParam String contractCode,
+                                                                                @RequestParam int revision,
+                                                                                @RequestParam String datasetCode,
+                                                                                @RequestPart("package") MultipartFile archive) throws IOException {
+        var preview = packages.previewPackage(packageCode, contractCode, revision, datasetCode, archive.getInputStream());
+        return preview.blocked() ? ResponseEntity.unprocessableEntity().body(preview) : ResponseEntity.ok(preview);
+    }
+
+    /** Approved contract-derived descriptor from which any producer assembles a conformant package. */
+    @GetMapping("/contracts/{contractCode}/revisions/{revision}/datasets/{datasetCode}/package-descriptor")
+    @PreAuthorize("hasAuthority('READ_RESOURCE')")
+    public ResponseEntity<ArtifactPackageDescriptor> packageDescriptor(@PathVariable String contractCode, @PathVariable int revision,
+                                                                       @PathVariable String datasetCode) {
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(descriptors.describe(contractCode, revision, datasetCode));
+    }
+
+    /** Accepted manifest document: derived file claims and row-to-file edges, persisted at admission. */
+    @GetMapping("/manifests/{manifestId}/document")
+    @PreAuthorize("hasAuthority('WRITE_RESOURCE')")
+    public ResponseEntity<org.base.api.service.artifact.PackageManifestDocument> manifestDocument(@PathVariable long manifestId) {
+        return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(manifestDocuments.read(manifestId));
     }
 
     @PostMapping("/manifests/{manifestId}/verification")

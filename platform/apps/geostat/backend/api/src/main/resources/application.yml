@@ -109,11 +109,16 @@ storage:
     # Host consumers use for signed artifact downloads; empty disables distribution (fail closed).
     public-endpoint: ${STORAGE_PUBLIC_ENDPOINT:}
     region: ${STORAGE_REGION:us-east-1}
+    # Namespace of resumable-upload checkpoints inside the ingest bucket.
+    staging-prefix: ${STORAGE_STAGING_PREFIX:artifacts/staging/}
 
 platform:
   # Artifact line bounds (ArtifactProperties); all overridable per environment.
   artifacts:
     upload-prefix: ${PLATFORM_ARTIFACT_UPLOAD_PREFIX:artifacts/sha256/}
+    # Accepted manifest documents (derived file claims + row-to-file edges), outside the content pool.
+    manifest-document-prefix: ${PLATFORM_ARTIFACT_MANIFEST_DOCUMENT_PREFIX:artifacts/manifests/}
+    max-manifest-document-bytes: ${PLATFORM_ARTIFACT_MAX_MANIFEST_DOCUMENT_BYTES:268435456}
     max-inventory-bytes: ${PLATFORM_ARTIFACT_MAX_INVENTORY_BYTES:16777216}
     max-package-entries: ${PLATFORM_ARTIFACT_MAX_PACKAGE_ENTRIES:20000}
     max-entry-bytes: ${PLATFORM_ARTIFACT_MAX_ENTRY_BYTES:1073741824}
@@ -133,6 +138,21 @@ platform:
     integrity-audit-max-bytes-per-run: ${PLATFORM_ARTIFACT_INTEGRITY_AUDIT_MAX_BYTES_PER_RUN:2147483648}
     relation-audit-batch-size: ${PLATFORM_ARTIFACT_RELATION_AUDIT_BATCH_SIZE:100}
     report-issue-limit: ${PLATFORM_ARTIFACT_REPORT_ISSUE_LIMIT:200}
+    # Governed package pipeline worker (ingest -> materialize -> bind -> reconcile -> gates).
+    package-run:
+      enabled: ${PLATFORM_ARTIFACT_PACKAGE_RUN_ENABLED:true}
+      delay-millis: ${PLATFORM_ARTIFACT_PACKAGE_RUN_DELAY_MS:15000}
+      batch-size: ${PLATFORM_ARTIFACT_PACKAGE_RUN_BATCH_SIZE:5}
+      lease-minutes: ${PLATFORM_ARTIFACT_PACKAGE_RUN_LEASE_MINUTES:30}
+      retry-after-seconds: ${PLATFORM_ARTIFACT_PACKAGE_RUN_RETRY_AFTER_SECONDS:120}
+      stale-running-seconds: ${PLATFORM_ARTIFACT_PACKAGE_RUN_STALE_RUNNING_SECONDS:3600}
+    # Storage-to-registry reconciliation; records orphan evidence, never deletes.
+    storage-sweep:
+      enabled: ${PLATFORM_ARTIFACT_STORAGE_SWEEP_ENABLED:true}
+      delay-millis: ${PLATFORM_ARTIFACT_STORAGE_SWEEP_DELAY_MS:300000}
+      batch-size: ${PLATFORM_ARTIFACT_STORAGE_SWEEP_BATCH_SIZE:500}
+      lease-minutes: ${PLATFORM_ARTIFACT_STORAGE_SWEEP_LEASE_MINUTES:10}
+      grace-minutes: ${PLATFORM_ARTIFACT_STORAGE_SWEEP_GRACE_MINUTES:1440}
   # Identity binding is environment-agnostic: every profile reads the same keys;
   # only the env file decides whether and against which issuer OIDC runs.
   oidc:

@@ -129,6 +129,12 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
         executeAndRecord(data, "db/platform/094_artifact_integrity_audit.sql");
         executeAndRecord(data, "db/platform/095_access_package_malware_admission.sql");
         executeAndRecord(control, "db/platform/096_kids_r8_source_registry_reconciliation.sql");
+        executeAndRecord(control, "db/platform/097_site_contract_dataset_table_binding.sql");
+        executeAndRecord(control, "db/platform/098_site_contract_dataset_table_binding_backfill.sql");
+        executeAndRecord(control, "db/platform/099_site_contract_revision_governance.sql");
+        executeAndRecord(data, "db/platform/100_artifact_storage_sweep.sql");
+        executeAndRecord(data, "db/platform/101_artifact_package_run.sql");
+        executeAndRecord(data, "db/platform/102_artifact_manifest_document.sql");
         events.publishEvent(new PlatformSchemaReadyEvent(Instant.now()));
     }
 
@@ -148,12 +154,13 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
            resets) on each restart; the ledger is the single source of "applied". */
         if (recorded != null && recorded.equalsIgnoreCase(checksum)) return;
         if (recorded != null) {
-            // 065 was corrected before production rollout to make locator
-            // cleanup idempotent. Reconcile that pre-release ledger entry once;
-            // all other applied migrations remain immutable and fail closed.
+            // These pre-release migrations were corrected before production
+            // rollout without changing their applied effects. Reconcile their
+            // ledger checksum once; all other drift fails closed.
             if (resource.endsWith("065_kids_r8_access_locator_bindings.sql")
                     || resource.endsWith("069_kids_r8_release_ready_semantics.sql")
-                    || resource.endsWith("070_kids_r8_complete_mapping_specs.sql")) {
+                    || resource.endsWith("070_kids_r8_complete_mapping_specs.sql")
+                    || resource.endsWith("097_site_contract_dataset_table_binding.sql")) {
                 control.update("UPDATE platform.schema_migration SET checksum=? WHERE migration_id=?", checksum, resource);
                 return;
             }

@@ -146,6 +146,7 @@ application-secret.properties
 #  Data Files / Uploads (large binary files)
 # ──────────────────────────────────────────────────────────────────────────────
 *.accdb
+!samples/kids-portal-v1-canonical-r8-final.accdb
 *.mdb
 *.xlsx
 *.xls
@@ -192,3 +193,8 @@ jacoco/
 
 # Claude Code personal settings
 .claude/settings.local.json
+
+# Deterministic packages are rebuilt from their sources (see samples/README.md)
+samples/*.zip
+# Local session transcripts
+conversation-*.txt

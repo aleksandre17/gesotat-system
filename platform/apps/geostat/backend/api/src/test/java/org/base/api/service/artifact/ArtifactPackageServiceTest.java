@@ -71,7 +71,7 @@ class ArtifactPackageServiceTest {
         ObjectProvider<ArtifactObjectStore> provider = mock(ObjectProvider.class);
         when(provider.getIfAvailable()).thenReturn(store);
         return new ArtifactPackageService(provider, registry, new ObjectMapper(), new ArtifactMetrics(mock(ObjectProvider.class)), new ArtifactProperties(), new ArtifactContentTypeVerifier(),
-                packageContracts, new ArtifactAccessPackageValidator());
+                packageContracts, new PackageDatasetCarriers(java.util.List.of(new AccessDatasetCarrier(new ArtifactAccessPackageValidator()))), mock(ArtifactContractResolver.class), mock(ArtifactManifestDocuments.class));
     }
 
     @Test
@@ -119,7 +119,7 @@ class ArtifactPackageServiceTest {
         when(resolver.resolve("SITE_A", 2, "RECORDS")).thenReturn(contract);
         ArtifactPackageService service = new ArtifactPackageService(provider, registry, new ObjectMapper(), new ArtifactMetrics(mock(ObjectProvider.class)),
                 new ArtifactProperties(), new ArtifactContentTypeVerifier(),
-                resolver, new ArtifactAccessPackageValidator());
+                resolver, new PackageDatasetCarriers(java.util.List.of(new AccessDatasetCarrier(new ArtifactAccessPackageValidator()))), mock(ArtifactContractResolver.class), mock(ArtifactManifestDocuments.class));
         var accessFile = Files.createTempFile("contract-upload-", ".accdb");
         var archive = new ByteArrayOutputStream();
         try {

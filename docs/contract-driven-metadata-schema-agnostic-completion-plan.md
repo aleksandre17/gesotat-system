@@ -218,6 +218,7 @@ contract authoring/approval
 - [-] full semantic breaking-change analyzer — provider-neutral scalar, set, nested projection and response-schema comparison is implemented and tested; durable contract-registry/policy workflow binding remains;
 - [-] approval state API და durable approval-evidence write path დაემატა (`ContractLifecycle`, `PlatformContractGovernanceController`, migration 082); restart-safe `ContractLifecycleOrchestrator`/`JdbcContractLifecycleStateStore` და migration 084 ახლა approve→supersede/rollback state persistence-სა და idempotent recovery-ს ამატებს; production approval/authority remains;
 - [x] generated documentation drift gate binding (`documentation-zero-drift.ps1` is enforced fail-closed and PASS evidence is recorded).
+- [-] **2026-09-19 — runtime workflow binding (AIR-2026-025/026):** persisted semantic comparison now actually reads the contract documents; site contract revision approval is a governed API (`SiteContractRevisionApprovalService`, pluggable `ContractApprovalCheck` beans, migration 099: append-only checksum-bound approval evidence, approved-revision immutability, single approved revision). Breaking revisions are blocked unless declared `BREAKING_NEW_REVISION` and acknowledged. Source + unit tests PASS; SQL Server fixture and dev runtime acceptance remain, so this stays `[-]`.
 
 ### C-02 Provider capability/discovery
 

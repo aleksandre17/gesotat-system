@@ -356,6 +356,37 @@ manifest to a snapshot or run relation reconciliation; those remain separate
 workflow states and the package orchestration gate remains open. Source test and
 remote development boot evidence is recorded in
 [`artifact-package-admission-runtime-2026-09-18.json`](../evidence/artifact-package-admission-runtime-2026-09-18.json).
+The KIDS R8 remote admission, physical-table binding, and idempotent replay
+evidence is recorded in
+[`kids-r8-contract-bound-package-admission-runtime-2026-09-18.json`](../evidence/kids-r8-contract-bound-package-admission-runtime-2026-09-18.json).
+
+The physical Access table is resolved through the approved dataset's direct
+`contract_table_definition_id` binding. `site_contract_dataset.access_table_name`
+may retain a legacy/logical name; it is not a substitute for the versioned
+physical definition used to validate package bytes. Missing or ambiguous
+approved bindings fail closed before any object or manifest is written.
+
+Contract-bound admission also evaluates every approved relation of the dataset
+over the package's own rows before any object is written. Row identity is the
+contract's ordered key fields (`site_contract_field.key_role`); the evaluation is
+the same `ArtifactMatcher` used for snapshot binding. Any `ERROR` rejects the
+package with `422 artifact-relation-preview-blocked` and the exact issues; the
+accepted receipt carries the per-relation preview (edges, orphans, warnings).
+Upload sessions complete through the same path.
+
+```text
+GET  /api/v1/platform/artifacts/contracts/{contractCode}/revisions/{revision}/datasets/{datasetCode}/package-descriptor
+     READ_RESOURCE; approved dataset structure (physical table, required and key fields)
+     plus approved relation declarations (match rule, cardinality, policy)
+POST /api/v1/platform/artifacts/manifests/package/preview
+     WRITE_RESOURCE; same parameters as admission; validate-only, nothing stored (§26)
+```
+
+Package producers read only the descriptor. The generic assembler
+(`ops/scripts/shell/artifact-package-assemble.sh` → Gradle
+`:api:assembleArtifactPackage`) packages the Access dataset plus exactly the
+files its rows reference, refuses on any preview `ERROR`, builds deterministically
+and writes assembly evidence. It contains no contract-specific value.
 
 Large uploads can use the durable session API, also guarded by `WRITE_RESOURCE`
 and an OIDC subject plus the configured tenant claim (`tenant_id` by default):
@@ -811,5 +842,33 @@ API. Contract-bound ZIP admission now resolves an approved site contract revisio
 and dataset version, validates the required Access table fields, and persists that
 identity into manifest evidence (migrations 091–092). Runtime SQL Server migration
 and partial-binding rejection fixture pass. Authenticated package upload smoke
-still requires a scoped `WRITE_RESOURCE` token. KIDS binding is a seed row set only (migration 088). Status per
+still requires a scoped `WRITE_RESOURCE` token. KIDS binding is a seed row set only (migration 088). The full KIDS R8
+package (Access + 450 row-referenced files) was assembled from the descriptor,
+previewed, admitted as manifest 6 (451/451 VERIFIED, idempotent replay) and proven
+slot-for-slot equal to published snapshot 52:
+[`kids-r8-full-package-admission-runtime-2026-09-18.json`](../evidence/kids-r8-full-package-admission-runtime-2026-09-18.json). Status per
 layer and open external gates: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md`.
+
+### 29.2 Implementation status (2026-09-19)
+
+§26 is implemented as a governed package run: `POST /api/v1/platform/artifacts/package-runs {manifestId}` accepts an
+admitted, contract-bound manifest once (one run per package checksum) and a lease-guarded worker carries it through
+the §7 protocol from row staging to release-gate evaluation, persisting progress after every stage
+(`ingest.artifact_package_run`, append-only stage history). `GET …/{runId}` is the progress surface; `POST
+…/{runId}/retry` resumes a stopped run at the stage where it stopped. §12 holds: any rejected row, blocked binding,
+failed reconciliation or failed gate leaves the run `BLOCKED` and nothing is published — a run never publishes.
+§19 gains the storage sweep (objects present in storage but unknown to the registry are recorded as orphans, never
+deleted). Dataset formats and storage providers are ports (`PackageDatasetCarrier`, `PackageDatasetIngestor`,
+`ArtifactObjectStore`, `ArtifactUploadStagingStore`, `ArtifactObjectInventory`). Source and tests only; runtime
+acceptance is checklist item 17.4.
+
+### 29.3 Shipped manifest and end-to-end run (2026-09-19)
+
+A producer may ship `manifest.json` at the package root (`geostat.artifact-package-manifest.v1`): contract identity,
+dataset entry, one claim per file (`path`, `sha256`, `bytes`, `mediaType`) and one claim per row↔file edge (`rowKey`,
+`relationCode`, `language`, `ordinal`, `path`). It is a claim, not an authority (§25): admission derives its own
+manifest and relation plan and accepts the package only when the claim is exact; otherwise nothing is written. The
+entry is reserved and is not package content. The package layout under the root is decided by the approved relation
+rule (`packageRoot`); the `files/` folder in §2 is illustrative. The complete KIDS R8 package (Access build 8.0.1, 450
+row-bound files, shipped manifest) ran end to end on dev to `REVIEW_REQUIRED`:
+[`kids-r8-package-end-to-end-runtime-2026-09-19.json`](../evidence/kids-r8-package-end-to-end-runtime-2026-09-19.json).

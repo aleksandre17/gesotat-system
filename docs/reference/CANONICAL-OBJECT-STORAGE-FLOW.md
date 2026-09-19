@@ -167,6 +167,12 @@ runtime authority და მისი უსაფრთხოდ retirement შ
 
 `source_resource_id` არის ფაილის/resource-ის სტაბილური identity.
 
+`__ent_kids_resource` არის R8-ის physical Access table identity. მისი package
+validation approved site dataset-იდან უნდა მივიდეს შესაბამის versioned
+`contract_table_definition`-მდე პირდაპირი `contract_table_definition_id`-ით;
+`site_contract_dataset.access_table_name`-ის legacy მნიშვნელობა physical table
+სახელად არ უნდა იქნეს გამოყენებული.
+
 ### Raw lineage
 
 `__raw_document` ინახავს artifact-ის lineage-ს და არა ბიზნეს-ცხრილის დუბლირებულ
@@ -256,7 +262,11 @@ typed data-სა და დროებით signed URL-ს.
 
 ```text
 package inventory                 POST .../manifests/inventory (existing governed inventory)
+package descriptor               GET  .../contracts/{code}/revisions/{rev}/datasets/{dataset}/package-descriptor
+  → generic assembler             ops/scripts/shell/artifact-package-assemble.sh (Access + referenced files only)
+package preview (no writes)       POST .../manifests/package/preview
 contract ZIP package              POST .../manifests/package?contractCode=&revision=&datasetCode=
+  → relation preview              contract key identity + ArtifactMatcher; ERROR → 422 before any object write
 large contract ZIP                POST .../upload-sessions → checkpointed /parts/{n} → /complete
   → tenant quota + durable state  ingest.artifact_upload_session / artifact_upload_part
   → private staged parts         artifacts/staging/{server-session}/{part}/{sha256}.part
