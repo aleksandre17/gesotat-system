@@ -113,4 +113,26 @@ class CanonicalObservationWriterTest {
         assertThrows(CanonicalObservationWriter.WriteConflict.class, () -> writer.write(labour, observations, binding, new LoadContext(7, Map.of())));
         assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM [statistics].series", Integer.class));
     }
+
+    @Test void loadsAcrossSeveralBatchesAndReplaysWithoutWriting() {
+        List<WideRowNormalizer.Observation> all = new java.util.ArrayList<>();
+        Map<Long, Long> lineage = new HashMap<>();
+        long row = 0;
+        for (int year = 1700; year < 2026; year++) for (String area : new String[]{"GE", "GE_TB", "GE_KA"}) for (String sex : new String[]{"F", "M", "_T"}) {
+            Map<String, Object> r = new HashMap<>(Map.of("TIME_PERIOD", String.valueOf(year), "REF_AREA", area, "SEX", sex, "EMPLOYED", year, "UNEMPLOYED", 1));
+            for (WideRowNormalizer.Observation o : normalise(labour, LABOUR, r)) {
+                all.add(new WideRowNormalizer.Observation(++row, o.observationKey(), o.dimensions(), o.period(), o.measureCode(), o.measureRef(), o.unitRef(),
+                        o.value(), o.status(), o.statusAttribute(), o.attributes(), o.overriddenConstants()));
+                lineage.put(row, row);
+            }
+        }
+        assertTrue(all.size() > 3 * CanonicalObservationWriter.BATCH, "the load must cross batch boundaries");
+        Receipt first = writer.write(labour, all, binding, new LoadContext(7, lineage));
+        assertEquals(9 * 2, first.seriesCreated(), "one series per measure and non-time tuple");
+        assertEquals(all.size(), first.observationsCreated());
+        assertEquals(all.size() * 2, jdbc.queryForObject("SELECT COUNT(*) FROM [statistics].observation_dimension", Integer.class));
+        assertEquals(0, jdbc.queryForObject("SELECT COUNT(*) FROM [statistics].observation o LEFT JOIN [statistics].observation_dimension d ON d.observation_id=o.observation_id WHERE d.observation_id IS NULL", Integer.class),
+                "every observation received its dimensions, whatever batch it was in");
+        assertEquals(new Receipt(0, 0, all.size()), writer.write(labour, all, binding, new LoadContext(7, lineage)), "replay writes nothing");
+    }
 }

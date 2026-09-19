@@ -1,7 +1,7 @@
 # სტატისტიკური კონტრაქტი — იმპლემენტაციის checklist
 
 თარიღი: 2026-09-19  
-სტატუსი: **Contract → approval → Access file → governed load → existing release gates: DONE on dev runtime. SDMX-CSV, regression, Q14 file budgets, legacy crosswalk proposal — DONE. ღია: real MS Access (human), steward decisions for 62 legacy metrics, official SDMX validation, batched DB write, push (origin is PUBLIC). Release — NOT READY.**  
+სტატუსი: **Contract → approval → Access file → governed load → existing release gates: DONE on dev runtime. SDMX-CSV, regression, Q14 file budgets, legacy crosswalk proposal — DONE. ღია: real MS Access (human), steward decisions for 62 legacy metrics, official SDMX validation, merge to master. Release — NOT READY.**  
 Authority: [საერთო გეგმა](COMMON-STATISTICAL-CONTRACT-PLAN.md), [გადაწყვეტილებების რეესტრი Q01–Q50](STATISTICAL-CONTRACT-OPEN-QUESTIONS.md), [lifecycle](STATISTICAL-CONTRACT-LIFECYCLE.md).
 
 წესი: `[x]` — მხოლოდ evidence-ის ბმულით. `[ ]` — არ არის შესრულებული. Evidence-ის გარეშე პუნქტი არ მონიშნდება.
@@ -126,7 +126,8 @@ Evidence: `CanonicalObservationWriterTest` (5 tests, H2, column shape of `002_da
 - [x] Hand-over to the existing release gates: the load conforms to what they measure (candidate state `REVIEW_REQUIRED`, staged rows, source-row count); live snapshot 55 ⇒ `releasable=true`, all applicable gates PASS; a published snapshot is still refused — [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19.json).
 - [x] Gate made to conform to Q22: an empty value with a declared status is not a defect; only an unexplained empty value fails `STATISTICAL_SEMANTICS_VALID` — `ReleaseGateServiceTest` PASS + live.
 - [x] Metric identity = dataset × exact measure version (defect found live, fixed) — `revisedMeasureVersionInANewContractRevisionBindsItsOwnMetric`.
-- [ ] Batched database write for loads near the Q14 ceiling (the writer issues one statement per row).
+- [x] Batched database write: resolve first, then JDBC batches of 1 000 per table; live 2 712 observations in 9 s on dev, dates from 1800 exact on SQL Server — `loadsAcrossSeveralBatchesAndReplaysWithoutWriting`, [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19.json).
+- [x] Defect fixed: periods written as `java.sql.Date` shifted historical dates by a day; now `LocalDate` end to end.
 - [x] Q11 refined and enforced: a load is a `FULL_SNAPSHOT` (the native unit of the platform); other modes answer `422` explicitly — test + live.
 - [ ] Snapshot-delta design for `UPSERT / DELETE` (only if a real dataset needs it).
 - [x] Machine-readable legacy crosswalk (Q46): 86 legacy metrics → 1:1 proposed measure references, no merge by name, 0 collisions; 24 registrable after steward sign-off, 62 blocked with typed reasons — `ops/scripts/python/statistical-legacy-crosswalk.py`, [proposal](evidence/statistical-contract/legacy-crosswalk-proposal-2026-09-19.json).

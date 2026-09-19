@@ -101,7 +101,6 @@
   "limits": [
     "Real Microsoft Access not exercised (files were written and read with Jackcess).",
     "SDMX-CSV output is asserted by unit tests only; SDMX-JSON and validation with official SDMX tooling are open.",
-    "Batched database write for loads near the design ceiling is open.",
     "62 of 86 legacy metrics need a steward decision before they can be registered."
   ],
   "result": "PASS",
@@ -414,5 +413,26 @@
   "push": {
     "done": false,
     "reason": "origin (github.com/aleksandre17/gesotat-system) is PUBLIC (anonymous 200, API visibility=public) and the unpushed history contains a real dataset (samples/*.accdb, chartjson.dat) and internal host, realm and client names; the stack-kit submodule remote answers 404 anonymously (private or absent). Publishing is irreversible, so it was not done."
+  },
+  "batchedWrite": {
+    "change": "CanonicalObservationWriter resolves every binding and every conflict first, then writes series, observations, dimensions and attributes in JDBC batches of 1 000; bindings are looked up once per load",
+    "defectFound": "periods were written as java.sql.Date, which passes through the JVM time zone; historical dates (year 1700 in the test) shifted by a day. Periods are now written and compared as LocalDate",
+    "tests": "CanonicalObservationWriterTest.loadsAcrossSeveralBatchesAndReplaysWithoutWriting: 5 868 observations across 6 batches, every observation has its dimensions, replay writes nothing",
+    "live": {
+      "snapshot": 56,
+      "rows": 2712,
+      "observations": 2712,
+      "http": 201,
+      "wallSeconds": 9,
+      "replay": "ALREADY_LOADED",
+      "gates": "releasable=true",
+      "sqlServerCheck": {
+        "observations": 2712,
+        "dimensions": 2712,
+        "minStart": "1800-01-01",
+        "maxEnd": "2025-12-31",
+        "periodValueMismatches": 0
+      }
+    }
   }
 }

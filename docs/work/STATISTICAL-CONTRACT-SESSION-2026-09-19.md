@@ -39,6 +39,9 @@ Evidence: [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19
 3. Snapshot-ის state და staged rows — release gate-ებს არ ემთხვეოდა. გამოსწორდა.
 4. Gate `STATISTICAL_SEMANTICS_VALID` — ცარიელი მნიშვნელობა status-ით defect-ად ითვლებოდა. გამოსწორდა.
 
+5. თარიღი `java.sql.Date`-ით — ძველი წლები ერთი დღით იწევდა. გამოსწორდა: `LocalDate`.
+6. Batch write — გაკეთდა. dev-ზე 2 712 observation, 9 წამი.
+
 ## 4. რა დარჩა
 
 | # | საკითხი | ვინ |
@@ -46,7 +49,6 @@ Evidence: [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19
 | 1 | რეალური Microsoft Access: ფაილის გახსნა, `AGE_GROUP`-ის არჩევა, შენახვა | ადამიანი, Access-ით |
 | 2 | 62 legacy metric: unit, denominator, multiplier | steward |
 | 3 | SDMX: ოფიციალური validator, SDMX-JSON | ინჟინერი |
-| 4 | Batch write: 400 000 observation-ის ჩაწერა | ინჟინერი |
 | 5 | 9 default — რეესტრის §6 | მფლობელი |
 | 6 | DSD-ის რეგისტრაცია API-ით | ინჟინერი |
 | 7 | `master`-ში merge (pull request) | მფლობელი |
