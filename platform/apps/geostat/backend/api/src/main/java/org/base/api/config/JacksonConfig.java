@@ -53,7 +53,9 @@ public class JacksonConfig {
                     context.addSerializers(new SimpleSerializers() {
                         @Override
                         public JsonSerializer<?> findSerializer(SerializationConfig config, JavaType type, BeanDescription beanDesc) {
-                            if (type.getRawClass().isAssignableFrom(PageNode.class)) {
+                            // Only PageNode and its subtypes. The reversed test also matched Object, so every
+                            // untyped value was routed through this serializer.
+                            if (PageNode.class.isAssignableFrom(type.getRawClass())) {
                                 return new JsonSerializer<PageNode>() {
                                     @Override
                                     public void serialize(PageNode value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
@@ -79,33 +81,6 @@ public class JacksonConfig {
                                             gen.writeNull();
                                         }
                                         gen.writeEndObject();
-                                    }
-                                };
-                            }
-                            return null;
-                        }
-                    });
-                    context.addDeserializers(new SimpleDeserializers() {
-                        @Override
-                        public JsonDeserializer<?> findBeanDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) {
-                            if (type.getRawClass().isAssignableFrom(PageNode.class)) {
-                                return new JsonDeserializer<PageNode>() {
-                                    @Override
-                                    public PageNode deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-                                        JsonNode node = p.getCodec().readTree(p);
-                                        ObjectMapper mapper = (ObjectMapper) p.getCodec();
-                                        PageNode pageNode = mapper.treeToValue(node, PageNode.class);
-                                        if (node.has("parentId")) {
-                                            Long parentId = node.get("parentId").isNull() ? null : node.get("parentId").longValue();
-                                            if (parentId != null) {
-                                                PageNode parent = new PageNode() {};
-                                                parent.setId(parentId);
-                                                pageNode.setParent(parent);
-                                            } else {
-                                                pageNode.setParent(null);
-                                            }
-                                        }
-                                        return pageNode;
                                     }
                                 };
                             }
