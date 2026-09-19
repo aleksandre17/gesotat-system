@@ -100,8 +100,8 @@
   ],
   "limits": [
     "Real Microsoft Access not exercised (files were written and read with Jackcess).",
-    "Full :api:test regression still not completed.",
-    "SDMX export from the plan, legacy crosswalk and performance budgets are open.",
+    "SDMX-CSV output is asserted by unit tests only; it was not validated with official SDMX tooling.",
+    "Legacy crosswalk (Q46), performance budgets (Q14) and the hand-over of a PREPARED snapshot to the release gates are open.",
     "Generation is synchronous; the durable job variant is open."
   ],
   "result": "PASS",
@@ -309,5 +309,36 @@
       ]
     },
     "defectFoundLive": "the first attempt answered 400: the object key prefix lacked the trailing slash the artifact key convention requires; fixed, and the test double now applies the real ArtifactKeys rules so this class of error fails in unit tests"
+  },
+  "regression": {
+    "command": ":api:test, whole module, started / passed / failed events logged per test",
+    "firstPass": {
+      "started": 405,
+      "passed": 402,
+      "failed": 2,
+      "skipped": 1,
+      "unfinishedTests": 0,
+      "note": "every started test finished, but Gradle did not exit: one test fork never picked up its queue of 17 classes"
+    },
+    "secondPass": {
+      "scope": "exactly those 17 classes, run on their own",
+      "started": 52,
+      "passed": 52,
+      "failed": 0,
+      "gradleExit": 0
+    },
+    "total": {
+      "ran": 457,
+      "passed": 454,
+      "failed": 2,
+      "skipped": 1
+    },
+    "failures": [
+      "LegacySurfaceAuthorityTest.noCallerAtAllReachesNothing",
+      "LegacyOperatorPermissionMigrationTest.itNamesNoRoleAndRemovesNothing"
+    ],
+    "failuresBelongTo": "another session's uncommitted legacy-lockdown work (untracked test and migration 105); not part of commit 8f1887c and not touched here",
+    "statisticalContractTests": "84 of 84 passed inside the full run (81 + 3 SDMX exporter)",
+    "harnessFinding": "with maxParallelForks > 1 one fork stalls before starting its first class, so the single-command full run never ends; the stall predates this work (a worker of another session has been stuck since 20:32) and no thread dump could be taken (jstack and jcmd could not attach)"
   }
 }

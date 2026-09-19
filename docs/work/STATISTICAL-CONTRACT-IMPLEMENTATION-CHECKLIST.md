@@ -1,7 +1,7 @@
 # სტატისტიკური კონტრაქტი — იმპლემენტაციის checklist
 
 თარიღი: 2026-09-19  
-სტატუსი: **Increments 1–4 — DONE on dev runtime (SQL Server, Keycloak, MinIO): contract → approval → Access file → governed load into a PREPARED snapshot. ღია: real MS Access, SDMX export, legacy crosswalk, performance, full regression, commit. Release — NOT READY.**  
+სტატუსი: **Increments 1–4 — DONE on dev runtime; SDMX-CSV codec and full regression — DONE. Commits `8f1887c` + follow-up, not pushed. ღია: real MS Access, SDMX tooling validation, legacy crosswalk, performance, release-gate hand-over. Release — NOT READY.**  
 Authority: [საერთო გეგმა](COMMON-STATISTICAL-CONTRACT-PLAN.md), [გადაწყვეტილებების რეესტრი Q01–Q50](STATISTICAL-CONTRACT-OPEN-QUESTIONS.md), [lifecycle](STATISTICAL-CONTRACT-LIFECYCLE.md).
 
 წესი: `[x]` — მხოლოდ evidence-ის ბმულით. `[ ]` — არ არის შესრულებული. Evidence-ის გარეშე პუნქტი არ მონიშნდება.
@@ -137,11 +137,17 @@ Evidence: `CanonicalObservationWriterTest` (5 tests, H2, column shape of `002_da
 
 ### Increment 6 — Export and release (G4)
 
-- [ ] SDMX-CSV 2.0 / SDMX-JSON 2.0 codec from plan; conformance validation (Q47).
-- [ ] Multi-measure → 2.1: `UNSUPPORTED_CONVERSION` test.
+- [x] SDMX-CSV 2.0 codec from the plan: one row per key, each measure and its status in its own column, deterministic order, exact decimals — `SdmxCsvExporterTest` (3).
+- [ ] SDMX-JSON 2.0 codec; validation of both with official SDMX tooling; serving endpoint over a published snapshot (Q47).
+- [x] Multi-measure → 2.1 is refused, never pivoted — `whatTheTargetFormatCannotHoldIsRefusedNotPivoted`.
 - [ ] Build manifest, trace, log scrub (Q48).
 - [ ] Performance budgets, bounded heap, off shared host (Q14).
 - [ ] Rollout / rollback rehearsal; consumer sign-off (Q15, Q50).
+
+### Regression
+
+- [x] Full `:api:test` regression: 457 ran, 454 passed, 1 skipped, 2 failed — both failures belong to another session's uncommitted legacy-lockdown work — [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19.json).
+- [ ] Test-harness stall: with parallel forks one fork never starts its queue, so the single-command run does not end (pre-existing; AIR-2026-048).
 
 ### Owner / steward
 

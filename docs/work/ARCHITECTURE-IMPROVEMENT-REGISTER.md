@@ -879,6 +879,8 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   on its schedule, so expired legacy tokens are never purged. (3) The dev operator service client carries
   `publish.execute` and `platform.admin`; one identity therefore authors, publishes and crosses tenants, which defeats
   separation of duties for anything but the four-eyes rule of the statistical contract.
-- **Decision:** none of the three is changed here. (1) needs a reviewed cleanup migration with a backup; (2) a
+  (4) The API test task runs with `maxParallelForks > 1` and one fork stalls before starting its first class, so a
+  single-command full run never ends; all tests pass when the stalled queue is run on its own.
+- **Decision:** none of the four is changed here. (1) needs a reviewed cleanup migration with a backup; (2) a
   transactional boundary in legacy core; (3) a role review of the dev realm.
 

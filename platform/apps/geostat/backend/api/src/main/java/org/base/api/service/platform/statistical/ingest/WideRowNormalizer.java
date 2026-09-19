@@ -40,7 +40,7 @@ public final class WideRowNormalizer {
     public record RowIssue(long row, String component, IssueCode code, String message) { }
 
     public record Observation(long sourceRow, String observationKey, Map<String, String> dimensions, PeriodValue period,
-                              String measureCode, Ref measureRef, Ref unitRef, BigDecimal value, String status,
+                              String measureCode, Ref measureRef, Ref unitRef, BigDecimal value, String status, String statusAttribute,
                               Map<String, String> attributes, Set<String> overriddenConstants) { }
 
     public record Result(boolean accepted, List<Observation> observations, List<RowIssue> issues, Set<Long> quarantinedRows) { }
@@ -115,18 +115,18 @@ public final class WideRowNormalizer {
         for (PlannedComponent m : plan.withRole(Component.Role.MEASURE)) {
             BigDecimal value = decimal(m, row.get(m.code()), n, issues);
             Map<String, String> own = new TreeMap<>();
-            String status = null;
+            String status = null, statusAttribute = null;
             for (PlannedComponent a : plan.withRole(Component.Role.ATTRIBUTE)) {
                 String attributeValue = attributes.get(a.code());
                 if (attributeValue == null) continue;
                 String target = a.attachment().measure();
                 if (target != null && !target.equals(m.code())) continue;
-                if (a.conceptRef().code().equals(statusConceptCode)) { if (status == null || target != null) status = attributeValue; }
+                if (a.conceptRef().code().equals(statusConceptCode)) { if (status == null || target != null) { status = attributeValue; statusAttribute = a.code(); } }
                 else own.put(a.code(), attributeValue);
             }
             if (value == null && status == null && text(row.get(m.code())) == null)
                 issues.add(new RowIssue(n, m.code(), IssueCode.VALUE_WITHOUT_STATUS_MISSING, "an empty value needs an explicit status; zero, missing and suppressed are different facts"));
-            out.add(new Observation(n, key, Map.copyOf(tuple), period, m.code(), m.measureRef(), m.unitRef(), value, status, Map.copyOf(own), Set.copyOf(overridden)));
+            out.add(new Observation(n, key, Map.copyOf(tuple), period, m.code(), m.measureRef(), m.unitRef(), value, status, statusAttribute, Map.copyOf(own), Set.copyOf(overridden)));
         }
         return out;
     }
