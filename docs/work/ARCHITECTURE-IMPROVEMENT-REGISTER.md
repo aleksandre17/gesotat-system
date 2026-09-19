@@ -855,3 +855,30 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   3. Any agent brief that touches the shared host states the memory limit explicitly.
   4. Production capacity: 8 GB for roughly 30 containers is itself a finding; the dev API alone (Gradle bootRun, two
      JVMs) holds about 1.3 GiB. Dev should run the packaged JAR like production, which also improves parity.
+
+### AIR-2026-047 — Common statistical contract: compiler, registry identity, workflow, authoring file and governed load
+
+- **სტატუსი:** `IN_PROGRESS` (dev runtime proven; release NOT READY) / **priority:** `P1` / **owner:** Control + Delivery + Ingestion
+- **აღმოჩენა / decision:** the statistical input surface was KIDS-shaped (carrier, cell ordinal, JSON path, `DOUBLE` values).
+  It is replaced by one provider-agnostic contract: closed grammar, exact versioned references, a single semantic plan,
+  Access as an adapter with exact `NUMERIC`, and loading through the existing dataset / dataset-version / metric / lineage
+  model. The existing model was made to conform (additive migrations 106-108); no parallel registry or table family exists.
+- **Decisions:** `docs/work/STATISTICAL-CONTRACT-OPEN-QUESTIONS.md` (Q01-Q50). Q11 refined: a load is a full snapshot,
+  the native unit of the platform; `UPSERT / DELETE / REPLACE_SCOPE` are refused explicitly until a snapshot-delta design exists.
+- **Evidence:** `docs/evidence/statistical-contract-runtime-2026-09-19.json`; checklist
+  `docs/work/STATISTICAL-CONTRACT-IMPLEMENTATION-CHECKLIST.md`; 81 package tests.
+- **Open:** real Microsoft Access check, SDMX export from the plan, legacy crosswalk (Q46), performance budgets (Q14),
+  DSD registration through the API, full `:api:test` regression, commit and release invariant.
+
+### AIR-2026-048 — Legacy defects observed while proving AIR-2026-047 on dev (not caused by it)
+
+- **სტატუსი:** `TRIAGED` / **priority:** `P2` / **owner:** Control + Security
+- **აღმოჩენა:** (1) dataset `KIDS_STATISTICAL_INPUT` holds 973 `DRAFT` dataset versions on dev: the trace of the
+  restart-time non-idempotent DML the migration runner comment already describes; the rows are inert but make
+  "latest version" queries meaningless. (2) `JwtTokenUtil.removeExpiredTokens` throws `TransactionRequiredException`
+  on its schedule, so expired legacy tokens are never purged. (3) The dev operator service client carries
+  `publish.execute` and `platform.admin`; one identity therefore authors, publishes and crosses tenants, which defeats
+  separation of duties for anything but the four-eyes rule of the statistical contract.
+- **Decision:** none of the three is changed here. (1) needs a reviewed cleanup migration with a backup; (2) a
+  transactional boundary in legacy core; (3) a role review of the dev realm.
+

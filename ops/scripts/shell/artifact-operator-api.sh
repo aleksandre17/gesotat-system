@@ -8,6 +8,8 @@
 #
 # Inputs (gitignored): ops/config/projects/geostat/services/api/.env.dev
 #   ARTIFACT_OPERATOR_CLIENT_ID, ARTIFACT_OPERATOR_CLIENT_SECRET
+#   OPERATOR_ENV_PREFIX selects another service identity from the same file (default ARTIFACT_OPERATOR),
+#   e.g. CONTRACT_APPROVER for the four-eyes counterpart: <PREFIX>_CLIENT_ID / <PREFIX>_CLIENT_SECRET
 # Overrides: GEOSTAT_SERVER (default administrator@192.168.1.199), GEOSTAT_API (default localhost:8081)
 set -euo pipefail
 
@@ -19,14 +21,15 @@ SERVER="${GEOSTAT_SERVER:-administrator@192.168.1.199}"
 API="${GEOSTAT_API:-localhost:8081}"
 
 value() { grep -E "^$1=" "$ENV_FILE" | head -1 | cut -d= -f2- | tr -d '\r\n'; }
-CLIENT_ID="$(value ARTIFACT_OPERATOR_CLIENT_ID)"
-[ -n "$CLIENT_ID" ] && [ -n "$(value ARTIFACT_OPERATOR_CLIENT_SECRET)" ] || { echo "operator client is not configured in $ENV_FILE" >&2; exit 3; }
+PREFIX="${OPERATOR_ENV_PREFIX:-ARTIFACT_OPERATOR}"
+CLIENT_ID="$(value "${PREFIX}_CLIENT_ID")"
+[ -n "$CLIENT_ID" ] && [ -n "$(value "${PREFIX}_CLIENT_SECRET")" ] || { echo "operator client is not configured in $ENV_FILE" >&2; exit 3; }
 
 quote() { printf "'%s'" "${1//\'/\'\\\'\'}"; }
 ARGS=""; for a in "$@"; do ARGS="$ARGS $(quote "$a")"; done
 
 # The secret travels only on stdin; the token lives only in a server-side shell variable.
-{ printf 'grant_type=client_credentials&client_id=%s&client_secret=' "$CLIENT_ID"; value ARTIFACT_OPERATOR_CLIENT_SECRET; } |
+{ printf 'grant_type=client_credentials&client_id=%s&client_secret=' "$CLIENT_ID"; value "${PREFIX}_CLIENT_SECRET"; } |
 ssh -o BatchMode=yes "$SERVER" "
   T=\$(curl -sk --resolve auth.geostat.internal:443:127.0.0.1 https://auth.geostat.internal/realms/geostat/protocol/openid-connect/token --data @- \
        | python3 -c 'import sys,json; print(json.load(sys.stdin).get(\"access_token\",\"\"))')

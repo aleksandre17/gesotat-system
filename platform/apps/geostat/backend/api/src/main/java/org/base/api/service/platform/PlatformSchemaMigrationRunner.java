@@ -143,6 +143,9 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
         executeAndRecord(data, "db/platform/102_artifact_manifest_document.sql");
         executeAndRecord(control, "db/platform/103_ingestion_contract_code_not_null_repair.sql");
         executeAndRecord(control, "db/platform/104_data_product_tenancy.sql");
+        executeAndRecord(control, "db/platform/106_statistical_reference_identity.sql");
+        executeAndRecord(control, "db/platform/107_statistical_contract_draft.sql");
+        executeAndRecord(control, "db/platform/108_statistical_reference_definition_digest.sql");
         events.publishEvent(new PlatformSchemaReadyEvent(Instant.now()));
     }
 

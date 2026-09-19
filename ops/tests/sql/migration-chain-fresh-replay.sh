@@ -53,3 +53,9 @@ echo "FAILED_COUNT=$failed"
 
 echo "APPLIED=$applied"
 run -d "${DB[control]}" -Q "SET NOCOUNT ON; SELECT CONCAT(contract_code,N' r',revision,N' ',status,N' datasets=',(SELECT COUNT(*) FROM platform.site_contract_dataset d WHERE d.site_contract_revision_id=r.site_contract_revision_id)) FROM platform.site_contract_revision r ORDER BY contract_code,revision"
+
+# Optional behaviour proof: a Control Plane script executed against the freshly built database (constraints,
+# triggers). It must fail the run by itself (THROW) when an expectation does not hold.
+if [ -n "${POST_CONTROL_SQL:-}" ]; then
+  run -d "${DB[control]}" -i "$POST_CONTROL_SQL" </dev/null
+fi

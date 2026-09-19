@@ -1,0 +1,313 @@
+{
+  "schema": "geostat.evidence.v1",
+  "recordedAt": "2026-09-19",
+  "subject": "common statistical contract - increments 2-3 runtime proof",
+  "environment": "remote dev: geostat-api-dev :8081, SQL Server container geostat-system-mssql, Keycloak service client geostat-artifact-operator. Production untouched; :8083/health = 200 before and after.",
+  "migrationChainReplay": {
+    "tool": "ops/tests/sql/migration-chain-fresh-replay.sh + POST_CONTROL_SQL hook",
+    "databases": "disposable zz_replay_*, dropped; none left (verified)",
+    "registeredScripts": 103,
+    "applied": 103,
+    "failed": 0,
+    "endState": [
+      "KIDS_PORTAL_V1 r6 SUPERSEDED datasets=12",
+      "KIDS_PORTAL_V1 r7 SUPERSEDED datasets=15",
+      "KIDS_PORTAL_V1 r8 APPROVED datasets=15"
+    ],
+    "note": "second replay after migration 108; 103 = local runner including 105 (another session's uncommitted work). Dev runs 104 -> 106 -> 107 -> 108; 105 was deliberately not shipped."
+  },
+  "schemaBehaviour": {
+    "script": "ops/tests/sql/statistical-contract-schema-behaviour.sql",
+    "cases": 26,
+    "passed": 26,
+    "failed": 0,
+    "covers": [
+      "106 code grammar, closed kind set, target shape, exact-version uniqueness",
+      "106 decided reference immutable, never deleted, APPROVED->SUPERSEDED only",
+      "106 numeric envelope 28/10",
+      "107 idempotency key per product, lifecycle values, digests required for review",
+      "107 compare-and-set, one APPROVED per dataset (filtered unique index), atomic supersede+approve",
+      "107 approved text immutable, never deleted, history append-only",
+      "108 definition digest written once"
+    ]
+  },
+  "devDeploy": {
+    "method": "selective sync of the statistical contract files only (41 files) into the dev workspace + runner registration + container restart",
+    "notShipped": "other sessions' uncommitted legacy-lockdown / supply-chain changes",
+    "rollback": "/tmp/PlatformSchemaMigrationRunner.java.before-statistical on the host; migrations are additive",
+    "startup": "Started ApiApplication in 9.9 s; 7 statistical-contract routes registered",
+    "ledger": [
+      "106 applied 2026-09-19 18:02:14Z",
+      "107 applied 2026-09-19 18:02:14Z"
+    ],
+    "triggersPresent": 3
+  },
+  "liveApi": {
+    "product": "KIDS_PORTAL",
+    "cases": [
+      {
+        "case": "create with Idempotency-Key",
+        "http": 201,
+        "etag": "\"1\"",
+        "cacheControl": "no-store"
+      },
+      {
+        "case": "replay same key and payload",
+        "http": 201,
+        "sameId": true
+      },
+      {
+        "case": "same key, other payload",
+        "http": 409,
+        "code": "statistical-contract-idempotency-conflict"
+      },
+      {
+        "case": "create without key",
+        "http": 428
+      },
+      {
+        "case": "save without If-Match",
+        "http": 428
+      },
+      {
+        "case": "save with stale If-Match",
+        "http": 412
+      },
+      {
+        "case": "preview with empty registry",
+        "http": 200,
+        "accepted": false,
+        "issues": "3 x UNRESOLVED_REFERENCE"
+      },
+      {
+        "case": "submit uncompilable",
+        "http": 422,
+        "code": "statistical-contract-not-compilable"
+      },
+      {
+        "case": "contract through another product path",
+        "http": 404
+      },
+      {
+        "case": "anonymous",
+        "http": 401
+      }
+    ]
+  },
+  "leftOnDev": "contracts: one DRAFT smoke, one SUPERSEDED, one APPROVED proof (proof measures superseded, so it fails closed); 8 reference rows in namespace STAT; dataset RUNTIME_PROOF with one PREPARED snapshot (54), never published; one object in geostat-ingest; Keycloak client geostat-contract-approver",
+  "findings": [
+    "Pre-existing, unrelated: JwtTokenUtil.removeExpiredTokens throws TransactionRequiredException on schedule (legacy core)."
+  ],
+  "limits": [
+    "Real Microsoft Access not exercised (files were written and read with Jackcess).",
+    "Full :api:test regression still not completed.",
+    "SDMX export from the plan, legacy crosswalk and performance budgets are open.",
+    "Generation is synchronous; the durable job variant is open."
+  ],
+  "result": "PASS",
+  "registryWriteSideLive": {
+    "surface": "/api/v1/platform/products/KIDS_PORTAL/statistical-references",
+    "namespace": "STAT",
+    "registeredAndApproved": [
+      "profile:STAT:STAT_AGGREGATE(1.0.0)",
+      "concept:STAT:TIME_PERIOD(1.0.0)",
+      "concept:STAT:AGE_GROUP(1.0.0)",
+      "concept:STAT:RUNTIME_PROOF_COUNT(1.0.0)",
+      "unit:STAT:PERSONS(1.0.0)",
+      "codelist:STAT:CL_AGE_GROUP(1.0.0) -> existing classification_version 6 (AGE_GROUP, 12 active items)"
+    ],
+    "leftProposedOnPurpose": "measure:STAT:RUNTIME_PROOF_COUNT(1.0.0) - a proof measure must never become approved semantics",
+    "negative": [
+      {
+        "case": "same exact version, other definition",
+        "http": 409
+      },
+      {
+        "case": "codelist over a classification version without active items",
+        "http": 422
+      }
+    ]
+  },
+  "contractEndToEndLive": {
+    "contract": "2a5807ea-d115-45a3-a43b-e4c97a3e468c",
+    "dataset": "STAT:RUNTIME_PROOF",
+    "steps": [
+      {
+        "step": "create",
+        "http": 201
+      },
+      {
+        "step": "preview",
+        "http": 200,
+        "accepted": true,
+        "physicalTable": "stat_DSD_RUNTIME_PROOF",
+        "columns": [
+          "TIME_PERIOD",
+          "AGE_GROUP",
+          "PROOF_COUNT"
+        ]
+      },
+      {
+        "step": "submit",
+        "http": 200,
+        "state": "REVIEW_REQUIRED"
+      },
+      {
+        "step": "approve by the author (four-eyes)",
+        "http": 403,
+        "code": "statistical-contract-self-approval"
+      },
+      {
+        "step": "save during review",
+        "http": 409,
+        "code": "statistical-contract-illegal-transition"
+      }
+    ],
+    "historyEvents": 3
+  },
+  "secondIdentity": {
+    "client": "geostat-contract-approver",
+    "realm": "geostat (shared with production; additive change, precedent: artifact-operator-oidc-client-runtime-2026-09-18.json)",
+    "type": "confidential, service account only; standard, implicit and password flows disabled",
+    "realmRoles": [
+      "contract.read",
+      "quality.approve"
+    ],
+    "authorities": [
+      "READ_RESOURCE",
+      "PUBLISH_RESOURCE"
+    ],
+    "tenantId": "geostat",
+    "mappers": "cloned from geostat-artifact-operator (audience geostat-api, realm roles)",
+    "secretLocation": "ops/config/projects/geostat/services/api/.env.dev (gitignored): CONTRACT_APPROVER_CLIENT_ID / CONTRACT_APPROVER_CLIENT_SECRET; never printed",
+    "helper": "ops/scripts/shell/artifact-operator-api.sh with OPERATOR_ENV_PREFIX=CONTRACT_APPROVER",
+    "existingClientsChanged": 0,
+    "disable": "kcadm.sh update clients/<id> -r geostat -s enabled=false",
+    "observation": "On dev the operator client carries contract.read, contract.write, publish.execute and platform.admin (granted by earlier sessions), so it holds the publish and cross-tenant authorities; the approver holds no write authority."
+  },
+  "fourEyesLive": [
+    {
+      "case": "approver proposes a reference (no write authority)",
+      "http": 403
+    },
+    {
+      "case": "approve with a digest that was not reviewed",
+      "http": 409,
+      "code": "statistical-contract-digest-mismatch"
+    },
+    {
+      "case": "approve by the second identity",
+      "http": 200,
+      "state": "APPROVED",
+      "decidedBy": "service account of geostat-contract-approver"
+    },
+    {
+      "case": "replay of the same decision",
+      "http": 200,
+      "state": "APPROVED"
+    }
+  ],
+  "authoringFileLive": {
+    "download": {
+      "http": 200,
+      "bytes": 425984,
+      "digestHeaderEqualsSha256OfBody": true,
+      "cacheControl": "no-store",
+      "fileName": "STAT_RUNTIME_PROOF_b4444a55e7bd.accdb"
+    },
+    "content": {
+      "table": "stat_DSD_RUNTIME_PROOF",
+      "columns": [
+        "TIME_PERIOD:TEXT",
+        "AGE_GROUP:TEXT",
+        "PROOF_COUNT:NUMERIC"
+      ],
+      "georgianCaptionsPreserved": true,
+      "codelistRows": 12
+    },
+    "validation": [
+      {
+        "file": "two valid rows",
+        "accepted": true,
+        "rows": 2,
+        "observations": 2
+      },
+      {
+        "file": "two valid + two invalid rows (ATOMIC_REJECT)",
+        "accepted": false,
+        "rows": 4,
+        "observations": 0,
+        "rowIssues": [
+          "3 TIME_PERIOD INVALID_PERIOD",
+          "3 AGE_GROUP INVALID_CODE",
+          "4 PROOF_COUNT VALUE_WITHOUT_STATUS_MISSING"
+        ]
+      },
+      {
+        "file": "not an Access file",
+        "accepted": false,
+        "fileIssues": [
+          "NOT_A_READABLE_AUTHORING_FILE"
+        ]
+      }
+    ],
+    "temporaryFilesLeftInTheContainer": 0
+  },
+  "driftFailsClosed": {
+    "action": "proof measure superseded after the test",
+    "then": "GET authoring-file -> 422 statistical-contract-not-compilable / REFERENCE_NOT_APPROVED",
+    "meaning": "an approved contract is never silently reinterpreted when its registry dependency is withdrawn"
+  },
+  "governedLoadLive": {
+    "contract": "05137629-6464-49d5-ba49-74c8d0322c9d (revision 1.0.1 of STAT:RUNTIME_PROOF; approved by the second identity; classified BACKWARD_COMPATIBLE against the superseded revision)",
+    "cases": [
+      {
+        "case": "load a valid filled file",
+        "http": 201,
+        "outcome": "LOADED",
+        "batchId": 10,
+        "datasetSnapshotId": 54,
+        "rows": 2,
+        "observations": 2
+      },
+      {
+        "case": "same file again",
+        "http": 200,
+        "outcome": "ALREADY_LOADED",
+        "datasetSnapshotId": 54
+      },
+      {
+        "case": "file with invalid rows (ATOMIC_REJECT)",
+        "http": 422,
+        "outcome": "REJECTED",
+        "rowIssues": 3,
+        "written": 0
+      },
+      {
+        "case": "mode=UPSERT",
+        "http": 422,
+        "code": "statistical-contract-unsupported-load-mode"
+      },
+      {
+        "case": "identity without the import authority",
+        "http": 403
+      }
+    ],
+    "databaseState": {
+      "snapshot": "54 PREPARED rows=2 (a load never publishes)",
+      "observations": [
+        "2024-01-01..2024-12-31 VALID 1250 unit=PERSONS coded_dims=1",
+        "2025-01-01..2025-12-31 VALID 1310 unit=PERSONS coded_dims=1"
+      ],
+      "lineageRecords": 2,
+      "artifact": "ACCDB 434176 bytes at s3://geostat-ingest/statistical-authoring/<sha256>.accdb",
+      "publishedSnapshotsAfter": 42,
+      "controlBindings": [
+        "dataset RUNTIME_PROOF STATISTICAL v1 APPROVED checksum=394d2069d706",
+        "metric KIDS_PORTAL.RUNTIME_PROOF.PROOF_COUNT",
+        "dimension STAT.AGE_GROUP.1.0.0"
+      ]
+    },
+    "defectFoundLive": "the first attempt answered 400: the object key prefix lacked the trailing slash the artifact key convention requires; fixed, and the test double now applies the real ArtifactKeys rules so this class of error fails in unit tests"
+  }
+}
