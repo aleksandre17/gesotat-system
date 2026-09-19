@@ -828,3 +828,30 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 - **სტატუსი:** `TRIAGED` / **priority:** `P1` / **owner:** Serving + Data Protection
 - **აღმოჩენა / decision:** see checklist 17.20. The 400 is correct fail-closed behaviour of the physical query
   service for `ACCESS`-plane tables; making it pass by re-labelling tables would publish raw source documents.
+
+### AIR-2026-046 — INCIDENT: a vulnerability scan exhausted memory on the host shared with production
+
+- **სტატუსი:** `VERIFIED` (cause and recovery) / **priority:** `P0` / **owner:** Delivery + SRE
+- **What happened (2026-09-19, about 17:50–20:30 local):** a background agent ran SBOM and vulnerability scanners
+  (`anchore/syft:v1.52.0`, `anchore/grype:v0.119.0`) as containers on `192.168.1.199`. The host has 8 GB RAM and
+  4 GB swap and runs about 30 containers of several projects, including production `geostat-api`. The scanner's
+  database load pushed the host into swap thrashing: SSH timed out at banner exchange and `:8083/health`
+  (production) and `:8081/health` (dev) timed out from outside. The kernel OOM killer fired at 19:50:13 and killed
+  a desktop session process (`wireplumber`). 15-minute load average peaked above 22.
+- **Impact:** production and dev were **unreachable from outside for up to about two and a half hours**. No
+  GEOSOTAT container was killed or restarted (`geostat-api` "Up 3 days (healthy)" afterwards); no data was written
+  by the scan. Swap remained 100 % full after recovery (clearing it needs root).
+- **Cause:** a memory-heavy tool was run without a memory limit on a host that has no headroom and is shared with
+  production. The instruction to the agent said "be gentle" and to watch production health, but set no hard limit;
+  once the host thrashed the health checks could not run either. The lead is responsible for that brief.
+- **Recovery:** the scanners finished or were killed by memory pressure; no scanner container remained. Verified:
+  production and dev health UP, no restarts. Left on the host: images `anchore/syft`, `anchore/grype` and the
+  volume `geostat-grype-db` (disk only).
+- **Rules from now on:**
+  1. No scanning, building or load generation on this host without hard limits (`docker run --memory --memory-swap
+     --cpus`) sized from measured free memory, and never while free memory is below a stated floor.
+  2. Supply-chain scanning runs off-host (CI runner or the workstation) against SBOM files; the server is asked only
+     for image digests, which costs nothing.
+  3. Any agent brief that touches the shared host states the memory limit explicitly.
+  4. Production capacity: 8 GB for roughly 30 containers is itself a finding; the dev API alone (Gradle bootRun, two
+     JVMs) holds about 1.3 GiB. Dev should run the packaged JAR like production, which also improves parity.
