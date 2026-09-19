@@ -11,11 +11,12 @@ import java.util.*;
 public class ContractCompatibilityService {
     private final JdbcTemplate db;
     private final ObjectMapper json = new ObjectMapper();
+    private static final String REVISION_SQL="SELECT revision,status,contract_checksum,contract_document_json FROM platform.site_contract_revision WHERE contract_code=? AND revision=?";
     public ContractCompatibilityService(@Qualifier("primaryJdbcTemplate") JdbcTemplate db){this.db=db;}
     public Map<String,Object> compare(String code,int from,int to){
         if(code==null||code.isBlank()||from<1||to<1||from==to) throw new IllegalArgumentException("Two distinct positive contract revisions are required");
-        Map<String,Object> a=db.queryForMap("SELECT revision,status,contract_checksum FROM platform.site_contract_revision WHERE contract_code=? AND revision=?",code,from);
-        Map<String,Object> b=db.queryForMap("SELECT revision,status,contract_checksum FROM platform.site_contract_revision WHERE contract_code=? AND revision=?",code,to);
+        Map<String,Object> a=db.queryForMap(REVISION_SQL,code,from);
+        Map<String,Object> b=db.queryForMap(REVISION_SQL,code,to);
         Long oldId=db.queryForObject("SELECT site_contract_revision_id FROM platform.site_contract_revision WHERE contract_code=? AND revision=?",Long.class,code,from); Long newId=db.queryForObject("SELECT site_contract_revision_id FROM platform.site_contract_revision WHERE contract_code=? AND revision=?",Long.class,code,to);
         Map<String,String> oldDatasets=datasets(oldId),newDatasets=datasets(newId);
         List<String> addedDatasets=new ArrayList<>(),removedDatasets=new ArrayList<>(),changedDatasets=new ArrayList<>();

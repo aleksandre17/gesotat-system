@@ -55,7 +55,11 @@ class ContractCompatibilityServiceTest {
             Object revisionValue = arguments.length >= 3 ? arguments[2] : ((Object[]) arguments[1])[1];
             int revision = ((Number) revisionValue).intValue();
             String document = revision == 1 ? "{\"metric\":\"COUNT\",\"unit\":\"PERSON\"}" : "{\"metric\":\"COUNT\",\"unit\":\"HOUSEHOLD\"}";
-            return Map.of("revision", revision, "status", "APPROVED", "contract_checksum", "c" + revision, "contract_document_json", document);
+            // Only columns the statement actually selects are returned, so a missing column cannot be masked by the stub.
+            String sql = inv.getArgument(0, String.class);
+            Map<String,Object> row = new java.util.LinkedHashMap<>(Map.of("revision", revision, "status", "APPROVED", "contract_checksum", "c" + revision));
+            if (sql.contains("contract_document_json")) row.put("contract_document_json", document);
+            return row;
         };
         when(db.queryForMap(anyString(), any(), any())).thenAnswer(semanticAnswer);
         when(db.queryForMap(anyString(), any(Object[].class))).thenAnswer(semanticAnswer);
