@@ -28,6 +28,7 @@ public class ArtifactAttachmentService {
     private final ArtifactRegistry registry;
     private final ArtifactProperties properties;
     private final ArtifactMetrics metrics;
+    private final ArtifactManifestDocuments documents;
 
     public record RelationSummary(String relationCode, int plannedEdges, int written, int unchanged, int orphanArtifacts) {}
 
@@ -35,12 +36,13 @@ public class ArtifactAttachmentService {
                                 Map<String, Integer> issueCounts, List<ArtifactIssue> issues, boolean issuesTruncated) {}
 
     public ArtifactAttachmentService(ArtifactAttachmentRepository attachments, ArtifactContractResolver contracts, ArtifactRegistry registry,
-                                     ArtifactProperties properties, ArtifactMetrics metrics) {
+                                     ArtifactProperties properties, ArtifactMetrics metrics, ArtifactManifestDocuments documents) {
         this.attachments = attachments;
         this.contracts = contracts;
         this.registry = registry;
         this.properties = properties;
         this.metrics = metrics;
+        this.documents = documents;
     }
 
     @Transactional(transactionManager = "dataPlaneTransactionManager")
@@ -56,7 +58,12 @@ public class ArtifactAttachmentService {
         Map<String, Map<String, Long>> existing = new HashMap<>();
         for (ArtifactRelationDefinition definition : definitions)
             existing.put(definition.relationCode(), attachments.slots(datasetSnapshotId, definition.relationCode()));
-        ArtifactBindingPlanner.Plan plan = ArtifactBindingPlanner.plan(definitions, attachments.sourceRows(datasetSnapshotId), registry.entries(manifestId), existing);
+        List<ArtifactMatcher.SourceRow> rows = attachments.sourceRows(datasetSnapshotId);
+        // Values a package declares outside the row payload are replayed from the document accepted at admission,
+        // so binding uses exactly the edges the preview derived.
+        if (DeclaredRowValues.needed(definitions))
+            rows = DeclaredRowValues.apply(definitions, rows, DeclaredRowValues.fromDocument(definitions, documents.read(manifestId)));
+        ArtifactBindingPlanner.Plan plan = ArtifactBindingPlanner.plan(definitions, rows, registry.entries(manifestId), existing);
 
         boolean write = !plan.blocked() && !dryRun;
         List<RelationSummary> summaries = new ArrayList<>();

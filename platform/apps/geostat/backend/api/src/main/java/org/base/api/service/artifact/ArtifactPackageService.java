@@ -234,7 +234,7 @@ public class ArtifactPackageService {
         ArtifactRelationPreview.Report report;
         try {
             report = definitions.isEmpty() ? ArtifactRelationPreview.evaluate(List.of(), List.of(), manifest.entries())
-                    : ArtifactRelationPreview.evaluate(definitions, staged.dataset().carrier().rows(staged.dataset().path().toFile(), contract), manifest.entries());
+                    : ArtifactRelationPreview.evaluate(definitions, DeclaredRowValues.packageRows(definitions, staged.dataset().carrier(), staged.dataset().path().toFile(), contract), manifest.entries());
         } catch (IOException unreadable) {
             throw new IllegalArgumentException("Package dataset rows could not be read", unreadable);
         }

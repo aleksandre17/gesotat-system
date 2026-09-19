@@ -3,6 +3,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.base.api.service.artifact.ArtifactAccessPackageValidator;
+import org.base.api.service.artifact.DeclaredRowValues;
+import org.base.api.service.artifact.AccessDatasetCarrier;
 import org.base.api.service.artifact.ArtifactAccessRowReader;
 import org.base.api.service.artifact.ArtifactIssue;
 import org.base.api.service.artifact.ArtifactManifest;
@@ -71,7 +73,9 @@ public final class ArtifactPackageAssembler {
         ArtifactMatchRules rules = discoverRules();
         List<ArtifactRelationDefinition> definitions = descriptor.relations().stream().map(r -> r.toDefinition(rules)).toList();
         if (definitions.isEmpty()) throw new IllegalStateException("Dataset " + descriptor.dataset().datasetCode() + " declares no artifact relations");
-        List<ArtifactMatcher.SourceRow> rows = ArtifactAccessRowReader.read(access.toFile(), descriptor.dataset());
+        // The same row view admission uses, including attachments a package declares in its own tables.
+        List<ArtifactMatcher.SourceRow> rows = DeclaredRowValues.packageRows(definitions,
+                new AccessDatasetCarrier(new ArtifactAccessPackageValidator()), access.toFile(), descriptor.dataset());
 
         // Package path → local source file, for every value a declared rule resolves.
         TreeMap<String, Path> files = new TreeMap<>();

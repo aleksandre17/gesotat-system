@@ -690,7 +690,7 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 
 ### AIR-2026-037 — Explicit relation-table attachments need a multi-dataset package run
 
-- **სტატუსი:** `DISCOVERED` / **priority:** `P1` / **owner:** Ingestion + Data Platform
+- **სტატუსი:** `READY` (2026-09-19, see AIR-2026-039) / **priority:** `P1` / **owner:** Ingestion + Data Platform
 - **აღმოჩენა:** contract §4.2/§4.3 describes attachments declared in package tables (`__raw_document`,
   `__rel_entity_artifact`: N:M, role, ordinal, primary). Only `SOURCE_PATH` exists. The matcher already supports
   ordered 1:N values, so the missing part is not matching but **where the edges come from**: they are rows of another
@@ -726,3 +726,26 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 - **Remaining:** the production ledger was not read; its first deploy of this runner must run the replay tool's
   checks in preflight. Other scripts may hold statements that failed silently on existing databases without
   breaking an empty build; a ledger-versus-schema audit is the way to find them.
+
+### AIR-2026-039 — `RELATION_TABLE` match rule: attachments declared in package tables (contract §4.2, §4.3, §27)
+
+- **სტატუსი:** `READY` (source + acceptance test; no approved contract declares it yet, so there is no runtime run) /
+  **priority:** `P1` / **owner:** Ingestion
+- **Design actually built (simpler than the multi-dataset run sketched in AIR-2026-037):** the edges are derived once,
+  at admission, from the package's relation and artifact tables, are part of the accepted manifest document
+  (migration 102), and snapshot binding **replays them from that document**. Row identity is the contract key in both
+  places, so no second snapshot and no cross-dataset join is needed, and preview and binding cannot disagree.
+- **Pieces:** `RelationTableMatchRule` + parser (`type: RELATION_TABLE`; relation table, entity/artifact key fields,
+  ordinal, optional role filter and language field, artifact table, file-name field, `packageRoot`, languages);
+  capability `PackageDeclaredValues` (the rule derives its own `DeclaredEdge`s, the engine never names a rule type);
+  port `PackageTableReader` (implemented by the Access carrier; a format without tables refuses such a rule);
+  `DeclaredRowValues` feeds the values to the **unchanged** `ArtifactMatcher` as ordered package paths, so
+  cardinality, missing attachments, orphans, policy and case checks are the existing ones.
+- **Fail-closed declarations:** unknown artifact key, relation row for an unknown dataset row, two files on one
+  ordinal, ordinal gaps, undeclared language — each refuses the package before any write.
+- **Evidence:** `RelationTableMatchRuleAcceptanceTest` — 1000 rows, 1500 files, 1502 edges (rows with two files, one
+  file shared by three rows, a foreign-role edge ignored): admission edges = document edges = binding edges; negative
+  and parser cases. The KIDS package rebuilt through the shared row view is byte-identical (SHA-256 `427d12e9…`).
+  `:api:test` 288 PASS; schema-agnostic preflight 0 violations.
+- **To use it for a site:** approve an `artifact_relation_definition` whose `match_rule_json` has
+  `"type":"RELATION_TABLE"`; nothing else changes.

@@ -872,3 +872,12 @@ entry is reserved and is not package content. The package layout under the root 
 rule (`packageRoot`); the `files/` folder in §2 is illustrative. The complete KIDS R8 package (Access build 8.0.1, 450
 row-bound files, shipped manifest) ran end to end on dev to `REVIEW_REQUIRED`:
 [`kids-r8-package-end-to-end-runtime-2026-09-19.json`](../evidence/kids-r8-package-end-to-end-runtime-2026-09-19.json).
+
+### 29.4 Attachments declared in package tables (2026-09-19)
+
+§4.2/§4.3 are implemented as match rule type `RELATION_TABLE`. The relation names, in its approved `match_rule_json`,
+the relation table and its entity-key, artifact-key and ordinal fields (optionally a role filter and a language
+field), the artifact table with its key and file-name fields, and the `packageRoot` the file names live under. Ordinals
+are positions: `1..n` without gaps per row and language. One file may serve many rows and one row may have many files
+(§27); nothing is inferred. The edges are derived at admission, stored in the accepted manifest document (§25) and
+replayed from it when the snapshot is bound, so the preview, the document and the stored attachments are one set.
