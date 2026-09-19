@@ -102,7 +102,10 @@ public final class StatisticalBindingService {
     /** A dimension is the concept, shared by every dataset that uses it; the version is part of its identity. */
     private static String dimensionCode(PlannedComponent c) { return bounded(c.conceptRef().namespace() + "." + c.conceptRef().code() + "." + c.conceptRef().version()); }
 
-    private static String metricCode(String productCode, SemanticPlan plan, PlannedComponent m) { return bounded(productCode + "." + plan.datasetCode() + "." + m.code()); }
+    /** A metric is one exact measure version observed in one dataset; a revised measure is another metric, never a silent re-use. */
+    private static String metricCode(String productCode, SemanticPlan plan, PlannedComponent m) {
+        return bounded(productCode + "." + plan.datasetCode() + "." + m.code() + "." + m.measureRef().version());
+    }
 
     private static String bounded(String code) {
         if (code.length() > 120) throw new IllegalStateException("binding code exceeds 120 characters: " + code);

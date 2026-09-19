@@ -75,6 +75,7 @@ class StatisticalLoadServiceTest {
                 "CREATE TABLE ingest.batch(batch_id BIGINT IDENTITY PRIMARY KEY, contract_id BIGINT NOT NULL, product_id BIGINT NOT NULL, status VARCHAR(24) NOT NULL, checksum CHAR(64), started_at TIMESTAMP, finished_at TIMESTAMP)",
                 "CREATE TABLE ingest.artifact(artifact_id BIGINT IDENTITY PRIMARY KEY, batch_id BIGINT NOT NULL, original_name VARCHAR(512) NOT NULL, format VARCHAR(32) NOT NULL, object_uri VARCHAR(2048) NOT NULL, checksum CHAR(64) NOT NULL, byte_size BIGINT NOT NULL)",
                 "CREATE TABLE ingest.dataset_load(dataset_load_id BIGINT IDENTITY PRIMARY KEY, batch_id BIGINT NOT NULL, dataset_version_id BIGINT NOT NULL, source_name VARCHAR(255) NOT NULL, source_row_count BIGINT, accepted_count BIGINT, rejected_count BIGINT, status VARCHAR(24) NOT NULL)",
+                "CREATE TABLE ingest.staged_row(staged_row_id BIGINT IDENTITY PRIMARY KEY, dataset_load_id BIGINT NOT NULL, source_row_number BIGINT NOT NULL, source_key VARCHAR(512), raw_payload_json VARCHAR(4000) NOT NULL, payload_hash CHAR(64) NOT NULL, validation_status VARCHAR(24) NOT NULL, error_json VARCHAR(4000), UNIQUE(dataset_load_id,source_row_number))",
                 "CREATE TABLE publication.dataset_snapshot(dataset_snapshot_id BIGINT IDENTITY PRIMARY KEY, dataset_load_id BIGINT NOT NULL UNIQUE, dataset_version_id BIGINT NOT NULL, status VARCHAR(24) NOT NULL, row_count BIGINT NOT NULL, checksum CHAR(64) NOT NULL)",
                 "CREATE TABLE raw.source_record(source_record_id BIGINT IDENTITY PRIMARY KEY, dataset_snapshot_id BIGINT NOT NULL, artifact_id BIGINT NOT NULL, source_row_number BIGINT NOT NULL, source_key VARCHAR(512), payload_json VARCHAR(4000) NOT NULL, payload_hash CHAR(64) NOT NULL)",
                 "CREATE TABLE [statistics].series(series_id BIGINT IDENTITY PRIMARY KEY, dataset_snapshot_id BIGINT NOT NULL, metric_id BIGINT NOT NULL, series_key_hash CHAR(64) NOT NULL, unit_code VARCHAR(64), status VARCHAR(24) NOT NULL, source_record_id BIGINT, UNIQUE(dataset_snapshot_id,metric_id,series_key_hash))",
@@ -147,12 +148,14 @@ class StatisticalLoadServiceTest {
         assertEquals(Outcome.LOADED, receipt.outcome());
         assertEquals(2, receipt.rows());
         assertEquals(4, receipt.observations());
-        assertEquals("PREPARED", jdbc.queryForObject("SELECT status FROM publication.dataset_snapshot WHERE dataset_snapshot_id=?", String.class, receipt.datasetSnapshotId()), "a load never publishes");
+        assertEquals("REVIEW_REQUIRED", jdbc.queryForObject("SELECT status FROM publication.dataset_snapshot WHERE dataset_snapshot_id=?", String.class, receipt.datasetSnapshotId()), "a load never publishes");
         assertEquals("STATISTICAL", jdbc.queryForObject("SELECT dataset_family FROM platform.dataset", String.class));
         assertEquals(plan.revisionDigest(), jdbc.queryForObject("SELECT contract_checksum FROM platform.dataset_version", String.class), "the dataset version is the approved revision");
         assertEquals(2, count("platform.metric"));
         assertEquals(2, count("platform.dimension"), "time is not a stored dimension");
         assertEquals(2, count("raw.source_record"), "one lineage record per source row");
+        assertEquals(2, jdbc.queryForObject("SELECT COUNT(*) FROM ingest.staged_row WHERE validation_status='VALID'", Integer.class), "the release gates measure staged rows");
+        assertEquals(2, jdbc.queryForObject("SELECT row_count FROM publication.dataset_snapshot", Integer.class), "the snapshot counts source rows, like every governed snapshot");
         assertEquals(4, count("[statistics].observation"));
         assertEquals(1, jdbc.queryForObject("SELECT COUNT(*) FROM [statistics].observation WHERE observation_status='M' AND numeric_value IS NULL", Integer.class));
         assertEquals(1, objectStore.size(), "the source bytes are kept for replay");
@@ -179,7 +182,7 @@ class StatisticalLoadServiceTest {
         Receipt receipt = load(filled(t -> { add(t, "2025", "GE", "F", new BigDecimal("1"), null, new BigDecimal("2"), null); add(t, "2025-Q7", "XX", "F", new BigDecimal("1"), null, null, null); }));
         assertEquals(Outcome.REJECTED, receipt.outcome());
         assertEquals(3, receipt.rowIssues().size());
-        for (String table : new String[]{"ingest.batch", "ingest.artifact", "publication.dataset_snapshot", "raw.source_record", "[statistics].observation", "platform.dataset"}) assertEquals(0, count(table), table);
+        for (String table : new String[]{"ingest.batch", "ingest.artifact", "ingest.staged_row", "publication.dataset_snapshot", "raw.source_record", "[statistics].observation", "platform.dataset"}) assertEquals(0, count(table), table);
         assertTrue(objectStore.isEmpty(), "a rejected file is not retained as a source");
         assertEquals(Outcome.REJECTED, loads.load(IMPORTER, contractId, "FULL_SNAPSHOT", "x", new ByteArrayInputStream("junk".getBytes())).outcome());
     }
@@ -192,5 +195,26 @@ class StatisticalLoadServiceTest {
         DraftRecord pending = workflow.create(AUTHOR, LABOUR.productCode(), labourDraft(), "pending");
         assertThrows(ContractWorkflow.WorkflowException.class, () -> loads.load(IMPORTER, pending.draftId(), "FULL_SNAPSHOT", "f", new ByteArrayInputStream(file)), "only an approved contract admits data");
         assertEquals(0, count("ingest.batch"));
+    }
+
+    @Test void revisedMeasureVersionInANewContractRevisionBindsItsOwnMetric() throws Exception {
+        load(filled(t -> add(t, "2025", "GE", "F", new BigDecimal("1"), null, new BigDecimal("2"), null)));
+
+        // Steward publishes EMPLOYED 1.1.0; the dataset moves to it in a new approved revision.
+        Ref revised = Ref.parse("measure:SHARED:EMPLOYED(1.1.0)");
+        registry.approved(revised, new org.base.api.service.platform.statistical.registry.StatisticalRegistry.MeasureDefinition(revised,
+                Ref.parse("concept:SHARED:EMPLOYED(1.0.0)"), new org.base.api.service.platform.statistical.model.Representation.Numeric(18, 0, false), Ref.parse("unit:SHARED:PERSONS(1.0.0)")));
+        jdbc.update("INSERT INTO platform.statistical_reference(kind,namespace_id,code,version_major,version_minor,version_patch,target_type,target_id) VALUES('MEASURE',1,'EMPLOYED',1,1,0,'MEASURE',300)");
+        String nextDraft = labourDraft().replace("measure:SHARED:EMPLOYED(1.0.0)", "measure:SHARED:EMPLOYED(1.1.0)");
+        DraftRecord draft = workflow.create(AUTHOR, LABOUR.productCode(), nextDraft, "k2");
+        DraftRecord review = workflow.submit(AUTHOR, draft.draftId(), draft.version());
+        workflow.approve(APPROVER, draft.draftId(), review.version(), review.revisionDigest());
+        contractId = draft.draftId();
+        plan = compiler(registry).compile(nextDraft, LABOUR, Mode.APPROVAL).plan().orElseThrow();
+
+        assertEquals(Outcome.LOADED, load(filled(t -> add(t, "2026", "GE", "F", new BigDecimal("3"), null, new BigDecimal("4"), null))).outcome());
+        assertEquals(1, count("platform.dataset"), "one dataset");
+        assertEquals(2, count("platform.dataset_version"), "one version per approved revision");
+        assertEquals(3, count("platform.metric"), "EMPLOYED 1.0.0, EMPLOYED 1.1.0 and the unchanged UNEMPLOYED");
     }
 }

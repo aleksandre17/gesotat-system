@@ -58,7 +58,10 @@ public class SnapshotFactsRepository {
                      JOIN [statistics].series se ON se.series_id=o.series_id
                      WHERE r.dataset_snapshot_id=s.dataset_snapshot_id AND se.dataset_snapshot_id<>s.dataset_snapshot_id),
                   (SELECT COUNT(*) FROM [statistics].observation o JOIN [statistics].series se ON se.series_id=o.series_id
-                     WHERE se.dataset_snapshot_id=s.dataset_snapshot_id AND o.numeric_value IS NULL AND o.text_value IS NULL AND o.boolean_value IS NULL)
+                     WHERE se.dataset_snapshot_id=s.dataset_snapshot_id AND o.numeric_value IS NULL AND o.text_value IS NULL AND o.boolean_value IS NULL
+                       /* An empty value is a defect only when nothing explains it: a declared status (missing, suppressed, not
+                          applicable) is a fact of its own, distinct from zero. Only the default status counts as unexplained. */
+                       AND o.observation_status='VALID')
                 FROM publication.dataset_snapshot s JOIN ingest.dataset_load l ON l.dataset_load_id=s.dataset_load_id
                 WHERE s.dataset_snapshot_id=?""",
                 (rs, n) -> new SnapshotFacts(rs.getLong(1), rs.getLong(2), rs.getString(3), rs.getLong(4), rs.getLong(5), rs.getString(6),

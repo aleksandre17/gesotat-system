@@ -143,7 +143,7 @@ public class StatisticalContractController {
     }
 
     /**
-     * Loads a filled file into a PREPARED snapshot. Never publishes. Safe to repeat: the same file for the same
+     * Loads a filled file into a candidate (REVIEW_REQUIRED) snapshot. Never publishes. Safe to repeat: the same file for the same
      * approved revision returns the first receipt. A rejected file answers 422 with every finding and writes nothing.
      */
     @PostMapping("/{contractId}/loads")

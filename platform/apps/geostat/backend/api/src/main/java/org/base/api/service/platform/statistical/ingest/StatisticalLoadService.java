@@ -25,11 +25,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Governed load of a filled authoring file into a PREPARED dataset snapshot.
+ * Governed load of a filled authoring file into a REVIEW_REQUIRED (candidate) dataset snapshot.
  *
  * Order of effects: (1) validate, nothing written; (2) keep the source bytes content-addressed in the object
  * store — the replay source; (3) one Data Plane transaction writes batch, artifact, load, snapshot, lineage
- * records and canonical observations. A crash before (3) leaves an unreferenced immutable object the storage
+ * records, staged rows and canonical observations. A crash before (3) leaves an unreferenced immutable object the storage
  * sweep already handles; a crash inside (3) rolls back. Publication is never part of a load: the existing
  * quality, privacy and release gates decide that later.
  *
@@ -119,17 +119,23 @@ public final class StatisticalLoadService {
                 int accepted = read.rows().size() - normalised.quarantinedRows().size();
                 long loadId = insert("INSERT INTO ingest.dataset_load(batch_id,dataset_version_id,source_name,source_row_count,accepted_count,rejected_count,status) VALUES(?,?,?,?,?,?,'LOADED')",
                         "SELECT MAX(dataset_load_id) FROM ingest.dataset_load WHERE batch_id=?", List.of(batchId, bound.datasetVersionId(), tableName, read.rows().size(), accepted, normalised.quarantinedRows().size()), List.of(batchId));
-                long snapshotId = insert("INSERT INTO publication.dataset_snapshot(dataset_load_id,dataset_version_id,status,row_count,checksum) VALUES(?,?,'PREPARED',?,?)",
-                        "SELECT dataset_snapshot_id FROM publication.dataset_snapshot WHERE dataset_load_id=?", List.of(loadId, bound.datasetVersionId(), normalised.observations().size(), sha256), List.of(loadId));
+                long snapshotId = insert("INSERT INTO publication.dataset_snapshot(dataset_load_id,dataset_version_id,status,row_count,checksum) VALUES(?,?,'REVIEW_REQUIRED',?,?)",
+                        "SELECT dataset_snapshot_id FROM publication.dataset_snapshot WHERE dataset_load_id=?", List.of(loadId, bound.datasetVersionId(), accepted, sha256), List.of(loadId)); // row_count counts source rows, as every governed snapshot does
 
                 Map<Long, Long> lineage = new HashMap<>();
                 for (int i = 0; i < read.rows().size(); i++) {
                     long rowNumber = i + 1L;
-                    if (normalised.quarantinedRows().contains(rowNumber)) continue;
                     String payload = json(new TreeMap<>(stringify(read.rows().get(i))));
+                    String payloadHash = CanonicalJson.digest("geostat.stat-source-row.v1", payload);
+                    boolean quarantined = normalised.quarantinedRows().contains(rowNumber);
+                    // Staged rows are the record the release gates measure: every source row is accounted for, valid or not.
+                    dataPlane.update("INSERT INTO ingest.staged_row(dataset_load_id,source_row_number,source_key,raw_payload_json,payload_hash,validation_status,error_json) VALUES(?,?,?,?,?,?,?)",
+                            loadId, rowNumber, tableName + "#" + rowNumber, payload, payloadHash, quarantined ? "REJECTED" : "VALID",
+                            quarantined ? json(normalised.issues().stream().filter(issue -> issue.row() == rowNumber).toList()) : null);
+                    if (quarantined) continue;
                     lineage.put(rowNumber, insert("INSERT INTO raw.source_record(dataset_snapshot_id,artifact_id,source_row_number,source_key,payload_json,payload_hash) VALUES(?,?,?,?,?,?)",
                             "SELECT MAX(source_record_id) FROM raw.source_record WHERE dataset_snapshot_id=? AND source_row_number=?",
-                            List.of(snapshotId, artifactId, rowNumber, tableName + "#" + rowNumber, payload, CanonicalJson.digest("geostat.stat-source-row.v1", payload)), List.of(snapshotId, rowNumber)));
+                            List.of(snapshotId, artifactId, rowNumber, tableName + "#" + rowNumber, payload, payloadHash), List.of(snapshotId, rowNumber)));
                 }
                 writer.write(plan, normalised.observations(), bindings.binding(plan, bound), new CanonicalObservationWriter.LoadContext(snapshotId, lineage));
                 return new Receipt(Outcome.LOADED, plan.revisionDigest(), sha256, batchId, snapshotId, read.rows().size(), normalised.observations().size(), List.of(),

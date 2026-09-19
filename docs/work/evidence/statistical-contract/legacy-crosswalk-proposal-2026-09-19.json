@@ -1,0 +1,2863 @@
+{
+  "schema": "geostat.statistical-legacy-crosswalk.v1",
+  "source": "remote dev geostat-system, platform.metric + metric_semantic_profile + statistical_unit, read-only, 2026-09-19",
+  "rules": "identity by code, never by name similarity; no merge; blocked rows need a steward decision before any registration",
+  "summary": {
+    "legacyMetrics": 86,
+    "distinctLegacyMeasures": 2,
+    "allowedAfterSignOff": 24,
+    "blocked": 62,
+    "blockers": {
+      "INFERRED_UNIT_BELOW_CONFIDENCE": 54,
+      "NO_UNIT_EVIDENCE": 43,
+      "RATIO_NEEDS_TYPED_DENOMINATOR_AND_BASE": 9,
+      "SCALED_UNIT_NEEDS_UNIT_MULT_DECISION": 9
+    },
+    "targetCollisions": []
+  },
+  "entries": [
+    {
+      "legacy": {
+        "metricCode": "KIDS_ABORTIONS_COUNT",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_EVENT",
+        "quantityKind": "EVENT",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "162",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:ABORTIONS_COUNT(1.0.0)",
+        "conceptRef": "concept:KIDS:ABORTIONS_COUNT(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_EVENT(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_ADOPTED_CHILDREN",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PERSON",
+        "quantityKind": "PERSON",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "306",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:ADOPTED_CHILDREN(1.0.0)",
+        "conceptRef": "concept:KIDS:ADOPTED_CHILDREN(1.0.0)",
+        "unitRef": "unit:KIDS:PERSON(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_ANAEMIA_PREVALENCE",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PERCENT",
+        "quantityKind": "RATIO",
+        "scaleFactor": 0.01,
+        "denominatorText": "100 population",
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "409",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.95
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:ANAEMIA_PREVALENCE(1.0.0)",
+        "conceptRef": "concept:KIDS:ANAEMIA_PREVALENCE(1.0.0)",
+        "unitRef": "unit:KIDS:PERCENT(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "RATIO_NEEDS_TYPED_DENOMINATOR_AND_BASE",
+        "SCALED_UNIT_NEEDS_UNIT_MULT_DECISION"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_AVERAGE_NIGHTS_PER_VISIT",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "AVERAGE_NIGHTS",
+        "quantityKind": "NIGHT",
+        "scaleFactor": 1.0,
+        "denominatorText": "per visit",
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "387",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:AVERAGE_NIGHTS_PER_VISIT(1.0.0)",
+        "conceptRef": "concept:KIDS:AVERAGE_NIGHTS_PER_VISIT(1.0.0)",
+        "unitRef": "unit:KIDS:AVERAGE_NIGHTS(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_BLOOD_DISEASE_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "170",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:BLOOD_DISEASE_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:BLOOD_DISEASE_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_CHILDREN_GRANTED_ADOPTION_STATUS",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PERSON",
+        "quantityKind": "PERSON",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "308",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.96
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:CHILDREN_GRANTED_ADOPTION_STATUS(1.0.0)",
+        "conceptRef": "concept:KIDS:CHILDREN_GRANTED_ADOPTION_STATUS(1.0.0)",
+        "unitRef": "unit:KIDS:PERSON(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_CHRONIC_MEDICINE_PROGRAM_BENEFICIARIES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PERSON",
+        "quantityKind": "PERSON",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "305",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:CHRONIC_MEDICINE_PROGRAM_BENEFICIARIES(1.0.0)",
+        "conceptRef": "concept:KIDS:CHRONIC_MEDICINE_PROGRAM_BENEFICIARIES(1.0.0)",
+        "unitRef": "unit:KIDS:PERSON(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_CIRCULATORY_DISEASE_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "176",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:CIRCULATORY_DISEASE_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:CIRCULATORY_DISEASE_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_CONGENITAL_MALFORMATION_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "183",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:CONGENITAL_MALFORMATION_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:CONGENITAL_MALFORMATION_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_DAILY_INTERNET_USE_SHARE",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PERCENT",
+        "quantityKind": "RATIO",
+        "scaleFactor": 0.01,
+        "denominatorText": "100 population",
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "438",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:DAILY_INTERNET_USE_SHARE(1.0.0)",
+        "conceptRef": "concept:KIDS:DAILY_INTERNET_USE_SHARE(1.0.0)",
+        "unitRef": "unit:KIDS:PERCENT(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "RATIO_NEEDS_TYPED_DENOMINATOR_AND_BASE",
+        "SCALED_UNIT_NEEDS_UNIT_MULT_DECISION"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_DIABETES_MELLITUS_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "165",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:DIABETES_MELLITUS_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:DIABETES_MELLITUS_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_DIGESTIVE_DISEASE_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "178",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:DIGESTIVE_DISEASE_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:DIGESTIVE_DISEASE_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_DISABILITY_SOCIAL_PACKAGE_RECIPIENTS",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PERSON",
+        "quantityKind": "PERSON",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "297",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.98
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:DISABILITY_SOCIAL_PACKAGE_RECIPIENTS(1.0.0)",
+        "conceptRef": "concept:KIDS:DISABILITY_SOCIAL_PACKAGE_RECIPIENTS(1.0.0)",
+        "unitRef": "unit:KIDS:PERSON(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_DOMESTIC_VISITS_MONTHLY_AVERAGE",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "THOUSAND_VISITS",
+        "quantityKind": "VISIT",
+        "scaleFactor": 1000.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "386",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:DOMESTIC_VISITS_MONTHLY_AVERAGE(1.0.0)",
+        "conceptRef": "concept:KIDS:DOMESTIC_VISITS_MONTHLY_AVERAGE(1.0.0)",
+        "unitRef": "unit:KIDS:THOUSAND_VISITS(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "SCALED_UNIT_NEEDS_UNIT_MULT_DECISION"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_EARLY_EDUCATION_LEAVERS_RATE",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PERCENT",
+        "quantityKind": "RATIO",
+        "scaleFactor": 0.01,
+        "denominatorText": "100 population",
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "452",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.97
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:EARLY_EDUCATION_LEAVERS_RATE(1.0.0)",
+        "conceptRef": "concept:KIDS:EARLY_EDUCATION_LEAVERS_RATE(1.0.0)",
+        "unitRef": "unit:KIDS:PERCENT(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "RATIO_NEEDS_TYPED_DENOMINATOR_AND_BASE",
+        "SCALED_UNIT_NEEDS_UNIT_MULT_DECISION"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_EAR_MASTOID_DISEASE_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "175",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:EAR_MASTOID_DISEASE_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:EAR_MASTOID_DISEASE_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_ENDOCRINE_METABOLIC_DISEASE_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "171",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.98
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:ENDOCRINE_METABOLIC_DISEASE_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:ENDOCRINE_METABOLIC_DISEASE_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_EYE_ADNEXA_DISEASE_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "174",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:EYE_ADNEXA_DISEASE_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:EYE_ADNEXA_DISEASE_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_162",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_162(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_162(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_163",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_163(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_163(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_164",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_164(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_164(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_165",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_165(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_165(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_166",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_166(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_166(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_167",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_167(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_167(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_168",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_168(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_168(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_169",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_169(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_169(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_170",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_170(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_170(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_171",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_171(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_171(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_172",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_172(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_172(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_173",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_173(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_173(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_174",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_174(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_174(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_175",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_175(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_175(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_176",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_176(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_176(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_177",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_177(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_177(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_178",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_178(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_178(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_179",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_179(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_179(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_180",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_180(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_180(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_181",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_181(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_181(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_183",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_183(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_183(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_297",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_297(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_297(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_299",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_299(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_299(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_301",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_301(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_301(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_303",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_303(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_303(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_305",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_305(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_305(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_306",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_306(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_306(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_308",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_308(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_308(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_310",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_310(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_310(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_373",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_373(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_373(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_385",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_385(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_385(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_386",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_386(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_386(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_387",
+        "measureCode": "OBS_VALUE",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "SUM",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_387(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_387(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_404",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_404(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_404(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_407",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_407(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_407(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_409",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_409(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_409(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_417",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_417(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_417(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_418",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_418(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_418(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_438",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_438(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_438(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_439",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_439(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_439(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_440",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_440(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_440(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_451",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_451(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_451(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_FILE_452",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": null,
+        "quantityKind": null,
+        "scaleFactor": 0.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "SUPERSEDED",
+        "sourceResourceKey": null,
+        "unitInference": {
+          "method": null,
+          "confidence": 0.0
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:FILE_452(1.0.0)",
+        "conceptRef": "concept:KIDS:FILE_452(1.0.0)",
+        "unitRef": null,
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "NO_UNIT_EVIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_HIV_INCIDENCE_RATE",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PER_1000_UNINFECTED_POPULATION",
+        "quantityKind": "RATIO",
+        "scaleFactor": 1.0,
+        "denominatorText": "1,000 uninfected population",
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "407",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:HIV_INCIDENCE_RATE(1.0.0)",
+        "conceptRef": "concept:KIDS:HIV_INCIDENCE_RATE(1.0.0)",
+        "unitRef": "unit:KIDS:PER_1000_UNINFECTED_POPULATION(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "RATIO_NEEDS_TYPED_DENOMINATOR_AND_BASE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_INFECTIOUS_PARASITIC_DISEASE_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "169",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:INFECTIOUS_PARASITIC_DISEASE_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:INFECTIOUS_PARASITIC_DISEASE_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_INTERNALLY_DISPLACED_PERSONS",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PERSON",
+        "quantityKind": "PERSON",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "310",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:INTERNALLY_DISPLACED_PERSONS(1.0.0)",
+        "conceptRef": "concept:KIDS:INTERNALLY_DISPLACED_PERSONS(1.0.0)",
+        "unitRef": "unit:KIDS:PERSON(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_LABOUR_FORCE_POPULATION",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "THOUSAND_PERSONS",
+        "quantityKind": "PERSON",
+        "scaleFactor": 1000.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "373",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.85
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:LABOUR_FORCE_POPULATION(1.0.0)",
+        "conceptRef": "concept:KIDS:LABOUR_FORCE_POPULATION(1.0.0)",
+        "unitRef": "unit:KIDS:THOUSAND_PERSONS(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "SCALED_UNIT_NEEDS_UNIT_MULT_DECISION"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_LITERACY_RATE",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PERCENT",
+        "quantityKind": "RATIO",
+        "scaleFactor": 0.01,
+        "denominatorText": "100 population",
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "451",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:LITERACY_RATE(1.0.0)",
+        "conceptRef": "concept:KIDS:LITERACY_RATE(1.0.0)",
+        "unitRef": "unit:KIDS:PERCENT(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "RATIO_NEEDS_TYPED_DENOMINATOR_AND_BASE",
+        "SCALED_UNIT_NEEDS_UNIT_MULT_DECISION"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_MALIGNANT_NEOPLASM_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "163",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:MALIGNANT_NEOPLASM_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:MALIGNANT_NEOPLASM_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_MATERNAL_MORTALITY_RATIO",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PER_100000_LIVE_BIRTHS",
+        "quantityKind": "RATIO",
+        "scaleFactor": 1.0,
+        "denominatorText": "100,000 live births",
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "404",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:MATERNAL_MORTALITY_RATIO(1.0.0)",
+        "conceptRef": "concept:KIDS:MATERNAL_MORTALITY_RATIO(1.0.0)",
+        "unitRef": "unit:KIDS:PER_100000_LIVE_BIRTHS(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "RATIO_NEEDS_TYPED_DENOMINATOR_AND_BASE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_MENTAL_BEHAVIOURAL_DISORDER_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "172",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:MENTAL_BEHAVIOURAL_DISORDER_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:MENTAL_BEHAVIOURAL_DISORDER_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_MOBILE_PHONE_USE_SHARE",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PERCENT",
+        "quantityKind": "RATIO",
+        "scaleFactor": 0.01,
+        "denominatorText": "100 population",
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "440",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:MOBILE_PHONE_USE_SHARE(1.0.0)",
+        "conceptRef": "concept:KIDS:MOBILE_PHONE_USE_SHARE(1.0.0)",
+        "unitRef": "unit:KIDS:PERCENT(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "RATIO_NEEDS_TYPED_DENOMINATOR_AND_BASE",
+        "SCALED_UNIT_NEEDS_UNIT_MULT_DECISION"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_MUSCULOSKELETAL_DISEASE_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "180",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:MUSCULOSKELETAL_DISEASE_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:MUSCULOSKELETAL_DISEASE_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_MUSCULOSKELETAL_TUBERCULOSIS_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "168",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.98
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:MUSCULOSKELETAL_TUBERCULOSIS_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:MUSCULOSKELETAL_TUBERCULOSIS_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_NERVOUS_SYSTEM_DISEASE_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "173",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:NERVOUS_SYSTEM_DISEASE_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:NERVOUS_SYSTEM_DISEASE_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_PLANNED_OUTPATIENT_REGISTERED_PERSONS",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PERSON",
+        "quantityKind": "PERSON",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "303",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:PLANNED_OUTPATIENT_REGISTERED_PERSONS(1.0.0)",
+        "conceptRef": "concept:KIDS:PLANNED_OUTPATIENT_REGISTERED_PERSONS(1.0.0)",
+        "unitRef": "unit:KIDS:PERSON(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_RECENT_COMPUTER_USE_SHARE",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PERCENT",
+        "quantityKind": "RATIO",
+        "scaleFactor": 0.01,
+        "denominatorText": "100 population",
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "439",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:RECENT_COMPUTER_USE_SHARE(1.0.0)",
+        "conceptRef": "concept:KIDS:RECENT_COMPUTER_USE_SHARE(1.0.0)",
+        "unitRef": "unit:KIDS:PERCENT(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "RATIO_NEEDS_TYPED_DENOMINATOR_AND_BASE",
+        "SCALED_UNIT_NEEDS_UNIT_MULT_DECISION"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_RESIDENT_VISITORS_MONTHLY_AVERAGE",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "THOUSAND_PERSONS",
+        "quantityKind": "PERSON",
+        "scaleFactor": 1000.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "385",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:RESIDENT_VISITORS_MONTHLY_AVERAGE(1.0.0)",
+        "conceptRef": "concept:KIDS:RESIDENT_VISITORS_MONTHLY_AVERAGE(1.0.0)",
+        "unitRef": "unit:KIDS:THOUSAND_PERSONS(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "SCALED_UNIT_NEEDS_UNIT_MULT_DECISION"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_RESPIRATORY_DISEASE_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "177",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:RESPIRATORY_DISEASE_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:RESPIRATORY_DISEASE_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_RESPIRATORY_TUBERCULOSIS_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "166",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.98
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:RESPIRATORY_TUBERCULOSIS_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:RESPIRATORY_TUBERCULOSIS_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_SEXUALLY_TRANSMITTED_DISEASE_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "164",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:SEXUALLY_TRANSMITTED_DISEASE_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:SEXUALLY_TRANSMITTED_DISEASE_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_SKIN_SUBCUTANEOUS_DISEASE_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "179",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:SKIN_SUBCUTANEOUS_DISEASE_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:SKIN_SUBCUTANEOUS_DISEASE_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_SUBSISTENCE_ALLOWANCE_BENEFICIARIES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PERSON",
+        "quantityKind": "PERSON",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "301",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:SUBSISTENCE_ALLOWANCE_BENEFICIARIES(1.0.0)",
+        "conceptRef": "concept:KIDS:SUBSISTENCE_ALLOWANCE_BENEFICIARIES(1.0.0)",
+        "unitRef": "unit:KIDS:PERSON(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_SUICIDES_COUNT",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_EVENT",
+        "quantityKind": "EVENT",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "417",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:SUICIDES_COUNT(1.0.0)",
+        "conceptRef": "concept:KIDS:SUICIDES_COUNT(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_EVENT(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_SUICIDE_MORTALITY_RATE",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PER_100000_POPULATION",
+        "quantityKind": "RATIO",
+        "scaleFactor": 1.0,
+        "denominatorText": "100,000 population",
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "418",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.97
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:SUICIDE_MORTALITY_RATE(1.0.0)",
+        "conceptRef": "concept:KIDS:SUICIDE_MORTALITY_RATE(1.0.0)",
+        "unitRef": "unit:KIDS:PER_100000_POPULATION(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE",
+        "RATIO_NEEDS_TYPED_DENOMINATOR_AND_BASE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_SURVIVOR_SOCIAL_PACKAGE_RECIPIENTS",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "PERSON",
+        "quantityKind": "PERSON",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "299",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.95
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:SURVIVOR_SOCIAL_PACKAGE_RECIPIENTS(1.0.0)",
+        "conceptRef": "concept:KIDS:SURVIVOR_SOCIAL_PACKAGE_RECIPIENTS(1.0.0)",
+        "unitRef": "unit:KIDS:PERSON(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_TUBERCULOUS_MENINGITIS_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "167",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.98
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:TUBERCULOUS_MENINGITIS_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:TUBERCULOUS_MENINGITIS_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "BLOCKED",
+      "blockers": [
+        "INFERRED_UNIT_BELOW_CONFIDENCE"
+      ]
+    },
+    {
+      "legacy": {
+        "metricCode": "KIDS_UROGENITAL_DISEASE_NEW_CASES",
+        "measureCode": "KIDS_OBS_VALUE_INPUT",
+        "unitCode": "COUNT_CASE",
+        "quantityKind": "CASE",
+        "scaleFactor": 1.0,
+        "denominatorText": null,
+        "aggregation": "NONE",
+        "status": "PROVISIONAL_APPROVED",
+        "sourceResourceKey": "181",
+        "unitInference": {
+          "method": "TITLE_RANGE_STANDARD_INFERENCE",
+          "confidence": 0.99
+        }
+      },
+      "target": {
+        "measureRef": "measure:KIDS:UROGENITAL_DISEASE_NEW_CASES(1.0.0)",
+        "conceptRef": "concept:KIDS:UROGENITAL_DISEASE_NEW_CASES(1.0.0)",
+        "unitRef": "unit:KIDS:COUNT_CASE(1.0.0)",
+        "numericEnvelope": {
+          "precision": 28,
+          "scale": 10,
+          "note": "canonical envelope; the steward narrows it per measure"
+        }
+      },
+      "mappingKind": "1:1",
+      "decision": "PROPOSED",
+      "automaticRegistration": "ALLOWED_AFTER_STEWARD_SIGN_OFF",
+      "blockers": []
+    }
+  ]
+}

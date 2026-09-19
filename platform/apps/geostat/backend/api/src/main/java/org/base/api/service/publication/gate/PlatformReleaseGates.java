@@ -61,7 +61,7 @@ public final class PlatformReleaseGates {
         }
     }
 
-    /** Observations belong to this snapshot's own series and carry a value. */
+    /** Observations belong to this snapshot's own series and carry a value or a status that explains why there is none. */
     @Component
     public static class StatisticalSemanticsValid implements ReleaseGate {
         public String code() { return "STATISTICAL_SEMANTICS_VALID"; }
@@ -70,7 +70,7 @@ public final class PlatformReleaseGates {
             if (f.observationRows() == 0) return GateEvaluation.notApplicable(code(), "snapshot materialized no observations");
             List<String> x = new ArrayList<>();
             if (f.observationForeignSeriesRows() > 0) x.add(f.observationForeignSeriesRows() + " observations use a series of another snapshot");
-            if (f.observationEmptyValues() > 0) x.add(f.observationEmptyValues() + " observations carry no value");
+            if (f.observationEmptyValues() > 0) x.add(f.observationEmptyValues() + " observations carry neither a value nor a status that explains its absence");
             return GateEvaluation.of(code(), x);
         }
     }

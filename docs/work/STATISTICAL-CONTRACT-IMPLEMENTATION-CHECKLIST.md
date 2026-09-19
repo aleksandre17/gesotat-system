@@ -1,7 +1,7 @@
 # სტატისტიკური კონტრაქტი — იმპლემენტაციის checklist
 
 თარიღი: 2026-09-19  
-სტატუსი: **Increments 1–4 — DONE on dev runtime; SDMX-CSV codec and full regression — DONE. Commits `8f1887c` + follow-up, not pushed. ღია: real MS Access, SDMX tooling validation, legacy crosswalk, performance, release-gate hand-over. Release — NOT READY.**  
+სტატუსი: **Contract → approval → Access file → governed load → existing release gates: DONE on dev runtime. SDMX-CSV, regression, Q14 file budgets, legacy crosswalk proposal — DONE. ღია: real MS Access (human), steward decisions for 62 legacy metrics, official SDMX validation, batched DB write, push (origin is PUBLIC). Release — NOT READY.**  
 Authority: [საერთო გეგმა](COMMON-STATISTICAL-CONTRACT-PLAN.md), [გადაწყვეტილებების რეესტრი Q01–Q50](STATISTICAL-CONTRACT-OPEN-QUESTIONS.md), [lifecycle](STATISTICAL-CONTRACT-LIFECYCLE.md).
 
 წესი: `[x]` — მხოლოდ evidence-ის ბმულით. `[ ]` — არ არის შესრულებული. Evidence-ის გარეშე პუნქტი არ მონიშნდება.
@@ -123,10 +123,14 @@ Evidence: `CanonicalObservationWriterTest` (5 tests, H2, column shape of `002_da
 - [x] No lineage or no binding ⇒ refused — `aLoadWithoutLineageOrBindingIsRefused`.
 - [x] `StatisticalBindingService`: approved plan → existing `dataset`, `dataset_version` (checksum = revision digest), `ingestion_contract`, `metric`, `dimension`; idempotent — `StatisticalLoadServiceTest` (4) + live — [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19.json).
 - [x] Governed load `POST …/loads`: validate → retain source bytes content-addressed → one Data Plane transaction (batch, artifact, load, PREPARED snapshot, lineage, observations); replay = same receipt; rejected file writes nothing; separate IMPORT duty — tests + live on dev (snapshot 54, `period_end`, coded dimension, MinIO object; 42 published snapshots untouched) — [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19.json).
-- [ ] Hand-over of the PREPARED snapshot to the existing reconciliation / release-gate run.
+- [x] Hand-over to the existing release gates: the load conforms to what they measure (candidate state `REVIEW_REQUIRED`, staged rows, source-row count); live snapshot 55 ⇒ `releasable=true`, all applicable gates PASS; a published snapshot is still refused — [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19.json).
+- [x] Gate made to conform to Q22: an empty value with a declared status is not a defect; only an unexplained empty value fails `STATISTICAL_SEMANTICS_VALID` — `ReleaseGateServiceTest` PASS + live.
+- [x] Metric identity = dataset × exact measure version (defect found live, fixed) — `revisedMeasureVersionInANewContractRevisionBindsItsOwnMetric`.
+- [ ] Batched database write for loads near the Q14 ceiling (the writer issues one statement per row).
 - [x] Q11 refined and enforced: a load is a `FULL_SNAPSHOT` (the native unit of the platform); other modes answer `422` explicitly — test + live.
 - [ ] Snapshot-delta design for `UPSERT / DELETE` (only if a real dataset needs it).
-- [ ] Legacy ↔ new semantic diff (Q46).
+- [x] Machine-readable legacy crosswalk (Q46): 86 legacy metrics → 1:1 proposed measure references, no merge by name, 0 collisions; 24 registrable after steward sign-off, 62 blocked with typed reasons — `ops/scripts/python/statistical-legacy-crosswalk.py`, [proposal](evidence/statistical-contract/legacy-crosswalk-proposal-2026-09-19.json).
+- [ ] Steward decisions for the 62 blocked metrics; registration; value-level semantic diff of a migrated dataset.
 - [x] Writer on real SQL Server (dev): observations, dimensions, lineage written under the existing triggers — [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19.json).
 
 ### Increment 5 — Access UX (G0 spike → G3)
@@ -141,7 +145,7 @@ Evidence: `CanonicalObservationWriterTest` (5 tests, H2, column shape of `002_da
 - [ ] SDMX-JSON 2.0 codec; validation of both with official SDMX tooling; serving endpoint over a published snapshot (Q47).
 - [x] Multi-measure → 2.1 is refused, never pivoted — `whatTheTargetFormatCannotHoldIsRefusedNotPivoted`.
 - [ ] Build manifest, trace, log scrub (Q48).
-- [ ] Performance budgets, bounded heap, off shared host (Q14).
+- [x] Q14 file-path budgets at the design ceiling, off the shared host, 1 GiB heap: 200 000 rows / 400 000 observations — read 0.6 s, normalise 3.1 s (budget 120 s), file 21 MB (budget 250 MB), heap 515 MB — `StatisticalContractPerformanceTest`, [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19.json).
 - [ ] Rollout / rollback rehearsal; consumer sign-off (Q15, Q50).
 
 ### Regression

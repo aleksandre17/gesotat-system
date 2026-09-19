@@ -94,15 +94,15 @@
       }
     ]
   },
-  "leftOnDev": "contracts: one DRAFT smoke, one SUPERSEDED, one APPROVED proof (proof measures superseded, so it fails closed); 8 reference rows in namespace STAT; dataset RUNTIME_PROOF with one PREPARED snapshot (54), never published; one object in geostat-ingest; Keycloak client geostat-contract-approver",
+  "leftOnDev": "contracts: 1 DRAFT smoke, 2 SUPERSEDED, 1 APPROVED proof; reference rows in namespace STAT incl. proof measures 1.0.0/1.0.1 SUPERSEDED and 1.0.2 APPROVED; dataset RUNTIME_PROOF with candidate snapshots 54 (PREPARED, pre-conformance) and 55 (REVIEW_REQUIRED, releasable, not published); objects in geostat-ingest; Keycloak client geostat-contract-approver",
   "findings": [
     "Pre-existing, unrelated: JwtTokenUtil.removeExpiredTokens throws TransactionRequiredException on schedule (legacy core)."
   ],
   "limits": [
     "Real Microsoft Access not exercised (files were written and read with Jackcess).",
-    "SDMX-CSV output is asserted by unit tests only; it was not validated with official SDMX tooling.",
-    "Legacy crosswalk (Q46), performance budgets (Q14) and the hand-over of a PREPARED snapshot to the release gates are open.",
-    "Generation is synchronous; the durable job variant is open."
+    "SDMX-CSV output is asserted by unit tests only; SDMX-JSON and validation with official SDMX tooling are open.",
+    "Batched database write for loads near the design ceiling is open.",
+    "62 of 86 legacy metrics need a steward decision before they can be registered."
   ],
   "result": "PASS",
   "registryWriteSideLive": {
@@ -340,5 +340,79 @@
     "failuresBelongTo": "another session's uncommitted legacy-lockdown work (untracked test and migration 105); not part of commit 8f1887c and not touched here",
     "statisticalContractTests": "84 of 84 passed inside the full run (81 + 3 SDMX exporter)",
     "harnessFinding": "with maxParallelForks > 1 one fork stalls before starting its first class, so the single-command full run never ends; the stall predates this work (a worker of another session has been stuck since 20:32) and no thread dump could be taken (jstack and jcmd could not attach)"
+  },
+  "releaseGateHandOver": {
+    "finding": "the platform names a materialised candidate snapshot REVIEW_REQUIRED and its gates measure staged rows and a source-row count; the first load wrote PREPARED, no staged rows and an observation count, so the existing gate endpoint refused it (400)",
+    "conformance": "the load now writes the platform's candidate state, one staged row per source row (VALID or REJECTED with its findings) and the source-row count; nothing in the gate service was special-cased for statistical contracts",
+    "live": {
+      "snapshot": 55,
+      "endpoint": "POST /api/v1/platform/publication/snapshots/55/gates",
+      "http": 200,
+      "releasable": true,
+      "gates": {
+        "SCHEMA_VALID": "PASS",
+        "KEYS_VALID": "PASS",
+        "RAW_LINEAGE_VALID": "PASS",
+        "STATISTICAL_SEMANTICS_VALID": "PASS",
+        "PUBLICATION_ATOMIC": "PASS",
+        "CLASSIFIERS_VALID": "NOT_APPLICABLE",
+        "RELATIONS_VALID": "NOT_APPLICABLE"
+      },
+      "publishedSnapshotStillRefused": "POST .../snapshots/52/gates -> 400"
+    },
+    "gateMadeToConform": "STATISTICAL_SEMANTICS_VALID counted every empty value as a defect; an empty value with a declared status (missing, suppressed, not applicable) is now a fact of its own and only an unexplained empty value fails the gate (register Q22)",
+    "notDone": "publication of the proof snapshot: a proof dataset must not be published; publication stays a steward decision"
+  },
+  "defectsFoundLive": [
+    "object key prefix without the trailing slash required by the artifact key convention (400) - fixed, test double now applies the real key rules",
+    "a revised measure version in a new contract revision collided with the metric code of the previous version (DuplicateKey, 400) - metric identity is now dataset x exact measure version; covered by revisedMeasureVersionInANewContractRevisionBindsItsOwnMetric",
+    "candidate snapshot state and staged rows did not match what the existing release gates measure - conformed, see releaseGateHandOver"
+  ],
+  "performance": {
+    "where": "workstation, not the shared host; test task heap limit 1 GiB",
+    "test": "StatisticalContractPerformanceTest (-Dstat.performance=true)",
+    "ceiling": {
+      "wideRows": 200000,
+      "observations": 400000,
+      "measures": 2,
+      "perMeasureStatus": true
+    },
+    "measured": {
+      "accessFileBytes": 21282816,
+      "fillMs": 1471,
+      "readMs": 645,
+      "normaliseMs": 3132,
+      "sdmxCsvExportMs": 1195,
+      "heapUsedMb": 515,
+      "heapMaxMb": 1024
+    },
+    "budgetsQ14": {
+      "validationMsBudget": 120000,
+      "validationMsMeasured": 3777,
+      "fileBytesBudget": 262144000
+    },
+    "notMeasured": "the database write of 400000 observations on SQL Server; the writer issues one statement per row and needs batching before a load of that size - open"
+  },
+  "legacyCrosswalk": {
+    "tool": "ops/scripts/python/statistical-legacy-crosswalk.py",
+    "output": "docs/work/evidence/statistical-contract/legacy-crosswalk-proposal-2026-09-19.json",
+    "summary": {
+      "legacyMetrics": 86,
+      "distinctLegacyMeasures": 2,
+      "allowedAfterStewardSignOff": 24,
+      "blocked": 62,
+      "blockers": {
+        "INFERRED_UNIT_BELOW_CONFIDENCE": 54,
+        "NO_UNIT_EVIDENCE": 43,
+        "RATIO_NEEDS_TYPED_DENOMINATOR_AND_BASE": 9,
+        "SCALED_UNIT_NEEDS_UNIT_MULT_DECISION": 9
+      },
+      "targetCollisions": 0
+    },
+    "meaning": "every legacy metric gets a 1:1 proposed measure reference; nothing is merged by name; 62 rows cannot be registered until a steward supplies the unit, the typed denominator or the multiplier decision. No database row was written."
+  },
+  "push": {
+    "done": false,
+    "reason": "origin (github.com/aleksandre17/gesotat-system) is PUBLIC (anonymous 200, API visibility=public) and the unpushed history contains a real dataset (samples/*.accdb, chartjson.dat) and internal host, realm and client names; the stack-kit submodule remote answers 404 anonymously (private or absent). Publishing is irreversible, so it was not done."
   }
 }
