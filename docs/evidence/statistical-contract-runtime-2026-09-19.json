@@ -99,9 +99,9 @@
     "Pre-existing, unrelated: JwtTokenUtil.removeExpiredTokens throws TransactionRequiredException on schedule (legacy core)."
   ],
   "limits": [
-    "Real Microsoft Access not exercised (files were written and read with Jackcess).",
     "SDMX-CSV output is asserted by unit tests only; SDMX-JSON and validation with official SDMX tooling are open.",
-    "62 of 86 legacy metrics need a steward decision before they can be registered."
+    "62 of 86 legacy metrics need a steward decision before they can be registered.",
+    "Access was exercised through automation on one build (16.0.4229); a person clicking through the dropdown on other builds is still worth one look"
   ],
   "result": "PASS",
   "registryWriteSideLive": {
@@ -433,6 +433,34 @@
         "maxEnd": "2025-12-31",
         "periodValueMismatches": 0
       }
+    }
+  },
+  "realMicrosoftAccess": {
+    "recordedAt": "2026-09-20",
+    "access": "Microsoft Access 16.0.4229.1011 (Office 2016 release build), driven through its own COM automation on the workstation",
+    "defect": "the generator wrote ACCDB 2016 format; this Access build refused it with 'The database you are trying to open requires a newer version of Microsoft Access'. The owner reported it as 'the file does not open'. Every other generator in the repository writes ACCDB 2010; the adapter now does too, pinned by a test",
+    "afterFix": {
+      "open": "OK",
+      "tables": {
+        "stat_DSD_RUNTIME_PROOF": "3 fields",
+        "__cl_1_CL_AGE_GROUP": "12 rows",
+        "__stat_contract": "5 rows"
+      },
+      "captions": [
+        "TIME_PERIOD=პერიოდი",
+        "AGE_GROUP=ასაკობრივი ჯგუფი",
+        "PROOF_COUNT=რაოდენობა"
+      ],
+      "lookup": "AGE_GROUP DisplayControl=111 (combo box), RowSource over the pinned codelist",
+      "saveRow": "2025 | 0-12 | 1234 saved",
+      "duplicateKey": "refused by Access",
+      "fractionIntoScale0": "refused by Access",
+      "datasheetView": "opened"
+    },
+    "roundTrip": {
+      "file": "saved by Microsoft Access",
+      "validation": "accepted, 1 row, 1 observation",
+      "load": "LOADED into snapshot 57"
     }
   }
 }

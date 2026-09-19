@@ -1,4 +1,4 @@
-# სტატისტიკური კონტრაქტი — სესიის ანგარიში (2026-09-19)
+/mo# სტატისტიკური კონტრაქტი — სესიის ანგარიში (2026-09-19)
 
 სტატუსი: dev-ზე მუშაობს. Release — NOT READY.  
 Branch: `security/hardening-2`. Commit-ები: `8f1887c`, `9cf6bd5`, `349c90a`.  
@@ -42,11 +42,13 @@ Evidence: [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19
 5. თარიღი `java.sql.Date`-ით — ძველი წლები ერთი დღით იწევდა. გამოსწორდა: `LocalDate`.
 6. Batch write — გაკეთდა. dev-ზე 2 712 observation, 9 წამი.
 
+7. Access ფაილი არ იხსნებოდა: ფორმატი 2016. Access 2016-ის ძველი build-ი მას არ ხსნის. გამოსწორდა: ფორმატი 2010. Access-ში შემოწმდა: იხსნება, ინახება, dev-ზე აიტვირთა.
+
 ## 4. რა დარჩა
 
 | # | საკითხი | ვინ |
 |---|---|---|
-| 1 | რეალური Microsoft Access: ფაილის გახსნა, `AGE_GROUP`-ის არჩევა, შენახვა | ადამიანი, Access-ით |
+| 1 | Access-ის სხვა ვერსიები: 32-bit, Microsoft 365 | ადამიანი |
 | 2 | 62 legacy metric: unit, denominator, multiplier | steward |
 | 3 | SDMX: ოფიციალური validator, SDMX-JSON | ინჟინერი |
 | 5 | 9 default — რეესტრის §6 | მფლობელი |

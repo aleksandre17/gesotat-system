@@ -37,6 +37,11 @@ import java.util.TreeMap;
 public final class AccessAuthoringAdapter {
     public static final String SOURCE_PROFILE = "ACCESS_ACCDB";
     public static final String STAMP_TABLE = "__stat_contract";
+    /**
+     * ACCDB 2010 format: opened by Access 2010 and every later build, and the format of every other generator in
+     * this repository. The 2016 format flag is refused by Access 2016 release builds ("requires a newer version").
+     */
+    public static final Database.FileFormat FILE_FORMAT = Database.FileFormat.V2010;
     private static final short COMBO_BOX = 111;
 
     public record CodeItem(String code, String label) { }
@@ -62,7 +67,7 @@ public final class AccessAuthoringAdapter {
 
     public void emit(SemanticPlan plan, Map<Ref, List<CodeItem>> codelists, String captionLanguage, File target) throws IOException {
         if (!SOURCE_PROFILE.equals(plan.physical().providerCode())) throw new IllegalArgumentException("plan was not compiled for " + SOURCE_PROFILE);
-        try (Database db = DatabaseBuilder.create(Database.FileFormat.V2016, target)) {
+        try (Database db = DatabaseBuilder.create(FILE_FORMAT, target)) {
             Map<Ref, String> lookupTables = new LinkedHashMap<>();
             for (PlannedComponent c : plan.components())
                 if (c.isAuthoringColumn() && c.representation() instanceof Representation.Coded coded && !lookupTables.containsKey(coded.codelistRef()))

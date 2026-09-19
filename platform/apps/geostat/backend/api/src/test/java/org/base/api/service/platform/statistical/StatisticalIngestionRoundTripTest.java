@@ -152,6 +152,7 @@ class StatisticalIngestionRoundTripTest {
 
         String tableName = land.physical().tables().get(0).name();
         try (Database db = DatabaseBuilder.open(file)) {
+            assertEquals(Database.FileFormat.V2010, db.getFileFormat(), "a format every supported Access build opens");
             Table table = db.getTable(tableName);
             assertEquals(DataType.NUMERIC, table.getColumn("AREA_SIZE").getType(), "exact decimal, not DOUBLE");
             assertEquals(28, table.getColumn("AREA_SIZE").getPrecision());

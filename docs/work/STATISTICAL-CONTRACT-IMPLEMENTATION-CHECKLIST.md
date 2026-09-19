@@ -1,7 +1,7 @@
 # სტატისტიკური კონტრაქტი — იმპლემენტაციის checklist
 
 თარიღი: 2026-09-19  
-სტატუსი: **Contract → approval → Access file → governed load → existing release gates: DONE on dev runtime. SDMX-CSV, regression, Q14 file budgets, legacy crosswalk proposal — DONE. ღია: real MS Access (human), steward decisions for 62 legacy metrics, official SDMX validation, merge to master. Release — NOT READY.**  
+სტატუსი: **Contract → approval → Access file → governed load → existing release gates: DONE on dev runtime. SDMX-CSV, regression, Q14 file budgets, legacy crosswalk proposal — DONE. ღია: steward decisions for 62 legacy metrics, official SDMX validation, merge to master. Release — NOT READY.**  
 Authority: [საერთო გეგმა](COMMON-STATISTICAL-CONTRACT-PLAN.md), [გადაწყვეტილებების რეესტრი Q01–Q50](STATISTICAL-CONTRACT-OPEN-QUESTIONS.md), [lifecycle](STATISTICAL-CONTRACT-LIFECYCLE.md).
 
 წესი: `[x]` — მხოლოდ evidence-ის ბმულით. `[ ]` — არ არის შესრულებული. Evidence-ის გარეშე პუნქტი არ მონიშნდება.
@@ -136,7 +136,9 @@ Evidence: `CanonicalObservationWriterTest` (5 tests, H2, column shape of `002_da
 
 ### Increment 5 — Access UX (G0 spike → G3)
 
-- [ ] Real Access open / select / save evidence, per supported version (Q03, Q36).
+- [x] Real Microsoft Access 16.0.4229: file opens, Georgian captions, combo-box lookup over the pinned codelist, row saved, duplicate key and fraction into scale 0 refused by Access, datasheet view opens; the Access-saved file validates and loads (snapshot 57) — [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19.json).
+- [x] Defect fixed: ACCDB 2016 format was refused by Access 2016 release builds; now ACCDB 2010, pinned by a test.
+- [ ] Other Access builds (32-bit, Microsoft 365 current channel) — one manual look.
 - [ ] Template ACCDB spike: Navigation Pane groups, startup view.
 - [ ] Georgian captions and lookups verified in real Access UI.
 
