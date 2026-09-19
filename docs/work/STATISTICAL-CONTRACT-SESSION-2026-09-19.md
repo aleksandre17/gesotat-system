@@ -49,19 +49,18 @@ Evidence: [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19
 | 4 | Batch write: 400 000 observation-ის ჩაწერა | ინჟინერი |
 | 5 | 9 default — რეესტრის §6 | მფლობელი |
 | 6 | DSD-ის რეგისტრაცია API-ით | ინჟინერი |
-| 7 | Push | მფლობელის პასუხი |
+| 7 | `master`-ში merge (pull request) | მფლობელი |
 
 ## 5. Push
 
-Push არ გაკეთდა. მიზეზი:
+Push გაკეთდა 2026-09-19. მფლობელის ცხადი ნებართვა: საჯარო repo-ში push.
 
-- `github.com/aleksandre17/gesotat-system` — საჯარო repo. შემოწმება: ანონიმური HTTP 200, API `visibility: public`.
-- commit-ებში რეალური dataset-ი: `samples/*.accdb`, `samples/chartjson.dat`.
-- docs-ში შიდა server-ის მისამართები, Keycloak realm და client-ების სახელები.
-- საჯარო გამოქვეყნება უკან არ ბრუნდება.
-- submodule `stack-kit` პირველი push-დება. მისი remote ანონიმურად 404.
+- Branch: `security/hardening-2`. Remote: `github.com/aleksandre17/gesotat-system`.
+- გზა: HTTPS. SSH port 22 ამ ქსელიდან დახურულია.
+- Force — არ. Remote `master` ამ branch-ის წინაპარია.
+- submodule `stack-kit`: commit `1b2c77b` remote-ზე უკვე იყო.
+- ავტორი: Aleksandre Sisvadze.
+- `master` — push არ გაკეთდა. გზა: pull request `security/hardening-2` → `master`.
 
-არჩევანი:
-
-1. Repo-ს private-ად გადაყვანა GitHub-ზე, შემდეგ push. რეკომენდაცია.
-2. მფლობელის ცხადი ნებართვა: dataset-ის და შიდა სახელების საჯარო გამოქვეყნება დასაშვებია.
+გაფრთხილება: repo საჯაროა. `samples/*.accdb`, `samples/chartjson.dat` და docs-ის შიდა სახელები საჯარო გახდა.
+რეკომენდაცია: repo-ს private-ად გადაყვანა, ან ამ ფაილების history-იდან ამოღება.
