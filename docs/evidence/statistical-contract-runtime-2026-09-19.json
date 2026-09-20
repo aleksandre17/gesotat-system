@@ -462,5 +462,23 @@
       "validation": "accepted, 1 row, 1 observation",
       "load": "LOADED into snapshot 57"
     }
+  },
+  "navigationPaneGroups": {
+    "recordedAt": "2026-09-20",
+    "decision": "Access keeps Navigation Pane groups in its own system tables; the generator writes them directly, so no template file and no macro is needed (the Access package plan left the mechanism open)",
+    "groups": {
+      "შესავსები მონაცემები": "the data tables of the structure",
+      "ცნობარები": "the pinned codelists",
+      "კონტრაქტი": "the contract stamp"
+    },
+    "verifiedInAccess": "Access 16.0.4229 reads the category, the three groups and their members back in order; the file opens and its tables open",
+    "boundary": "grouping is presentation only: it grants no right, hides nothing, and a file whose groups were lost still opens, validates and loads",
+    "test": "StatisticalIngestionRoundTripTest.accessTemplateIsTypedCaptionedAndRoundTripsExactDecimals asserts the three groups and their members"
+  },
+  "demonstrationContract": {
+    "why": "the proof contract has one dimension and one measure, so its file holds three tables; a realistic contract was generated to show the shape",
+    "dataset": "STAT:DEMO_SERVICES, contract 6a8a206b-bfff-43ac-a046-da3bec64e4f6, approved by the second identity",
+    "structure": "5 dimensions (time, category, subcategory, age group, language), 2 measures with their own statuses, 1 observation note",
+    "file": "6 tables: 1 data table with 10 columns, 4 codelists (17, 4, 12 and 3 codes), 1 contract stamp"
   }
 }

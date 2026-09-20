@@ -20,6 +20,7 @@ import org.base.api.service.platform.statistical.plan.SemanticPlan.PlannedCompon
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -43,6 +44,12 @@ public final class AccessAuthoringAdapter {
      */
     public static final Database.FileFormat FILE_FORMAT = Database.FileFormat.V2010;
     private static final short COMBO_BOX = 111;
+    /** Navigation Pane vocabulary of Access: a custom category holds named groups of objects. */
+    private static final int CUSTOM_CATEGORY = 4, TABLE_OBJECT = 1;
+    public static final String CATEGORY = "GEOSTAT";
+    public static final String GROUP_DATA = "შესავსები მონაცემები";
+    public static final String GROUP_CODELISTS = "ცნობარები";
+    public static final String GROUP_CONTRACT = "კონტრაქტი";
 
     public record CodeItem(String code, String label) { }
 
@@ -74,6 +81,7 @@ public final class AccessAuthoringAdapter {
                     lookupTables.put(coded.codelistRef(), codelistTable(db, coded.codelistRef(), codelists, lookupTables.size()));
             for (PhysicalTable table : plan.physical().tables()) dataTable(db, plan, table, lookupTables, captionLanguage);
             stamp(db, plan);
+            navigationGroups(db, plan, lookupTables.values());
         }
     }
 
@@ -134,6 +142,55 @@ public final class AccessAuthoringAdapter {
         col.putProperty("BoundColumn", DataType.INT, (short) 1);
         col.putProperty("ColumnCount", DataType.INT, (short) 2);
         col.putProperty("LimitToList", DataType.BOOLEAN, true);
+    }
+
+    /**
+     * Groups the objects in the Navigation Pane so the author sees where data is entered and which tables only
+     * describe the approved contract (Access package plan). Access keeps this in its own system tables; the rows
+     * are written here, so no template file and no macro is needed. Grouping is presentation: it grants no right
+     * and hides nothing, and a file whose groups were lost still opens and still loads.
+     */
+    private void navigationGroups(Database db, SemanticPlan plan, Collection<String> codelistTables) throws IOException {
+        Table categories = db.getSystemTable("MSysNavPaneGroupCategories");
+        Table groups = db.getSystemTable("MSysNavPaneGroups");
+        Table links = db.getSystemTable("MSysNavPaneGroupToObjects");
+        Table objectIds = db.getSystemTable("MSysNavPaneObjectIDs");
+        if (categories == null || groups == null || links == null || objectIds == null) return; // older provider: tables only
+
+        Map<String, Integer> knownObjects = new LinkedHashMap<>();
+        int maxObjectId = 0;
+        for (Row row : objectIds) {
+            knownObjects.put(String.valueOf(row.get("Name")), (Integer) row.get("Id"));
+            maxObjectId = Math.max(maxObjectId, (Integer) row.get("Id"));
+        }
+        Map<String, List<String>> plannedGroups = new LinkedHashMap<>();
+        plannedGroups.put(GROUP_DATA, plan.physical().tables().stream().map(PhysicalTable::name).toList());
+        plannedGroups.put(GROUP_CODELISTS, List.copyOf(codelistTables));
+        plannedGroups.put(GROUP_CONTRACT, List.of(STAMP_TABLE));
+
+        int categoryId = nextId(categories), groupId = nextId(groups), linkId = nextId(links), position = 0;
+        categories.addRow(null, 0, categoryId, CATEGORY, 0, null, CUSTOM_CATEGORY);
+        for (Map.Entry<String, List<String>> group : plannedGroups.entrySet()) {
+            if (group.getValue().isEmpty()) continue;
+            int id = groupId++;
+            groups.addRow(0, categoryId, id, group.getKey(), 0, 0, position++);
+            int inner = 0;
+            for (String object : group.getValue()) {
+                Integer objectId = knownObjects.get(object);
+                if (objectId == null) {
+                    objectId = ++maxObjectId;
+                    objectIds.addRow(objectId, object, TABLE_OBJECT);
+                    knownObjects.put(object, objectId);
+                }
+                links.addRow(0, id, 0, linkId++, null, objectId, inner++);
+            }
+        }
+    }
+
+    private static int nextId(Table table) throws IOException {
+        int max = 0;
+        for (Row row : table) max = Math.max(max, (Integer) row.get("Id"));
+        return max + 1;
     }
 
     private static void stamp(Database db, SemanticPlan plan) throws IOException {

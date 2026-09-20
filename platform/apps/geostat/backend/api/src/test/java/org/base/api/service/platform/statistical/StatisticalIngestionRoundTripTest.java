@@ -160,6 +160,25 @@ class StatisticalIngestionRoundTripTest {
             assertEquals("ფართობი", table.getColumn("AREA_SIZE").getProperties().getValue(PropertyMap.CAPTION_PROP));
             assertTrue(String.valueOf(table.getColumn("LAND_USE").getProperties().getValue("RowSource")).contains("__cl_"), "stable code stored, label shown");
             assertTrue(db.getTableNames().stream().noneMatch(n -> n.toLowerCase().contains("carrier") || n.toLowerCase().contains("kids")), "no legacy or site-specific surface");
+
+            // The Navigation Pane shows where data is entered, separately from what only describes the contract.
+            Map<String, java.util.List<String>> pane = new java.util.LinkedHashMap<>();
+            Map<Integer, String> objectNames = new java.util.HashMap<>();
+            for (com.healthmarketscience.jackcess.Row row : db.getSystemTable("MSysNavPaneObjectIDs")) objectNames.put((Integer) row.get("Id"), String.valueOf(row.get("Name")));
+            Map<Integer, String> groupNames = new java.util.HashMap<>();
+            Integer category = null;
+            for (com.healthmarketscience.jackcess.Row row : db.getSystemTable("MSysNavPaneGroupCategories"))
+                if (AccessAuthoringAdapter.CATEGORY.equals(row.get("Name"))) category = (Integer) row.get("Id");
+            assertNotNull(category, "the generated file declares its own Navigation Pane category");
+            for (com.healthmarketscience.jackcess.Row row : db.getSystemTable("MSysNavPaneGroups"))
+                if (category.equals(row.get("GroupCategoryID"))) groupNames.put((Integer) row.get("Id"), String.valueOf(row.get("Name")));
+            for (com.healthmarketscience.jackcess.Row row : db.getSystemTable("MSysNavPaneGroupToObjects")) {
+                String group = groupNames.get((Integer) row.get("GroupID"));
+                if (group != null) pane.computeIfAbsent(group, g -> new java.util.ArrayList<>()).add(objectNames.get((Integer) row.get("ObjectID")));
+            }
+            assertEquals(java.util.List.of(tableName), pane.get(AccessAuthoringAdapter.GROUP_DATA));
+            assertEquals(2, pane.get(AccessAuthoringAdapter.GROUP_CODELISTS).size(), "both codelists of the land structure, including the overridable constant dimension");
+            assertEquals(java.util.List.of(AccessAuthoringAdapter.STAMP_TABLE), pane.get(AccessAuthoringAdapter.GROUP_CONTRACT));
             table.addRow("GE", "FOREST", new BigDecimal("2822400.1234567890"));
             table.addRow("GE_KA", "ARABLE", new BigDecimal("999999999999999999.9999999999"));
         }

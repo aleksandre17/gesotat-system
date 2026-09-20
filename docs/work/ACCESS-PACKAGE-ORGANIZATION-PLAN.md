@@ -41,7 +41,7 @@ Navigation Pane-ის დაჯგუფება ან ობიექტი�
 
 ## შემდგომ დასაზუსტებელი საკითხები
 
-- Navigation Pane-ის ჯგუფების გენერაციისა და შენახვის ტექნიკური გზა და მხარდაჭერილი Access ვერსიები.
+- ~~Navigation Pane-ის ჯგუფების გენერაციისა და შენახვის ტექნიკური გზა~~ — გადაწყდა 2026-09-20: გენერატორი თავად წერს Access-ის სისტემურ ცხრილებში (`MSysNavPaneGroupCategories`, `MSysNavPaneGroups`, `MSysNavPaneGroupToObjects`, `MSysNavPaneObjectIDs`); შაბლონის ფაილი და macro არ სჭირდება. შემოწმდა Access 16.0.4229-ზე. ფაილის ფორმატი — ACCDB 2010. იხ. [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19.json).
 - საწყისი ხედის დაყენების მექანიზმი.
 - რომელი მონაცემები გამოჩნდება პირდაპირ ცხრილებად და სად იქნება საჭირო შესავსები ფორმა.
 - Metadata-ში ჯგუფისა და რედაქტირებადობის აღწერის საჭიროება და მისი versioning/compatibility წესი.
