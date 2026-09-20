@@ -13,9 +13,18 @@ import java.util.*;
  */
 @Service
 public class ContractIntrospectionService {
-    private final JdbcTemplate db;
+    /** The table an include would expand into; capabilities advertise only what this caller may read. */
+    private String relationTarget(long revisionId, String relationCode) {
+        List<String> target = db.query("SELECT TOP 1 to_dataset_code FROM platform.site_contract_relation WHERE site_contract_revision_id=? AND relation_code=?",
+                (r, n) -> r.getString(1), revisionId, relationCode);
+        return target.isEmpty() ? relationCode : target.get(0);
+    }
 
-    public ContractIntrospectionService(@Qualifier("primaryJdbcTemplate") JdbcTemplate db) {
+    private final JdbcTemplate db;
+    private final ServingPolicy serving;
+
+    public ContractIntrospectionService(@Qualifier("primaryJdbcTemplate") JdbcTemplate db, ServingPolicy serving) {
+        this.serving = serving;
         this.db = db;
     }
 
@@ -82,7 +91,7 @@ public class ContractIntrospectionService {
                         "cardinality", r.getString(7), "required", r.getBoolean(8)), revisionId, dataset, dataset));
         out.put("allowedFilters", db.query("SELECT f.field_name FROM platform.site_contract_field f JOIN platform.site_contract_dataset d ON d.contract_dataset_id=f.contract_dataset_id WHERE d.site_contract_revision_id=? AND d.dataset_code=? ORDER BY f.ordinal",
                 (r, n) -> r.getString(1), revisionId, dataset));
-        List<String> includes=new ArrayList<>(); includes.addAll(db.query("SELECT relation_code FROM platform.site_contract_relation WHERE site_contract_revision_id=? AND (from_dataset_code=? OR to_dataset_code=?) ORDER BY load_priority",(r,n)->r.getString(1),revisionId,dataset,dataset)); out.put("allowedIncludes", includes);
+        List<String> includes=new ArrayList<>(); includes.addAll(db.query("SELECT relation_code FROM platform.site_contract_relation WHERE site_contract_revision_id=? AND (from_dataset_code=? OR to_dataset_code=?) ORDER BY load_priority",(r,n)->r.getString(1),revisionId,dataset,dataset)); includes.removeIf(code -> !serving.permits(revisionId, relationTarget(revisionId, code))); out.put("allowedIncludes", includes);
         // Aggregation capability is contract/registry driven.  COUNT is the
         // universal cardinality operation; measure-specific operations come
         // only from the approved metric registry for this dataset.  This

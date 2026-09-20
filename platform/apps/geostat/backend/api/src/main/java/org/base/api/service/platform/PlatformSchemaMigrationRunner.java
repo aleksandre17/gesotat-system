@@ -146,6 +146,7 @@ public class PlatformSchemaMigrationRunner implements ApplicationRunner {
         executeAndRecord(control, "db/platform/106_statistical_reference_identity.sql");
         executeAndRecord(control, "db/platform/107_statistical_contract_draft.sql");
         executeAndRecord(control, "db/platform/108_statistical_reference_definition_digest.sql");
+        executeAndRecord(control, "db/platform/109_contract_table_serving_policy.sql");
         events.publishEvent(new PlatformSchemaReadyEvent(Instant.now()));
     }
 

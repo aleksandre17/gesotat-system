@@ -825,7 +825,7 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 
 ### AIR-2026-045 — Page 11 declared includes cannot be served and one of them would expose raw documents
 
-- **სტატუსი:** `TRIAGED` / **priority:** `P1` / **owner:** Serving + Data Protection
+- **სტატუსი:** `CLOSED` (2026-09-20, `docs/evidence/page11-includes-serving-2026-09-20.json`) / was `TRIAGED` / **priority:** `P1` / **owner:** Serving + Data Protection
 - **აღმოჩენა / decision:** see checklist 17.20. The 400 is correct fail-closed behaviour of the physical query
   service for `ACCESS`-plane tables; making it pass by re-labelling tables would publish raw source documents.
 
@@ -872,7 +872,7 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
 
 ### AIR-2026-048 — Legacy defects observed while proving AIR-2026-047 on dev (not caused by it)
 
-- **სტატუსი:** `TRIAGED` / **priority:** `P2` / **owner:** Control + Security
+- **სტატუსი:** `IN_PROGRESS` / **priority:** `P2` / **owner:** Control + Security
 - **აღმოჩენა:** (1) dataset `KIDS_STATISTICAL_INPUT` holds 973 `DRAFT` dataset versions on dev: the trace of the
   restart-time non-idempotent DML the migration runner comment already describes; the rows are inert but make
   "latest version" queries meaningless. (2) `JwtTokenUtil.removeExpiredTokens` throws `TransactionRequiredException`
@@ -881,6 +881,20 @@ Checklist: `docs/work/STORAGE-ARTIFACT-CLOSURE-CHECKLIST.md` · ADR-008 · evide
   separation of duties for anything but the four-eyes rule of the statistical contract.
   (4) The API test task runs with `maxParallelForks > 1` and one fork stalls before starting its first class, so a
   single-command full run never ends; all tests pass when the stalled queue is run on its own.
-- **Decision:** none of the four is changed here. (1) needs a reviewed cleanup migration with a backup; (2) a
-  transactional boundary in legacy core; (3) a role review of the dev realm.
+- **Decision / current evidence (2026-09-20):** (2) now has an explicit `@Transactional` boundary on the scheduled
+  repository delete, with `:core:test` PASS. (4) now configures one API test fork because its Spring/JPA tests share
+  scheduler and embedded-database state; full `:api:test` now has a clean reproducible PASS (454 tests, 2 skipped).
+  (1) still needs a reviewed cleanup migration with a backup; (3)
+  still needs a role review of the dev realm.
 
+### AIR-2026-049 — Sourcing an env file into a shell truncated every JDBC URL and took the dev API down
+
+- **სტატუსი:** `CLOSED` (2026-09-20) / **priority:** `P2` / **owner:** Ops
+- **აღმოჩენა:** recreating the dev API container to pick up a new authority map was done by sourcing `.env.dev`
+  into the shell so that Compose could interpolate `${DB_PRIMARY_URL}`. The shell cut every value at the first
+  `;`, so the container started with `jdbc:sqlserver://geostat-system-mssql:1433` and nothing else: the driver
+  then required a trusted certificate and no datasource could start. The dev API was down for about twelve
+  minutes; production was untouched and answered 200 throughout.
+- **Decision:** the deploy path is `docker-compose --env-file <file> -f <compose> up -d --no-build <service>`;
+  Compose parses the file itself. An env file is never sourced into a shell. A plain container restart keeps the
+  environment it was created with, so a changed env file needs a recreate — which is why this path matters.

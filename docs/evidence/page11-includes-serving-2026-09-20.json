@@ -1,0 +1,50 @@
+{
+  "schema": "geostat.evidence.v1",
+  "recordedAt": "2026-09-20",
+  "subject": "checklist 17.20 / AIR-2026-045 — page 11 declared includes",
+  "problem": "page 11 declared two includes whose targets are ACCESS-plane tables; the physical query service refuses every non-DATA table, so the page answered 400. Those tables have no physical rows at all: their content lives in canonical raw storage.",
+  "decision": "the contract gained an explicit serving policy (migration 109): a table outside the Data Plane is served only when it says it is servable, and only to a caller holding the authority it demands. Deny by default; no table was re-labelled as DATA.",
+  "implementation": {
+    "migration": "109_contract_table_serving_policy.sql — servable + serving_authority on contract_table_definition; KIDS_STATISTICAL_CARRIER servable to every reader, KIDS_RAW_DOCUMENT servable only with RAW_READ",
+    "service": "ServingPolicy decides and serves: rows come from raw.source_record of the newest PUBLISHED snapshot of that table's dataset, projected to the contract's declared fields",
+    "query": "ContractPhysicalQueryService asks the policy instead of refusing by plane; relation expansion silently skips a child the caller may not read; keyset pagination stays Data Plane only",
+    "capabilities": "allowedIncludes advertises only what this caller may read",
+    "authority": "raw.read now also maps to RAW_READ (application.yml, compose default and the dev env); READ_RESOURCE alone does not open raw documents"
+  },
+  "tests": "ServingPolicyTest (5) plus the contract/page/keyset suites: 114 tests, 0 failures",
+  "live": {
+    "operator (contract.read, contract.write, publish.execute, platform.admin)": {
+      "capabilities": [
+        "INPUT_FOR_CARRIER"
+      ],
+      "page11Query": {
+        "http": 200,
+        "returned": 5,
+        "total": 1760,
+        "carrierIncludeMatched": 5
+      },
+      "rawIncludeRequested": {
+        "http": 400,
+        "meaning": "an include this caller may not read is not declared to them; the answer does not reveal that it exists"
+      }
+    },
+    "raw-read identity (contract.read, quality.approve, raw.read)": {
+      "capabilities": [
+        "INPUT_FOR_CARRIER",
+        "INPUT_RAW_LINEAGE"
+      ],
+      "page11Query": {
+        "http": 200,
+        "returned": 3,
+        "bothIncludesMatched": 3
+      }
+    }
+  },
+  "incidentDuringTheWork": {
+    "what": "recreating the dev container to pick up the new authority map truncated every JDBC URL at the first ';' because the env file was sourced into a shell for compose interpolation; the API could not reach SQL Server for ~12 minutes",
+    "recovery": "recreated with `docker-compose --env-file .env.dev -f docker-compose.workspace.yml up -d --no-build api`; health UP, role map in effect",
+    "production": "untouched throughout; :8083/health answered 200 at every check",
+    "lesson": "never source an env file into a shell for compose; pass --env-file so compose parses it"
+  },
+  "result": "PASS"
+}
