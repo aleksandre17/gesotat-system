@@ -140,12 +140,14 @@ Evidence: `CanonicalObservationWriterTest` (5 tests, H2, column shape of `002_da
 - [x] Defect fixed: ACCDB 2016 format was refused by Access 2016 release builds; now ACCDB 2010, pinned by a test.
 - [ ] Other Access builds (32-bit, Microsoft 365 current channel) — one manual look.
 - [x] Navigation Pane groups written by the generator itself (no template, no macro): "შესავსები მონაცემები", "ცნობარები", "კონტრაქტი"; verified in real Access — [runtime evidence](../evidence/statistical-contract-runtime-2026-09-19.json).
-- [ ] Startup view (opening the data table on file open) and authoring forms.
+- [x] Four groups with the Access package plan's own names, the contract identity and schema copy in the file, and the opening category set to it — verified in Access; that the window actually opens on it is left for a person to watch.
+- [ ] Authoring forms (the plan allows tables or forms; tables are used).
 - [ ] Georgian captions and lookups verified in real Access UI.
 
 ### Increment 6 — Export and release (G4)
 
 - [x] SDMX-CSV 2.0 codec from the plan: one row per key, each measure and its status in its own column, deterministic order, exact decimals — `SdmxCsvExporterTest` (3).
+- [x] Access → canonical → export semantic equivalence proven end to end — `SemanticEquivalenceTest`; two defects found and fixed (published decimals, status marker).
 - [ ] SDMX-JSON 2.0 codec; validation of both with official SDMX tooling; serving endpoint over a published snapshot (Q47).
 - [x] Multi-measure → 2.1 is refused, never pivoted — `whatTheTargetFormatCannotHoldIsRefusedNotPivoted`.
 - [ ] Build manifest, trace, log scrub (Q48).

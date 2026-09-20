@@ -465,20 +465,38 @@
   },
   "navigationPaneGroups": {
     "recordedAt": "2026-09-20",
-    "decision": "Access keeps Navigation Pane groups in its own system tables; the generator writes them directly, so no template file and no macro is needed (the Access package plan left the mechanism open)",
+    "decision": "the Access package plan, followed to the letter: four groups with its names, the identity and schema of the contract carried in the file as a read-only copy, and the fillable data as the view the file opens on",
+    "mechanism": "Access keeps groups in its own system tables and the opening category in the 'NavPane Category' database property; the generator writes both, so no template file and no macro is needed",
     "groups": {
       "შესავსები მონაცემები": "the data tables of the structure",
-      "ცნობარები": "the pinned codelists",
-      "კონტრაქტი": "the contract stamp"
+      "იდენტობა და სქემა": "__gs_package, __gs_dataset, __gs_field, __gs_key, __gs_relation, __gs_page, __gs_projection, __stat_contract",
+      "კლასიფიკატორები": "the pinned codelists",
+      "წყაროს კვალი": "__raw_document"
     },
-    "verifiedInAccess": "Access 16.0.4229 reads the category, the three groups and their members back in order; the file opens and its tables open",
+    "verifiedInAccess": "Access 16.0.4229 reads the four groups in order, 'NavPane Category' = the generated category, and the file and its tables open",
+    "contractCopy": {
+      "__gs_package": 1,
+      "__gs_dataset": 1,
+      "__gs_field": 10,
+      "__gs_key": 5,
+      "meaning": "the copy is never authority: import compares it with the Control Plane and refuses a file whose copy was edited"
+    },
     "boundary": "grouping is presentation only: it grants no right, hides nothing, and a file whose groups were lost still opens, validates and loads",
-    "test": "StatisticalIngestionRoundTripTest.accessTemplateIsTypedCaptionedAndRoundTripsExactDecimals asserts the three groups and their members"
+    "openForAPerson": "that Access actually opens on that category is a visual fact; the property is written and read back, but nobody has watched the window yet"
   },
   "demonstrationContract": {
     "why": "the proof contract has one dimension and one measure, so its file holds three tables; a realistic contract was generated to show the shape",
     "dataset": "STAT:DEMO_SERVICES, contract 6a8a206b-bfff-43ac-a046-da3bec64e4f6, approved by the second identity",
     "structure": "5 dimensions (time, category, subcategory, age group, language), 2 measures with their own statuses, 1 observation note",
     "file": "6 tables: 1 data table with 10 columns, 4 codelists (17, 4, 12 and 3 codes), 1 contract stamp"
+  },
+  "semanticEquivalence": {
+    "requirement": "the last item of the simplification plan: Access → canonical model → export must carry the same facts",
+    "test": "SemanticEquivalenceTest.whatWasTypedIsWhatIsStoredIsWhatIsExported — a filled file is normalised, written to the canonical tables, read back from those tables alone, and exported; the export from the file and the export from the database are compared byte for byte",
+    "defectsFound": [
+      "the storage column is DECIMAL(28,10), so values came back with ten decimals; the export now publishes the number of decimals the contract declares (1800, not 1800.0000000000)",
+      "a value with no author-declared status is stored as VALID; that marker is the platform's own and is no longer published as if the author had chosen it"
+    ],
+    "result": "PASS"
   }
 }

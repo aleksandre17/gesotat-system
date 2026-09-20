@@ -52,8 +52,8 @@ public final class SdmxCsvExporter {
             StringBuilder order = new StringBuilder();
             dimensions.forEach(d -> order.append(o.dimensions().getOrDefault(d.code(), "")).append('	'));
             Map<String, String> row = rows.computeIfAbsent(order.toString(), k -> new LinkedHashMap<>(o.dimensions()));
-            row.put(o.measureCode(), o.value() == null ? "" : o.value().toPlainString());
-            if (o.statusAttribute() != null) row.put(o.statusAttribute(), o.status());
+            row.put(o.measureCode(), render(o.value(), plan.component(o.measureCode())));
+            if (o.statusAttribute() != null && o.status() != null) row.put(o.statusAttribute(), o.status()); // no declared status, nothing published
             o.attributes().forEach(row::putIfAbsent);
         }
 
@@ -65,6 +65,18 @@ public final class SdmxCsvExporter {
             out.append(String.join(",", cells.stream().map(SdmxCsvExporter::escape).toList())).append("\r\n");
         }
         return out.toString();
+    }
+
+    /**
+     * A measure is published with the number of decimals its contract declares, whatever scale the storage
+     * column happened to use. The value itself is never changed: ingestion already refused anything that does
+     * not fit, so this only fixes how many zeros are written.
+     */
+    private static String render(java.math.BigDecimal value, PlannedComponent measure) {
+        if (value == null) return "";
+        if (!(measure.representation() instanceof org.base.api.service.platform.statistical.model.Representation.Numeric numeric) || numeric.approximate())
+            return value.toPlainString();
+        return value.setScale(numeric.scale(), java.math.RoundingMode.UNNECESSARY).toPlainString();
     }
 
     /** RFC 4180 quoting. */

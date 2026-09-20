@@ -48,8 +48,13 @@ public final class AccessAuthoringAdapter {
     private static final int CUSTOM_CATEGORY = 4, TABLE_OBJECT = 1;
     public static final String CATEGORY = "GEOSTAT";
     public static final String GROUP_DATA = "შესავსები მონაცემები";
-    public static final String GROUP_CODELISTS = "ცნობარები";
-    public static final String GROUP_CONTRACT = "კონტრაქტი";
+    public static final String GROUP_SCHEMA = "იდენტობა და სქემა";
+    public static final String GROUP_CODELISTS = "კლასიფიკატორები";
+    public static final String GROUP_LINEAGE = "წყაროს კვალი";
+    /** Identity and schema copy of the approved contract, under the canonical names of the Access package plan. */
+    public static final String PACKAGE_TABLE = "__gs_package", DATASET_TABLE = "__gs_dataset", FIELD_TABLE = "__gs_field",
+            KEY_TABLE = "__gs_key", RELATION_TABLE = "__gs_relation", PAGE_TABLE = "__gs_page", PROJECTION_TABLE = "__gs_projection",
+            RAW_DOCUMENT_TABLE = "__raw_document";
 
     public record CodeItem(String code, String label) { }
 
@@ -81,6 +86,7 @@ public final class AccessAuthoringAdapter {
                     lookupTables.put(coded.codelistRef(), codelistTable(db, coded.codelistRef(), codelists, lookupTables.size()));
             for (PhysicalTable table : plan.physical().tables()) dataTable(db, plan, table, lookupTables, captionLanguage);
             stamp(db, plan);
+            contractCopy(db, plan);
             navigationGroups(db, plan, lookupTables.values());
         }
     }
@@ -145,6 +151,100 @@ public final class AccessAuthoringAdapter {
     }
 
     /**
+     * The identity and schema of the approved contract, carried into the file as a read-only copy (Access package
+     * plan): what this package is, which dataset it fills, which fields and key the contract declares, and the
+     * places provenance will be recorded. The copy is never authority — import compares it with the Control Plane
+     * and refuses a file whose copy was edited — so it is written once and shown, not filled.
+     */
+    private void contractCopy(Database db, SemanticPlan plan) throws IOException {
+        Table packages = new TableBuilder(PACKAGE_TABLE)
+                .addColumn(new ColumnBuilder("package_code", DataType.TEXT).setLengthInUnits(120))
+                .addColumn(new ColumnBuilder("profile_ref", DataType.TEXT).setLengthInUnits(255))
+                .addColumn(new ColumnBuilder("contract_revision_digest", DataType.TEXT).setLengthInUnits(64))
+                .addColumn(new ColumnBuilder("generated_at", DataType.TEXT).setLengthInUnits(32))
+                .putProperty(PropertyMap.DESCRIPTION_PROP, "Identity of this authoring package; read-only copy of the approved contract.")
+                .toTable(db);
+        packages.addRow(plan.datasetNamespace() + "." + plan.datasetCode(), plan.profileRef().wire(), plan.revisionDigest(),
+                java.time.Instant.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS).toString());
+
+        Table datasets = new TableBuilder(DATASET_TABLE)
+                .addColumn(new ColumnBuilder("dataset_code", DataType.TEXT).setLengthInUnits(120))
+                .addColumn(new ColumnBuilder("namespace_code", DataType.TEXT).setLengthInUnits(120))
+                .addColumn(new ColumnBuilder("structure_ref", DataType.TEXT).setLengthInUnits(255))
+                .addColumn(new ColumnBuilder("physical_table_name", DataType.TEXT).setLengthInUnits(120))
+                .putProperty(PropertyMap.DESCRIPTION_PROP, "The dataset this package fills and the table that holds it.")
+                .toTable(db);
+        for (PhysicalTable table : plan.physical().tables())
+            datasets.addRow(plan.datasetCode(), plan.datasetNamespace(), plan.structureRef().wire(), table.name());
+
+        Table fields = new TableBuilder(FIELD_TABLE)
+                .addColumn(new ColumnBuilder("table_name", DataType.TEXT).setLengthInUnits(120))
+                .addColumn(new ColumnBuilder("field_name", DataType.TEXT).setLengthInUnits(120))
+                .addColumn(new ColumnBuilder("component_role", DataType.TEXT).setLengthInUnits(24))
+                .addColumn(new ColumnBuilder("value_type", DataType.TEXT).setLengthInUnits(32))
+                .addColumn(new ColumnBuilder("required", DataType.BOOLEAN))
+                .addColumn(new ColumnBuilder("concept_ref", DataType.TEXT).setLengthInUnits(255))
+                .addColumn(new ColumnBuilder("measure_ref", DataType.TEXT).setLengthInUnits(255))
+                .addColumn(new ColumnBuilder("unit_ref", DataType.TEXT).setLengthInUnits(255))
+                .addColumn(new ColumnBuilder("codelist_ref", DataType.TEXT).setLengthInUnits(255))
+                .addColumn(new ColumnBuilder("caption", DataType.TEXT).setLengthInUnits(255))
+                .putProperty(PropertyMap.DESCRIPTION_PROP, "Every field the contract declares, with the meaning behind it.")
+                .toTable(db);
+        Table keys = new TableBuilder(KEY_TABLE)
+                .addColumn(new ColumnBuilder("table_name", DataType.TEXT).setLengthInUnits(120))
+                .addColumn(new ColumnBuilder("field_name", DataType.TEXT).setLengthInUnits(120))
+                .addColumn(new ColumnBuilder("key_position", DataType.LONG))
+                .putProperty(PropertyMap.DESCRIPTION_PROP, "The dimensions that identify one row; their order is the contract's.")
+                .toTable(db);
+        for (PhysicalTable table : plan.physical().tables()) {
+            int keyPosition = 0;
+            for (PhysicalColumn column : table.columns()) {
+                if (column.componentCode() == null) continue;
+                PlannedComponent c = plan.component(column.componentCode());
+                fields.addRow(table.name(), column.name(), c.role().name(), c.representation().logicalType(), c.required(),
+                        c.conceptRef() == null ? null : c.conceptRef().wire(), c.measureRef() == null ? null : c.measureRef().wire(),
+                        c.unitRef() == null ? null : c.unitRef().wire(),
+                        c.representation() instanceof Representation.Coded coded ? coded.codelistRef().wire() : null,
+                        plan.captions().getOrDefault(c.code(), Map.of()).get(captionLanguageOf(plan)));
+                if (c.role() == Component.Role.DIMENSION) keys.addRow(table.name(), column.name(), ++keyPosition);
+            }
+        }
+
+        // Declared, and empty in an authoring file: a statistical structure carries no relations, pages or
+        // projections of its own, and provenance is written when the filled file is loaded, not before.
+        new TableBuilder(RELATION_TABLE)
+                .addColumn(new ColumnBuilder("relation_code", DataType.TEXT).setLengthInUnits(160))
+                .addColumn(new ColumnBuilder("from_field", DataType.TEXT).setLengthInUnits(120))
+                .addColumn(new ColumnBuilder("to_table", DataType.TEXT).setLengthInUnits(120))
+                .addColumn(new ColumnBuilder("to_field", DataType.TEXT).setLengthInUnits(120))
+                .putProperty(PropertyMap.DESCRIPTION_PROP, "Declared relations of the contract; empty for a single-structure authoring file.")
+                .toTable(db);
+        new TableBuilder(PAGE_TABLE)
+                .addColumn(new ColumnBuilder("page_code", DataType.TEXT).setLengthInUnits(160))
+                .addColumn(new ColumnBuilder("dataset_code", DataType.TEXT).setLengthInUnits(120))
+                .putProperty(PropertyMap.DESCRIPTION_PROP, "Pages that serve this dataset; filled by the platform, not by the author.")
+                .toTable(db);
+        new TableBuilder(PROJECTION_TABLE)
+                .addColumn(new ColumnBuilder("projection_code", DataType.TEXT).setLengthInUnits(160))
+                .addColumn(new ColumnBuilder("dataset_code", DataType.TEXT).setLengthInUnits(120))
+                .addColumn(new ColumnBuilder("projection_model", DataType.TEXT).setLengthInUnits(64))
+                .putProperty(PropertyMap.DESCRIPTION_PROP, "Declared projections over this dataset; filled by the platform.")
+                .toTable(db);
+        new TableBuilder(RAW_DOCUMENT_TABLE)
+                .addColumn(new ColumnBuilder("document_identity", DataType.TEXT).setLengthInUnits(255))
+                .addColumn(new ColumnBuilder("original_filename", DataType.TEXT).setLengthInUnits(255))
+                .addColumn(new ColumnBuilder("payload_checksum", DataType.TEXT).setLengthInUnits(64))
+                .addColumn(new ColumnBuilder("received_at", DataType.TEXT).setLengthInUnits(32))
+                .putProperty(PropertyMap.DESCRIPTION_PROP, "Provenance of the loaded file; written by the platform on load.")
+                .toTable(db);
+    }
+
+    /** The language whose captions this file carries; the generator wrote them, so any caption identifies it. */
+    private static String captionLanguageOf(SemanticPlan plan) {
+        return plan.captions().values().stream().flatMap(m -> m.keySet().stream()).findFirst().orElse("ka");
+    }
+
+    /**
      * Groups the objects in the Navigation Pane so the author sees where data is entered and which tables only
      * describe the approved contract (Access package plan). Access keeps this in its own system tables; the rows
      * are written here, so no template file and no macro is needed. Grouping is presentation: it grants no right
@@ -165,11 +265,15 @@ public final class AccessAuthoringAdapter {
         }
         Map<String, List<String>> plannedGroups = new LinkedHashMap<>();
         plannedGroups.put(GROUP_DATA, plan.physical().tables().stream().map(PhysicalTable::name).toList());
+        plannedGroups.put(GROUP_SCHEMA, List.of(PACKAGE_TABLE, DATASET_TABLE, FIELD_TABLE, KEY_TABLE, RELATION_TABLE, PAGE_TABLE, PROJECTION_TABLE, STAMP_TABLE));
         plannedGroups.put(GROUP_CODELISTS, List.copyOf(codelistTables));
-        plannedGroups.put(GROUP_CONTRACT, List.of(STAMP_TABLE));
+        plannedGroups.put(GROUP_LINEAGE, List.of(RAW_DOCUMENT_TABLE));
 
         int categoryId = nextId(categories), groupId = nextId(groups), linkId = nextId(links), position = 0;
         categories.addRow(null, 0, categoryId, CATEGORY, 0, null, CUSTOM_CATEGORY);
+        // Opening the file shows this category, whose first group is the one the author fills (Access package plan).
+        db.getDatabaseProperties().put("NavPane Category", DataType.LONG, categoryId);
+        db.getDatabaseProperties().save();
         for (Map.Entry<String, List<String>> group : plannedGroups.entrySet()) {
             if (group.getValue().isEmpty()) continue;
             int id = groupId++;

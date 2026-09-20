@@ -35,8 +35,11 @@ import java.util.TreeMap;
  */
 public final class CanonicalObservationWriter {
     public static final String SERIES_DOMAIN = "geostat.stat-series-key.v1";
-    /** Stored when the contract declares no status for a present value: the value is simply a normal one. */
-    private static final String STATUS_NORMAL = "VALID";
+    /**
+     * Stored when the author declared no status: the value is simply a normal one. It is the platform's marker,
+     * never a code of a contract codelist, so reading it back means "no declared status" and it is not published.
+     */
+    public static final String STATUS_NORMAL = "VALID";
 
     /** Port to the identifiers the canonical tables use. Absent means the contract is not bound for loading. */
     public interface Binding {

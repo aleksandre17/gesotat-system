@@ -139,6 +139,11 @@ class StatisticalIngestionRoundTripTest {
 
     // ---- Access adapter: emit -> fill -> read -> normalize (Q34, Q36)
 
+    private static long plan_dimensions(SemanticPlan plan) {
+        return plan.withRole(org.base.api.service.platform.statistical.model.Component.Role.DIMENSION).stream()
+                .filter(SemanticPlan.PlannedComponent::isAuthoringColumn).count();
+    }
+
     private static final Map<Ref, List<CodeItem>> CODELISTS = Map.of(
             CL_AREA, List.of(new CodeItem("GE", "საქართველო"), new CodeItem("GE_TB", "თბილისი"), new CodeItem("GE_KA", "კახეთი")),
             CL_SEX, List.of(new CodeItem("F", "ქალი"), new CodeItem("M", "კაცი"), new CodeItem("_T", "ჯამი")),
@@ -178,7 +183,16 @@ class StatisticalIngestionRoundTripTest {
             }
             assertEquals(java.util.List.of(tableName), pane.get(AccessAuthoringAdapter.GROUP_DATA));
             assertEquals(2, pane.get(AccessAuthoringAdapter.GROUP_CODELISTS).size(), "both codelists of the land structure, including the overridable constant dimension");
-            assertEquals(java.util.List.of(AccessAuthoringAdapter.STAMP_TABLE), pane.get(AccessAuthoringAdapter.GROUP_CONTRACT));
+            assertTrue(pane.get(AccessAuthoringAdapter.GROUP_SCHEMA).containsAll(java.util.List.of(
+                    AccessAuthoringAdapter.PACKAGE_TABLE, AccessAuthoringAdapter.DATASET_TABLE, AccessAuthoringAdapter.FIELD_TABLE,
+                    AccessAuthoringAdapter.KEY_TABLE, AccessAuthoringAdapter.STAMP_TABLE)), "the contract copy of the Access package plan");
+            assertEquals(java.util.List.of(AccessAuthoringAdapter.RAW_DOCUMENT_TABLE), pane.get(AccessAuthoringAdapter.GROUP_LINEAGE));
+
+            // The copy describes the same contract the file was generated from.
+            com.healthmarketscience.jackcess.Row identity = db.getTable(AccessAuthoringAdapter.PACKAGE_TABLE).iterator().next();
+            assertEquals(land.revisionDigest(), identity.getString("contract_revision_digest"));
+            assertEquals(plan_dimensions(land), db.getTable(AccessAuthoringAdapter.KEY_TABLE).getRowCount(), "one key row per dimension column");
+            assertTrue(db.getTable(AccessAuthoringAdapter.FIELD_TABLE).getRowCount() >= 3, "every authoring column is described");
             table.addRow("GE", "FOREST", new BigDecimal("2822400.1234567890"));
             table.addRow("GE_KA", "ARABLE", new BigDecimal("999999999999999999.9999999999"));
         }
