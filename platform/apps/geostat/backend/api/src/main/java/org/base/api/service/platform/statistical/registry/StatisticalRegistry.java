@@ -20,8 +20,19 @@ public interface StatisticalRegistry {
 
     enum Lifecycle { PROPOSED, APPROVED, SUPERSEDED }
 
-    /** Single semantic authority for a measure: concept, exact representation and unit (register Q32). */
-    record MeasureDefinition(Ref ref, Ref conceptRef, Representation.Numeric representation, Ref unitRef) { }
+    /**
+     * How a measure may be combined across a dimension (register Q24). NONE is the default and the safe one:
+     * percentages, indices and averages are never summed, and a chart or query may not decide otherwise.
+     */
+    enum Aggregation { NONE, SUM, AVG, MIN, MAX }
+
+    /** Single semantic authority for a measure: concept, exact representation, unit and aggregation (Q24, Q32). */
+    record MeasureDefinition(Ref ref, Ref conceptRef, Representation.Numeric representation, Ref unitRef, Aggregation aggregation) {
+        public MeasureDefinition { aggregation = aggregation == null ? Aggregation.NONE : aggregation; }
+        public MeasureDefinition(Ref ref, Ref conceptRef, Representation.Numeric representation, Ref unitRef) {
+            this(ref, conceptRef, representation, unitRef, Aggregation.NONE);
+        }
+    }
 
     record Codelist(Ref ref, Set<String> codes) {
         public Codelist { codes = Set.copyOf(codes); }

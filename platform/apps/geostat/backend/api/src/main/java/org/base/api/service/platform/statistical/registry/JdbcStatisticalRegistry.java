@@ -52,7 +52,7 @@ public final class JdbcStatisticalRegistry implements StatisticalRegistry {
     @Override public Optional<MeasureDefinition> measure(Ref ref, Scope scope) {
         if (ref.kind() != Ref.Kind.MEASURE) return Optional.empty();
         return row(ref, scope).flatMap(row -> one(control.query(
-                "SELECT numeric_precision, numeric_scale, approximate_numeric, unit_id, concept_reference_id FROM platform.measure WHERE measure_id = ?",
+                "SELECT numeric_precision, numeric_scale, approximate_numeric, unit_id, concept_reference_id, aggregation_default FROM platform.measure WHERE measure_id = ?",
                 (rs, i) -> {
                     int precision = rs.getInt(1); boolean noPrecision = rs.wasNull();
                     int scale = rs.getInt(2); boolean noScale = rs.wasNull();
@@ -63,7 +63,10 @@ public final class JdbcStatisticalRegistry implements StatisticalRegistry {
                     Optional<Ref> concept = byId(conceptId, scope);
                     Optional<Ref> unit = noUnit ? Optional.empty() : byTarget("STATISTICAL_UNIT", unitId, scope);
                     if (concept.isEmpty() || (!noUnit && unit.isEmpty())) return Optional.<MeasureDefinition>empty();
-                    return Optional.of(new MeasureDefinition(ref, concept.get(), new Representation.Numeric(precision, scale, approximate), unit.orElse(null)));
+                    Aggregation aggregation;
+                    try { aggregation = Aggregation.valueOf(String.valueOf(rs.getString(6))); }
+                    catch (IllegalArgumentException unknownToThisProfile) { aggregation = Aggregation.NONE; } // an unknown rule is never a licence to combine
+                    return Optional.of(new MeasureDefinition(ref, concept.get(), new Representation.Numeric(precision, scale, approximate), unit.orElse(null), aggregation));
                 }, row.targetId())).flatMap(o -> o));
     }
 

@@ -21,6 +21,7 @@ public record SemanticPlan(Ref profileRef, String datasetNamespace, String datas
     /** A component with every derived value resolved. {@code constantValue} is set when bound by contract. */
     public record PlannedComponent(String code, Component.Role role, int position, Ref conceptRef,
                                    Representation representation, Ref measureRef, Ref unitRef,
+                                   org.base.api.service.platform.statistical.registry.StatisticalRegistry.Aggregation aggregation,
                                    Component.Attachment attachment, boolean required,
                                    String constantValue, boolean overridable) {
         public boolean isAuthoringColumn() {

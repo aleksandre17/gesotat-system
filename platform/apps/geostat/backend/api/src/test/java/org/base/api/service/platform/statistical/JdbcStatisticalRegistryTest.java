@@ -47,7 +47,7 @@ class JdbcStatisticalRegistryTest {
         jdbc.execute("CREATE TABLE platform.statistical_unit(unit_id BIGINT IDENTITY PRIMARY KEY, unit_code VARCHAR(120))");
         jdbc.execute("""
                 CREATE TABLE platform.measure(measure_id BIGINT IDENTITY PRIMARY KEY, measure_code VARCHAR(120), numeric_precision INT,
-                  numeric_scale INT, approximate_numeric BIT DEFAULT 0, unit_id BIGINT, concept_reference_id BIGINT)""");
+                  numeric_scale INT, approximate_numeric BIT DEFAULT 0, unit_id BIGINT, concept_reference_id BIGINT, aggregation_default VARCHAR(24) DEFAULT 'NONE' NOT NULL)""");
         jdbc.execute("CREATE TABLE platform.classification_item(classification_item_id BIGINT IDENTITY PRIMARY KEY, classification_version_id BIGINT, code VARCHAR(128), status VARCHAR(24))");
         jdbc.execute("""
                 CREATE TABLE platform.statistical_component(component_id BIGINT IDENTITY PRIMARY KEY, dsd_id BIGINT, component_code VARCHAR(120),

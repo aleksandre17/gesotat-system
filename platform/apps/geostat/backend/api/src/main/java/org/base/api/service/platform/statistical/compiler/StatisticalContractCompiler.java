@@ -108,7 +108,9 @@ public final class StatisticalContractCompiler {
             out.add(new PlannedComponent(c.code(), c.role(), ++position,
                     measure != null ? measure.conceptRef() : c.conceptRef(),
                     measure != null ? measure.representation() : c.representation(),
-                    c.measureRef(), measure != null ? measure.unitRef() : null, c.attachment(), c.required(),
+                    c.measureRef(), measure != null ? measure.unitRef() : null,
+                    measure != null ? measure.aggregation() : org.base.api.service.platform.statistical.registry.StatisticalRegistry.Aggregation.NONE,
+                    c.attachment(), c.required(),
                     constant == null ? null : constant.value(), constant != null && constant.overridable()));
         }
         return out;
@@ -136,6 +138,7 @@ public final class StatisticalContractCompiler {
         form.put("representation", representationForm(c.representation()));
         form.put("measure", c.measureRef() == null ? null : c.measureRef().wire());
         form.put("unit", c.unitRef() == null ? null : c.unitRef().wire());
+        form.put("aggregation", c.aggregation());
         if (c.attachment() != null) form.put("attachment", Map.of("level", c.attachment().level(),
                 "dimensions", c.attachment().dimensions().stream().sorted().toList(),
                 "measure", c.attachment().measure() == null ? "" : c.attachment().measure()));
