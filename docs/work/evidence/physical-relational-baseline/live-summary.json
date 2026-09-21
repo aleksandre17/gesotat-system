@@ -1,0 +1,47 @@
+{
+ "summary": {
+  "method": "live read-only sys.* introspection, 2026-09-21",
+  "databases": {
+   "geostat-system": {
+    "COL": 851,
+    "KEY": 171,
+    "FK": 98,
+    "CK": 70,
+    "IX": 201,
+    "TRG": 9,
+    "MOD": 0,
+    "ROWS": 93
+   },
+   "geostat-data": {
+    "COL": 343,
+    "KEY": 55,
+    "FK": 35,
+    "CK": 45,
+    "IX": 83,
+    "TRG": 11,
+    "MOD": 2,
+    "ROWS": 41
+   },
+   "geostat-archive": {
+    "COL": 40,
+    "KEY": 10,
+    "FK": 2,
+    "CK": 0,
+    "IX": 12,
+    "TRG": 0,
+    "MOD": 0,
+    "ROWS": 5
+   }
+  }
+ },
+ "raw_counts": {
+  "COL": 1234,
+  "KEY": 236,
+  "FK": 135,
+  "CK": 115,
+  "IX": 296,
+  "TRG": 20,
+  "MOD": 2,
+  "ROWS": 139
+ }
+}

@@ -1,0 +1,221 @@
+{
+  "version": 1,
+  "id": "access-package-composer",
+  "status": "OPEN",
+  "problem": "The approved KIDS R8 Access package has a statistical part that is hard to fill and slows every update. Three generators (the R8 script, AccessAuthoringAdapter, and the Control Plane site contract) hold the same facts. The owner requires one package: generic, contract-driven, with authoring classes, generated pick-lists, SDMX component names and a provenance trail that is always present.",
+  "scope": "A contract-less PROTOTYPE of the target package built from the approved R8 file (ops/scripts/java/prototype), its independent verifier and column audit, a live Microsoft Access acceptance test, a one-page composer design and a proposed canonical standard. No production code path generates this package yet. No publication. The prototype file is evidence, never a source of truth.",
+  "layer": "Delivery (package generation and presentation); Control for the contract revision it requires; Ingestion and Security unchanged",
+  "baseline": "R8 package platform/apps/geostat/backend/api/kids-portal-v1-canonical-r8-final.accdb (24 tables, 184 columns, 21 enforced relationships). Branch security/hardening-2 with unrelated pre-existing dirty changes. Independent audit of the first candidate: docs/work/evidence/kids-package-full-audit-2026-09-20/AUDIT-CONCLUSION.md (11 findings).",
+  "authority": [
+    "AGENTS.md",
+    "docs/contract-driven-metadata-schema-agnostic-completion-plan.md",
+    "docs/work/COMMON-STATISTICAL-CONTRACT-PLAN.md",
+    "docs/work/ACCESS-PACKAGE-ORGANIZATION-PLAN.md",
+    "docs/reference/engineering/REQUIREMENTS.md"
+  ],
+  "reuse": "Reuses the R8 package as the single source of carried content, the existing classifier tables (__cl_alias as the generic crosswalk), the existing localized metadata table (__gs_metadata) for inference evidence, the Jackcess dependency, and the independent audit task :api:auditAccessArtifact. Does not add a second registry. Finding: the Control Plane already stores the package contract (site_contract_dataset 15, site_contract_field 287, site_contract_relation 58), so the product composer must read it instead of hard-coding it a third time.",
+  "impact": "Runtime changes made under this card on 2026-09-20: numeric envelope widened to scale 16 (migrations 111 control, 112 data; registry and compiler share one configured envelope), proven lossless on dev. The statistical read endpoint was deployed to dev. Originally: Registry change made earlier in the session (aggregation as part of a measure definition) belongs to AIR-2026-047 and is listed there.",
+  "compatibility": "The candidate replaces five R8 statistical tables by one SDMX-shaped observation table, a contract catalog and generic W3C-PROV provenance tables. That is legitimate only as a versioned contract revision with mapping, compatibility report and deprecation rule. Until then the required-table findings of the independent audit stand by design. R8, its contract and published snapshot 36 are untouched; rollback is to do nothing.",
+  "failure": "Builder refuses: a table without a dataset description, a table described twice, a non-constant dataset-level attribute, a non-positive key order, an unknown family. Verifier and live test fail closed and block delivery. Known provider hazards are recorded as facts F-1..F-7 in the canonical standard.",
+  "security": "No credentials, hosts or secrets in the artefact. DECIDED (ADR-012, 2026-09-20): AGENTS.md forbids executable business logic inside an Access artefact; generated, provenance-only data macros of a closed shape are permitted as integrity automation, and the server never trusts them (standard rule P-6). Any other executable content remains forbidden. Navigation Pane grouping is presentation, not a security boundary.",
+  "requirements": {
+    "GOV-001": {
+      "decision": "APPLY",
+      "reason": "Completion plan, statistical plan, package organisation plan, AGENTS.md and the R8 package were read; three existing generators and the Control Plane site contract were inventoried before designing the composer."
+    },
+    "GOV-002": {
+      "decision": "APPLY",
+      "reason": "Traced producer (generator), contract (site contract revision), persistence (package tables), consumer (Access author, server load) and operations (live acceptance in the real provider)."
+    },
+    "GOV-003": {
+      "decision": "APPLY",
+      "reason": "One card, one master checklist, evidence with digests, explicit handoff."
+    },
+    "GOV-004": {
+      "decision": "APPLY",
+      "reason": "Status is OPEN / NOT READY; no completion is claimed beyond what a test proves."
+    },
+    "SCH-001": {
+      "decision": "APPLY",
+      "reason": "The candidate changes table names against the approved plan; it is marked 8+CANDIDATE / NOT_APPROVED and requires a versioned contract revision. Not yet satisfied."
+    },
+    "SCH-002": {
+      "decision": "APPLY",
+      "reason": "Column-level mapping of all 184 R8 columns with 0 unaccounted; exact references pin codelist versions."
+    },
+    "SCH-003": {
+      "decision": "APPLY",
+      "reason": "Unknown family, undescribed table and duplicate description are refused by the builder."
+    },
+    "ARC-001": {
+      "decision": "APPLY",
+      "reason": "Design keeps Access knowledge in one writer adapter and derives groups, pick-lists and macros from contract metadata; the prototype is a script and is not yet that architecture."
+    },
+    "ARC-002": {
+      "decision": "APPLY",
+      "reason": "No site-specific branch is intended in the composer; the prototype still names KIDS tables and is therefore not the product."
+    },
+    "ING-001": {
+      "decision": "NA",
+      "reason": "No ingestion path is changed by this card."
+    },
+    "DAT-001": {
+      "decision": "APPLY",
+      "reason": "32 of 32 tables keyed, 36 enforced relationships, duplicates refused in all four authority tables (negative tests)."
+    },
+    "DAT-002": {
+      "decision": "APPLY",
+      "reason": "Values proven 880/880 against the lexical source; scale 16 because 221 source values carry 11-16 decimals. OPEN DECISION D-3 on the numeric envelope."
+    },
+    "API-001": {
+      "decision": "NA",
+      "reason": "No API is changed by this card."
+    },
+    "UI-001": {
+      "decision": "APPLY",
+      "reason": "Pages and projections are carried; the statistics page and projection are repointed and marked REVIEW_REQUIRED rather than silently kept READY."
+    },
+    "SEC-001": {
+      "decision": "NA",
+      "reason": "No execution boundary is changed by this card."
+    },
+    "SEC-002": {
+      "decision": "APPLY",
+      "reason": "See security: open decision D-1 on executable content in the artefact."
+    },
+    "EVO-001": {
+      "decision": "APPLY",
+      "reason": "Compatibility is defined as a required contract revision; not yet written."
+    },
+    "OBS-001": {
+      "decision": "NA",
+      "reason": "No runtime path is changed by this card."
+    },
+    "TST-001": {
+      "decision": "APPLY",
+      "reason": "No test was weakened. The verifier was taught to recognise two deliberate repoints explicitly instead of ignoring mismatches."
+    },
+    "TST-002": {
+      "decision": "APPLY",
+      "reason": "Independent verifier, column audit, negative identity tests, and a 7-step live test in Microsoft Access repeated on 4 fresh copies."
+    },
+    "REL-001": {
+      "decision": "APPLY",
+      "reason": "Nothing is released. Release invariants are untouched and unmet for this work."
+    }
+  },
+  "files": [
+    "platform/apps/geostat/backend/api/src/main/java/org/base/api/service/platform/packaging/PackagePlan.java",
+    "platform/apps/geostat/backend/api/src/main/java/org/base/api/service/platform/packaging/AuthoringPolicy.java",
+    "platform/apps/geostat/backend/api/src/main/java/org/base/api/service/platform/packaging/PackageContractSource.java",
+    "platform/apps/geostat/backend/api/src/main/java/org/base/api/service/platform/packaging/JdbcPackageContractSource.java",
+    "platform/apps/geostat/backend/api/src/test/java/org/base/api/service/platform/packaging/PackageContractSourceTest.java",
+    "docs/work/evidence/access-package-composer-plan-2026-09-20.json",
+    "docs/work/ACCESS-PACKAGE-MASTER-CHECKLIST.md",
+    "docs/work/ACCESS-PACKAGE-COMPOSER-DESIGN.md",
+    "docs/work/ACCESS-PACKAGE-CANONICAL-STANDARD.md",
+    "docs/work/evidence/kids-package-full-audit-2026-09-20/AUDIT-RESPONSE.md",
+    "ops/scripts/java/prototype/BuildPackage.java",
+    "ops/scripts/java/prototype/VerifyPackage.java",
+    "ops/scripts/java/prototype/Audit.java",
+    "ops/scripts/java/prototype/LinkViews.java",
+    "ops/scripts/java/prototype/codelist_views.ps1",
+    "ops/scripts/java/prototype/provenance_macros.ps1",
+    "ops/scripts/java/prototype/provenance_test.ps1",
+    "ops/scripts/java/prototype/see-access.ps1",
+    "ops/scripts/java/prototype/ka.py",
+    "ops/scripts/java/prototype/ContentDigest.java",
+    "ops/scripts/java/prototype/README.md",
+    "docs/work/evidence/access-package-candidate-3-2026-09-20.json",
+    "docs/work/evidence/access-package-dev-hygiene-2026-09-20.json",
+    "docs/work/ACCESS-PACKAGE-HANDOFF.md",
+    "docs/decisions/ADR-access-package-integrity-automation.md",
+    "ops/scripts/java/prototype/master-checklist.translit.txt"
+  ],
+  "sourceDigests": {
+    "platform/apps/geostat/backend/api/src/main/java/org/base/api/service/platform/packaging/PackagePlan.java": "180716020B63DCDF50FA73660BF26118EF037D86A4671D28B8CDC237F392F2C4",
+    "platform/apps/geostat/backend/api/src/main/java/org/base/api/service/platform/packaging/AuthoringPolicy.java": "2E2BB0F0C1D1030E4DF5BB72CDDB45FDB73958AA9E6E1F103C64B809A5041B01",
+    "platform/apps/geostat/backend/api/src/main/java/org/base/api/service/platform/packaging/PackageContractSource.java": "CA7E1813C53E00140043719EFCA7CCD276C4A86FC61B42F3C778BD8F85D8E48C",
+    "platform/apps/geostat/backend/api/src/main/java/org/base/api/service/platform/packaging/JdbcPackageContractSource.java": "4500B35774A6802399040A45E15DCC6769CCAD1A280866A9589EB5011FFC903D",
+    "platform/apps/geostat/backend/api/src/test/java/org/base/api/service/platform/packaging/PackageContractSourceTest.java": "6E00E952763F672F3E63760B63EA5C96C02A4C257228D12E6E6C38C401D2CE97",
+    "docs/work/evidence/access-package-composer-plan-2026-09-20.json": "7E3B880158588DA0285EF5CA392F969F6831F1E1342D769100711B5F14CFC582",
+    "docs/work/ACCESS-PACKAGE-MASTER-CHECKLIST.md": "676EFFEF1B4607A601DC3E2D7FC8AA4DF81E3C27830B57D335ED7C7D02F11020",
+    "docs/work/ACCESS-PACKAGE-COMPOSER-DESIGN.md": "4DA289D8DF63862F109F8DA3A7E96D53EAF43B9172CE3F4C4B03C8CFBE12E99A",
+    "docs/work/ACCESS-PACKAGE-CANONICAL-STANDARD.md": "8E85C7F880944CADAD3F2339682D304F1418196B319F83F7D67E0AEABEF72302",
+    "docs/work/evidence/kids-package-full-audit-2026-09-20/AUDIT-RESPONSE.md": "3F80BBAC8991688B90B29DD061DE5FC64D2F03D11C289433968DE330A7CA9F0C",
+    "ops/scripts/java/prototype/BuildPackage.java": "F3330AB12E510A6DDAD028B2AE224E333392C5D1E861B417A64C2111AE066B86",
+    "ops/scripts/java/prototype/VerifyPackage.java": "A68611210B1A62AC11DA838E6BD047888686FD13F32B178CB0DB4B4E9EEE1547",
+    "ops/scripts/java/prototype/Audit.java": "07C36D92EC64C3AB153C5BCF2AFDE034615F7AA2AFD88A88572EEC5D99BF2A19",
+    "ops/scripts/java/prototype/LinkViews.java": "C038D5B145FDD336D72B5A2F82D08D104B970DF126E568BBC08BD11620701128",
+    "ops/scripts/java/prototype/codelist_views.ps1": "8584423BA19AE8F54C732E3EA2487895FC545F42268DC6CBCAB340E8639DE033",
+    "ops/scripts/java/prototype/provenance_macros.ps1": "9E48CF49035B208FE406835C4A53830222C6F94E9B86424731C98565C33B64B6",
+    "ops/scripts/java/prototype/provenance_test.ps1": "53C4E4242865E8C5271D92F69CF67E50AF62DB736A39A51B6880A64A58ED55D9",
+    "ops/scripts/java/prototype/see-access.ps1": "0FA8269AFA62BD76CDF7E570F9C98B79C18B239C2B3363CA9279E61C5C22FE26",
+    "ops/scripts/java/prototype/ka.py": "8938C747E67CD5406230663ABBB13BD44252A651D7A2BA03378FFCF6ADD7736B",
+    "ops/scripts/java/prototype/ContentDigest.java": "2B997AC1D0789037BC207CFEEC9171F08CAE364C00ABE0991077401ECDCD00D9",
+    "ops/scripts/java/prototype/README.md": "B58BC33CCB540278E5D2C979CD5BFB9BCFE74A47DF7EE13669A08530F400CF8E",
+    "docs/work/evidence/access-package-candidate-3-2026-09-20.json": "D7F9C47B3AB1C84CB602E4A62EF8423F7344D45FD8EC6494C36BC2F93ED97E19",
+    "docs/work/evidence/access-package-dev-hygiene-2026-09-20.json": "DE2BE9D617D18E5977C4EC4D7AC40EA369D8D27C33620C86513676CD6465E2FD",
+    "docs/work/ACCESS-PACKAGE-HANDOFF.md": "73C754117B4D70DB5E77D1A066EA6FED1EF05C54766C88DF36E17946B3331342",
+    "docs/decisions/ADR-access-package-integrity-automation.md": "E9739FB6893887F906004F54D252CF0E290B325D68ED431983116A0C9C63EB38",
+    "ops/scripts/java/prototype/master-checklist.translit.txt": "F540804C45C222159027C63D22EBA51685F37F719C17B5B7E52CABE172B4FD0E"
+  },
+  "tests": [
+    {
+      "command": "java -cp <jackcess> ops/scripts/java/prototype/VerifyPackage.java <R8.accdb> <candidate.accdb>",
+      "exitCode": 0,
+      "environment": "Windows, Corretto 17, Jackcess 4.0.7; VERDICT: PASS"
+    },
+    {
+      "command": "java -cp <jackcess> ops/scripts/java/prototype/Audit.java <R8.accdb> <candidate.accdb>",
+      "exitCode": 0,
+      "environment": "R8 tables=24 R8 columns=184 unaccounted=0 broken targets=0"
+    },
+    {
+      "command": "pwsh ops/scripts/java/prototype/provenance_test.ps1 -File <copy of candidate>",
+      "exitCode": 0,
+      "environment": "Microsoft Access 16.0.4229 through COM; 7 of 7 steps; 3 of 3 fresh copies of candidate 3"
+    },
+    {
+      "command": "java -cp <jackcess> ops/scripts/java/prototype/ContentDigest.java <generation A> <generation B>",
+      "exitCode": 0,
+      "environment": "both 2e8a33d0b38f5db019cf43c3ea1cb4921f0ae413b2b86c9b6cc53657dfbc4373"
+    },
+    {
+      "command": "platform/apps/geostat/backend/gradlew.bat :api:auditAccessArtifact -PaccessArtifact=C:\\Users\\Test-User\\Desktop\\KIDS_PACKAGE_candidate_3.accdb --no-daemon",
+      "exitCode": 1,
+      "environment": "expected fail-closed: 7 findings remain (4 required-table names awaiting the contract revision, 3 DRAFT projections awaiting a steward); the 5 structural findings of the first audit are gone"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/work/evidence/access-package-composer-plan-2026-09-20.json",
+      "sha256": "7E3B880158588DA0285EF5CA392F969F6831F1E1342D769100711B5F14CFC582"
+    },
+    {
+      "path": "docs/work/evidence/kids-indicators-exact-end-to-end-2026-09-20.json",
+      "sha256": "315ABF81805E908D6A04A13B8DCD2A879AEA4EFD956BBE4D005B8958566B07D3"
+    },
+    {
+      "path": "docs/work/evidence/statistical-numeric-envelope-2026-09-20.json",
+      "sha256": "9F46EDE43C59064DC1B1CD3ACFFF4145DA09BBB016451ED05A8D24F1D7FCE181"
+    },
+    {
+      "path": "docs/work/evidence/access-package-dev-hygiene-2026-09-20.json",
+      "sha256": "DE2BE9D617D18E5977C4EC4D7AC40EA369D8D27C33620C86513676CD6465E2FD"
+    },
+    {
+      "path": "docs/work/evidence/access-package-candidate-3-2026-09-20.json",
+      "sha256": "D7F9C47B3AB1C84CB602E4A62EF8423F7344D45FD8EC6494C36BC2F93ED97E19"
+    },
+    {
+      "path": "docs/work/evidence/kids-package-full-audit-2026-09-20/AUDIT-RESPONSE.md",
+      "sha256": "3F80BBAC8991688B90B29DD061DE5FC64D2F03D11C289433968DE330A7CA9F0C"
+    },
+    {
+      "path": "docs/work/ACCESS-PACKAGE-CANONICAL-STANDARD.md",
+      "sha256": "8E85C7F880944CADAD3F2339682D304F1418196B319F83F7D67E0AEABEF72302"
+    }
+  ],
+  "handoff": "A new session reads docs/work/ACCESS-PACKAGE-HANDOFF.md first, then follows docs/work/ACCESS-PACKAGE-MASTER-CHECKLIST.md in order. Owner decisions D-1..D-3 are taken (ADR-012); D-4 (steward items) stays open. Finish line set by the owner: Access file to the ideal, then the contract revision and the full path end to end (import, database, API). Phase 3 done through the API (87 of 87 wrong-model references superseded). Phase 4.1-4.3 done: numeric envelope live on dev, and the full path import -> database -> API proven exact (880/880, incl. 221 values of 11-16 decimals) for the server authoring file, snapshot 61. INCIDENTS to read before touching dev: a 13-minute outage (undeployed classes shipped) and a 90-second publication displacement (publish is product-wide, AIR-2026-054; rolled back; residue: snapshots 53, 57-61 PUBLISHED, 53 not ours). Phase 5.1 done: PackageContractSource -> PackagePlan (digest) + AuthoringPolicy, 6/6 tests on a non-KIDS site; the real KIDS r8 contract satisfies every invariant. Next in phase 5: FamilySection registry + PackageWriter (5.2), then the loader reading the same plan (5.3). Also: per-code attribute (AIR-052), classification API (AIR-053), site contract revision, composer. Done without a decision: self-description complete, relation endpoints and page dataset enforced, repeat generation gives one content digest, independent audit 11 -> 7. Next without a decision: retire today's mistaken dev records (master checklist phase 3). Candidate artefact: C:\\Users\\Test-User\\Desktop\\KIDS_PACKAGE_candidate_3.accdb sha256 751AA16B07B791298A369377C02E1F68A32C5725A9E638D08DA27EC7248A5BF3. Status remains OPEN / NOT READY."
+}

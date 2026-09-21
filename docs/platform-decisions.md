@@ -111,3 +111,72 @@ content addressing და verification; private bucket-ები; მხოლ�
 
 **ხელახლა განხილვის trigger:** anonymous/გარე მომწოდებლის upload, public production release, ან
 ორგანიზაციული scanner სერვისის ხელმისაწვდომობა.
+
+## ADR-010 — Tenant-scoped authorization (ABAC)
+
+**სტატუსი:** ACCEPTED (2026-09-19) · სრული ტექსტი: `docs/decisions/ADR-tenant-scoped-authorization.md`
+
+product ეკუთვნის ერთ tenant-ს; caller-ის tenant claim უნდა ემთხვეოდეს. `TenantAccessPolicy`
+deny-by-default; coverage არის დეკლარირებული და ტესტით დაცული თვისება; cross-tenant გადასვლა
+მხოლოდ `PLATFORM_CROSS_TENANT` authority-ით და audit log-ით.
+
+## ADR-011 — Legacy surface retirement
+
+**სტატუსი:** ACCEPTED (2026-09-19) · სრული ტექსტი: `docs/decisions/ADR-legacy-surface-retirement.md`
+
+ADR-010 §5-ის 12 `LEGACY` ზედაპირი governed platform-ის ნაწილი არ არის. ოთხი ოჯახი
+(`ACCESS_UPLOAD`, `SPREADSHEET_CONVERSION`, `DATABASE_EXPORT`, `DEMO`), თითოეული ერთი feature
+switch-ით, **default-ად გამორთული** → 410 Gone + RFC 9457. ჩართულიც მხოლოდ ცალკე ოპერატორული
+authority-თ (`PLATFORM_LEGACY_OPERATOR`, IdP role `platform.legacy`) მიიღწევა. caller-supplied
+egress (HTTP fetch, JDBC host) მოითხოვს allow-list-ს — ცარიელი სია ფუნქციას თიშავს — და
+DNS rebinding გამორიცხულია ერთჯერადი resolution-ით და pinned socket-ით. prod profile-ზე
+ჩართული ოჯახი აჩენს startup WARNING-ს, არა failure-ს.
+
+## ADR-012 — Integrity automation inside an Access package
+
+**სტატუსი:** ACCEPTED (2026-09-20) · სრული ტექსტი: `docs/decisions/ADR-access-package-integrity-automation.md`
+
+Access პაკეტს შეუძლია მთლიანობის შემოწმება თავის შიგნით, მაგრამ ვერ ხდება კანონიკური
+ავტორიტეტი: მას შეუძლია metadata schema-ზე მითითება, არა მისი გამოცხადება ან დამტკიცება.
+
+## ADR-013 — Repository Control Protocol
+
+**სტატუსი:** ACCEPTED (2026-09-20) · სრული ტექსტი: `docs/decisions/ADR-repository-control-protocol.md`
+
+პროექტის მდგომარეობა ცხოვრობს ფაილებში, არა საუბრის ისტორიაში. `docs/project/` არის
+კონტროლის სიბრტყე; `docs/standards/PROJECT-OPERATING-SYSTEM.md` — გენერიკული პროტოკოლი,
+პროექტის ფაქტების გარეშე. მმართველობა მანქანურად აღსრულდება
+(`ops/cli/validation/rcp-verify.py`), და უკვე არსებული დოკუმენტები კლასიფიცირდება
+რეესტრში, არა გადაწერით.
+
+## ADR-014 — ორი პროგრამა, ერთი authority plane
+
+**სტატუსი:** ACCEPTED (2026-09-21) · სრული ტექსტი: `docs/decisions/ADR-lifecycle-program-separation.md`
+
+Rehabilitation lifecycle და statistical contract/product პროგრამა არის **ორი ცალკეული
+lifecycle ერთი კანონიკური authority plane-ის ქვეშ**. განრიგები არ ერწყმის; authority ერთია.
+M3/M2 და authority chain — rehabilitation-ის; M1 instance და ქვემოთ — სტატისტიკური პროგრამის.
+`CTRL-MANIFEST` ერთადერთი rehabilitation roadmap-ია, `CTRL-CURRENT` — ერთადერთი state authority;
+არცერთი პროგრამა მეორის ფაზაზე gate-ს ვერ აცხადებს. ხურავს `DEF-08`/`TASK-002`. Review
+პირობა: პირველივე კოლიზია `PHASE-004`-ზე.
+
+## ADR-015 — SDMX conformance boundary
+
+**სტატუსი:** ACCEPTED (2026-09-21) · სრული ტექსტი: `docs/decisions/ADR-sdmx-conformance-boundary.md`
+
+SDMX მართავს **მხოლოდ სტატისტიკურ პასუხისმგებლობას**: responsibility boundary-შია მხოლოდ ის,
+რისი მონაცემიც არის გამოცხადებული dimension tuple-ით დაკლავიშებული observation set.
+Entity/relation/resource/geo, serving API, control plane, canonical persistence და VTL —
+გარეთ. თვით conformance claim-ს **`Q47` ფლობს** (Information Model 3.1 subset, `SDMX-CSV 2.0`,
+`SDMX-JSON 2.0`) და აქ არ მეორდება. ტერმინი "SDMX-compatible" claim-ად აკრძალულია.
+
+## ADR-016 — Access არის მხარდაჭერილი provider, semantic authority-ის გარეშე
+
+**სტატუსი:** ACCEPTED (2026-09-21) · სრული ტექსტი: `docs/decisions/ADR-access-provider-status.md`
+
+`PERMANENT` vs `TRANSITIONAL` არასწორი კითხვაა. Access არის **first-class, პოტენციურად
+ხანგრძლივი provider**, რომელსაც **არ აქვს კანონიკური სემანტიკური authority**, და canonical
+architecture მის მუდმივობას არ უშვებს. Provider-ის ძლიერი მხარეები boundary-ს მიღმა
+გამოიყენება; მისი ლიმიტები canonical semantics-ს ვერ ასუსტებს (`declaration ≤ provider ≤
+canonical`). Access სამი პასუხისმგებლობაა — physical provider, authoring surface, round-trip
+carrier — და მხოლოდ პირველია მონაცემთა ბაზაზე დამოკიდებული.

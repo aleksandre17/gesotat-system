@@ -51,3 +51,7 @@ gesotat-system/
 ├── artifacts/recovered/
 └── build/                                      [IGNORED]
 ```
+
+## Engineering governance authority
+
+`docs/reference/engineering/README.md` is the operational index for the existing quality doctrine: architecture/schema hierarchy, requirements, anti-patterns, standards and change protocol. Shared agent entrypoint: `docs/reference/engineering/agent-entrypoint.md`. Structural gate: `ops/cli/validation/engineering-governance.py`; negative tests: `ops/tests/governance/`. Durable change records: `docs/work/cards/<id>/governance.json`; evidence: `docs/work/evidence/<id>/`.

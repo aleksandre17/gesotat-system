@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "namespace": "ADR",
+  "decisions": [
+    {"id":"ADR-001","title":"Database topology","document":"docs/platform-decisions.md","section":"ADR-001","status":"ACCEPTED"},
+    {"id":"ADR-002","title":"External file authority","document":"docs/platform-decisions.md","section":"ADR-002","status":"ACCEPTED"},
+    {"id":"ADR-003","title":"History and archive","document":"docs/platform-decisions.md","section":"ADR-003","status":"ACCEPTED"},
+    {"id":"ADR-004","title":"Scale baseline","document":"docs/platform-decisions.md","section":"ADR-004","status":"ACCEPTED"},
+    {"id":"ADR-005","title":"First migration pilot","document":"docs/platform-decisions.md","section":"ADR-005","status":"ACCEPTED"},
+    {"id":"ADR-006","title":"Production object storage deployment","document":"docs/platform-decisions.md","section":"ADR-006","status":"ACCEPTED"},
+    {"id":"ADR-007","title":"Publication policy","document":"docs/platform-decisions.md","section":"ADR-007","status":"ACCEPTED"},
+    {"id":"ADR-008","title":"Artifact identity, attachment and distribution","document":"docs/platform-decisions.md","section":"ADR-008","status":"ACCEPTED"},
+    {"id":"ADR-009","title":"Malware scanning deferred","document":"docs/platform-decisions.md","section":"ADR-009","status":"ACCEPTED"},
+    {"id":"ADR-010","title":"Tenant-scoped authorization","document":"docs/decisions/ADR-tenant-scoped-authorization.md","section":"ADR-010","status":"ACCEPTED"},
+    {"id":"ADR-011","title":"Legacy surface retirement","document":"docs/decisions/ADR-legacy-surface-retirement.md","section":"ADR-011","status":"ACCEPTED"},
+    {"id":"ADR-012","title":"Integrity automation inside an Access package","document":"docs/decisions/ADR-access-package-integrity-automation.md","section":"ADR-012","status":"ACCEPTED"}
+  ]
+}

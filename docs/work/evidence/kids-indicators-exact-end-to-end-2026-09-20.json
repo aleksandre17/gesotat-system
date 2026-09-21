@@ -1,0 +1,115 @@
+{
+  "evidence": "kids-indicators-exact-end-to-end",
+  "recordedAt": "2026-09-20",
+  "environment": "dev (192.168.1.199), through the governed API only",
+  "path": "approved contract revision -> generated authoring file -> filled from the source text -> governed load -> canonical observations -> release gates -> publication -> API",
+  "contract": {
+    "id": "6f6b3080-4a51-439f-a631-ba25e7446765",
+    "datasetKey": "KIDS:KIDS_INDICATORS",
+    "structure": "DSD_KIDS_INDICATORS 3.0.0",
+    "shape": "TIME_PERIOD x AGE x INDICATOR -> OBS_VALUE, with UNIT_MEASURE and OBS_STATUS",
+    "measure": "measure:KIDS:OBS_VALUE(2.0.0) exact (28,16), aggregation NONE",
+    "revisionDigest": "d6cb84e577aa1964f8f6e8a341f667f4127c05643c24a32d58e49bae9801539e",
+    "fourEyes": "author != approver, revision digest under If-Match",
+    "supersedes": "f224667a (the same shape under scale 10)"
+  },
+  "authoringFile": {
+    "table": "stat_DSD_KIDS_INDICATORS",
+    "columns": [
+      "TIME_PERIOD",
+      "AGE",
+      "INDICATOR",
+      "UNIT_MEASURE",
+      "OBS_VALUE",
+      "OBS_STATUS"
+    ],
+    "obsValueScale": 16,
+    "rows": 880,
+    "valuesBeyondTenDecimals": 221,
+    "filledFrom": "R8 __stat_kids_statistical_input.value_lexical, read as exact decimals",
+    "sha256": "57c3c05d5bc67cf51f3b70677e097bf1afe5de6fe99d308831a74853a3392d9e"
+  },
+  "load": {
+    "outcome": "LOADED",
+    "batchId": 17,
+    "datasetSnapshotId": 61,
+    "rows": 880,
+    "observations": 880,
+    "fileIssues": 0,
+    "rowIssues": 0
+  },
+  "reconciliationAgainstTheLexicalSource": {
+    "sourceFacts": 880,
+    "stored": 880,
+    "exact": 880,
+    "missing": 0,
+    "different": 0,
+    "extra": 0,
+    "valuesWithMoreThanTenDecimals": 221,
+    "ofThemExactInTheDatabase": 221,
+    "statusesStored": {
+      "A": 880
+    },
+    "tool": "reconcile_exact.py - compares exact decimals, not rounded numbers"
+  },
+  "releaseGates": {
+    "snapshot": 61,
+    "releasable": true,
+    "gates": {
+      "KEYS_VALID": "PASS",
+      "PUBLICATION_ATOMIC": "PASS",
+      "RAW_LINEAGE_VALID": "PASS",
+      "SCHEMA_VALID": "PASS",
+      "STATISTICAL_SEMANTICS_VALID": "PASS",
+      "CLASSIFIERS_VALID": "NOT_APPLICABLE",
+      "RELATIONS_VALID": "NOT_APPLICABLE"
+    }
+  },
+  "whatThisProves": "import, database and API with no digit lost - FOR THE SERVER'S STATISTICS-ONLY AUTHORING FILE. It is not the owner's finish line: the unified package (candidate 3) has not travelled this path.",
+  "whatItDoesNotProve": [
+    "the unified package: this is the server's statistics-only authoring file, not candidate 3",
+    "UNIT_MEASURE is still typed per row (AIR-2026-052)",
+    "a publication that leaves the rest of the product alone - see publicationIncident"
+  ],
+  "servingOnTheApi": {
+    "deployed": [
+      "StatisticalChartController",
+      "ChartService",
+      "CanonicalObservationReader",
+      "ContractWorkflow (mayAuthor, public exception)",
+      "StatisticalContractConfiguration (chart beans + envelope)"
+    ],
+    "deploymentProcedure": "server copies backed up; shipped; compiled INSIDE the running container (gradle exit 0, 0 errors) before the restart; healthy after 3 checks",
+    "endpoint": "GET /api/v1/platform/products/KIDS_PORTAL/statistical-contracts/6f6b3080-4a51-439f-a631-ba25e7446765/charts/data?limit=10000",
+    "response": {
+      "rows": 880,
+      "datasetSnapshotId": 61,
+      "contractRevisionDigest": "d6cb84e577aa1964..."
+    },
+    "comparedWithTheLexicalSourceAsExactDecimals": {
+      "exact": 880,
+      "different": 0,
+      "valuesWithMoreThanTenDecimals": 221,
+      "ofThemExactThroughTheApi": 221
+    }
+  },
+  "publicationIncident": {
+    "what": "publishing snapshot 61 replaced the product's current publication (14) by a new one (15) for about 90 seconds",
+    "cause": "POST /platform/publication/publish is a product-wide release: DataPlanePublicationWriter makes EVERY REVIEW_REQUIRED dataset snapshot of the product a member and flips them all to PUBLISHED, and the new publication supersedes the previous one. The request names one snapshot; the operation releases all.",
+    "effect": {
+      "publication15Members": [
+        53,
+        57,
+        58,
+        59,
+        60,
+        61
+      ],
+      "publishedDatasetSnapshots": "42 -> 50",
+      "sweptIn": "58 and 59 (the wrong model - I had written they must never be published), 57 and 60 (earlier test loads), and 53 (dataset version 73, 225 resources) - a pending candidate that was NOT mine"
+    },
+    "remedy": "POST /platform/publication/rollback to publication 14 - status ROLLED_BACK; publication 14 is current again",
+    "residueTheApiCannotUndo": "dataset snapshots 53, 57, 58, 59, 60, 61 keep status PUBLISHED although they are not members of the current publication. Snapshot 53 can no longer be released through the normal flow by whoever prepared it.",
+    "lesson": "on a shared product, never call publish to demonstrate one dataset. A governed load into a product creates a REVIEW_REQUIRED snapshot that the next product release will sweep in."
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "id": "statistical-contract-authority-alignment",
+  "status": "OPEN",
+  "problem": "The configurable statistical contract authority port and HTTP method security used different policy sources, so a non-default deployment could authorize the workflow but reject its controller boundary.",
+  "scope": "Align StatisticalContractController author, approve and import method-security expressions with StatisticalContractAccessDecision. Run the API/core regression suite. No permission vocabulary migration or release claim.",
+  "layer": "Security and Serving",
+  "baseline": "Current dirty worktree after governance package; pre-existing backend changes preserved.",
+  "authority": [
+    "AGENTS.md",
+    "docs/reference/engineering/REQUIREMENTS.md",
+    "platform/apps/geostat/backend/api/src/main/java/org/base/api/security/StatisticalContractAccessDecision.java",
+    "platform/apps/geostat/backend/api/src/main/java/org/base/api/service/platform/statistical/workflow/ContractWorkflow.java"
+  ],
+  "reuse": "Reuses the existing StatisticalContractAccessDecision bean and authorityName port already used by StatisticalReferenceController; removes duplicated controller literals.",
+  "impact": "HTTP method security now resolves AUTHOR, APPROVE and IMPORT through the configured access-decision policy before the workflow executes. Read access remains the existing platform READ_RESOURCE boundary.",
+  "compatibility": "Default properties retain WRITE_RESOURCE, PUBLISH_RESOURCE and WRITE_RESOURCE behavior. Custom authority properties now apply consistently at both HTTP and workflow boundaries.",
+  "failure": "Missing bean or invalid role fails application startup; missing configured authority is denied. No retry or state mutation occurs at method-security evaluation. Revert the controller annotation-only change if compatibility evidence fails.",
+  "security": "Preserves tenant and execution-time subject checks in StatisticalContractAccessDecision; no broad grant or anonymous path is introduced.",
+  "requirements": {
+    "GOV-001": {"decision":"APPLY","reason":"Existing access decision and reference controller were inspected before editing."},
+    "GOV-002": {"decision":"APPLY","reason":"Impact is traced from configured authority properties through HTTP method security into workflow checks."},
+    "GOV-003": {"decision":"APPLY","reason":"This card records the bounded controller change and regression handoff."},
+    "SCH-001": {"decision":"NA","reason":"No schema, contract grammar or semantic reference changes."},
+    "SCH-002": {"decision":"NA","reason":"No business concept or data grain changes."},
+    "SCH-003": {"decision":"NA","reason":"No provider or site execution path changes."},
+    "ARC-001": {"decision":"APPLY","reason":"The controller now consumes the existing authorization port rather than duplicating policy literals."},
+    "ING-001": {"decision":"NA","reason":"No ingestion parser or source receipt behavior changes."},
+    "DAT-001": {"decision":"NA","reason":"No persistence or tenant data model changes."},
+    "DAT-002": {"decision":"NA","reason":"No transaction, retry or idempotency behavior changes."},
+    "API-001": {"decision":"APPLY","reason":"The affected API operations retain their contract while resolving configured authorization consistently."},
+    "UI-001": {"decision":"NA","reason":"No page or component contract changes."},
+    "SEC-001": {"decision":"APPLY","reason":"This is an authorization boundary change and requires behavioral regression evidence."},
+    "SEC-002": {"decision":"NA","reason":"No credential, raw-data or transport destination behavior changes."},
+    "EVO-001": {"decision":"NA","reason":"No migration or persisted compatibility change."},
+    "OBS-001": {"decision":"NA","reason":"No telemetry contract changes."},
+    "ARC-002": {"decision":"NA","reason":"No artifact or retention behavior changes."},
+    "TST-001": {"decision":"APPLY","reason":"Behavioral tests are retained and rerun; no assertions are weakened."},
+    "TST-002": {"decision":"APPLY","reason":"The exact Gradle command and result are recorded in the session handoff; durable evidence remains to be attached."},
+    "REL-001": {"decision":"NA","reason":"This bounded change does not claim release readiness."},
+    "GOV-004": {"decision":"APPLY","reason":"The smallest change reuses the existing configurable port and avoids a new policy abstraction."}
+  },
+  "files": [
+    "platform/apps/geostat/backend/api/src/main/java/org/base/api/controller/StatisticalContractController.java",
+    "platform/apps/geostat/backend/api/src/test/java/org/base/api/security/StatisticalContractAccessDecisionTest.java"
+  ],
+  "sourceDigests": {},
+  "tests": [
+    {"command":"platform/apps/geostat/backend/gradlew.bat :core:test :api:test --no-daemon","exitCode":0,"environment":"Windows PowerShell; Gradle 8.13; BUILD SUCCESSFUL in 1m 58s"}
+  ],
+  "evidence": [],
+  "handoff": "Attach durable API authorization evidence, including a non-default configured-authority behavioral case, then mark VERIFIED. The current suite proves default-path regression only; production release remains subject to the full release invariant."
+}

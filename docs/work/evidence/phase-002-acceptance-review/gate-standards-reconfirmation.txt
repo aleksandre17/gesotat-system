@@ -1,0 +1,184 @@
+GATE-STANDARDS - re-confirmation after adversarial acceptance review
+PHASE-002 / TASK-003
+==============================================================================
+
+Date:        2026-09-21
+Baseline:    HEAD b46c0438d4927851fcd688a8a8e71468aba6cf18 (working tree dirty; see card)
+Environment: Windows 10 Pro 10.0.19045; Python 3.13.3
+Card:        docs/work/cards/phase-002-acceptance-review/governance.json
+Work item:   docs/project/work/completed/TASK-003-phase-002-acceptance-review.md
+
+Scope discipline: the five candidates below are HYPOTHETICAL CONSTRUCTIONS built to test the
+benchmark's discriminatory power. No real artifact - legacy Access, the R8 resource package,
+KIDS_PACKAGE_candidate_2 - was evaluated, scored or compared. PHASE-003 has not begun.
+
+------------------------------------------------------------------------------
+1. BENCHMARK DISCRIMINATION TEST - five adversarial candidates
+------------------------------------------------------------------------------
+
+CANDIDATE A - universal EAV / JSON metadata engine claiming total schema agnosticism
+------------------------------------------------------------------------------------
+  INVARIANTS        VIOLATED: BM-INV-05 (declared type/nullability/uniqueness/RI/cardinality not held in
+                      storage), BM-INV-24 (grain inexpressible), BM-INV-10 (no dimension-tuple uniqueness)
+  CRITERIA          FAIL: BM-EC-021, BM-EC-016, BM-EC-017, BM-EC-002, BM-EC-011
+  REJECTION         BM-REJ-05 fake agnosticism, BM-REJ-07 EAV degeneration
+  VERDICT           REJECTED
+  NOTE              The JSON form was already rejected. The TYPED form - one row per declared field with
+                      typed value columns, an attribute registry and FKs - PASSED the benchmark as first
+                      written, because BM-EC-021's evidence method was column-type inspection and each field
+                      did have a type. HOLE FOUND. Repaired by the constraint-expressibility test in
+                      BM-EC-021 and by BM-INV-24. Now REJECTED for the right reason.
+
+CANDIDATE B - rigid strongly typed per-dataset schemas; excellent integrity, poor evolution
+-------------------------------------------------------------------------------------------
+  INVARIANTS        HOLDS: BM-INV-05, BM-INV-24, BM-INV-03, BM-INV-10 (integrity is its strength)
+  CRITERIA          FAIL: BM-EC-019 (a new dataset needs hand-authored schema), BM-EC-020 (proliferation
+                      unbounded by a declared pattern), BM-EC-023; PARTIAL: BM-EC-026
+  QUALITY           BM-QA-03 strong; BM-QA-08 weak; BM-QA-12 degrades with every dataset added
+  REJECTION         BM-REJ-03 accidental rigidity
+  VERDICT           NOT READY - penalised on evolvability, not on integrity
+  NOTE              Correct behaviour: the benchmark must not reward integrity by forgiving rigidity, and
+                      must not reject a candidate whose failure is bounded and fixable by a declared pattern.
+
+CANDIDATE C - metadata-driven, separate semantic definitions for storage / API / chart / export
+-----------------------------------------------------------------------------------------------
+  INVARIANTS        VIOLATED: BM-INV-15 (parallel semantic models), BM-INV-01 (two owners for one fact)
+  CRITERIA          FAIL: BM-EC-054, BM-EC-055, BM-EC-035
+  REJECTION         BM-REJ-08 duplicate authority
+  VERDICT           REJECTED
+  NOTE              This is the repository's own CF-030 shape - four chart mechanisms, two liveness models -
+                      so a benchmark that failed to reject it would have failed its founding case.
+
+CANDIDATE D - provider-agnostic abstraction supporting only the lowest common denominator
+-----------------------------------------------------------------------------------------
+  INVARIANTS        HOLDS: BM-INV-08, BM-INV-01, BM-INV-07. BM-INV-09 catches it for NUMERIC precision
+                      only, because that is the one axis DR-006 already fixed
+  CRITERIA          PASSED as first written: BM-EC-026, BM-EC-051, BM-EC-052 were all satisfied - the
+                      provider WAS one realisation among several and capabilities WERE declared
+  VERDICT (before)  ACCEPTED - wrongly. HOLE FOUND.
+  VERDICT (after)   REJECTED by BM-EC-085: for every capability the canonical model lacks, the reason
+                      must be a requirement, not a provider limit, unless the provider is required for that
+                      dataset AND the canonical store still holds the superset (declaration <= provider <=
+                      canonical). This was the answer to the final falsification question of the review.
+  NOTE              The distinction that matters: bounding a DECLARATION by the weakest required provider is
+                      legitimate; lowering CANONICAL SEMANTICS to it is a lowest-common-denominator design.
+
+CANDIDATE E - many DDD / Clean / Hexagonal abstractions, unnecessary conceptual complexity
+------------------------------------------------------------------------------------------
+  INVARIANTS        HOLDS - abstraction does not by itself violate an invariant, which is why the
+                      invariant gate alone cannot catch this candidate
+  CRITERIA          FAIL: section 6.12 requires each adopted principle to state where it does NOT apply
+  QUALITY           BM-QA-12 penalises it comparatively: more concepts, no capability the simpler
+                      candidate lacks
+  REJECTION         BM-REJ-01 overengineering, BM-REJ-02 abstraction that cannot name its invariant
+  VERDICT           NOT READY
+  NOTE              BM-QA-12 was REQUIRED with a bare count and no threshold - unusable standalone.
+                      Repaired to BOUNDED/comparative with the rule that excess must name the capability it
+                      buys. The ContractPageExecutionRegistry (seven identical adapters) is the local case.
+
+RESULT: 3 of 5 rejected or penalised correctly by the benchmark as first written.
+        2 of 5 passed and should not have (A in its typed form, D).
+        Both holes were in the EVIDENCE METHOD, not the principle - a criterion whose method
+        is weaker than its question reads as rigorous and passes the thing it names.
+
+------------------------------------------------------------------------------
+2. WHAT WAS REPAIRED
+------------------------------------------------------------------------------
+
+Quality-attribute model
+  - BM-QA table gained a 'Standard, or explicit non-adoption' column, one entry per attribute:
+    4 x 'no external standard exists', 1 x explicit non-adoption (ISO 9241), the rest named.
+    GATE-STANDARDS's headline condition was previously satisfied by a sentence claiming the
+    mapping existed. That is documentation-only evidence, committed by the artifact whose job
+    is to detect it. THE FIRST PASS WAS PREMATURE ON THIS CONDITION.
+  - 3 adopted standards declared to have no benchmark hook, with the reason (SLSA, NIST SSDF
+    beyond verification, BCP 14) - the benchmark must be able to say 'excellent standard,
+    wrong responsibility'.
+  - BM-QA-12 threshold corrected from REQUIRED-with-a-count to BOUNDED/comparative.
+
+Invariants: 22 -> 24
+  - BM-INV-23 raw retained immutably and canonical re-derivable under a corrected revision.
+  - BM-INV-24 declared grain enforced by a business-key constraint, not a surrogate key.
+
+Criteria: 84 -> 86, three repaired
+  - BM-EC-021 constraint-expressibility test (catches typed EAV).
+  - BM-EC-018 denormalisation must be mechanically derived and reconcilable, not merely declared.
+  - BM-EC-073 measured at two volumes an order of magnitude apart, growth stated before measuring.
+  - BM-EC-085 provider-capability floor (catches lowest-common-denominator).
+  - BM-EC-086 specialization must declare its boundary, or it is parallel architecture.
+
+Automation model: 35 -> 44 responsibilities, 7 -> 8 rules
+  - Missing entirely: contract derivation from an existing artifact, lineage capture, structural
+    migration authoring, data-correcting migration authoring, migration execution, documentation
+    navigation, document authority classification, conformance corpus, test classification.
+    Migrations mattered most: RC-002 is the second root cause and the model was silent on them.
+  - MSA-R8 forbids derivation that produces only a runtime interpretation - the degeneration of
+    DECLARE ONCE -> DERIVE into DECLARE GENERIC METADATA -> HIDE SEMANTICS IN RUNTIME.
+
+Claims corrected
+  - BM-Q-03 and BM-Q-05 do NOT block PHASE-004. BM-QA-09 is TARGET/BOUNDED, so a design is
+    acceptable when every path declares a bound; the values bind before PHASE-010. The ASVS
+    subset selects evidence depth, which is PHASE-009 work. BM-Q-01 and BM-Q-02 do block
+    PHASE-004: both decide what the canonical model is obliged to express.
+
+What survived unchanged: the decision hierarchy, the fail-closed verdict ordering, 18 of 22
+invariants, 79 of 84 criteria, every standards disposition, and the ownership model.
+
+------------------------------------------------------------------------------
+3. UNRESOLVED QUESTIONS - RESOLUTION TIMING
+------------------------------------------------------------------------------
+
+  BM-Q-01 SDMX conformance level        MUST RESOLVE BEFORE PHASE-004
+  BM-Q-02 Access permanence             MUST RESOLVE BEFORE PHASE-004
+  BM-Q-03 performance objectives        EXTERNAL BUSINESS/POLICY - due before PHASE-010
+  BM-Q-04 multi-site tenancy            CAN BE RESOLVED DURING CANONICAL DESIGN
+  BM-Q-05 ASVS control subset           EXTERNAL BUSINESS/POLICY - due before PHASE-009
+  BM-Q-06 non-cube data standard        CAN BE RESOLVED DURING CANONICAL DESIGN
+  BM-Q-07 localisation depth            IMPLEMENTATION-TIME DECISION (per contract)
+  BM-Q-08 canonical period semantics    CAN BE RESOLVED DURING CANONICAL DESIGN
+
+  BLOCKING PHASE-003: 0. Each has an interim rule; the audit records where a different
+  answer would change a verdict.
+
+------------------------------------------------------------------------------
+4. COMMANDS AND EXIT CODES
+------------------------------------------------------------------------------
+
+$ python ops/cli/validation/rcp-verify.py
+exit code: 0
+  | WARN  [RCP-801] docs\work\GEOSTAT-API-ARCHITECTURE-RECOVERY-CHECKPOINT-2026-09-20.md: 5324 lines - review cohesion (soft limit 1500)
+  | WARN  [RCP-801] docs\work\GEOSTAT-API-RECOVERY-COMPLETENESS-AUDIT-2026-09-20.md: 1578 lines - review cohesion (soft limit 1500)
+  | RCP PASS: 420 checks, 0 errors, 2 warnings, 34 governed artifacts
+
+$ python -m unittest discover -s ops/tests/governance
+exit code: 0
+  | .......................................................................................................................
+  | ----------------------------------------------------------------------
+  | Ran 119 tests in 7.211s
+  | 
+  | OK
+
+$ python ops/cli/validation/engineering-governance.py
+exit code: 0   (status PASS)
+  | Recorded in the card's tests array. That run validates the SHA-256 of this file, so
+  | embedding its output would invalidate the digest it had just validated.
+
+------------------------------------------------------------------------------
+5. VERDICT
+------------------------------------------------------------------------------
+
+PHASE_002_SUBSTANTIVE_ACCEPTANCE:                  PASS (after correction)
+GATE_STANDARDS_CONFIRMED:                          PASS - re-confirmed; first PASS premature
+CRITERIA_MATERIAL_GAPS_FOUND:                      7   (5 criterion-level, 2 quality-attribute)
+INVARIANT_MATERIAL_GAPS_FOUND:                     2
+AUTOMATION_MATERIAL_GAPS_FOUND:                    9 responsibilities, 1 rule
+UNRESOLVED_QUESTIONS_BLOCKING_PHASE_003:           0
+TASK_002_STATUS:                                   DEFERRED - owner decision; analysis advanced
+BENCHMARK_CAN_DISCRIMINATE_PLAUSIBLE_BAD_ARCH:     YES (after correction; NO before)
+PARALLEL_AUTHORITIES_INTRODUCED:                   0
+UNMATERIALIZED_DURABLE_KNOWLEDGE:                  0
+
+Residual weakness, stated rather than hidden: five adversarial candidates is a sample, not a
+proof of completeness. The most useful next contribution is a sixth candidate that passes this
+benchmark and should not.
+

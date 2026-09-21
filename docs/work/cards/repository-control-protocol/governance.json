@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "id": "repository-control-protocol",
+  "status": "SUPERSEDED",
+  "supersededBy": "standards-architecture-quality-benchmark",
+  "problem": "Project state, lifecycle and document authority lived in conversation history and in filenames. A new session could not determine where the work stood, what was next or which document was current, and two audits found the rehabilitation roadmap silently truncated.",
+  "scope": "Knowledge and process governance only: the project control plane (docs/project), the generic protocol (docs/standards/PROJECT-OPERATING-SYSTEM.md), the RCP validator and its tests, the RCP adoption decision, and the session protocol block in AGENTS.md, plus CF-043/CF-044 recorded in their canonical owner (REC-CONSOLIDATION §1.4). No application business or runtime architecture is touched.",
+  "layer": "Control policy and repository knowledge governance",
+  "baseline": "b46c0438d4927851fcd688a8a8e71468aba6cf18; target platform/apps/geostat/backend/api unchanged at 26 modified / 29 untracked; pre-existing dirty backend, ops and docs work preserved and not absorbed into this card.",
+  "authority": [
+    "AGENTS.md",
+    "docs/reference/ENGINEERING-QUALITY-DOCTRINE.md",
+    "docs/reference/CANONICAL-FULL-TREE.md",
+    "docs/reference/engineering/README.md",
+    "docs/decisions/ADR-repository-control-protocol.md"
+  ],
+  "reuse": "Existing owners were inspected and kept: the AIR register owns improvement debt, docs/platform-decisions.md and docs/decisions own ADRs, the recovery registers own findings, requirements, authority and coverage, and governance cards own bounded change records. No second register, roadmap, authority registry or knowledge base was created; pre-existing documents were classified in place, never relocated.",
+  "impact": "Every session now starts at docs/project/CURRENT.md and ends by running the RCP validator. Adding a governed document requires metadata and a catalogue entry. Twenty-one currency-asserting filenames now carry an assigned authority, and a new one without authority fails RCP-701.",
+  "compatibility": "No runtime contract, schema, migration, API surface or deployment artifact is affected. The validator is stdlib-only Python and reads repository text; it changes no state. Historical documents keep their content, so all inbound references and evidence remain valid.",
+  "failure": "The validator fails closed: any unresolved reference, missing authority, vocabulary violation, roadmap gap or duplicate canonical owner exits non-zero and blocks the session-end claim. Rollback is removal of docs/project, docs/standards, the validator and the AGENTS.md control block; no data or runtime state is involved.",
+  "security": "No credentials, database access, network access or deployment. The validator reads files under the repository root and executes nothing it reads. Digests detect drift but do not authenticate authors.",
+  "requirements": {
+    "GOV-001": {
+      "decision": "APPLY",
+      "reason": "Existing owners were inspected before anything was created: the AIR register, ADR plane, canonical tree and recovery registers keep their responsibilities; the control plane routes to them and restates none of them."
+    },
+    "GOV-002": {
+      "decision": "APPLY",
+      "reason": "Every governed artifact carries an explicit authority, in its own header or in the adoption register. RCP-404 fails the build on two canonical owners for one responsibility."
+    },
+    "GOV-003": {
+      "decision": "APPLY",
+      "reason": "ADR-013 records the decision with alternatives and consequences; identifiers are not reused and the next free identifier is recorded in ADOPTION."
+    },
+    "GOV-004": {
+      "decision": "APPLY",
+      "reason": "Lifecycle, gates, standing obligations and deferred-hardening triggers are all held by MANIFEST, the single roadmap; RCP-511/512 prevent silent truncation."
+    },
+    "ARC-001": {
+      "decision": "APPLY",
+      "reason": "One responsibility, one canonical owner is the protocol invariant and is machine checked; the control plane holds no architecture or findings."
+    },
+    "ARC-002": {
+      "decision": "APPLY",
+      "reason": "Dependency direction is preserved: control artifacts reference knowledge artifacts, never the reverse, and the generic protocol holds zero project facts."
+    },
+    "EVO-001": {
+      "decision": "APPLY",
+      "reason": "Pre-existing documents are classified, not rewritten or moved; the adoption register carries authority externally so historical evidence stays intact."
+    },
+    "OBS-001": {
+      "decision": "APPLY",
+      "reason": "The validator reports check count, errors, warnings and governed-artifact count on every run; CURRENT records the last baseline."
+    },
+    "SEC-001": {
+      "decision": "APPLY",
+      "reason": "No authentication, authorization, tenancy or credential surface is touched. The validator reads repository text only."
+    },
+    "SEC-002": {
+      "decision": "APPLY",
+      "reason": "No secrets are read, written or logged; the validator executes nothing it finds in the files it validates."
+    },
+    "TST-001": {
+      "decision": "APPLY",
+      "reason": "44 negative tests inject one defect per validator check and assert that exact check fires; a check without a test is an incomplete change (OBL-VERIFY-PROVEN)."
+    },
+    "TST-002": {
+      "decision": "APPLY",
+      "reason": "14 bootstrap tests assert repository-only continuation and 39 coverage tests assert that every mechanism the commissioning specification required still exists, both against the real repository, so decay fails the build instead of going unnoticed."
+    },
+    "REL-001": {
+      "decision": "APPLY",
+      "reason": "No release surface is touched. The validator is advisory to sessions today; CI wiring is DEF-01 with a firing trigger."
+    },
+    "SCH-001": {
+      "decision": "NA",
+      "reason": "No schema is declared, altered or generated by this change."
+    },
+    "SCH-002": {
+      "decision": "NA",
+      "reason": "No schema versioning or compatibility surface is involved."
+    },
+    "SCH-003": {
+      "decision": "NA",
+      "reason": "No schema-agnostic runtime path is touched."
+    },
+    "ING-001": {
+      "decision": "NA",
+      "reason": "No ingestion mechanism, source contract or import path is involved."
+    },
+    "DAT-001": {
+      "decision": "NA",
+      "reason": "No canonical data, observation or entity storage is read or written."
+    },
+    "DAT-002": {
+      "decision": "NA",
+      "reason": "No data lineage, grain or precision decision is involved."
+    },
+    "API-001": {
+      "decision": "NA",
+      "reason": "No API surface, controller or serving contract is added or changed."
+    },
+    "UI-001": {
+      "decision": "NA",
+      "reason": "No UI or page contract is involved."
+    }
+  },
+  "files": [
+    "AGENTS.md",
+    "docs/project/README.md",
+    "docs/project/CURRENT.md",
+    "docs/project/MANIFEST.md",
+    "docs/project/CATALOG.md",
+    "docs/project/ADOPTION.md",
+    "docs/project/work/README.md",
+    "docs/project/work/_TASK-TEMPLATE.md",
+    "docs/standards/PROJECT-OPERATING-SYSTEM.md",
+    "docs/decisions/ADR-repository-control-protocol.md",
+    "docs/work/GEOSTAT-API-RECOVERY-CONSOLIDATION-2026-09-20.md",
+    "ops/cli/validation/rcp-verify.py",
+    "ops/tests/governance/test_rcp_verify.py",
+    "ops/tests/governance/test_rcp_bootstrap.py",
+    "ops/tests/governance/test_pos_coverage.py",
+    "docs/work/cards/repository-control-protocol/governance.json"
+  ],
+  "sourceDigests": {
+    "AGENTS.md": "20eab6fa5ac3cbf074edc54d9d6767dde4b2d90097ffc1b579e0d00cab7620f2",
+    "docs/project/README.md": "747f9aae10f05be8c345267346f2bb5262fbbf02316eace3a16450713a071f26",
+    "docs/project/CURRENT.md": "6d33167fde77bca0ae5ba8cb9e98584255caa1665c004e2dd37f57fdd7a4c5fa",
+    "docs/project/MANIFEST.md": "e4ede1719e979c2ea32636e51330e63a0bf1de0254e62848c96d03b052c56a93",
+    "docs/project/CATALOG.md": "040d41f6c3b3b315f7050bdf0cbcc0904d2e5f3ead5951420bea266ecbf0f888",
+    "docs/project/ADOPTION.md": "04540d505c61f3b4053949187a5c5f7697da79b7c4bd5d86df867a7a1f0ce0ff",
+    "docs/project/work/README.md": "4910a383ad74a8c77dec9a19b8485f4b030b469365a4e715ad734c0cf7477b8a",
+    "docs/project/work/_TASK-TEMPLATE.md": "97762ff60905ae3c14754f05eb0ebe1b1195337010ae3401d095fc00dbba0c34",
+    "docs/standards/PROJECT-OPERATING-SYSTEM.md": "c011d5713d60b068584bec0cb7d3fdc48edb22c7f3cc980bd38fbaac0c845e7f",
+    "docs/decisions/ADR-repository-control-protocol.md": "d28469e3ca21de791d58ebe5fdde77ade5f5f8c9dd168987364ad6a7f292efa6",
+    "docs/work/GEOSTAT-API-RECOVERY-CONSOLIDATION-2026-09-20.md": "e3abac9b11aa80cb65c57a82a3c6e5b4cd7e14f0dbd36f9d7bbbe58d65aeaf98",
+    "ops/cli/validation/rcp-verify.py": "33b5a89ff2ad1b52628eb872bf3f0084dad8ca3b8ecd009abf3d666d44ae52d6",
+    "ops/tests/governance/test_rcp_verify.py": "3c8fd4cea1e24dcfeebbbd6a97ffa92b7078ea57722c97d1bd169173ccb2fa80",
+    "ops/tests/governance/test_rcp_bootstrap.py": "10fbaf894efd37c85df9e994ca806b5bcd4567d80b9514c9a29e7f8592beece7",
+    "ops/tests/governance/test_pos_coverage.py": "91ef5ffdd5da6eee655afe46d73594d4a831ef5c0b4dea937c94dee7e18a7ec0"
+  },
+  "tests": [
+    {
+      "command": "python ops/cli/validation/rcp-verify.py",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD b46c043"
+    },
+    {
+      "command": "python -m unittest discover -s ops/tests/governance",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD b46c043"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/work/evidence/repository-control-protocol/tests.txt",
+      "sha256": "239abfaabecd4afb0ced50ca779620b0b686108e5808c6a3d1a54bc33bbf2e78"
+    }
+  ],
+  "handoff": "RCP is implemented and machine-enforced; durable knowledge is distributed to canonical owners. Next permitted action is PHASE-002 (Standards & Architecture Quality Benchmark) behind GATE-STANDARDS — not started, and not to be started under this card. Open obligations live in MANIFEST: standing obligations OBL-RCP-VERIFY and OBL-VERIFY-PROVEN, deferred hardening DEF-01..DEF-07, and CLEAN_BUILD_UPGRADE_EQUIVALENCE (UNPROVEN, due before PHASE-010). Two known authority items remain scheduled, not lost: the canonical-directory-blueprint merge (DEF-03) and the object-storage-flow CAD-02 row (DEF-04). SUPERSEDED 2026-09-21 by standards-architecture-quality-benchmark, per the change protocol's rule for later work that legitimately changes covered source: PHASE-002 edited four control-plane files this card covers (CURRENT, MANIFEST, CATALOG, ADOPTION). Nothing here is rewritten - the evidence and digests above remain historical and were true of HEAD b46c043 on 2026-09-20. The successor re-ran both suites (rcp-verify and the 119 governance tests) before claiming VERIFIED."
+}

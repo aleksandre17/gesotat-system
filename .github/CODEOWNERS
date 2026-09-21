@@ -1,0 +1,13 @@
+# Architecture and governance authorities require explicit repository-owner review.
+/AGENTS.md @aleksandre17
+/CLAUDE.md @aleksandre17
+/docs/reference/engineering/ @aleksandre17
+/docs/reference/ENGINEERING-QUALITY-DOCTRINE.md @aleksandre17
+/docs/decisions/ @aleksandre17
+/docs/platform-decisions.md @aleksandre17
+/docs/work/cards/ @aleksandre17
+/platform/apps/geostat/backend/core/src/main/resources/db/platform/ @aleksandre17
+/ops/cli/validation/engineering-governance.py @aleksandre17
+/ops/tests/governance/ @aleksandre17
+/.github/workflows/architecture-governance.yml @aleksandre17
+/.github/CODEOWNERS @aleksandre17

@@ -1,0 +1,150 @@
+GATE-STANDARDS - acceptance evidence
+PHASE-002 - Standards & Architecture Quality Benchmark
+==============================================================================
+
+Date:        2026-09-21
+Repository:  gesotat-system, branch security/hardening-2
+Baseline:    HEAD b46c0438d4927851fcd688a8a8e71468aba6cf18 (working tree dirty; see card)
+Environment: Windows 10 Pro 10.0.19045; Python 3.13.3
+Work item:   docs/project/work/completed/TASK-001-standards-architecture-quality-benchmark.md
+Card:        docs/work/cards/standards-architecture-quality-benchmark/governance.json
+
+This bundle records structural and governance evidence only. A structural PASS is not
+runtime conformance and not production readiness (AGENTS.md; engineering/README.md).
+
+------------------------------------------------------------------------------
+1. COMMANDS AND EXIT CODES
+------------------------------------------------------------------------------
+
+$ python ops/cli/validation/rcp-verify.py
+exit code: 0
+  | WARN  [RCP-801] docs\work\GEOSTAT-API-ARCHITECTURE-RECOVERY-CHECKPOINT-2026-09-20.md: 5324 lines - review cohesion (soft limit 1500)
+  | WARN  [RCP-801] docs\work\GEOSTAT-API-RECOVERY-COMPLETENESS-AUDIT-2026-09-20.md: 1578 lines - review cohesion (soft limit 1500)
+  | RCP PASS: 395 checks, 0 errors, 2 warnings, 33 governed artifacts
+
+$ python -m unittest discover -s ops/tests/governance
+exit code: 0
+  | .......................................................................................................................
+  | ----------------------------------------------------------------------
+  | Ran 119 tests in 7.944s
+  | 
+  | OK
+
+$ python ops/cli/validation/engineering-governance.py
+exit code: 0   (status PASS)
+  | Recorded in the card's tests array rather than embedded here. That run validates the
+  | SHA-256 of this very file, so pasting its output in would change the digest the run
+  | had just validated and the next run would reject it as stale. The claim stays
+  | falsifiable: re-execute the command against this checkout.
+
+------------------------------------------------------------------------------
+2. DEF-05 TRIGGER CHECK - not fired
+------------------------------------------------------------------------------
+
+DEF-05 (extend RCP-605 to non-.md references and to link targets inside prose) fires
+only when a broken reference is found that the current check misses. RCP-605 validates
+references inside work items only, so the sweep below covers every backticked repository
+path of any extension and every relative markdown link in docs/project/**.md and
+docs/standards/*.md:
+
+  | files swept:           12
+  | references checked:    142  (backticked repository paths of any extension, plus relative markdown links)
+  | broken references:     0
+
+Result: trigger NOT fired - no evidence the current check misses anything. Recorded in
+MANIFEST rather than acted on: building a control for an unfired trigger is speculative
+hardening, and the trigger is what makes the deferral survivable.
+
+------------------------------------------------------------------------------
+3. GATE-STANDARDS CONDITIONS
+------------------------------------------------------------------------------
+
+ 1. Every material quality attribute has a named standard or an explicit non-adoption decision
+    -> STD-BENCH-001 s4 - 14 attributes, each with a measure, a threshold class and an
+       evidence type; plus the STANDARDS.md disposition matrix, 18 sources, none unclassified
+
+ 2. Standards matrix: adopted / adapted / conditional / rejected, with rationale and limits
+    -> docs/reference/engineering/STANDARDS.md - the existing owner, extended rather than
+       duplicated; domain profile S1-S16 routed to with a precedence rule, never restated
+
+ 3. Quality-attribute model with measures and thresholds
+    -> STD-BENCH-001 s4 - ISO/IEC 25010 adapted; both deviations declared and justified
+
+ 4. Cross-layer architecture evaluation criteria, evidence-bound
+    -> STD-BENCH-001 s6 - 84 criteria over 11 domains, tagged to the 8 ownership layers of
+       ARCHITECTURE.md and to the L0-L47 recovery coverage rows
+
+ 5. Automation opportunity / classification model
+    -> STD-AUTO-001 - closed vocabulary, decision procedure, 10 safety preconditions,
+       MSA-001..035 target classes, 7 unsafe-automation rules that override the register
+
+ 6. Hard invariants the later Canonical Architecture must satisfy
+    -> STD-BENCH-001 s5 - BM-INV-01..22, each with a falsifier, an enforcement class and the
+       source authority it projects from
+
+ 7. Anti-pattern / rejection criteria
+    -> STD-BENCH-001 s7 - BM-REJ-01..14, each with why it is fatal here and how it is detected
+
+ 8. Unresolved standards questions, explicit, owned and bounded
+    -> STD-BENCH-001 s9 - BM-Q-01..08, each with an answer owner and an interim rule;
+       BM-Q-01, BM-Q-03 and BM-Q-05 block PHASE-004 acceptance
+
+ 9. Requirement coverage - nothing recovered was dropped
+    -> STD-BENCH-001 s10 - REQ-001..041 mapped to attributes and criteria, 41 of 41, 0 dropped
+
+10. No parallel authority introduced
+    -> RCP-403/404 in the run above; ownership tables open both new artifacts; the standards
+       matrix extends its existing owner; the AIR register was not cloned
+
+11. Durable knowledge materialized; next-phase required context explicit
+    -> CURRENT required read set (8 entries) and next permitted action; MANIFEST PHASE-003
+       entry and GATE-COMPARATIVE; TASK-001 handoff; TASK-002 escalation
+
+12. The benchmark was challenged against itself
+    -> STD-BENCH-001 s8 - six falsification attempts with confidence levels, including the
+       attempt to show that the benchmark is itself accidental complexity
+
+------------------------------------------------------------------------------
+4. DEFERRED CONTROLS OWNED BY PHASE-002
+------------------------------------------------------------------------------
+
+DEF-01  CLOSED      rcp-verify.py now runs in CI on every push and pull request to
+                    main/master (.github/workflows/architecture-governance.yml).
+                    Branch protection stays an external control and is NOT asserted.
+DEF-04  CLOSED      Object-storage responsibility row added to the CAD-02 authority
+                    registry (DOC-CAD s2.2), with producer evidence, classification and
+                    the residual convention-only lifecycle defect (s2.3).
+DEF-05  NOT FIRED   See section 2. Owner moved to PHASE-003; the trigger stands.
+DEF-08  FIRED, OPEN Escalated to the owner as TASK-002 (BLOCKED). An agent may not settle
+                    a programme-scheduling or authority-classification decision. The
+                    phase found the scope wider than ADOPTION s8.3 states. Deadline:
+                    PHASE-004.
+
+------------------------------------------------------------------------------
+5. CARD SUPERSESSION
+------------------------------------------------------------------------------
+
+PHASE-002 edited four control-plane files covered by the VERIFIED card
+repository-control-protocol (CURRENT, MANIFEST, CATALOG, ADOPTION). Per the change
+protocol, that card is now SUPERSEDED with supersededBy pointing at this one, and its
+evidence is preserved unaltered as historical. This card re-ran both suites before
+claiming VERIFIED. Consequence, stated rather than hidden: the remaining files of the
+superseded card (AGENTS.md, the validator, its three test suites, ADR-013, the protocol
+spec, the work mechanism, REC-CONSOLIDATION) no longer carry VERIFIED review-range
+coverage. No range containing only this phase's changes is affected, because none of
+those files changed here; a future range that touches them needs its own card, which it
+would have needed regardless.
+
+------------------------------------------------------------------------------
+6. VERDICT
+------------------------------------------------------------------------------
+
+PHASE_002_STATUS:                        COMPLETE
+GATE_STANDARDS:                          PASS
+MATERIAL_UNRESOLVED_STANDARDS_QUESTIONS: 8   (BM-Q-01..08, each owned, each bounded)
+PARALLEL_AUTHORITIES_INTRODUCED:         0
+UNMATERIALIZED_DURABLE_KNOWLEDGE:        0
+
+PASS means the gate's evidence was satisfied. It is never a narrative compliment, and it
+certifies nothing about runtime behaviour or production readiness.
+

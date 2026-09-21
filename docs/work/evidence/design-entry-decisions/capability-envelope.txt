@@ -1,0 +1,240 @@
+DESIGN-ENTRY - PART 2: CAPABILITY ENVELOPE, STANDARDS, GOVERNED-CHAIN HYPOTHESES
+TASK-005 (continued) / GATE-DESIGN-ENTRY
+==============================================================================
+
+Date:        2026-09-21
+Baseline:    HEAD b46c0438d4927851fcd688a8a8e71468aba6cf18 (working tree dirty; see card)
+Environment: Windows 10 Pro 10.0.19045; Python 3.13.3
+Materialized in existing owners only - AUD-CAPABILITY s6-s16, STANDARDS.md, STD-BENCH-001.
+No new artifact. No table, class, storage engine or graph implementation chosen.
+PHASE-004 has NOT been started.
+
+------------------------------------------------------------------------------
+1. CAPABILITY ENVELOPE - 24 concerns
+------------------------------------------------------------------------------
+
+  In scope with an owner and evidence                      20
+  In scope with NO owner and never built                    4
+     - tidy / long statistical structure description  (DDI-CDI names the model)
+     - product-like objects with variants and options
+     - MANY_TO_MANY as a DECLARABLE relation          (CAP-M10)
+     - impact / dependency analysis                   (D4 / CAP-M14)
+
+  Envelope test: ONE COHERENT SEMANTIC AND CONTRACT SYSTEM WITH JUSTIFIED SPECIALIZED
+  REPRESENTATIONS - NOT ONE GENERIC PHYSICAL STRUCTURE. No physical representation is
+  prescribed for any row; 'in scope' means design may reason about it.
+
+------------------------------------------------------------------------------
+2. METADATA RESPONSIBILITY MODEL
+------------------------------------------------------------------------------
+
+  8 responsibilities named for testing, all distinguished in the design space.
+  3 materially distinct ones were MISSING from the list and are added:
+     GOVERNANCE METADATA   - an act, not a description (CAP-011 is the live violation)
+     INFERENCE METADATA    - an assertion ABOUT a semantic; MSA-R2 forbids the act, so
+                             recording it is the only available control
+     ACCESS / CONFIDENTIALITY POLICY METADATA - enforced rather than displayed, and
+                             temporal (Q12 publish_not_before)
+  The eleven differ in LIFECYCLE, not in shape - which is why a generic bag can hold them
+  all and enforce none (CAP-030 REJECT, CAP-M03 REQUIRED-BUT-MISSING).
+
+------------------------------------------------------------------------------
+3. RAW -> CANONICAL -> DERIVED -> PUBLISHED
+------------------------------------------------------------------------------
+
+  10 of 11 transitions/properties have a sufficient requirement and a named owner.
+  1 does not: valid-time vs transaction-time, as-of queries, late-arriving data,
+  tombstones, classifier effective periods. Already identified in OBL-WORKSTREAMS
+  (SUPPORTING) and NOT routed into design entry -> D2 / CAP-M13. Now routed.
+
+------------------------------------------------------------------------------
+4. RELATIONSHIP SPACE
+------------------------------------------------------------------------------
+
+  Statistical <-> non-statistical classes: 7 named + 3 we had not named
+    (entity<->entity across families; classifier item<->item across schemes;
+     resource<->resource containment). 3 of the 10 exist; 4 do not.
+  Relationship semantics: 13 dimensions tested against __gs_relation and the manifest.
+    Expressible: 6.   NOT expressible: 7 - ownership, containment/composition,
+    dependency, temporal validity, version scope, materialization, and M:N cardinality.
+  A universal source_id/target_id/relationship_type triple would make all 13 equally
+  inexpressible: it can record a relationship and cannot constrain one.
+
+------------------------------------------------------------------------------
+5. LOGICAL IDENTITY vs PHYSICAL MATERIALIZATION
+------------------------------------------------------------------------------
+
+  No artifact separates them: __gs_dataset.access_table_name is a logical code pointing
+  straight at a physical name, so a table rename edits the contract.
+  The repository contains both the failure and the fix, three times independently:
+    AQ-05                      - a path stood in for an identity and was wrong in 2 days
+    ingest.artifact_object     - 'content identity is the checksum; a second location for
+                                 the same bytes is not a new object'
+    Q39                        - 'ACCDB binary checksum - build-specific, recorded, not compared'
+  New criterion BM-EC-089 makes it testable: move a materialization, diff the contract.
+
+------------------------------------------------------------------------------
+6. HYPOTHESIS VERDICTS
+------------------------------------------------------------------------------
+
+  END-TO-END GOVERNED CHAIN ................................ MODIFY
+    Not a chain: measured fan-out (225 rows -> 450 files) and fan-in (derived statistic
+      from several upstreams). It is a DAG; the linear form is one path through it.
+    Not one graph: THREE graphs share the same nodes and differ in direction, mutability
+      and lifetime - derivation/provenance (acyclic, append-only), dependency/impact
+      (forward, mutable), composition/containment. One edge type constrains none.
+    Not a graph database: candidate_2 delivers most traversals with typed FKs; the
+      manifest delivers row->file with a typed edge list. Graph-LIKE traversability is
+      already achieved relationally at this scale.
+    Breaks at cross-boundary hops: file->row, object->registry row, published->revision.
+    Stronger prior art exists and covers one graph each: PROV-O (derivation),
+      OpenLineage (runtime events), DDI-CDI (datum roles across structures).
+    RETAINED: traversability, plus evidence-bound traversal - every hop must state how it
+      is known (FK, digest, declaration, recorded event).
+
+  CONTRACT-GOVERNED LIFECYCLE .............................. MODIFY
+    Contracts can govern the chain without becoming a second semantic authority under one
+    rule the evidence supports: a contract is authority for DECLARATION; never for
+    observation (what is), acts (what was approved) or outcomes (what was measured).
+    TEST: does any contract field change without a new revision? Then it is state
+    masquerading as declaration - which is exactly CAP-011.
+    THREE STAGES MISSING from the proposed 12: APPROVAL/AUTHORIZATION,
+    CORRECTION/REPROCESSING (a governed loop back from published), RETIREMENT.
+
+------------------------------------------------------------------------------
+7. STANDARDS AND MATURE MODELS INVESTIGATED (8 new, all dispositioned)
+------------------------------------------------------------------------------
+
+  DDI-CDI 1.0                       ADAPT (concepts) / REJECT (serialization)
+  Data Package v2 (Frictionless)    REFERENCE ONLY -> CONDITIONAL on external interchange
+  OpenLineage                       CONDITIONAL (W-05); PROV-O stays conceptual authority
+  ISO/IEC 25012 data quality        ADAPT (characteristics only)
+  SQL:2011 temporal tables          CONDITIONAL (bitemporality decision is PHASE-004's)
+  W3C SHACL                         REFERENCE ONLY (proof that typed + traversable coexist)
+  W3C RDF Data Cube (QB)            REJECT (superseded here by SDMX + DDI-CDI)
+  Persistent identifiers            CONDITIONAL (only for citation outside the platform)
+
+  Considered and deliberately not adopted, recorded so it is not reopened blindly:
+  GSBPM as a process model, DAMA-DMBOK, ODPS/DPDS data-product specs, CIDOC-CRM.
+
+  DDI-CDI is the discovery of this pass: one datum described in wide, long, dimensional
+  and key-value structures, playing different roles in each. It is the model for the
+  envelope's central requirement and no prompt in this programme had named it.
+
+------------------------------------------------------------------------------
+8. BLIND-SPOT PASS
+------------------------------------------------------------------------------
+
+  Candidates tested against the repository, not assumed. FOUR WERE FALSIFIED:
+    measure additivity and SUM-blocking ....... OWNED by Q24
+    missing-value semantics incl. N/A ......... OWNED by Q22
+    embargo (publish_not_before) .............. OWNED by Q12
+    concurrent authoring (ETag / If-Match) .... OWNED by Q40
+  SEVEN SURVIVED: D1 complementary disclosure control (0 hits repository-wide);
+    D2 bitemporality (known, unrouted); D3 legal erasure vs immutability (owner);
+    D4 consumer registration; D5 cross-dataset consistency; D6 reference-data ownership
+    across sites; D7 three relationship families.
+
+  THE FINDING THAT MATTERED MOST is a routing defect, not a dimension:
+    PHASE-004's input list did not include the statistical domain register Q01-Q50.
+    ADR-014 rule 1 makes its DECIDED entries binding on M1 semantics, and Q25/Q26/Q39/
+    Q47/Q48 already specify derivation rules, typed codelist crosswalks, canonical
+    digests, the conformance claim, and a build manifest carrying generator identity and
+    semantic correspondence - i.e. CAP-M01 and CAP-M02, 'missing from every artifact'.
+    Design would have re-decided fifty evidenced questions: duplicate authority at the
+    largest scale this programme has produced. FIXED in MANIFEST and CURRENT.
+
+------------------------------------------------------------------------------
+9. FALSIFICATION SCENARIOS (12)
+------------------------------------------------------------------------------
+
+  1  simple statistical dataset                  HOLDS
+  2  rich observation metadata                   HOLDS
+  3  product-like object model with variants     PARTIAL - envelope row 5, never built
+  4  M:N domain relationship with attributes     FAILS - CAP-M10 (already preserved)
+  5  observations linked to raw/source records   HOLDS - 880<->880 measured
+  6  derived statistic from several upstreams    PARTIAL - per-value fan-in: D7/CAP-M16
+  7  one logical resource in two providers       FAILS - no logical/physical separation
+  8  adding a second provider                    UNTESTED - ADR-016 rule 6 obligation
+  9  versioned contract/codelist evolution       HOLDS - Q26 typed crosswalk
+  10 lineage published -> source                 PARTIAL - breaks at published->revision: CAP-M01
+  11 impact source -> consumers                  FAILS - no consumer registry: D4/CAP-M14
+  12 suppressed cell recoverable by subtraction  FAILS - D1/CAP-M12
+
+  3 failures required a new requirement: 4 (already preserved), 11 (new), 12 (new).
+  No scenario was resolved by weakening a criterion.
+  Closed by: BM-INV-25 (a suppression must not be recoverable from the published set),
+  BM-EC-087 (protect, do not merely flag), BM-EC-088 (derive the impact set),
+  BM-EC-089 (meaning survives relocation).
+
+------------------------------------------------------------------------------
+10. REQUIRED-BUT-MISSING TRACE
+------------------------------------------------------------------------------
+
+  CAP-M01 semantic artifact<->contract digest ..... AUD-CAPABILITY s3/s5.4 + Q48 specifies it
+  CAP-M02 generator identity in the artifact ...... AUD-CAPABILITY s3/s5.4 + Q48 specifies it
+  CAP-M03 metadata schemas for 4 namespaces ....... AUD-CAPABILITY s3/s5.4 + s7
+  CAP-M04 machine-checkable grain ................. AUD-CAPABILITY s3/s5.4 + BM-INV-24, Q18
+  CAP-M05 classifier promotion + hierarchy ........ AUD-CAPABILITY s3/s5.4 + CF-016
+  CAP-M06 approval outside the transport .......... AUD-CAPABILITY s3/s5.4 + s11.2
+  CAP-M07 multi-structure / multi-measure ......... AUD-CAPABILITY s3/s5.4 + ADR-015
+  CAP-M08 non-cube statistical shapes ............. AUD-CAPABILITY s3/s5.4 + DDI-CDI
+  CAP-M09 time dimension validation ............... AUD-CAPABILITY s3/s5.4 + Q19
+  CAP-M10 declarable MANY_TO_MANY ................. AUD-CAPABILITY s3/s5.4 + scenario 4
+  CAP-M11 domain/CHECK constraints ................ AUD-CAPABILITY s3/s5.4 + s7
+                                                    -> 11 / 11 PRESERVED
+  Added by this pass: CAP-M12 complementary disclosure control; CAP-M13 bitemporal
+  semantics; CAP-M14 consumer registration; CAP-M15 cross-dataset consistency;
+  CAP-M16 three typed relationship families.          -> 16 total
+
+------------------------------------------------------------------------------
+11. COMMANDS AND EXIT CODES
+------------------------------------------------------------------------------
+
+$ python ops/cli/validation/rcp-verify.py
+exit code: 0
+  | WARN  [RCP-801] docs\work\GEOSTAT-API-ARCHITECTURE-RECOVERY-CHECKPOINT-2026-09-20.md: 5324 lines - review cohesion (soft limit 1500)
+  | WARN  [RCP-801] docs\work\GEOSTAT-API-RECOVERY-COMPLETENESS-AUDIT-2026-09-20.md: 1578 lines - review cohesion (soft limit 1500)
+  | RCP PASS: 558 checks, 0 errors, 2 warnings, 42 governed artifacts
+
+$ python -m unittest discover -s ops/tests/governance
+exit code: 0
+  | .......................................................................................................................
+  | ----------------------------------------------------------------------
+  | Ran 119 tests in 7.107s
+  | 
+  | OK
+
+$ python ops/cli/validation/engineering-governance.py
+exit code: 0   (status PASS)
+  | Recorded in the card's tests array; that run validates this file's own SHA-256.
+
+------------------------------------------------------------------------------
+12. VERDICT
+------------------------------------------------------------------------------
+
+CAPABILITY_ENVELOPE_STATUS:                              COMPLETE
+NEW_CAPABILITY_DIMENSIONS_DISCOVERED:                    7
+NEW_CAPABILITY_DIMENSIONS:                               D1 complementary disclosure control;
+   D2 bitemporality/as-of/late-arriving/tombstone; D3 legal erasure vs immutability;
+   D4 consumer registration; D5 cross-dataset consistency constraints; D6 reference-data
+   ownership across sites/tenants; D7 three typed relationship families
+REQUIRED_BUT_MISSING_PRESERVED:                          11/11  (+5 added = 16)
+METADATA_RESPONSIBILITY_MODEL_SUFFICIENT_FOR_ENTRY:      YES  (8 + 3 discovered)
+RAW_CANONICAL_DERIVED_PUBLISHED_CHAIN_COVERED:           YES  (D2 routed)
+STATISTICAL_NONSTATISTICAL_RELATIONSHIP_SPACE_COVERED:   YES  (7 + 3 classes; 4 absent, named)
+LOGICAL_PHYSICAL_SEPARATION_COVERED:                     YES  (requirement settled, mechanism open)
+END_TO_END_GOVERNED_CHAIN_HYPOTHESIS:                    MODIFY
+CONTRACT_GOVERNED_LIFECYCLE_HYPOTHESIS:                  MODIFY
+STANDARDS_OR_MODELS_INVESTIGATED:                        8 new + 4 rejected-on-consideration
+STANDARDS_DISPOSITIONS_MATERIALIZED:                     YES  (STANDARDS.md)
+BLIND_SPOT_PASS_FINDINGS:                                8  (7 dimensions + 1 routing defect)
+FALSIFICATION_SCENARIOS:                                 12
+FALSIFICATION_FAILURES_REQUIRING_NEW_REQUIREMENTS:       3
+NEW_PHASE_004_ENTRY_BLOCKERS:                            0
+PARALLEL_AUTHORITIES_INTRODUCED:                         0
+UNMATERIALIZED_DURABLE_KNOWLEDGE:                        0
+PHASE_004_READY_FOR_CANONICAL_DESIGN:                    YES
+
+PASS means the evidence was satisfied. It certifies nothing about runtime or production.
+

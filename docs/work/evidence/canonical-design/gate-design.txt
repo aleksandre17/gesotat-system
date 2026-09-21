@@ -1,0 +1,298 @@
+PHASE-004 CANONICAL DESIGN - closure evidence
+TASK-006 / GATE-DESIGN-ENTRY
+REVISION 2 - corrected under independent review, 2026-09-21
+==============================================================================
+
+Date:        2026-09-21
+Baseline:    HEAD b46c0438d4927851fcd688a8a8e71468aba6cf18 (dirty working tree; see card)
+Environment: Windows 10 Pro 10.0.19045; Python 3.13.3
+Target DB:   Microsoft SQL Server 2022 (RTM-CU20) - read-only introspection only
+Artifacts:   ARCH-BASELINE  - physical relational baseline (chain + live)
+             ARCH-DOSSIER   - database universe, ORM/legacy boundary, 19 guarantees
+             ARCH-CANONICAL - the canonical architecture; PART II governs
+
+Scope held: no implementation, no migration, no legacy deletion, no database modification,
+no Access refinement, no Admin/UI, no commit, no push. All database access was read-only.
+
+------------------------------------------------------------------------------
+1. THE SIX CONTRADICTIONS - each re-derived, not patched
+------------------------------------------------------------------------------
+
+  R-1 observation temporality
+     evidence : draft said snapshots suffice -> WRONG: valid_from/valid_to/is_current already exist
+     revised  : three named axes - business time (grain), assertion time (record), release time (snapshot);
+                is_current becomes DERIVED from valid_to, removing the class where the two disagree
+
+  R-2 kernel vs contract_structure
+     evidence : draft claimed novelty -> contract_structure already carries 13 relevant fields
+     revised  : kernel is its governed EVOLUTION; grain promoted from prose to a component set;
+                every one of the 13 columns has a named home in the revised kernel
+
+  R-3 typed entity patterns
+     evidence : draft had no concept of a typed narrow table keyed by (row, field, discriminator)
+     revised  : promoted to a KERNEL MECHANISM - value tables partitioned by value domain;
+                localized_text / resource_locator / entity_classification become instances of one rule
+
+  R-4 enumerated domains
+     evidence : draft would have turned platform CHECKs into codelist joins - a regression
+     revised  : two rules by owner: platform state vocabularies stay CHECK, user domains are FK+version;
+                all 39 enumerated CHECK constraints preserved untouched
+
+  R-5 relationship abstraction
+     evidence : draft structure CONFIRMED by 135 FKs and by the absence of any dependency table
+     revised  : strengthened - declared cardinality compiles to uniqueness, closing CF-040;
+                zero-cascade adopted as an invariant rather than merely inherited
+                SUPERSEDED IN DETAIL BY R-9 - see section 1b
+
+  R-6 presentation substrate
+     evidence : draft asserted one semantics -> dbo.chart_definitions and page_nodes exist physically
+     revised  : restated as a TARGET with a named legacy exception, scheduled by DR-001 and PHASE-011
+
+  R-7 recovery-evidence correction: REC-CONSOLIDATION states that no stored procedures exist;
+      publication.usp_kids_r8_reconciliation does (migrations 073/075). RC-003's conclusion
+      stands on its other four axes. Routed to its owner, not absorbed here.
+
+------------------------------------------------------------------------------
+1b. THE TWO REVIEW FALSIFICATIONS - claims corrected, not defended
+------------------------------------------------------------------------------
+
+  R-8 grain digest correspondence            ARCH-CANONICAL 31.6
+     claim under review : "declared grain uniqueness is ENGINE-ENFORCED by
+                          UNIQUE(structure_revision_id, business_key_digest), digest per Q39"
+     falsification      : a unique index over a digest proves invariant A - two identical
+                          digests cannot coexist. It does NOT prove invariant B - that the
+                          digest is the digest of the record's ACTUAL persisted grain values.
+                          Grain values live across typed value-domain tables; nothing in the
+                          draft stopped a writer persisting values X alongside digest(Y).
+     engine analysis    : B cannot be declarative in SQL Server 2022.
+                          CHECK cannot reference another table. A persisted computed column
+                          cannot leave its own row. A FOREIGN KEY cannot compute a hash. An
+                          indexed view cannot assemble a multi-row tuple into one hashable row
+                          (no STRING_AGG, no HASHBYTES over an aggregate, no subqueries).
+                          UNIQUE over the values themselves requires the grain in ONE row,
+                          i.e. a per-structure table - exactly what the stable kernel forbids.
+                          => FULL DECLARATIVE ENFORCEMENT IS IMPOSSIBLE WITHOUT DEFEATING
+                             THE STABLE-KERNEL REQUIREMENT. Stated, not engineered around.
+     mechanism adopted  : L1 GENERATED, NEVER ACCEPTED - no role holds INSERT/UPDATE on
+                             platform.record; the sole write path has NO digest parameter
+                          L2 DERIVED IN-TRANSACTION - the procedure's last statement and an
+                             AFTER trigger on each value table recompute from PERSISTED rows
+                          L3 VERIFIED BY TRIGGER - tr_record_grain_digest_verify recomputes
+                             and THROWs on mismatch; XACT_ABORT ON -> full rollback
+                          L4 RECONCILIATION - out-of-band recompute-and-compare, the detective
+                             control for a disabled trigger
+     Q39 WITHDRAWN      : Q39 canonicalizes a CONTRACT JSON DOCUMENT with RFC 8785 JCS and NFC
+                          on the JVM. A trigger cannot recompute it. Reusing it would have
+                          forced either a SECOND JCS IMPLEMENTATION IN T-SQL - a parallel
+                          canonicalizer, forbidden - or the loss of L2/L3, collapsing B to
+                          application-only. The grain key is therefore an ENGINE-LOCAL
+                          encoding: ordinal || domain_tag || len32 || canonical_bytes per
+                          component in declared order, length-prefixed (injective), then
+                          HASHBYTES SHA2_256 -> BINARY(32). Q39 keeps its own scope.
+     authority boundary : the ordered declared grain-component tuple is the SEMANTIC AUTHORITY.
+                          The digest is a PHYSICAL enforcement/indexing representation only -
+                          never published, never exchanged, never a business identifier, never
+                          compared across systems. Proof it is not semantic: changing the
+                          encoding is a physical migration that rebuilds every digest and
+                          changes no meaning.
+     residuals named    : (1) a DDL-privileged principal can DISABLE TRIGGER - identical to the
+                              enforcement class of all 20 existing immutability triggers, so
+                              not a regression; controls are DDL audit + L4
+                          (2) Unicode NFC of text grain components - byte-exact hashing admits
+                              NFC and NFD forms as distinct grain; T-SQL cannot normalize.
+                              OWNER DECISION REQUIRED (ARCH-CANONICAL 39)
+                          (3) a record written before its grain rows - closed by write-path
+                              ordering and business_key_digest NOT NULL
+     corrected verdict  : INV-006 = PARTIAL. A declarative, B procedural-in-engine.
+                          Against the baseline, where INV-006 is APPLICATION-ONLY, this is
+                          still a strengthening - but the earlier unqualified claim was false.
+
+  R-9 cardinality-specific enforcement       ARCH-CANONICAL 31.7
+     claim under review : "declared cardinality compiles into the uniqueness constraint over
+                          the endpoint tuple"
+     falsification      : UNIQUE(rel, source, target) prevents duplicate PAIRS. That is the
+                          whole rule for MANY_TO_MANY and NONE of the rule for the other three:
+                          it admits a second parent under ONE_TO_MANY, a second target under
+                          MANY_TO_ONE, and both under ONE_TO_ONE. One rule was named for four
+                          semantics.
+     second problem     : the obvious fix - a per-relationship filtered index - is DDL PER
+                          RELATIONSHIP, which would defeat
+                          ORDINARY_NEW_RELATIONSHIP_REQUIRES_PLATFORM_DDL: NO. Rejected.
+     derivation         : two independent questions decide the rule -
+                          may a given b have more than one a?  if not, TARGET must be unique
+                          may a given a have more than one b?  if not, SOURCE must be unique
+                          ONE_TO_ONE   -> both roles unique
+                          ONE_TO_MANY  -> target unique  (a child cannot gain a second parent)
+                          MANY_TO_ONE  -> source unique  (the inverse)
+                          MANY_TO_MANY -> pair unique only
+     mechanism adopted  : THREE FIXED INDEXES, ZERO PER-RELATIONSHIP DDL
+                          cardinality_code stays the semantic authority (closed vocabulary,
+                          CHECK - preserving R-4). Two PERSISTED computed BIT flags project it
+                          on the declaration row; the instance row carries the same two flags
+                          FK-LOCKED by a composite FOREIGN KEY, so they cannot disagree.
+                            ux_rel_pair       (rel, source, target)
+                            ux_rel_source_one (rel, source) WHERE enforce_source_unique = 1
+                            ux_rel_target_one (rel, target) WHERE enforce_target_unique = 1
+     proven in-repo     : the live catalogue already carries filtered indexes with exactly
+                          these predicate forms -
+                            ux_statistical_contract_draft_approved  WHERE state_code='APPROVED'
+                            ux_api_operation_owner_idempotency      WHERE idempotency_key IS NOT NULL
+                          single equality to a literal; no OR and no computed column in the
+                          predicate, both of which SQL Server forbids there.
+     bonus properties   : the composite FK makes the ENGINE REFUSE an in-place cardinality
+                          change while rows exist (it becomes a new revision + migration, which
+                          is the contract semantics anyway); endpoint STRUCTURE conformance
+                          uses the identical device.
+     corrected verdict  : all four cardinalities ENGINE-ENFORCED DECLARATIVELY, with typed
+                          endpoints, real FKs, zero cascade and contract authority intact.
+                          CF-040 closes for four cardinalities rather than one.
+
+------------------------------------------------------------------------------
+2. THE ARCHITECTURAL RESULT
+------------------------------------------------------------------------------
+
+  STABLE PHYSICAL KERNEL (value-domain-partitioned typed tables)
+     + LOGICAL MODEL EVOLVING BY DECLARATION
+     + SELECTIVE, DECLARED, REVERSIBLE MATERIALIZATION
+
+  Derived from evidence rather than preference: the repository already answers the
+  dynamic-model question three times - observation/observation_dimension (typed, grain
+  unenforceable), entity_record.payload_json (untyped: CF-039), and localized_text /
+  resource_locator / entity_classification (typed, keyed, constrained). The third is the
+  strongest, and it is what the kernel generalizes.
+
+  Why it is not EAV - three checks any reviewer can apply:
+     1. each value table holds ONE value domain with its correct physical type
+     2. the component identifier is CONTRACT-GOVERNED, never free text
+     3. the primary key INCLUDES the component and its discriminator
+  A design that loses any one of the three IS EAV and is rejected.
+
+  Grain enforcement, stated correctly after review (R-8):
+     invariant A - no two identical grain tuples -> UNIQUE(structure_revision_id,
+                   business_key_digest). ENGINE, DECLARATIVE.
+     invariant B - the digest matches the actual persisted values -> generated-not-accepted,
+                   derived in-transaction, verified by trigger. ENGINE, PROCEDURAL.
+     Today INV-006 is application-only, so this remains a STRENGTHENING - but it is PARTIAL,
+     not the "engine-enforced by construction" claimed before review.
+
+------------------------------------------------------------------------------
+3. WHAT GENUINELY WEAKENS - named, not hidden
+------------------------------------------------------------------------------
+
+  Per-field NOT NULL      -> compiled validation in the generic kernel
+  Per-field range/pattern -> compiled validation, or engine when materialized
+
+  Why this regresses nothing that exists: all 115 live CHECK constraints and every existing
+  NOT NULL sit on PLATFORM KERNEL tables, which remain physical with their constraints
+  intact. No user dataset has a physical range CHECK today, because no user dataset has its
+  own table - observation and entity_record are already generic. The comparison is therefore
+  generic-and-typed versus generic-and-untyped, and the revised design wins it.
+
+  Bounded by the specialization criteria of ARCH-CANONICAL 31.4 - volume, query plan,
+  regulatory enforcement, provider round trip. A materialization changes performance and
+  never meaning, and dropping it is safe: that reversibility is what separates specialization
+  from schema proliferation.
+
+  A THIRD limitation, of a different kind, is added by R-8 and kept out of the list above so
+  the two value-constraint limitations accepted by review are not silently widened:
+  tuple-to-digest correspondence is procedural, not declarative (31.6), with its three named
+  residuals.
+
+------------------------------------------------------------------------------
+4. TESTS RUN
+------------------------------------------------------------------------------
+
+  Simple evolution (32)   new structure, 8 fields, classifier, uniqueness, 1:N, M:N,
+                          localized value, resource attachment
+                          -> physical DDL NONE, JPA entity NONE, repository NONE
+  Complex statistical(33) grain, dimensions, measure, status, attributes, hierarchy,
+                          temporal revision, correction, snapshot, lineage, confidentiality
+                          -> typed, deterministic, reproducible, constrained
+  Integrity (34)          13 invalid states after the review correction added two rows;
+                          10 rejected by the ENGINE (8 declaratively, 2 procedurally),
+                          1 at the publication gate, 2 by compiled validation and named
+  Evolution lifecycle(35) create/add/change/relate/classify/publish/revise/retire
+                          -> platform DDL required in 0 of 9 ordinary steps
+  Falsification (31.5)    EAV, stringly-typed, universal-edge, metadata-magic, grain,
+                          performance and legacy-free attacks - each answered individually;
+                          the grain row is CORRECTED by R-8 rather than defended
+  False-digest test(31.6) 5 attempts to persist valid values with a false but unique digest
+                          -> 1 rejected at the permission check before any row is touched
+                             2 has no entry point (no digest parameter exists)
+                             3 rejected by tr_record_grain_digest_verify, full rollback
+                             4 re-derived in the same transaction by the value-table trigger
+                             5 trigger disabled by a DDL-privileged principal - NOT preventable
+                               in-database, named as a residual, detected by L4
+  Cardinality test(31.7)  4 attacks, one per cardinality -> each rejected by an index, not code
+
+  NOTE ON EVIDENCE CLASS: sections 31.6 and 31.7 are DERIVED AND ARGUED against the live
+  engine's documented behaviour and against filtered-index predicates observed in this
+  database. They are NOT EXECUTED. No DDL was run anywhere. Executable negative tests are a
+  named downstream obligation (ARCH-CANONICAL 40).
+
+------------------------------------------------------------------------------
+5. COMMANDS AND EXIT CODES
+------------------------------------------------------------------------------
+
+$ python ops/cli/validation/rcp-verify.py
+exit code: 0
+  | WARN  [RCP-801] docs\work\GEOSTAT-API-ARCHITECTURE-RECOVERY-CHECKPOINT-2026-09-20.md: 5324 lines — review cohesion (soft limit 1500)
+  | WARN  [RCP-801] docs\work\GEOSTAT-API-RECOVERY-COMPLETENESS-AUDIT-2026-09-20.md: 1578 lines — review cohesion (soft limit 1500)
+  | RCP PASS: 626 checks, 0 errors, 2 warnings, 46 governed artifacts
+
+$ python -m unittest discover -s ops/tests/governance
+exit code: 0
+  | Ran 119 tests in 7.482s
+  | OK
+
+$ python ops/cli/validation/engineering-governance.py
+exit code: 0   (status PASS)
+  | this run validates this file's own digest, so it is executed last, after the card is
+  | refreshed; the preceding FAIL on stale digests is the fail-closed control working
+
+------------------------------------------------------------------------------
+6. VERDICT
+------------------------------------------------------------------------------
+
+PHASE_004_STATUS:                                     COMPLETE (corrected under review)
+GATE_DESIGN_ENTRY:                                    PASS
+CANONICAL_ARCHITECTURE_DERIVED:                       YES
+LOGICAL_EVOLUTION_WITHOUT_DEFAULT_PLATFORM_DDL:       PASS
+STABLE_PHYSICAL_KERNEL_HYPOTHESIS:                    PASS (two named limitations + 31.6)
+RELATIONAL_INTEGRITY_UNDER_DYNAMIC_LOGICAL_MODEL:     PASS (10 of 13 engine; 8 declarative,
+                                                            2 procedural; 1 gate; 2 compile)
+GRAIN_TUPLE_IS_SEMANTIC_AUTHORITY:                    YES
+DIGEST_IS_ONLY_PHYSICAL_ENFORCEMENT_REPRESENTATION:   YES
+TUPLE_TO_DIGEST_CORRESPONDENCE_ENFORCEMENT:           GENERATED-NOT-ACCEPTED (permission-sealed
+                                                      write path, no digest parameter)
+                                                      + TRANSACTIONAL TRIGGER DERIVATION from
+                                                      persisted rows
+                                                      + TRIGGER VERIFICATION with rollback
+                                                      + RECONCILIATION as detective control.
+                                                      NOT declaratively enforceable in SQL
+                                                      Server without a per-structure table.
+FALSE_DIGEST_WITH_VALID_VALUES_REJECTED:              YES (permission, then trigger, atomically
+                                                      in the same transaction; residual: a
+                                                      DDL-privileged principal who disables the
+                                                      trigger - same ceiling as the 20 existing
+                                                      immutability triggers)
+INV_006_ENGINE_ENFORCED:                              PARTIAL
+CARDINALITY_1_TO_1_ENGINE_ENFORCED:                   YES
+CARDINALITY_1_TO_N_ENGINE_ENFORCED:                   YES
+CARDINALITY_N_TO_1_ENGINE_ENFORCED:                   YES
+CARDINALITY_N_TO_N_ENGINE_ENFORCED:                   YES
+ENTITY_PER_LOGICAL_STRUCTURE_REQUIRED:                NO
+ORDINARY_NEW_LOGICAL_TABLE_REQUIRES_PHYSICAL_TABLE:   NO
+ORDINARY_NEW_LOGICAL_FIELD_REQUIRES_ALTER_TABLE:      NO
+ORDINARY_NEW_RELATIONSHIP_REQUIRES_PLATFORM_DDL:      NO
+PHYSICAL_SPECIALIZATION_BOUNDARY_DEFINED:             YES (31.4, four criteria)
+ALL_19_BASELINE_GUARANTEES_PRESERVED_OR_STRENGTHENED: YES
+ALL_6_DRAFT_BASELINE_CONTRADICTIONS_RESOLVED:         YES
+REVIEW_FALSIFICATIONS_RESOLVED:                       2 of 2 (R-8, R-9)
+UNJUSTIFIED_RELATIONAL_REGRESSIONS_REMAINING:         0
+PROMPT_CONFLICTS_REJECTED_DURING_REVISION:            1 (section 38)
+PARALLEL_AUTHORITIES_INTRODUCED:                      0
+PHASE_005_READY:                                      YES
+
+PASS means the evidence was satisfied. It certifies nothing about runtime or production.
+Sections 31.6 and 31.7 are design-level derivations, not executed tests.

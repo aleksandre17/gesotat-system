@@ -1,0 +1,171 @@
+{
+  "version": 1,
+  "id": "canonical-design",
+  "status": "VERIFIED",
+  "problem": "PHASE-004 must derive a canonical architecture that is demonstrably stronger than every inspected artifact and demonstrably non-regressive against what already exists. Synthesis began from the Access artifacts, the recovery registers and the benchmark - and no phase had ever inventoried the SQL data plane, which is four times larger than every Access artifact combined and enforces invariants no document records.",
+  "scope": "Canonical design and the physical baseline that bounds it. Delivered so far: the physical relational baseline (ARCH-BASELINE) from 113 migrations plus read-only live introspection of three dev databases, and a draft architecture (ARCH-CANONICAL) written to section 29 and then paused. No migration, no provider generator, no Access physical refinement, no Admin/UI, no API implementation and no legacy deletion. No source artifact was modified and no DDL or DML was executed anywhere. A forensic deepening pass then completed the evidence barrier: full live read-only introspection of all reachable databases, the legacy datasource classified, ORM correspondence established, the six unclassified structures resolved, an anti-regression matrix of 19 guarantees recorded, and the blocked draft compared against physical evidence concept by concept. Still no migration, no implementation, no Access refinement, no Admin/UI, and no database was modified. An independent substantive review then falsified two enforcement claims; both are corrected in place (R-8 grain digest correspondence, R-9 cardinality-specific enforcement) with their derivations in ARCH-CANONICAL 31.6 and 31.7. The correction is bounded: no new design phase, no implementation, no migration, no database modification, no commit and no push.",
+  "layer": "Control policy and repository knowledge governance",
+  "baseline": "b46c0438d4927851fcd688a8a8e71468aba6cf18 on security/hardening-2; target platform/apps/geostat/backend/api unchanged at 26 modified / 29 untracked. Live introspection was read-only against the dev host 192.168.1.199, authorised by the owner mid-phase; the SA credential was dereferenced inside the container on the remote host and never entered this session or any artifact. The AIR register still carries another author's uncommitted work and was again not edited.",
+  "authority": [
+    "AGENTS.md",
+    "docs/project/CURRENT.md",
+    "docs/project/MANIFEST.md",
+    "docs/standards/ARCHITECTURE-QUALITY-BENCHMARK.md",
+    "docs/standards/AUTOMATION-CLASSIFICATION-MODEL.md",
+    "docs/work/GEOSTAT-CAPABILITY-INVENTORY-2026-09-21.md",
+    "docs/work/GEOSTAT-ARTIFACT-COMPARATIVE-AUDIT-2026-09-21.md",
+    "docs/work/GEOSTAT-API-CANONICAL-AUTHORITY-DOCTRINE-2026-09-20.md",
+    "docs/work/STATISTICAL-CONTRACT-OPEN-QUESTIONS.md",
+    "docs/decisions/ADR-lifecycle-program-separation.md",
+    "docs/decisions/ADR-sdmx-conformance-boundary.md",
+    "docs/decisions/ADR-access-provider-status.md"
+  ],
+  "reuse": "The baseline changed what counts as reuse. platform.contract_structure already carries structure, data class, grain, authority mode, lifecycle policy and policy references, so the draft kernel is an evolution of an existing table rather than an invention, and the draft must say so. Q48 already specifies the build manifest that CAP-M01 and CAP-M02 need. entity.localized_text, entity.resource_locator, entity.entity_classification and reference.classification_item_snapshot are existing typed patterns the family model must express rather than replace. Nothing new was created that an existing owner could hold: the baseline is evidence, the draft is design, and both cite their sources.",
+  "impact": "PHASE-004 is ACTIVE and cannot close. The baseline contradicts three sections of the draft - observation temporality, kernel novelty and family completeness - and adds a finding no phase had: 19 legacy dbo.* tables live in the same databases as the governed control plane, including a second migration ledger (dbo.migrations), a complete legacy authorization model (users/roles/permissions/tokens) and a physical chart_definitions. That inventory gives PHASE-011 an exact elimination target and gives the canonical design an explicit boundary it must not inherit by proximity. It also corrects an evidence defect in REC-CONSOLIDATION, which states that no stored procedures exist in the chain while publication.usp_kids_r8_reconciliation does. The deepening pass added the finding that decides how legacy elimination must be sequenced: the 19 dbo.* tables are exactly the ORM substrate, so the governed 120-table architecture is ORM-free by design and retiring a legacy table means retiring its entity class with it. It also proved the legacy datasource auto is unreachable and carries exactly one runtime dependency - a health probe - so it is not a data dependency of the new system, while the legacy data the system does use sits in dbo.* inside the new control-plane database. The review correction changes no phase state and no other artifact's authority: it rewrites two enforcement claims inside ARCH-CANONICAL, adds R-8 and R-9 to the Part II revision set, adds sections 31.6 and 31.7, and regenerates the gate evidence. Downstream consumers gain three obligations they did not have - the write-path permission model, the digest reconciliation check, and executable negative tests for both corrections - and one owner decision on Unicode normalization. Preservation pass, post-acceptance: two authority-surface defects were found and corrected without touching architecture. MANIFEST carried two sections headed PHASE-004 CANONICAL DESIGN, one COMPLETE and one NOT_STARTED - the stale admission record was retitled as the retained entry record that states no status, so the phase has one status owner again and none of its enumerated inputs were lost. CURRENT recorded 626 RCP checks, a figure reproducible only in a working tree that also holds the three gitignored codex-session transcripts; the committed-state figure is 620 and CURRENT now records that, with the difference explained rather than hidden.",
+  "compatibility": "No runtime contract, schema, migration, API surface, package or deployment artifact is affected; the live databases were read, never written. ARCH-CANONICAL is BLOCKED and deliberately uncatalogued so that an unfinished draft cannot be mistaken for canonical authority. ARCH-BASELINE is catalogued because it is finished evidence.",
+  "failure": "The failure this card guards against is a canonical design that silently regresses a typed relational guarantee. The control is ARCH-BASELINE section 6: every place where the draft would replace a PK, FK, UNIQUE, CHECK, type or cardinality with metadata interpretation is enumerated, and two of the three found are unjustified as drafted. Rollback is textual: the draft and the baseline are documents, and nothing executable changed. The review demonstrated the second failure mode this card must guard: not a silent regression, but a correct-sounding enforcement claim that the engine does not actually make. Both instances were withdrawn and re-derived rather than argued; the fail-closed governance validator caught the stale evidence digests produced by the correction, which is the control behaving as designed.",
+  "security": "Read-only introspection of a dev host authorised by the owner. No DDL or DML ran. No credential was read into the session, printed, logged or written to any artifact: the container's own environment variable was dereferenced inside docker exec on the remote side, and only non-secret connection facts (host, database names, user) appear anywhere. The baseline records that a complete legacy authorization model coexists with the OIDC model, which is a trust-boundary finding reported to its owners, not changed here.",
+  "requirements": {
+    "GOV-001": {
+      "decision": "APPLY",
+      "reason": "The baseline was reconstructed before any generalization was adopted, which is what surfaced platform.contract_structure as the kernel's true predecessor and stopped the draft from claiming novelty it does not have."
+    },
+    "GOV-002": {
+      "decision": "APPLY",
+      "reason": "The physical model was traced across all three databases and both planes: declaration tables, instance tables, publication, ingest and archive, plus the legacy dbo residency that no prior map included."
+    },
+    "GOV-003": {
+      "decision": "APPLY",
+      "reason": "TASK-006 records what was written, what was paused and why, and names the eight revisions outstanding; the draft carries the same warning in its own header so it cannot be finalized by accident. The preservation pass adds the commit boundary: the working tree carries two independent bodies of uncommitted work, and only the rehabilitation control plane belongs to this commit. The platform security-hardening implementation - 30 modified and 14 untracked paths under platform/, the ops PowerShell gates, ops/config, ops/tests/security, ops/tests/sql, the AIR register, the legacy-retirement governance document, ADR-tenant-scoped-authorization and the statistical implementation checklist - is another author's work in flight and is excluded rather than absorbed, exactly as this card's baseline required from the start."
+    },
+    "GOV-004": {
+      "decision": "APPLY",
+      "reason": "Five architectural alternatives were given their strongest form and compared responsibility by responsibility before one was chosen; the choice records its own cost and the risk it carries."
+    },
+    "ARC-001": {
+      "decision": "APPLY",
+      "reason": "The architecture converges on one authority chain and introduces no competitor. The review correction is the clearest evidence of that discipline working: the cheapest way to keep the original claim would have been a T-SQL reimplementation of the Q39 canonicalizer, and that was rejected precisely because it would have created a second implementation of one semantic rule. The chosen mechanism keeps one canonicalizer for contracts and one engine-local encoding for physical row identity, with different inputs, owners and purposes."
+    },
+    "ARC-002": {
+      "decision": "APPLY",
+      "reason": "Provenance is designed as an append-only derivation model with digest-bearing edges, and the baseline confirms every instance plane already carries an FK to raw.source_record."
+    },
+    "SEC-002": {
+      "decision": "APPLY",
+      "reason": "Live introspection used only read-only sys.* queries on an owner-authorised dev host. No credential entered the session, any artifact or any log: the container's own environment variable was dereferenced inside docker exec remotely, and only datasource roles and non-secret host and database names appear in the evidence."
+    },
+    "EVO-001": {
+      "decision": "APPLY",
+      "reason": "Revision semantics, compatibility classes and the expand-migrate-contract rule are designed, and the migration chain is confirmed fully applied at 113 with its ledger intact."
+    },
+    "OBS-001": {
+      "decision": "APPLY",
+      "reason": "Each decision is visible where a reader looks: the register, the catalogue, the adoption classification, CURRENT's read set and MANIFEST's PHASE-004 input table."
+    },
+    "TST-001": {
+      "decision": "APPLY",
+      "reason": "A governance test failed on this change and was not weakened to pass. test_anti_bloat asserted that work/active must not exist - true while no item was ever in flight, wrong once TASK-006 opened. The assertion now tests the rule it was protecting, no ceremonial EMPTY folder, across all three state folders, which is strictly stronger than the form it replaces."
+    },
+    "TST-002": {
+      "decision": "APPLY",
+      "reason": "Every count in the baseline is reproducible by re-running the inventory script or the sys.* queries; where the static parse and the live catalogue disagreed, the live figure is recorded as authoritative and the discrepancy explained. The review correction is held to the same standard and its evidence class is labelled honestly: sections 31.6 and 31.7 are derived and argued against documented engine behaviour and against filtered-index predicates read from the live catalogue (WHERE state_code='APPROVED' and WHERE idempotency_key IS NOT NULL, which is why WHERE flag = 1 is a proven form here), but they are NOT EXECUTED. No DDL was run anywhere. Executable negative tests for the five false-digest attempts and the four cardinality attacks are recorded as a downstream obligation, not claimed as done."
+    },
+    "SCH-001": {
+      "decision": "APPLY",
+      "reason": "The design preserves M3 to M0 and makes the upper levels enforceable rather than aspirational; the baseline confirms the chain's declaration layer is real and fully applied."
+    },
+    "SCH-002": {
+      "decision": "APPLY",
+      "reason": "Concept, representation, structure, component and grain are each given one identity, one owner and one invariant, and grain becomes machine-checkable for the first time. The review correction sharpened the grain authority boundary rather than moving it: the ordered declared grain-component tuple is the semantic authority and the digest is a physical enforcement and indexing representation only - never published, exchanged, or compared across systems. The proof that it is not semantic authority is that changing the encoding is a physical migration which changes no meaning. Q39 was withdrawn as the grain-key rule because a trigger cannot recompute RFC 8785 JCS in T-SQL, and reusing it would have forced either a second canonicalizer implementation - a parallel authority - or the loss of engine verification. Q39 keeps its own scope, contract-document digests."
+    },
+    "SCH-003": {
+      "decision": "APPLY",
+      "reason": "Six families share one declaration grammar with family-specific roles and physical patterns, so a new site or family is a declaration rather than a core change; the second-provider proof remains an obligation."
+    },
+    "ING-001": {
+      "decision": "NA",
+      "reason": "No ingestion path is exercised; no artifact was loaded, imported or admitted anywhere."
+    },
+    "DAT-001": {
+      "decision": "APPLY",
+      "reason": "The baseline inventories every typed guarantee that exists - 139 PKs, 135 FKs, 115 CHECKs, 97 UNIQUEs, 20 triggers, 7 filtered indexes - and the anti-regression analysis binds the design to preserving them. Under independent review two of the design's own enforcement claims were falsified and corrected rather than defended. R-8: a UNIQUE index over business_key_digest proves that two identical digests cannot coexist, not that a digest matches the record's actual persisted grain values; no declarative construct in SQL Server 2022 can bind the second invariant without putting the grain in one row, which is a per-structure table and defeats the stable kernel. INV-006 is therefore recorded as PARTIAL - declarative for tuple uniqueness, procedural (permission-sealed generation plus trigger verification) for correspondence - which is still a strengthening over today's application-only rule but is not what the draft claimed. R-9: one endpoint-tuple index enforces MANY_TO_MANY and none of the other three cardinalities; the corrected rule is three fixed indexes, two filtered on an FK-locked projection of the declared cardinality, which makes all four engine-enforced with zero DDL per relationship."
+    },
+    "DAT-002": {
+      "decision": "NA",
+      "reason": "No retry, transaction, timeout or idempotency behaviour exists in a read-only inspection."
+    },
+    "API-001": {
+      "decision": "NA",
+      "reason": "No request, response, projection or query plan is added or changed."
+    },
+    "UI-001": {
+      "decision": "NA",
+      "reason": "No page, view, chart, map, export or locale is declared or altered; presentation declarations were read as evidence only."
+    },
+    "SEC-001": {
+      "decision": "APPLY",
+      "reason": "Read-only introspection only; no DDL or DML was executed and no credential entered the session or any artifact - the container's own environment variable was dereferenced inside docker exec on the remote host, and only non-secret facts (engine version, index predicates, object names) were recorded. The review correction adds a security-relevant design element and a security-relevant open decision. The element: grain-digest integrity depends on a permission-sealed write path, so the DENY/EXECUTE-only permission model is named as a downstream obligation without which the guarantee degrades. The decision: Unicode NFC normalization of text grain components cannot be done in T-SQL, and unnormalized text admits two records the platform treats as distinct and a user reads as identical; this is routed to the owner (section 39) rather than settled by an agent."
+    },
+    "REL-001": {
+      "decision": "NA",
+      "reason": "No release surface, image, migration or provenance artifact is affected; this card claims no release readiness and PHASE-004 is not complete."
+    }
+  },
+  "files": [
+    "docs/project/CATALOG.md",
+    "docs/project/CURRENT.md",
+    "docs/project/MANIFEST.md",
+    "docs/project/work/completed/TASK-006-canonical-design.md",
+    "docs/work/GEOSTAT-CANONICAL-ARCHITECTURE-2026-09-21.md",
+    "docs/work/GEOSTAT-PHYSICAL-DATA-DOSSIER-2026-09-21.md",
+    "docs/work/GEOSTAT-PHYSICAL-RELATIONAL-BASELINE-2026-09-21.md",
+    "docs/work/cards/canonical-design/governance.json",
+    "docs/work/cards/design-entry-decisions/governance.json",
+    "docs/work/evidence/canonical-design/gate-design.txt",
+    "docs/work/evidence/physical-relational-baseline/live-schema-full.txt",
+    "docs/work/evidence/physical-relational-baseline/live-summary.json",
+    "docs/work/evidence/physical-relational-baseline/live-tables.txt",
+    "docs/work/evidence/physical-relational-baseline/physical-model.json",
+    "ops/tests/governance/test_pos_coverage.py"
+  ],
+  "sourceDigests": {
+    "docs/project/CATALOG.md": "1f359582bcd720c248bf704b98c9f9ec225caedbc0ae827479a87c088b06621b",
+    "docs/project/CURRENT.md": "740b2296630c1aa65355c5896bba6d66ae3ea85a10966ac0922178b47f51a0fb",
+    "docs/project/MANIFEST.md": "9e99f3d6abcb3a73ab3cf187f31d9fa74fd533338c18e9fb92d07ec431e01ca4",
+    "docs/project/work/completed/TASK-006-canonical-design.md": "df0cd038b8d50e5007d14a5b5ff0ce8a2700743aa86c3ea7d8d8b36757ecc3a8",
+    "docs/work/GEOSTAT-CANONICAL-ARCHITECTURE-2026-09-21.md": "ddfd4aecae83a609454dfabfdf155af2214d6faa7659a6835117f6fb0a1dcced",
+    "docs/work/GEOSTAT-PHYSICAL-DATA-DOSSIER-2026-09-21.md": "52be07e14e9ca858adb85f38e4effdec2dae026bddfefc9e1fa1e5bdce6776a6",
+    "docs/work/GEOSTAT-PHYSICAL-RELATIONAL-BASELINE-2026-09-21.md": "c53f64e8b9991bc21144804d193eab663f0a55becd9f18cad57dc5f715e12471",
+    "docs/work/cards/design-entry-decisions/governance.json": "3935be975578785b4e4829fc4450285987cf2f0f84b647750b9e78b17e60e507",
+    "docs/work/evidence/canonical-design/gate-design.txt": "07eb7cf548e0d092c1a7c5c6cc8fa76f6f29e6f600d5737c11a30a460ac69923",
+    "docs/work/evidence/physical-relational-baseline/live-schema-full.txt": "bd6a7cb53aa24d53438b2fb050e086a806b01a974fab38def025eb0c87c278f9",
+    "docs/work/evidence/physical-relational-baseline/live-summary.json": "5d6c7962cdd363728af27141eab738e8a51c19452a5d782fbe3d510d4d4f97f0",
+    "docs/work/evidence/physical-relational-baseline/live-tables.txt": "8359d1345b6a0722a10041fee7a40d40ec5e45955dbf5f285aec4952745092c9",
+    "docs/work/evidence/physical-relational-baseline/physical-model.json": "4e759105d5f829219427eb986e23cc5607cef4b979cd154ae0c9f9df6c2cd65b",
+    "ops/tests/governance/test_pos_coverage.py": "45131026a8b62a80a663757f1c41af1dc190da33bedda5eb3b4682b610590447"
+  },
+  "tests": [
+    {
+      "command": "python ops/cli/validation/rcp-verify.py",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD b46c043 (dirty working tree, see baseline)"
+    },
+    {
+      "command": "python -m unittest discover -s ops/tests/governance",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD b46c043 (dirty working tree, see baseline)"
+    },
+    {
+      "command": "python ops/cli/validation/engineering-governance.py",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD b46c043 (dirty working tree, see baseline)"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/work/evidence/canonical-design/gate-design.txt",
+      "sha256": "07eb7cf548e0d092c1a7c5c6cc8fa76f6f29e6f600d5737c11a30a460ac69923"
+    }
+  ],
+  "handoff": "PHASE-004 is COMPLETE and has now survived an independent substantive review that falsified two of its enforcement claims. Both were corrected in place rather than defended. R-8: UNIQUE(structure_revision_id, business_key_digest) proves only that two identical digests cannot coexist; it does not prove the digest corresponds to the record's actual persisted values, and no declarative SQL Server construct can prove that without collapsing the stable kernel into per-structure tables. The correspondence is enforced by generation rather than acceptance - the digest has no writer, is derived in-transaction from persisted rows, and is re-verified by trigger - with reconciliation as the detective control, and INV-006 is recorded as PARTIAL. Q39 is withdrawn as the grain-key rule and keeps its own scope. R-9: declared cardinality does not compile to one endpoint-tuple index; the corrected rule is three fixed indexes, two filtered on an FK-locked projection of cardinality_code, which makes all four cardinalities engine-enforced with zero DDL per relationship and additionally makes the engine refuse an in-place cardinality change while rows exist. The grain tuple remains the semantic authority and the digest remains a physical representation. What the next session must not mistake: sections 31.6 and 31.7 are DERIVED, NOT EXECUTED - no DDL has been run and no negative test exists yet. Three obligations follow into PHASE-005 - the write-path permission model, without which R-8's first and strongest layer does not exist; the digest reconciliation check; and executable negative tests for the five false-digest attempts and the four cardinality attacks. One owner decision is open and is security-relevant: how Unicode NFC normalization of text grain components is to be enforced, since T-SQL cannot normalize and byte-exact hashing would admit NFC and NFD forms as distinct grain. PHASE-005 was not started, nothing was committed and nothing was pushed."
+}

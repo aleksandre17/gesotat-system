@@ -1,0 +1,40 @@
+{
+  "command": [
+    "python",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "ops/tests/governance",
+    "-p",
+    "test_*.py"
+  ],
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": "....................\n----------------------------------------------------------------------\nRan 20 tests in 0.721s\n\nOK\n"
+}
+
+{
+  "command": [
+    "pwsh",
+    "-NoProfile",
+    "-Command",
+    "$files = @(\"ops/cli/validation/technical-acceptance.ps1\", \"ops/cli/validation/release-gate.ps1\"); foreach ($file in $files) { $tokens = $null; $parseErrors = $null; [void][System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $file), [ref]$tokens, [ref]$parseErrors); if ($parseErrors.Count -gt 0) { $parseErrors; exit 1 } }; Write-Output \"PowerShell syntax PASS\""
+  ],
+  "exitCode": 0,
+  "stdout": "PowerShell syntax PASS\n",
+  "stderr": ""
+}
+
+{
+  "command": [
+    "git",
+    "-c",
+    "core.safecrlf=false",
+    "diff",
+    "--check"
+  ],
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": ""
+}

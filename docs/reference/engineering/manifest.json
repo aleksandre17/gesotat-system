@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "requiredFiles": [
+    "docs/reference/engineering/README.md",
+    "docs/reference/engineering/ARCHITECTURE.md",
+    "docs/reference/engineering/REQUIREMENTS.md",
+    "docs/reference/engineering/ANTI-PATTERNS.md",
+    "docs/reference/engineering/CHANGE-PROTOCOL.md",
+    "docs/reference/engineering/STANDARDS.md",
+    "docs/reference/engineering/agent-entrypoint.md",
+    "docs/reference/ENGINEERING-QUALITY-DOCTRINE.md",
+    "docs/reference/CANONICAL-FULL-TREE.md",
+    "docs/platform-capability-and-architecture-audit-2026-09-13.md",
+    "ops/cli/validation/engineering-governance.py",
+    "ops/tests/governance/test_engineering_governance.py"
+  ],
+  "requirements": [
+    "GOV-001",
+    "GOV-002",
+    "GOV-003",
+    "SCH-001",
+    "SCH-002",
+    "SCH-003",
+    "ARC-001",
+    "ING-001",
+    "DAT-001",
+    "DAT-002",
+    "API-001",
+    "UI-001",
+    "SEC-001",
+    "SEC-002",
+    "EVO-001",
+    "OBS-001",
+    "ARC-002",
+    "TST-001",
+    "TST-002",
+    "REL-001",
+    "GOV-004"
+  ]
+}

@@ -1,0 +1,159 @@
+{
+  "version": 1,
+  "id": "artifact-comparative-audit",
+  "status": "SUPERSEDED",
+  "supersededBy": "design-entry-decisions",
+  "problem": "PHASE-004 would otherwise choose a canonical target without artifact evidence, and the repository held three uninspected inputs that PHASE-001 explicitly refused to judge: the R8 resource package, KIDS_PACKAGE_candidate_2 and the current canonical Access representation. Without a comparative audit the design would either copy the newest artifact or rediscover, one defect at a time, capabilities that already exist in an older one.",
+  "scope": "Read-only comparative audit of seven artifacts and the materialization of its result: two new knowledge artifacts, the judgement of REC-CONSOLIDATION section 15's three artifact inputs, one work item, and control-plane state. No artifact was selected as canonical, no architecture was designed, no schema or persistence strategy was chosen, and no application code, migration, contract or legacy mechanism was touched.",
+  "layer": "Control policy and repository knowledge governance",
+  "baseline": "b46c0438d4927851fcd688a8a8e71468aba6cf18 on security/hardening-2; target platform/apps/geostat/backend/api unchanged at 26 modified / 29 untracked. Source artifacts were copied to a scratch directory and opened with Jackcess in read-only mode; SHA-256 of every source artifact is unchanged after inspection. The AIR register still carries another author's 95 uncommitted lines and was again not edited, so AIR-2026-056 stays reserved in TASK-002.",
+  "authority": [
+    "AGENTS.md",
+    "docs/project/CURRENT.md",
+    "docs/project/MANIFEST.md",
+    "docs/standards/ARCHITECTURE-QUALITY-BENCHMARK.md",
+    "docs/standards/AUTOMATION-CLASSIFICATION-MODEL.md",
+    "docs/work/GEOSTAT-API-RECOVERY-CONSOLIDATION-2026-09-20.md",
+    "docs/work/GEOSTAT-API-CANONICAL-AUTHORITY-DOCTRINE-2026-09-20.md",
+    "docs/work/GEOSTAT-API-RECOVERY-PASS3-CLOSURE-2026-09-20.md",
+    "samples/README.md"
+  ],
+  "reuse": "Two artifacts were created because no owner existed for judging artifacts: AUD-COMPARATIVE for the comparison and AUD-CAPABILITY for the capability register and design input package. Everything they touch that already has an owner is cited, never restated: findings and requirements stay in REC-CONSOLIDATION, authority in DOC-CAD, criteria in STD-BENCH-001, automation classes in STD-AUTO-001, layer coverage in REC-COVERAGE. REC-CONSOLIDATION section 15 was updated in place rather than copied, because it owns the pending-input list. No finding discovered during the audit was re-registered in a new findings register.",
+  "impact": "PHASE-004 can start with an evidence package instead of a preference. Three results change what design must assume: no artifact passes the STD-BENCH-001 invariant gate, so the canonical model is not a copy of any of them; candidate_2 implements the per-combination constant declaration that PHASE-001 recorded as REQUIRED-BUT-MISSING (CF-015); and eleven capabilities are absent from every artifact. Two artifact-level facts were measured rather than assumed: the R8 package manifest verifies 451 of 451 digests with zero dangling edges, and two files sharing one name and one declared identity are byte-different and semantically identical, which retires byte digests as a correspondence mechanism.",
+  "compatibility": "No runtime contract, schema, migration, API surface, package or deployment artifact is affected, and no source artifact was modified - digests are unchanged before and after. The two new documents are additive; the only pre-existing artifact edited is REC-CONSOLIDATION, which gains a dated subsection under its own section 15 and loses nothing. One change record was superseded rather than rewritten: phase-002-acceptance-review now carries supersededBy this card, because PHASE-003 edited four control-plane files it covered.",
+  "failure": "Both validators fail closed and run in CI: a dangling reference, a duplicate canonical owner, a stale digest or an uncovered changed path exits non-zero and blocks the claim. The audit's own failure mode is over-claiming, and it is bounded by method: every quantitative statement was recomputed (digests, value multisets, edge resolution, duplicate grain checks) and every attractive hypothesis was recorded with its falsification attempt and confidence. Rollback is textual: delete the two documents, this card and evidence directory and the work item, and revert the REC-CONSOLIDATION subsection and the control-plane edits.",
+  "security": "No credential, database, network, CI or deployment surface is touched. Artifacts were opened read-only from copies; the reader executes nothing it finds in them. The audit records that A-R8 and A-CAND2 both assert approval state inside a transport artifact, which is a trust-boundary defect already owned as CF-033/CF-034 - it is reported, not changed.",
+  "requirements": {
+    "GOV-001": {
+      "decision": "APPLY",
+      "reason": "Existing owners were inspected before creating anything; the two new artifacts own a responsibility (judging artifacts) that no register held, and every fact they touch cites its owner."
+    },
+    "GOV-002": {
+      "decision": "APPLY",
+      "reason": "The audit traces each artifact through producer, contract self-description, raw and canonical planes, package boundary and presentation declarations, and records which boundaries it deliberately did not judge."
+    },
+    "GOV-003": {
+      "decision": "APPLY",
+      "reason": "TASK-004 records scope, method, what was not inspected and why, and the handoff; unrelated dirty work is preserved and named."
+    },
+    "GOV-004": {
+      "decision": "APPLY",
+      "reason": "Two artifacts rather than one per required-deliverable item: comparison and capability register have different consumers and lifecycles, and the thirteen required outputs map onto them without redundant documents."
+    },
+    "ARC-001": {
+      "decision": "APPLY",
+      "reason": "Responsibility classification precedes comparison, so no artifact is penalised for not being something it never claimed to be; the two new CATALOG rows declare distinct ownership and RCP-404 passes."
+    },
+    "ARC-002": {
+      "decision": "APPLY",
+      "reason": "The audit evaluates artifact provenance, retention and replay properties directly: raw envelope, derivation chain, package digests and re-derivability are each measured against BM-INV-23."
+    },
+    "SEC-002": {
+      "decision": "NA",
+      "reason": "No secret, credential, upload or fetch destination is involved; artifacts were read from local copies."
+    },
+    "EVO-001": {
+      "decision": "APPLY",
+      "reason": "Loss analysis covers every transition in the lineage and classifies each disappearance; one UNRESOLVED loss is named rather than smoothed over."
+    },
+    "OBS-001": {
+      "decision": "APPLY",
+      "reason": "Every verdict names the evidence that produced it, and the audit's residual weakness - one provider, one cube, five candidates - is stated in its own exit test."
+    },
+    "TST-001": {
+      "decision": "APPLY",
+      "reason": "No test was weakened or removed. The audit added verification of its own claims instead: 451 digests, 880 values, 0 dangling edges, 0 duplicate grain triples."
+    },
+    "TST-002": {
+      "decision": "APPLY",
+      "reason": "Commands, environment and exit codes are in the evidence bundle, and each performance statement is labelled PROVEN, MEASURED, STRUCTURALLY LIKELY or UNKNOWN; nothing is claimed as measured that was not."
+    },
+    "SCH-001": {
+      "decision": "NA",
+      "reason": "No meta-schema, grammar or contract is declared or altered; the audit reads declarations and does not change the authority chain."
+    },
+    "SCH-002": {
+      "decision": "APPLY",
+      "reason": "Concept-level comparison is the audit's core: grain, identity, dimensions, measures, units, statuses and classifiers are compared as declared semantics, and each artifact's declared grain is checked against its enforced key."
+    },
+    "SCH-003": {
+      "decision": "APPLY",
+      "reason": "Site-name leakage into generic families was counted per artifact (3 in A-R8, 0 in A-CAND2), and the audit records that generality is evidenced for one provider and one cube only."
+    },
+    "ING-001": {
+      "decision": "NA",
+      "reason": "No ingestion path is exercised; no artifact was loaded, imported or admitted anywhere."
+    },
+    "DAT-001": {
+      "decision": "NA",
+      "reason": "No canonical table, constraint, tenant scope or snapshot is created or modified."
+    },
+    "DAT-002": {
+      "decision": "NA",
+      "reason": "No retry, transaction, timeout or idempotency behaviour exists in a read-only inspection."
+    },
+    "API-001": {
+      "decision": "NA",
+      "reason": "No request, response, projection or query plan is added or changed."
+    },
+    "UI-001": {
+      "decision": "NA",
+      "reason": "No page, view, chart, map, export or locale is declared or altered; presentation declarations were read as evidence only."
+    },
+    "SEC-001": {
+      "decision": "NA",
+      "reason": "No authentication, authorization, tenancy or execution boundary exists in a read-only document audit."
+    },
+    "REL-001": {
+      "decision": "NA",
+      "reason": "No release surface, image, migration or provenance artifact is affected, and this card claims no release readiness."
+    }
+  },
+  "files": [
+    "docs/project/CATALOG.md",
+    "docs/project/CURRENT.md",
+    "docs/project/MANIFEST.md",
+    "docs/project/work/completed/TASK-004-artifact-comparative-audit.md",
+    "docs/work/GEOSTAT-API-RECOVERY-CONSOLIDATION-2026-09-20.md",
+    "docs/work/GEOSTAT-ARTIFACT-COMPARATIVE-AUDIT-2026-09-21.md",
+    "docs/work/GEOSTAT-CAPABILITY-INVENTORY-2026-09-21.md",
+    "docs/work/cards/artifact-comparative-audit/governance.json",
+    "docs/work/cards/phase-002-acceptance-review/governance.json",
+    "docs/work/evidence/artifact-comparative-audit/gate-comparative.txt"
+  ],
+  "sourceDigests": {
+    "docs/project/CATALOG.md": "14b69dd21feae550f25bb853140429b56befca2ed8263412725770139b9d3346",
+    "docs/project/CURRENT.md": "3fbe38d896a078fbc82bbc787241aa099615f976a9e5fc3ca60d19222d8a8af1",
+    "docs/project/MANIFEST.md": "af9798feefab8a3d89fb3b32b945f48044a106da01405d586990104ec8d0788e",
+    "docs/project/work/completed/TASK-004-artifact-comparative-audit.md": "3e8b5c2f156ac896ebdd0c3ddafcb271cafc82ed01ca0d65adc8699453d25e77",
+    "docs/work/GEOSTAT-API-RECOVERY-CONSOLIDATION-2026-09-20.md": "9ac4845f1417024b88afe4ba34d0753093b8326efcb0597468091a7dbd7644bc",
+    "docs/work/GEOSTAT-ARTIFACT-COMPARATIVE-AUDIT-2026-09-21.md": "af63c67b73618571617c26503c8eee63098510a4067c452bf16d069dd2ff70c6",
+    "docs/work/GEOSTAT-CAPABILITY-INVENTORY-2026-09-21.md": "af26a97300297a5cb5d0149fbf77559db60bd48c0286632bbd030ed7b94c7016",
+    "docs/work/cards/phase-002-acceptance-review/governance.json": "819b3980c7706e0db29780439d67650b324eea9afa958ec8c9dd9b601d9192a6",
+    "docs/work/evidence/artifact-comparative-audit/gate-comparative.txt": "65c6dfe3ce36c957c74ea910c3d95269afb98194bb58d4758c5ea850d7e11a4b"
+  },
+  "tests": [
+    {
+      "command": "python ops/cli/validation/rcp-verify.py",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD b46c043 (dirty working tree, see baseline)"
+    },
+    {
+      "command": "python -m unittest discover -s ops/tests/governance",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD b46c043 (dirty working tree, see baseline)"
+    },
+    {
+      "command": "python ops/cli/validation/engineering-governance.py",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD b46c043 (dirty working tree, see baseline)"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/work/evidence/artifact-comparative-audit/gate-comparative.txt",
+      "sha256": "65c6dfe3ce36c957c74ea910c3d95269afb98194bb58d4758c5ea850d7e11a4b"
+    }
+  ],
+  "handoff": "PHASE-003 is COMPLETE and GATE-COMPARATIVE is PASS. The next permitted phase is PHASE-004, Canonical Design, behind GATE-DESIGN-ENTRY, whose every listed check now passes; it has not been started. Design consumes AUD-CAPABILITY section 5 - must preserve, must eliminate, must reconcile, must add, provider-specific, open decisions - and not the artifacts themselves. Three inherited facts shape it: no artifact passes the invariant gate, so the target copies none of them; candidate_2's attribute attachment levels implement CF-015, which recovery recorded as missing, so the shape exists to reuse; and eleven capabilities (CAP-M01..M11) are absent from every artifact, so recombination is not sufficient. Three owner decisions are now due rather than pending: TASK-002 (DEF-08), BM-Q-01 SDMX conformance level and BM-Q-02 whether Access is permanent. Five comparative questions AQ-01..AQ-05 are carried into design. The audit's own weakest point is stated in its exit test: one provider and one cube were examined, so SCH-003-style generality rests on a single case. SUPERSEDED 2026-09-21 by design-entry-decisions: the design-entry task edited four files this card covered (CURRENT, MANIFEST, CATALOG and AUD-COMPARATIVE, the last to resolve AQ-05 and to correct one overstatement about candidate_2's self-description). Nothing above is rewritten; the successor re-ran all three checks."
+}

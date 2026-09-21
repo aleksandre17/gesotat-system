@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "allowedOwnerLayers": [
+    "Control",
+    "Ingestion",
+    "Data",
+    "Archive",
+    "Serving",
+    "Security",
+    "Observability",
+    "Delivery"
+  ],
+  "authorities": [
+    {
+      "id": "platform-engineering-governance",
+      "concept": "Repository-wide engineering and architecture governance",
+      "ownerLayer": "Control",
+      "status": "ACTIVE",
+      "authority": "docs/reference/ENGINEERING-QUALITY-DOCTRINE.md",
+      "projections": ["AGENTS.md", "CLAUDE.md", "docs/reference/engineering/agent-entrypoint.md"]
+    },
+    {
+      "id": "architecture-decision-identity",
+      "concept": "Global ADR identity and canonical decision document ownership",
+      "ownerLayer": "Control",
+      "status": "ACTIVE",
+      "authority": "docs/reference/engineering/decision-registry.json",
+      "projections": ["docs/platform-decisions.md"]
+    },
+    {
+      "id": "tenant-authorization",
+      "concept": "Product tenant ownership and tenant-scoped authorization",
+      "ownerLayer": "Security",
+      "status": "ACTIVE",
+      "authority": "docs/decisions/ADR-tenant-scoped-authorization.md",
+      "projections": []
+    },
+    {
+      "id": "legacy-surface-retirement",
+      "concept": "Legacy API surface gating and retirement",
+      "ownerLayer": "Security",
+      "status": "ACTIVE",
+      "authority": "docs/decisions/ADR-legacy-surface-retirement.md",
+      "projections": ["docs/legacy-retirement-governance.md"]
+    },
+    {
+      "id": "access-package-integrity",
+      "concept": "Permitted integrity automation inside Access authoring packages",
+      "ownerLayer": "Delivery",
+      "status": "ACTIVE",
+      "authority": "docs/decisions/ADR-access-package-integrity-automation.md",
+      "projections": ["docs/work/ACCESS-PACKAGE-CANONICAL-STANDARD.md"]
+    },
+    {
+      "id": "statistical-contract-ownership",
+      "concept": "Ownership boundary between site contracts and statistical contracts",
+      "ownerLayer": "Control",
+      "status": "CONFLICTED",
+      "candidates": [
+        "docs/work/COMMON-STATISTICAL-CONTRACT-PLAN.md",
+        "platform/apps/geostat/backend/core/src/main/resources/db/platform/022_kids_complete_site_contract.sql"
+      ],
+      "conflictRefs": ["docs/work/GEOSTAT-API-ARCHITECTURE-RECOVERY-CHECKPOINT-2026-09-20.md"],
+      "changePolicy": "ARCHITECTURAL_DECISION_REQUIRED"
+    },
+    {
+      "id": "visualization-contract-ownership",
+      "concept": "Canonical visualization and chart contract ownership",
+      "ownerLayer": "Serving",
+      "status": "CONFLICTED",
+      "candidates": [
+        "docs/managed-access-package-v1.md",
+        "platform/apps/geostat/backend/core/src/main/resources/db/platform/110_statistical_chart.sql"
+      ],
+      "conflictRefs": ["docs/work/GEOSTAT-API-ARCHITECTURE-RECOVERY-CHECKPOINT-2026-09-20.md"],
+      "changePolicy": "ARCHITECTURAL_DECISION_REQUIRED"
+    },
+    {
+      "id": "publication-membership-semantics",
+      "concept": "Publication membership, snapshot state and serving visibility",
+      "ownerLayer": "Serving",
+      "status": "CONFLICTED",
+      "candidates": [
+        "docs/platform-decisions.md",
+        "docs/work/ARCHITECTURE-IMPROVEMENT-REGISTER.md"
+      ],
+      "conflictRefs": ["docs/work/GEOSTAT-API-ARCHITECTURE-RECOVERY-CHECKPOINT-2026-09-20.md"],
+      "changePolicy": "ARCHITECTURAL_DECISION_REQUIRED"
+    }
+  ]
+}

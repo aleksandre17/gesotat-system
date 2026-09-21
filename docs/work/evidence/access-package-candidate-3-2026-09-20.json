@@ -1,0 +1,102 @@
+{
+  "evidence": "access-package-candidate-3",
+  "recordedAt": "2026-09-20",
+  "artefact": {
+    "path": "C:\\Users\\Test-User\\Desktop\\KIDS_PACKAGE_candidate_3.accdb",
+    "sha256": "751AA16B07B791298A369377C02E1F68A32C5725A9E638D08DA27EC7248A5BF3",
+    "bytes": 4947968,
+    "identity": "contract_revision 8+CANDIDATE, artifact_profile ACCESS_PACKAGE_COMPOSER_CANDIDATE, approvalState NOT_APPROVED"
+  },
+  "status": "OPEN / NOT READY - a candidate and its evidence, never a source of truth",
+  "structure": {
+    "tables": 32,
+    "withPrimaryKey": 32,
+    "enforcedRelationships": 39,
+    "datasets": 32,
+    "declaredFields": 223,
+    "fieldsByAuthoringClass": "see __gs_field.authoring_class",
+    "observations": 880,
+    "indicators": 43
+  },
+  "selfDescription": {
+    "tablesWithoutDataset": 0,
+    "datasetsWithoutFields": 0,
+    "columnsWithoutField": 0,
+    "relationEndpointsWithoutField": 0,
+    "note": "the nine __gs_* tables are now declared field by field from their physical columns and primary keys"
+  },
+  "identityNegativeTests": {
+    "duplicateDataset": "refused",
+    "duplicateField": "refused",
+    "duplicateKeyPart": "refused",
+    "duplicateRelation": "refused",
+    "keyOrderNumeric": true
+  },
+  "carriedFromR8": {
+    "tables": 24,
+    "columns": 184,
+    "unaccountedColumns": 0,
+    "brokenTargets": 0,
+    "deliberateDifferences": [
+      "statistics page and projection repointed to STAT_OBSERVATION and marked REVIEW_REQUIRED",
+      "empty dataset reference on the root page written as NULL",
+      "package identity marked as candidate"
+    ]
+  },
+  "values": {
+    "legacyInputs": 880,
+    "exactAgainstLexicalSource": 880,
+    "broken": 0,
+    "scale": 16
+  },
+  "repeatGeneration": {
+    "contentDigestA": "2e8a33d0b38f5db019cf43c3ea1cb4921f0ae413b2b86c9b6cc53657dfbc4373",
+    "contentDigestB": "2e8a33d0b38f5db019cf43c3ea1cb4921f0ae413b2b86c9b6cc53657dfbc4373",
+    "equal": true,
+    "excluded": [
+      "recorded_at",
+      "started_at"
+    ],
+    "tool": "ops/scripts/java/prototype/ContentDigest.java"
+  },
+  "liveAccess": {
+    "provider": "Microsoft Access 16.0.4229 through COM",
+    "steps": 7,
+    "freshCopies": 3,
+    "passed": 3,
+    "tool": "ops/scripts/java/prototype/provenance_test.ps1"
+  },
+  "independentStructuralAudit": {
+    "task": ":api:auditAccessArtifact",
+    "firstCandidateFindings": 11,
+    "thisCandidateFindings": 7,
+    "gone": [
+      "NO_INDEX:__gs_key",
+      "NO_PRIMARY_KEY:__gs_key",
+      "NO_INDEX:__gs_relation",
+      "NO_PRIMARY_KEY:__gs_relation",
+      "KEY_ORDER_NOT_INTEGER"
+    ],
+    "remaining": {
+      "MISSING_REQUIRED_TABLE": [
+        "__stat_metric",
+        "__raw_kids_statistical_carrier",
+        "__stat_kids_statistical_input",
+        "__rel_kids_statistical_semantic_binding"
+      ],
+      "DRAFT_PROJECTION": [
+        "KIDS_RESOURCE_ENTITY",
+        "KIDS_GLOSSARY_ENTRY_ENTITY",
+        "KIDS_SUBCATEGORY_RELATION"
+      ]
+    },
+    "whyRemaining": "required-table names change only through a versioned contract revision; DRAFT projections are R8's own approval states and a steward's decision. Neither may be fixed inside a file."
+  },
+  "stillOpen": [
+    "owner decisions D-1..D-4",
+    "contract revision",
+    "composer in product",
+    "server round-trip with negatives",
+    "second site with zero code change"
+  ]
+}

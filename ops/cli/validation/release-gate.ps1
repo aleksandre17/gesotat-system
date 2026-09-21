@@ -13,6 +13,10 @@ $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../../..')).Path
 Set-Location $root
 $fail = @()
+try {
+  & python (Join-Path $root 'ops/cli/validation/engineering-governance.py') --root $root | Out-Null
+  if ($LASTEXITCODE -ne 0) { $fail += 'engineering governance failed' }
+} catch { $fail += ('engineering governance unavailable: ' + $_.Exception.Message) }
 
 function Require-Path([string]$p) {
   if (-not (Test-Path -LiteralPath $p)) { $script:fail += "missing: $p" }
@@ -57,8 +61,13 @@ if ((Test-Path -LiteralPath 'ops/cli/data/generate-runtime-ledger.ps1') -and (Te
   if ($LASTEXITCODE -ne 0) { $fail += 'runtime ledger verification failed' }
 }
 if (Test-Path -LiteralPath 'ops/cli/validation/supply-chain-preflight.ps1') {
-  & pwsh -NoProfile -File '.\ops\cli\validation\supply-chain-preflight.ps1' -Output 'build/release-supply-chain.json' *> $null
+  # -RequireScan: a release needs a real SBOM + vulnerability scan produced for this
+  # commit and satisfying the policy. Missing, stale or failing evidence blocks.
+  & pwsh -NoProfile -File '.\ops\cli\validation\supply-chain-preflight.ps1' -Output 'build/release-supply-chain.json' -RequireScan *> $null
   if ($LASTEXITCODE -ne 0) { $fail += 'supply-chain preflight failed' }
+  else {
+    try { $scEvidence = Get-Content -Raw 'build/release-supply-chain.json' | ConvertFrom-Json; if ($scEvidence.schema -ne 'geostat.supply-chain-preflight.v1' -or $scEvidence.status -ne 'PASS') { $fail += 'supply-chain evidence is invalid' } } catch { $fail += 'supply-chain evidence is not valid JSON' }
+  }
 }
 if (Test-Path -LiteralPath 'ops/cli/validation/documentation-consistency.ps1') {
   & pwsh -NoProfile -File '.\ops\cli\validation\documentation-consistency.ps1' -Output 'build/release-documentation-consistency.json' *> $null

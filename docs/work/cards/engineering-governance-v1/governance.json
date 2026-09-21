@@ -1,0 +1,180 @@
+{
+  "version": 1,
+  "id": "engineering-governance-v1",
+  "status": "OPEN",
+  "problem": "Repeated sessions can lose recovered architecture, duplicate semantic authorities, reuse decision identifiers, skip protection and migration stages, or confuse a narrow PASS with system readiness.",
+  "scope": "Canonical governance package and shared agent entrypoint, strengthened with an architecture-integrity constitution: one authority/owner, recovery before redesign, stop-the-line conflicts, an ordered change state machine, three safety gates, monotonic migration, dirty-tree isolation, persistent continuation ledgers and bounded exceptions. No runtime rewrite, schema migration, deployment or certification.",
+  "layer": "Control policy and Delivery validation",
+  "baseline": "b46c0438d4927851fcd688a8a8e71468aba6cf18; pre-existing dirty backend/docs/operations work preserved.",
+  "authority": [
+    "AGENTS.md",
+    "docs/reference/ENGINEERING-QUALITY-DOCTRINE.md",
+    "docs/reference/CANONICAL-FULL-TREE.md",
+    "docs/reference/engineering/README.md"
+  ],
+  "reuse": "Extend existing doctrine, canonical tree, AIR/ADR ownership, technical-acceptance and release-gate. No second domain contract registry.",
+  "impact": "Every Codex/Claude entrypoint now requires DISCOVER -> RECOVER -> DECIDE -> PROTECT -> IMPLEMENT -> MIGRATE -> ELIMINATE -> VERIFY -> GOVERN, and requires Behavior, Architecture and Quality gates before completion. Agent entrypoints -> canonical requirements -> bounded cards -> structural gate -> existing technical/release gates remains the enforcement chain; runtime implementations are unchanged.",
+  "compatibility": "Existing root policy, M3/M2/M1/M0 authority, requirement catalogue and release checks are retained. The constitution tightens agent behavior without changing runtime contracts. Python 3.9+ remains required for governance gates. Review-range mode still requires an external immutable base/head and clean checkout; local static mode reports coverage NOT_ASSERTED.",
+  "failure": "Missing/malformed authority, unresolved semantic conflict, skipped stage, failed safety gate, drift or stale evidence fails closed. The policy/checker has no runtime state side effects. Rollback consists of reverting only the shared entrypoint constitution and this card/evidence update; preserve unrelated dirty work.",
+  "security": "No credentials, database access or deployment. Paths confined to repository; no execution of commands stored in cards. Evidence hashes detect drift but do not authenticate authors.",
+  "requirements": {
+    "GOV-001": {
+      "decision": "APPLY",
+      "reason": "Existing doctrine, audit, canonical tree, acceptance/release scripts and AIR were inspected; extend those authorities rather than replace them."
+    },
+    "GOV-002": {
+      "decision": "APPLY",
+      "reason": "Impact covers agent instructions, schema/layer review, change evidence and delivery gates; runtime domain behavior is unchanged."
+    },
+    "GOV-003": {
+      "decision": "APPLY",
+      "reason": "This card owns governance paths only. The initial dirty backend work remains outside completion claims."
+    },
+    "SCH-001": {
+      "decision": "NA",
+      "reason": "This change defines governance requirements but does not alter the runtime subject of SCH-001; no conformance claim is made for that subsystem."
+    },
+    "SCH-002": {
+      "decision": "NA",
+      "reason": "This change defines governance requirements but does not alter the runtime subject of SCH-002; no conformance claim is made for that subsystem."
+    },
+    "SCH-003": {
+      "decision": "NA",
+      "reason": "This change defines governance requirements but does not alter the runtime subject of SCH-003; no conformance claim is made for that subsystem."
+    },
+    "ARC-001": {
+      "decision": "APPLY",
+      "reason": "Governance lives in documentation and Delivery validation; no domain runtime dependency added."
+    },
+    "ING-001": {
+      "decision": "NA",
+      "reason": "This change defines governance requirements but does not alter the runtime subject of ING-001; no conformance claim is made for that subsystem."
+    },
+    "DAT-001": {
+      "decision": "NA",
+      "reason": "This change defines governance requirements but does not alter the runtime subject of DAT-001; no conformance claim is made for that subsystem."
+    },
+    "DAT-002": {
+      "decision": "NA",
+      "reason": "This change defines governance requirements but does not alter the runtime subject of DAT-002; no conformance claim is made for that subsystem."
+    },
+    "API-001": {
+      "decision": "NA",
+      "reason": "This change defines governance requirements but does not alter the runtime subject of API-001; no conformance claim is made for that subsystem."
+    },
+    "UI-001": {
+      "decision": "NA",
+      "reason": "This change defines governance requirements but does not alter the runtime subject of UI-001; no conformance claim is made for that subsystem."
+    },
+    "SEC-001": {
+      "decision": "NA",
+      "reason": "This change defines governance requirements but does not alter the runtime subject of SEC-001; no conformance claim is made for that subsystem."
+    },
+    "SEC-002": {
+      "decision": "NA",
+      "reason": "This change defines governance requirements but does not alter the runtime subject of SEC-002; no conformance claim is made for that subsystem."
+    },
+    "EVO-001": {
+      "decision": "NA",
+      "reason": "This change defines governance requirements but does not alter the runtime subject of EVO-001; no conformance claim is made for that subsystem."
+    },
+    "OBS-001": {
+      "decision": "NA",
+      "reason": "This change defines governance requirements but does not alter the runtime subject of OBS-001; no conformance claim is made for that subsystem."
+    },
+    "ARC-002": {
+      "decision": "NA",
+      "reason": "This change defines governance requirements but does not alter the runtime subject of ARC-002; no conformance claim is made for that subsystem."
+    },
+    "TST-001": {
+      "decision": "APPLY",
+      "reason": "Existing runtime tests are unchanged; new negative tests exercise rejected governance inputs."
+    },
+    "TST-002": {
+      "decision": "APPLY",
+      "reason": "Python unittest evidence is captured; broad runtime/release suites are not claimed by this card."
+    },
+    "REL-001": {
+      "decision": "NA",
+      "reason": "This change defines governance requirements but does not alter the runtime subject of REL-001; no conformance claim is made for that subsystem."
+    },
+    "GOV-004": {
+      "decision": "APPLY",
+      "reason": "Use existing doctrine/AIR and a Python standard-library checker; no new service, framework or parallel debt registry."
+    }
+  },
+  "files": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "docs/reference/CANONICAL-FULL-TREE.md",
+    "docs/reference/ENGINEERING-QUALITY-DOCTRINE.md",
+    "ops/cli/validation/technical-acceptance.ps1",
+    "ops/cli/validation/release-gate.ps1",
+    "ops/cli/validation/engineering-governance.py",
+    "ops/tests/governance/test_engineering_governance.py",
+    "docs/reference/engineering/agent-entrypoint.md",
+    "docs/reference/engineering/ANTI-PATTERNS.md",
+    "docs/reference/engineering/ARCHITECTURE.md",
+    "docs/reference/engineering/CHANGE-PROTOCOL.md",
+    "docs/reference/engineering/manifest.json",
+    "docs/reference/engineering/README.md",
+    "docs/reference/engineering/REQUIREMENTS.md",
+    "docs/reference/engineering/STANDARDS.md",
+    "docs/work/cards/engineering-governance-v1/governance.json",
+    "docs/work/evidence/engineering-governance-v1/tests.txt",
+    "docs/work/evidence/engineering-governance-v1/architecture-integrity-constitution-2026-09-20.txt"
+  ],
+  "sourceDigests": {
+    "AGENTS.md": "3cd6c2c0226cfa64a4b1a46a78e1375ff0fb1321c09adb308d8d8b9fd814851d",
+    "CLAUDE.md": "a8d55cc8a385a9a2e7cba4747551191addc971c625e5a8ee7373c19ad55dd3a4",
+    "docs/reference/CANONICAL-FULL-TREE.md": "8c6d512ad4f5ad158905b50dc6d120a6bd66773a403df60c5903408056a1f512",
+    "docs/reference/ENGINEERING-QUALITY-DOCTRINE.md": "ea32d16d4fdc7d1ba9e427c0628100d6442dd23ffa350696a0f58a9ad3ae2efc",
+    "ops/cli/validation/technical-acceptance.ps1": "19a9bf234d93f9e733905ca4661cf7b4b4237053236d9ed5b893014c416664c1",
+    "ops/cli/validation/release-gate.ps1": "126dcef00a8dc2ed8657857039e123a67dbb86a01ff082bd871bcd4af309b637",
+    "ops/cli/validation/engineering-governance.py": "fa9380793828ee7a7a6323f54bdbd33bf8d2d10feae2cdd55decf1a01b07bd52",
+    "ops/tests/governance/test_engineering_governance.py": "018524183d79831062ca16adddff323169295e732609014ee5b1b01f6e6f1f5b",
+    "docs/reference/engineering/agent-entrypoint.md": "5e1159b394a1e647a1d777faa19e7ad51643d3b3d524e73a48a832f813e9b007",
+    "docs/reference/engineering/ANTI-PATTERNS.md": "971f3e6a8f7b078d352b04676c544131ae3947d1d5cabfedfa31a91c276599ee",
+    "docs/reference/engineering/ARCHITECTURE.md": "f8322817fa67b5f5553e1d3e330b57a4895aef09b157183104866161decaefce",
+    "docs/reference/engineering/CHANGE-PROTOCOL.md": "fc198665670439dd353010f9c0f7f4cd19c53f1728cfb2bd450deb15fc4cd9f0",
+    "docs/reference/engineering/manifest.json": "6d0d410a3999f2f27f1dc36d3905ca50c3c7387d367c2ab71e73c37018fa32d2",
+    "docs/reference/engineering/README.md": "a631cbc82efd96222e06751a3c1f77a60fcf2c78af64cc4ea2e924ffae4377ef",
+    "docs/reference/engineering/REQUIREMENTS.md": "9091b9af04dc32915e7de0912e36e92082e79164b2eb711233876cc0e009a5da",
+    "docs/reference/engineering/STANDARDS.md": "51f99f53eed721926616d5ddd6751cea5cfc4450b6ba18022f279337d91a3463",
+    "docs/work/evidence/engineering-governance-v1/tests.txt": "c929e43eebd5c91fd839f2532b26cebde8bc6125c6a31d1c2abfcd2b1169ef50",
+    "docs/work/evidence/engineering-governance-v1/architecture-integrity-constitution-2026-09-20.txt": "006e3ae51c6ae5ed9b8348a85b02c32e6b42d98d0d74df44d37740193e68a48b"
+  },
+  "tests": [
+    {
+      "command": "python ops/cli/validation/engineering-governance.py",
+      "exitCode": 0,
+      "environment": "Windows PowerShell; Python 3.13.3; structural PASS; change coverage, runtime conformance and production readiness NOT_ASSERTED"
+    },
+    {
+      "command": "python -m unittest discover -s ops/tests/governance -p test_*.py",
+      "exitCode": 0,
+      "environment": "Windows-10-10.0.19045-SP0; Python 3.13.3"
+    },
+    {
+      "command": "pwsh -NoProfile -Command \"$files = @(\\\"ops/cli/validation/technical-acceptance.ps1\\\", \\\"ops/cli/validation/release-gate.ps1\\\"); foreach ($file in $files) { $tokens = $null; $parseErrors = $null; [void][System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $file), [ref]$tokens, [ref]$parseErrors); if ($parseErrors.Count -gt 0) { $parseErrors; exit 1 } }; Write-Output \\\"PowerShell syntax PASS\\\"\"",
+      "exitCode": 0,
+      "environment": "Windows-10-10.0.19045-SP0; Python 3.13.3"
+    },
+    {
+      "command": "git -c core.safecrlf=false diff --check",
+      "exitCode": 0,
+      "environment": "Windows-10-10.0.19045-SP0; Python 3.13.3"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/work/evidence/engineering-governance-v1/tests.txt",
+      "sha256": "c929e43eebd5c91fd839f2532b26cebde8bc6125c6a31d1c2abfcd2b1169ef50"
+    },
+    {
+      "path": "docs/work/evidence/engineering-governance-v1/architecture-integrity-constitution-2026-09-20.txt",
+      "sha256": "006e3ae51c6ae5ed9b8348a85b02c32e6b42d98d0d74df44d37740193e68a48b"
+    }
+  ],
+  "handoff": "Validate that AGENTS.md and CLAUDE.md exactly embed the canonical agent entrypoint, run the structural gate, governance negative suite and diff hygiene, then bind fresh digests/evidence and restore VERIFIED only for this governance scope. Future automation should add dedicated fitness checks for unique ADR identifiers and forbidden authority duplication; policy text alone cannot prove runtime conformance. Platform/release readiness remains NOT READY and no legacy AIR item is closed by this constitution."
+}

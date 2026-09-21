@@ -1,0 +1,146 @@
+DESIGN-ENTRY DECISIONS - evidence
+TASK-005 / GATE-DESIGN-ENTRY
+==============================================================================
+
+Date:        2026-09-21
+Baseline:    HEAD b46c0438d4927851fcd688a8a8e71468aba6cf18 (working tree dirty; see card)
+Environment: Windows 10 Pro 10.0.19045; Python 3.13.3
+Decisions:   docs/decisions/ADR-lifecycle-program-separation.md   (ADR-014)
+             docs/decisions/ADR-sdmx-conformance-boundary.md      (ADR-015)
+             docs/decisions/ADR-access-provider-status.md         (ADR-016)
+
+Scope discipline: no canonical architecture was designed, no schema or table chosen, no
+domain class or provider architecture implemented, no data migrated, and no source Access
+artifact was opened in this task. PHASE-004 has NOT been started.
+
+------------------------------------------------------------------------------
+1. DECISIONS - what the evidence changed
+------------------------------------------------------------------------------
+
+ADR-014  Two programs, one authority plane                        [PROPOSAL ADOPTED + 3 additions]
+  Validated against ONE FACT -> ONE OWNER (the two programs own different facts) and
+  STATE != WORK (a merged lifecycle would put increment-level work into MANIFEST).
+  Three alternatives rejected on evidence; parent/child fails because the child is AHEAD
+  of the parent - implementing while the parent forbids implementation.
+  Added beyond the proposal: a conflict protocol; the meta-level cut (M1-and-below vs
+  M2/M3) that makes the split checkable; and a REVIEW CONDITION, without which an
+  explicit split is unbounded temporary architecture at programme scale.
+
+ADR-015  SDMX conformance boundary                                [PROPOSAL REFRAMED]
+  Finding 1: Q47 in the statistical domain register ALREADY decides the conformance claim
+    (Information Model 3.1 subset; SDMX-CSV 2.0; SDMX-JSON 2.0; conformance matrix;
+    official schema validation; multi-measure -> 2.1 rejected, no silent pivot).
+    Writing a second claim would have created duplicate authority, so it is adopted by
+    reference and this ADR owns only the boundary.
+  Finding 2: SDMX declares conformance per artefact class and interface, not as ranked
+    levels - so 'which level?' has no answer in the standard. Sections: 1 Framework,
+    2 Information Model, 5 Registry, 6 Technical Notes, with REST API / SDMX-ML /
+    SDMX-JSON / SDMX-CSV maintained separately; current version 3.1 (May 2025), which is
+    what S1/Q47 already pin. Confidence MEDIUM-HIGH: the 3.1 PDF text layer was not
+    extractable in this environment; no part of the decision depends on exact wording.
+  Boundary rule, mechanically applicable: a responsibility is inside the SDMX boundary if
+    and only if its data is an observation set keyed by a declared dimension tuple.
+  Out of scope and said so: entity/relation/resource/geo families, the serving API, the
+    control plane, canonical persistence, VTL, provider and operational lifecycle.
+  Banned as a claim: 'SDMX-compatible' / 'SDMX-like' / 'SDMX-shaped'.
+
+ADR-016  Access: supported provider, no semantic authority        [PROPOSAL ADOPTED + 1 distinction]
+  The binary was rejected: PERMANENT licenses provider limits to shape canonical
+  semantics; TRANSITIONAL licenses neglect of a provider carrying live work.
+  Seven rules, each with the test that makes it enforceable.
+  Added beyond the proposal: Access is THREE responsibilities - physical provider,
+  authoring surface, round-trip carrier - and only the first is about a database. The
+  platform's real dependency is an offline typed authoring surface, of which Access is
+  today's implementation. Also recorded: rules 3-5 are unenforceable until provider
+  capability has exactly one producer (CF-038 three authorities, RC-003 no producer).
+
+AQ-05    Duplicate R8 authority                                   [RESOLVED ON PROVENANCE]
+  samples/kids-portal-v1-canonical-r8-final.accdb  -> git-tracked, committed (d4ec057), clean
+  platform/.../api/kids-portal-v1-canonical-r8-final.accdb -> ignored (.gitignore:148 *.accdb),
+    unknown to git
+  digest 746487ce... -> published in samples/README.md AND bound by two dated runtime records:
+      docs/evidence/kids-r8-contract-bound-package-admission-runtime-2026-09-18.json
+      docs/evidence/kids-r8-artifact-binding-live-runtime-2026-09-18.json
+  digest 926fedfc... (the api path TODAY) -> referenced by nothing in the repository
+  Conclusion: authority attaches to the CONTENT 746487ce..., not to either path. The api
+  path held that content on 2026-09-18 and holds different bytes now, recorded nowhere.
+  The path lied within two days; the digest did not - BM-INV-22 demonstrated, not argued.
+  Not manufactured from filename, path, mtime or convenience; semantic equivalence was
+  explicitly NOT treated as proof of authority.
+
+------------------------------------------------------------------------------
+2. CORRECTION TO PHASE-003
+------------------------------------------------------------------------------
+
+AUD-COMPARATIVE section 10 claimed candidate_2 declares 'every table, including the
+metadata tables' and called the artifact self-complete.
+Re-measured: 32 of 32 datasets are listed in __gs_dataset, but only 23 carry __gs_field
+rows - the nine __gs_* datasets describe every other table and not themselves.
+Caught by cross-checking docs/work/ACCESS-PACKAGE-CANONICAL-STANDARD.md section A3-1,
+which measured the same gap on the sibling artifact candidate_3.
+That document also corroborates this audit's independent measurements row for row:
+32 tables, 36 enforced relationships, 880 observations exact against R8's lexical source,
+1 structure / 3 dimensions / 1 measure / 3 attributes, 10 units over 43 indicators.
+Process finding recorded rather than rationalised: it was outside PHASE-003's
+required_context because it belongs to the other programme; under ADR-014 the programmes
+may reference each other, and the audit should have.
+
+------------------------------------------------------------------------------
+3. DESIGN-ENTRY SAFETY CHECK
+------------------------------------------------------------------------------
+
+  [x] recovered requirements and intent                REC-CONSOLIDATION                  CURRENT read set #6
+  [x] canonical authority doctrine                     DOC-CAD                            CURRENT read set #7
+  [x] PHASE-002 standards and benchmark                STD-BENCH-001 + STANDARDS.md       CURRENT read set #4
+  [x] hard invariants BM-INV-01..24                    STD-BENCH-001 s5                   CURRENT read set #4
+  [x] Maximum Safe Automation model                    STD-AUTO-001                       CURRENT read set #5
+  [x] PHASE-003 comparative evidence                   AUD-COMPARATIVE                    MANIFEST PHASE-004 input table
+  [x] complete capability inventory                    AUD-CAPABILITY                     CURRENT read set #9
+  [x] regressions / loss findings                      AUD-COMPARATIVE s16                MANIFEST PHASE-004 input table
+  [x] all REQUIRED-BUT-MISSING capabilities            AUD-CAPABILITY s3 (CAP-M01..M11)   MANIFEST PHASE-004 input table
+  [x] unresolved questions classified by blocking stage STD-BENCH-001 s9 + AUD-COMPARATIVE s22 both tables carry a timing column
+  [x] binding design-entry decisions                   ADR-014 / ADR-015 / ADR-016        CURRENT read set #10-12
+
+  [x] PHASE-004 is framed as a DERIVATION, not a selection. MANIFEST states it explicitly:
+      'It is forbidden to frame its task as choose the best candidate: it must be free to
+      produce an architecture materially better than every artifact inspected, and it must
+      satisfy the invariant gate, which none of them does.'
+
+------------------------------------------------------------------------------
+4. COMMANDS AND EXIT CODES
+------------------------------------------------------------------------------
+
+$ python ops/cli/validation/rcp-verify.py
+exit code: 0
+  | WARN  [RCP-801] docs\work\GEOSTAT-API-ARCHITECTURE-RECOVERY-CHECKPOINT-2026-09-20.md: 5324 lines - review cohesion (soft limit 1500)
+  | WARN  [RCP-801] docs\work\GEOSTAT-API-RECOVERY-COMPLETENESS-AUDIT-2026-09-20.md: 1578 lines - review cohesion (soft limit 1500)
+  | RCP PASS: 556 checks, 0 errors, 2 warnings, 42 governed artifacts
+
+$ python -m unittest discover -s ops/tests/governance
+exit code: 0
+  | .......................................................................................................................
+  | ----------------------------------------------------------------------
+  | Ran 119 tests in 8.451s
+  | 
+  | OK
+
+$ python ops/cli/validation/engineering-governance.py
+exit code: 0   (status PASS)
+  | Recorded in the card's tests array; that run validates this file's own SHA-256.
+
+------------------------------------------------------------------------------
+5. VERDICT
+------------------------------------------------------------------------------
+
+TASK_002:                              RESOLVED  (ADR-014; DEF-08 closed)
+BM_Q_01:                               RESOLVED  (ADR-015; claim remains Q47's)
+BM_Q_02:                               RESOLVED  (ADR-016)
+AQ_05:                                 RESOLVED  (provenance; content-addressed)
+AQ_05_BLOCKS_PHASE_004:                NO
+OTHER_PHASE_004_ENTRY_BLOCKERS_FOUND:  0   (2 obligations carried, not blockers)
+PARALLEL_AUTHORITIES_INTRODUCED:       0
+UNMATERIALIZED_DURABLE_KNOWLEDGE:      0
+PHASE_004_READY_FOR_CANONICAL_DESIGN:  YES
+
+PASS means the evidence was satisfied. It certifies nothing about runtime or production.
+

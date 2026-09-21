@@ -1,0 +1,51 @@
+{
+  "evidence": "access-package-dev-hygiene",
+  "recordedAt": "2026-09-20",
+  "environment": "dev (192.168.1.199), through the governed API only - no SQL was written",
+  "superseded": {
+    "through": "POST /statistical-references/decisions {decision: SUPERSEDE} as the four-eyes steward identity",
+    "measures": 43,
+    "concepts": 43,
+    "codelists": 1,
+    "requested": 87,
+    "succeeded": 87,
+    "what": "measure:KIDS:KIDS_FILE_n(1.0.0), concept:KIDS:KIDS_FILE_n(1.0.0), codelist:KIDS:CL_INDICATOR(1.0.0) - the model that treated 43 metrics as 43 measures"
+  },
+  "stateAfter": {
+    "referencesInNamespaceKIDS": {
+      "CODELIST": {
+        "APPROVED": 1,
+        "SUPERSEDED": 1
+      },
+      "CONCEPT": {
+        "APPROVED": 4,
+        "SUPERSEDED": 43
+      },
+      "MEASURE": {
+        "APPROVED": 1,
+        "SUPERSEDED": 43
+      },
+      "UNIT": {
+        "APPROVED": 10
+      }
+    },
+    "contracts": {
+      "bfe98140 KIDS:KIDS_STATISTICAL_SERIES": "SUPERSEDED",
+      "6d3e6ba2 KIDS:KIDS_STATISTICAL_SERIES": "APPROVED",
+      "d07a0d45 KIDS:KIDS_INDICATORS": "SUPERSEDED",
+      "f224667a KIDS:KIDS_INDICATORS": "APPROVED"
+    },
+    "snapshots": {
+      "36": "PUBLISHED (legacy, untouched)",
+      "58": "REVIEW_REQUIRED",
+      "59": "REVIEW_REQUIRED",
+      "60": "REVIEW_REQUIRED"
+    },
+    "publishedSnapshots": 42
+  },
+  "stillOpen": [
+    "Contract 6d3e6ba2 (43 measures, wrong model) is still APPROVED: the workflow retires a contract only by approving a successor for the same dataset key, and no successor of that key should exist. Every reference it pins is now SUPERSEDED, so it can never be revised or re-approved. A 'withdraw an approved contract' transition is missing - recorded as a finding.",
+    "Snapshots 58 and 59 must never be published; there is no 'reject a candidate snapshot' operation, so this is a recorded rule, not an enforced state.",
+    "Classification versions 10 and 11 of scheme KIDS_INDICATOR were written by hand-written SQL earlier today (AGENTS.md violation). They are to be redone through a governed classification API (AIR-2026-053)."
+  ]
+}

@@ -342,3 +342,7 @@ metadata-driven behavior, provider/site agnosticism, SOLID/Ports & Adapters,
 გარემო აკლია, იგი აღირიცხება როგორც მკაფიოly bounded external gate და არა როგორც
 ფარული substitute. შემდეგი სამუშაო ყოველთვის გრძელდება ბოლო რეალურად ღია
 invariant-იდან; ხარისხის შესამცირებლად უკან დახევა დაუშვებელია.
+
+## Operational enforcement and session continuity
+
+The canonical operational companion is [engineering/README.md](engineering/README.md). It assigns stable requirement IDs, schema/layer boundaries, anti-patterns, change-record evidence and a shared AGENTS/CLAUDE entrypoint. This doctrine remains the foundational authority; the companion does not create a competing semantic registry. Structural governance PASS is not proof of runtime behavior or production readiness.

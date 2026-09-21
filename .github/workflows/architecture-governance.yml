@@ -1,0 +1,69 @@
+name: Architecture governance
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: architecture-governance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  architecture-governance:
+    name: architecture-governance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Resolve immutable review range
+        id: range
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BASE: ${{ github.event.before }}
+          PUSH_HEAD: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            echo "base=$PR_BASE" >> "$GITHUB_OUTPUT"
+            echo "head=$PR_HEAD" >> "$GITHUB_OUTPUT"
+          else
+            echo "base=$PUSH_BASE" >> "$GITHUB_OUTPUT"
+            echo "head=$PUSH_HEAD" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check out candidate commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.range.outputs.head }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Governance negative tests
+        run: python -m unittest discover -s ops/tests/governance -p 'test_*.py'
+
+      # DEF-01 (MANIFEST, deferred hardening): the control-plane validator runs in CI, not
+      # only on demand. A control plane checked only by the session that changed it is
+      # checked by the party with the least incentive to find a defect.
+      - name: Repository control protocol
+        run: python ops/cli/validation/rcp-verify.py
+
+      - name: Review-range architecture gate
+        env:
+          REVIEW_BASE: ${{ steps.range.outputs.base }}
+          REVIEW_HEAD: ${{ steps.range.outputs.head }}
+        run: python ops/cli/validation/engineering-governance.py --base "$REVIEW_BASE" --head "$REVIEW_HEAD"
+
+      - name: Diff hygiene
+        run: git -c core.safecrlf=false diff --check "${{ steps.range.outputs.base }}" "${{ steps.range.outputs.head }}"

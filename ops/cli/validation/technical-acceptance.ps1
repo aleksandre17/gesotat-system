@@ -18,6 +18,11 @@ function Required([string]$relative) {
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Required artefact missing: $relative" }
 }
 
+Check 'engineering governance' {
+  & python (Join-Path $root 'ops/cli/validation/engineering-governance.py') --root $root | Out-Null
+  if ($LASTEXITCODE -ne 0) { throw 'Engineering governance failed' }
+}
+
 Check 'release automation artefacts' {
   Required 'ops/cli/validation/release-gate.ps1'; Required 'ops/cli/data/generate-evidence-bundle.ps1'; Required 'ops/cli/data/verify-evidence-bundle.ps1'; Required 'ops/cli/validation/production-evidence-readiness.ps1'; Required 'ops/cli/validation/remote-staging-smoke.ps1'; Required 'ops/cli/validation/kids-r8-api-delivery-preflight.ps1'; Required 'ops/cli/validation/schema-agnostic-runtime-preflight.ps1'; Required 'ops/cli/validation/secret-boundary-preflight.ps1'; Required 'ops/cli/validation/deployment-secret-injection-preflight.ps1'; Required 'ops/cli/validation/secure-overlay-preflight.ps1'; Required 'docs/production-evidence-handoff.md'
   Push-Location $root

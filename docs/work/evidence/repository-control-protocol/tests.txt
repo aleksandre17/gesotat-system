@@ -1,0 +1,13 @@
+$ python ops/cli/validation/rcp-verify.py
+exit=0
+WARN  [RCP-801] docs\work\GEOSTAT-API-ARCHITECTURE-RECOVERY-CHECKPOINT-2026-09-20.md: 5324 lines — review cohesion (soft limit 1500)
+WARN  [RCP-801] docs\work\GEOSTAT-API-RECOVERY-COMPLETENESS-AUDIT-2026-09-20.md: 1578 lines — review cohesion (soft limit 1500)
+RCP PASS: 319 checks, 0 errors, 2 warnings, 29 governed artifacts
+
+$ python -m unittest discover -s ops/tests/governance
+exit=0
+.......................................................................................................................
+----------------------------------------------------------------------
+Ran 119 tests in 7.027s
+
+OK

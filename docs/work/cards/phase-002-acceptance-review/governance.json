@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "id": "phase-002-acceptance-review",
+  "status": "SUPERSEDED",
+  "supersededBy": "artifact-comparative-audit",
+  "problem": "GATE-STANDARDS was declared PASS by the work item that produced the artifact it judged. A gate whose only reviewer is its author has one point of failure, and PHASE-003 inherits the benchmark as its evaluation instrument, so a hole in it propagates into the comparative audit, the design and everything after. This card answers whether that PASS was substantively justified or merely governance-valid.",
+  "scope": "Falsification and repair of the PHASE-002 output only: five adversarial hypothetical candidate architectures scored against the benchmark, an audit of criterion quality, invariant coverage, standards dispositions and automation decidability, resolution-timing classification for BM-Q-01..08, and the lifecycle-relationship analysis TASK-002 needed. Repairs limited to what the review proved broken. No real artifact was evaluated or compared - the candidates are constructions - so PHASE-003 has not begun; no architecture was designed, no schema chosen, and no application code, migration or legacy was touched.",
+  "layer": "Control policy and repository knowledge governance",
+  "baseline": "b46c0438d4927851fcd688a8a8e71468aba6cf18 on security/hardening-2; target platform/apps/geostat/backend/api unchanged at 26 modified / 29 untracked. Pre-existing dirty work by other authors is preserved and untouched; the AIR register still carries 95 uncommitted lines and was again not edited, so AIR-2026-056 remains reserved in TASK-002.",
+  "authority": [
+    "AGENTS.md",
+    "docs/project/CURRENT.md",
+    "docs/project/MANIFEST.md",
+    "docs/standards/PROJECT-OPERATING-SYSTEM.md",
+    "docs/reference/engineering/STANDARDS.md",
+    "docs/reference/engineering/REQUIREMENTS.md",
+    "docs/reference/engineering/ANTI-PATTERNS.md",
+    "docs/work/GEOSTAT-API-RECOVERY-CONSOLIDATION-2026-09-20.md",
+    "docs/work/GEOSTAT-API-CANONICAL-AUTHORITY-DOCTRINE-2026-09-20.md",
+    "docs/work/GEOSTAT-API-RECOVERY-PASS3-CLOSURE-2026-09-20.md"
+  ],
+  "reuse": "No new knowledge artifact was created. Every repair went into the existing owner: the benchmark gained a standards column, two invariants, two criteria and three repaired criteria; the automation model gained nine responsibilities and one rule; TASK-002 gained the lifecycle analysis it lacked. No second benchmark, no review register, no findings register - a review that produces its own parallel document is the defect it exists to catch. The AIR register was neither cloned nor edited.",
+  "impact": "The benchmark now rejects two candidates it previously passed: a typed EAV model that satisfied every field-level type check while making the dataset's grain inexpressible, and a lowest-common-denominator provider abstraction that satisfied every portability criterion while quietly lowering canonical semantics to the weakest provider. GATE-STANDARDS's headline condition is now an inspectable per-attribute mapping rather than a sentence claiming one. PHASE-003 inherits two extra obligations: score BM-INV-23/24 and BM-EC-085/086, and record BM-Q sensitivity per candidate. Two blocking claims were loosened to deadlines with stated reasons, which changes what PHASE-004 waits for.",
+  "compatibility": "No runtime contract, schema, migration, API surface, package or deployment artifact is affected. Inside the benchmark, identifiers are append-only: BM-INV-23/24 and BM-EC-085/086 take the next free numbers and no existing identifier changed meaning, so every citation made before this review still resolves to the same row. One change record was superseded rather than rewritten: standards-architecture-quality-benchmark now carries supersededBy this card, with its evidence, digests and test records untouched.",
+  "failure": "Both validators fail closed and both run in CI. Had a repair broken the control plane - a dangling reference, a duplicate canonical owner, a stale digest - rcp-verify and engineering-governance would exit non-zero and this card could not claim VERIFIED. Rollback is textual: revert the two docs/standards artifacts, the three control files, the two work items and this card and evidence directory. No data, migration or runtime state is involved.",
+  "security": "No credential, database, network, CI or deployment surface is touched by this card. The review changed security-relevant evaluation only by correcting BM-Q-05's timing; BM-EC-068..071 and SEC-001/002 remain mandatory whichever ASVS subset is later chosen, so no security obligation was relaxed.",
+  "requirements": {
+    "GOV-001": {
+      "decision": "APPLY",
+      "reason": "Every repair extended the artifact that already owned the responsibility; no new register, document or identifier namespace was created, and the reuse result is recorded here and in TASK-003."
+    },
+    "GOV-002": {
+      "decision": "APPLY",
+      "reason": "The consumer of each repair is named: PHASE-003 inherits two scoring obligations, PHASE-004 a corrected blocker set, PHASE-009 and PHASE-010 the two questions whose timing changed."
+    },
+    "GOV-003": {
+      "decision": "APPLY",
+      "reason": "TASK-003 records what was tested, what was found, what survived unchanged and what the next reviewer should attack; the superseded card keeps its own claims so the correction is auditable rather than invisible."
+    },
+    "GOV-004": {
+      "decision": "APPLY",
+      "reason": "Repairs were limited to proven holes - two invariants and two criteria, each traced to a candidate that walked through the gap. Adding rows for completeness was explicitly rejected and recorded as rejected."
+    },
+    "ARC-001": {
+      "decision": "APPLY",
+      "reason": "Ownership boundaries were re-tested during the review: the benchmark still owns evaluation, STANDARDS.md still owns standards selection, STD-AUTO-001 still owns automation classification, and RCP-404 still passes."
+    },
+    "ARC-002": {
+      "decision": "APPLY",
+      "reason": "BM-INV-23 raises raw retention and re-derivability from a criterion to an acceptance condition - the archive-layer property that governed reprocessing depends on."
+    },
+    "SEC-002": {
+      "decision": "NA",
+      "reason": "No CI, workflow, secret or credential surface is touched by this card; the DEF-01 wiring was made and verified under the superseded card."
+    },
+    "EVO-001": {
+      "decision": "APPLY",
+      "reason": "Pre-existing documents were classified and extended in place, never rewritten, relocated or superseded; closed deferred controls are struck through with their closure evidence rather than deleted, so the record of why they existed survives."
+    },
+    "OBS-001": {
+      "decision": "APPLY",
+      "reason": "The correction is visible where a reader looks: MANIFEST carries a dated correction note on the gate row, CURRENT carries the corrected blocker set, and the benchmark carries F-7/F-8."
+    },
+    "TST-001": {
+      "decision": "APPLY",
+      "reason": "No test was weakened or removed. Three criteria now demand harder evidence than before (constraint expressibility, two-scale measurement, derivation plus reconciliation), not easier."
+    },
+    "TST-002": {
+      "decision": "APPLY",
+      "reason": "Commands, exit codes and environment are in the evidence bundle, and the residual weakness is labelled: five adversarial candidates are a sample, not a proof of completeness."
+    },
+    "SCH-001": {
+      "decision": "NA",
+      "reason": "No meta-schema, grammar, contract or reference resolution is declared or altered. The benchmark states acceptance conditions about the M3-M0 chain; it does not implement or modify it."
+    },
+    "SCH-002": {
+      "decision": "NA",
+      "reason": "No concept, identity, grain, key or unit is defined here. Every semantic term used is referenced from the register that owns it."
+    },
+    "SCH-003": {
+      "decision": "NA",
+      "reason": "No site, provider or data-family declaration is added, and no generic-core code path exists in this change to branch on one."
+    },
+    "ING-001": {
+      "decision": "NA",
+      "reason": "No parsing, upload, fetch, receipt, validation or quarantine path is touched."
+    },
+    "DAT-001": {
+      "decision": "NA",
+      "reason": "No table, constraint, tenant scope, relation or snapshot is created or modified; the object-storage row classifies an existing responsibility without changing it."
+    },
+    "DAT-002": {
+      "decision": "NA",
+      "reason": "No retry, transaction, timeout or idempotency behaviour exists in a documentation and CI-configuration change."
+    },
+    "API-001": {
+      "decision": "NA",
+      "reason": "No request, response, projection or query plan is added or changed; no caller-facing surface exists in this change."
+    },
+    "UI-001": {
+      "decision": "NA",
+      "reason": "No page, view, chart, map, export or locale is declared or altered."
+    },
+    "SEC-001": {
+      "decision": "NA",
+      "reason": "No authentication, authorization, role, tenant boundary or execution boundary is touched; there is no runtime path in this change to enforce one at."
+    },
+    "REL-001": {
+      "decision": "NA",
+      "reason": "No release surface, image, migration, SBOM, scan or provenance artifact is affected. The added CI step is a governance check on pushes and pull requests, not a release gate, and this card claims no release readiness."
+    }
+  },
+  "files": [
+    "docs/project/CATALOG.md",
+    "docs/project/CURRENT.md",
+    "docs/project/MANIFEST.md",
+    "docs/project/work/blocked/TASK-002-work-stream-reconciliation.md",
+    "docs/project/work/completed/TASK-003-phase-002-acceptance-review.md",
+    "docs/standards/ARCHITECTURE-QUALITY-BENCHMARK.md",
+    "docs/standards/AUTOMATION-CLASSIFICATION-MODEL.md",
+    "docs/work/cards/phase-002-acceptance-review/governance.json",
+    "docs/work/cards/standards-architecture-quality-benchmark/governance.json",
+    "docs/work/evidence/phase-002-acceptance-review/gate-standards-reconfirmation.txt"
+  ],
+  "sourceDigests": {
+    "docs/project/CATALOG.md": "0f93530b37ff2c68f95331e26a9e925f5c67d3770b905dd04a2af1e2e5de1095",
+    "docs/project/CURRENT.md": "dfc5b51ff7f19acb3841a115c0eb4a729469abff9cb3b8d60a7647273c94b3a5",
+    "docs/project/MANIFEST.md": "a432e9cacab2d489cc14e058e743af2c3190e85470a698456a148bc7105f2420",
+    "docs/project/work/blocked/TASK-002-work-stream-reconciliation.md": "18de58a5b2f9b0628cf52e2864237996bcea7127792ee7ffd7d2b625a56a5b55",
+    "docs/project/work/completed/TASK-003-phase-002-acceptance-review.md": "af8fb62a4f50aa7c7f2425f180180dcd11023cfd6bc887b004a2afff02f9ce94",
+    "docs/standards/ARCHITECTURE-QUALITY-BENCHMARK.md": "3a37681166c14531261dc8d03ded7602c1b37b91cb4c2ba600bf5671525f54dd",
+    "docs/standards/AUTOMATION-CLASSIFICATION-MODEL.md": "65ae09b87cbe0ee82803f689bf856d956847e4e4471c4d375fef78e365daffa8",
+    "docs/work/cards/standards-architecture-quality-benchmark/governance.json": "f594f406a552c5c52fe48cea996d1f143545964a1bde7b546594844ec4438ba1",
+    "docs/work/evidence/phase-002-acceptance-review/gate-standards-reconfirmation.txt": "bf53170c5e5d783e93bd6fbb0878838b7f7d2a9b9b3f2b5f73cfb44993ba1a0a"
+  },
+  "tests": [
+    {
+      "command": "python ops/cli/validation/rcp-verify.py",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD b46c043 (dirty working tree, see baseline)"
+    },
+    {
+      "command": "python -m unittest discover -s ops/tests/governance",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD b46c043 (dirty working tree, see baseline)"
+    },
+    {
+      "command": "python ops/cli/validation/engineering-governance.py",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD b46c043 (dirty working tree, see baseline)"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/work/evidence/phase-002-acceptance-review/gate-standards-reconfirmation.txt",
+      "sha256": "bf53170c5e5d783e93bd6fbb0878838b7f7d2a9b9b3f2b5f73cfb44993ba1a0a"
+    }
+  ],
+  "handoff": "GATE-STANDARDS is re-confirmed with the corrections in place, and the repository says plainly that its first declaration was premature on the standards-mapping condition. PHASE-003 remains the next permitted phase and has not begun. It inherits two obligations: score every candidate against BM-INV-23/24 and BM-EC-085/086, and record for each open BM-Q whether a different answer would change the verdict. Two questions block PHASE-004 - BM-Q-01 SDMX conformance level and BM-Q-02 whether Access is a permanent provider; BM-Q-03 binds before PHASE-010 and BM-Q-05 before PHASE-009. TASK-002 is still BLOCKED on the owner but narrower: four lifecycle models were tested against the Project Operating System laws, three fail on repository evidence, and the surviving model's structural half is already binding - what remains is scheduling, which is a product decision. The benchmark's residual weakness is stated rather than hidden: five adversarial candidates is a sample, and the most useful next contribution is a sixth candidate that passes and should not. SUPERSEDED 2026-09-21 by artifact-comparative-audit: PHASE-003 edited three control-plane files this card covered: CURRENT, MANIFEST and CATALOG. Nothing above is rewritten; the successor re-ran all three checks before claiming VERIFIED."
+}

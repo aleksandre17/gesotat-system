@@ -107,7 +107,3 @@ An agent MUST NOT:
 - An exception requires an approved, time-bounded ADR naming scope, owner, risk, compensating controls, expiry and removal task. An agent cannot approve its own exception, and an exception MUST NOT silently weaken authentication, authorization, tenancy, privacy, data integrity or auditability.
 - If these rules conflict with an authorized user request, preserve safety and evidence, state the conflict explicitly and request a decision; do not silently choose either side.
 <!-- ENGINEERING-GOVERNANCE:END -->
-
-# Host instructions
-
-Read `AGENTS.md`, `.agents/project/project.json` and the canonical audit before changing host structure. Do not treat `.agents/kit` as upstream source. Preserve contract, migration and deployment compatibility.

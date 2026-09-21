@@ -1,0 +1,179 @@
+{
+  "version": 1,
+  "id": "design-entry-decisions",
+  "status": "SUPERSEDED",
+  "supersededBy": "canonical-design",
+  "problem": "Three conditions were attached to PHASE-004's acceptance rather than its entry - the programme relationship (DEF-08/TASK-002), the SDMX conformance question (BM-Q-01) and the Access provider question (BM-Q-02) - plus the comparative provenance question AQ-05. Entering canonical design with them open would mean designing under decisions that somebody else might later make differently, which is how a design gets re-done rather than reviewed.",
+  "scope": "Four bounded decisions and their materialization in the existing decision plane, plus the design-entry safety check. Three ADRs were added under docs/decisions/ and registered in docs/platform-decisions.md; one classification was applied in CTRL-ADOPTION under ADR-014; AQ-05 was resolved from repository provenance evidence; one PHASE-003 overstatement was corrected. No canonical architecture was designed, no schema or table chosen, no domain class or provider architecture implemented, no data migrated and no source Access artifact opened. Part 2 of the same task adds the capability-envelope portion: the envelope itself, the metadata responsibility model, the raw-to-published chain check, the relationship space, logical versus physical separation, verdicts on the two governed-chain hypotheses, a blind-spot pass, twelve falsification scenarios and the 11/11 required-but-missing trace. All of it went into existing owners - AUD-CAPABILITY, STANDARDS.md and STD-BENCH-001 - and no new artifact was created.",
+  "layer": "Control policy and repository knowledge governance",
+  "baseline": "b46c0438d4927851fcd688a8a8e71468aba6cf18 on security/hardening-2; target platform/apps/geostat/backend/api unchanged at 26 modified / 29 untracked. docs/platform-decisions.md carried 37 lines of uncommitted work by another author before this card touched it; this card adds three register entries and claims none of that prior content. The AIR register was again not edited, so AIR-2026-056 stays reserved in TASK-002.",
+  "authority": [
+    "AGENTS.md",
+    "docs/project/CURRENT.md",
+    "docs/project/MANIFEST.md",
+    "docs/standards/ARCHITECTURE-QUALITY-BENCHMARK.md",
+    "docs/work/GEOSTAT-ARTIFACT-COMPARATIVE-AUDIT-2026-09-21.md",
+    "docs/work/GEOSTAT-CAPABILITY-INVENTORY-2026-09-21.md",
+    "docs/work/STATISTICAL-CONTRACT-OPEN-QUESTIONS.md",
+    "docs/reference/engineering/STANDARDS.md",
+    "docs/work/GEOSTAT-API-CANONICAL-AUTHORITY-DOCTRINE-2026-09-20.md"
+  ],
+  "reuse": "The decisive reuse finding changed one decision's shape: Q47 in the statistical domain register already decides the SDMX conformance claim - Information Model 3.1 subset, SDMX-CSV 2.0, SDMX-JSON 2.0, conformance matrix, rejection test - so ADR-015 adopts it by reference and owns only the boundary question that nothing owned. The decisions went into the existing ADR plane rather than a new register; the classification went into CTRL-ADOPTION, which owns classification; AQ-05 went into AUD-COMPARATIVE, which owns artifact provenance. No new authority was created for any of them.",
+  "impact": "PHASE-004 may begin with no open acceptance condition. It inherits three binding decisions: which programme may decide what (ADR-014), where SDMX applies and where it must not (ADR-015), and what may depend on Access (ADR-016). Two obligations travel with them - ADR-014's review condition fires on the first collision with the statistical programme's DECIDED M1 semantics, and ADR-016's provider rules are unenforceable until provider capability has one producer. The statistical domain register is now CANONICAL for its domain, closing the routing defect PHASE-002 found. One PHASE-003 statement was corrected: candidate_2 lists 32 of 32 datasets but only 23 carry field declarations, so it is not self-complete. Part 2 closed a routing defect that would have cost more than any other finding in this phase: PHASE-004's input list did not include the statistical domain register, whose DECIDED entries bind M1 semantics under ADR-014 rule 1 and which already specifies CAP-M01 and CAP-M02 in its build manifest (Q48). It also added five required-but-missing capabilities (CAP-M12..M16), eight standards dispositions including DDI-CDI as the model for wide/long/dimensional/key-value description, and one invariant plus three criteria, each closing a falsification scenario that had no home.",
+  "compatibility": "No runtime contract, schema, migration, API surface, package or deployment artifact is affected, and no source artifact was opened. Decisions are additive: ADR-014/015/016 supersede nothing, and each states what it does not own. The one reclassification - STATISTICAL-CONTRACT-OPEN-QUESTIONS.md from SUPPORTING to CANONICAL for its domain - changes authority, not content, and narrows rather than widens: canonical for that domain's decisions and standards, and for nothing else. One change record was superseded rather than rewritten.",
+  "failure": "Both validators fail closed and run in CI; RCP-703/704 specifically check that a new decision record carries an authority and appears in the register, and RCP-404 checks that no two canonical rows claim one responsibility. The decision-level failure mode is a wrong decision rather than a broken file, and it is bounded by method: each ADR records the alternatives it rejected, the evidence, a falsification attempt and a confidence level, so a later reviewer can attack the reasoning rather than guess at it. Rollback is textual and complete.",
+  "security": "No credential, database, network, CI or deployment surface is touched. ADR-016 tightens rather than relaxes a trust boundary by restating that a provider artifact may reference a definition and never define or approve one, which is the CF-033/CF-034 violation class. No security obligation is relaxed anywhere in this card.",
+  "requirements": {
+    "GOV-001": {
+      "decision": "APPLY",
+      "reason": "Owners were searched before deciding, and it changed the outcome: Q47 was found to own the SDMX conformance claim, so ADR-015 was narrowed to the boundary instead of restating it."
+    },
+    "GOV-002": {
+      "decision": "APPLY",
+      "reason": "Each decision names its consumers and its dependencies: ADR-014 names the coordination instruments, ADR-015 names what it does not own, ADR-016 names the provider-capability producer it depends on."
+    },
+    "GOV-003": {
+      "decision": "APPLY",
+      "reason": "TASK-005 records what changed relative to the proposals, the correction made to PHASE-003 and the process finding behind it; TASK-002 closes with its residue explicitly handed to the programme that owns it."
+    },
+    "GOV-004": {
+      "decision": "APPLY",
+      "reason": "Three ADRs rather than one, because the decision plane detects duplicate ownership per record; each ADR records rejected alternatives and a falsification attempt with a confidence level."
+    },
+    "ARC-001": {
+      "decision": "APPLY",
+      "reason": "ADR-014 is a statement about authority ownership across two programmes, and it is checkable: one authority registry, one ADR plane, one roadmap per programme, one current-state authority."
+    },
+    "ARC-002": {
+      "decision": "NA",
+      "reason": "No archive, retention or replay mechanism is created or changed; AQ-05 reads existing provenance evidence rather than producing any."
+    },
+    "SEC-002": {
+      "decision": "NA",
+      "reason": "No secret, credential, upload or fetch destination is involved; artifacts were read from local copies."
+    },
+    "EVO-001": {
+      "decision": "APPLY",
+      "reason": "Nothing was rewritten or relocated: resolved questions keep their rows with the resolution attached, closed deferrals are struck through with their closure evidence, and the superseded card keeps its own claims."
+    },
+    "OBS-001": {
+      "decision": "APPLY",
+      "reason": "Each decision is visible where a reader looks: the register, the catalogue, the adoption classification, CURRENT's read set and MANIFEST's PHASE-004 input table."
+    },
+    "TST-001": {
+      "decision": "APPLY",
+      "reason": "No test was weakened or removed; the governance suite runs unchanged and is recorded with its exit code."
+    },
+    "TST-002": {
+      "decision": "APPLY",
+      "reason": "Commands, exit codes and environment are in the evidence bundle, and the confidence level of each decision is stated, including the MEDIUM-HIGH confidence on the SDMX framework's conformance mechanism whose source PDF text layer was not extractable here."
+    },
+    "SCH-001": {
+      "decision": "NA",
+      "reason": "No meta-schema, grammar or contract is declared or altered; the audit reads declarations and does not change the authority chain."
+    },
+    "SCH-002": {
+      "decision": "APPLY",
+      "reason": "Concept-level comparison is the audit's core: grain, identity, dimensions, measures, units, statuses and classifiers are compared as declared semantics, and each artifact's declared grain is checked against its enforced key."
+    },
+    "SCH-003": {
+      "decision": "APPLY",
+      "reason": "ADR-016 rule 6 makes provider generality an explicit obligation and records honestly that it is evidenced for exactly one provider, so it may not be reported as satisfied."
+    },
+    "ING-001": {
+      "decision": "NA",
+      "reason": "No ingestion path is exercised; no artifact was loaded, imported or admitted anywhere."
+    },
+    "DAT-001": {
+      "decision": "NA",
+      "reason": "No canonical table, constraint, tenant scope or snapshot is created or modified."
+    },
+    "DAT-002": {
+      "decision": "NA",
+      "reason": "No retry, transaction, timeout or idempotency behaviour exists in a read-only inspection."
+    },
+    "API-001": {
+      "decision": "NA",
+      "reason": "No request, response, projection or query plan is added or changed."
+    },
+    "UI-001": {
+      "decision": "NA",
+      "reason": "No page, view, chart, map, export or locale is declared or altered; presentation declarations were read as evidence only."
+    },
+    "SEC-001": {
+      "decision": "NA",
+      "reason": "No authentication, authorization, tenancy or execution boundary exists in a read-only document audit."
+    },
+    "REL-001": {
+      "decision": "NA",
+      "reason": "No release surface, image, migration or provenance artifact is affected, and this card claims no release readiness."
+    }
+  },
+  "files": [
+    "docs/decisions/ADR-access-provider-status.md",
+    "docs/decisions/ADR-lifecycle-program-separation.md",
+    "docs/decisions/ADR-sdmx-conformance-boundary.md",
+    "docs/platform-decisions.md",
+    "docs/project/ADOPTION.md",
+    "docs/project/CATALOG.md",
+    "docs/project/CURRENT.md",
+    "docs/project/MANIFEST.md",
+    "docs/project/work/completed/TASK-002-work-stream-reconciliation.md",
+    "docs/project/work/completed/TASK-005-design-entry-decisions.md",
+    "docs/reference/engineering/STANDARDS.md",
+    "docs/standards/ARCHITECTURE-QUALITY-BENCHMARK.md",
+    "docs/work/GEOSTAT-ARTIFACT-COMPARATIVE-AUDIT-2026-09-21.md",
+    "docs/work/GEOSTAT-CAPABILITY-INVENTORY-2026-09-21.md",
+    "docs/work/cards/artifact-comparative-audit/governance.json",
+    "docs/work/cards/design-entry-decisions/governance.json",
+    "docs/work/evidence/design-entry-decisions/capability-envelope.txt",
+    "docs/work/evidence/design-entry-decisions/design-entry.txt"
+  ],
+  "sourceDigests": {
+    "docs/decisions/ADR-access-provider-status.md": "3dd408a9c00ea34dd4f6990448c7cfe830b8608d9a650039a94f5bc88e442b46",
+    "docs/decisions/ADR-lifecycle-program-separation.md": "97679fc3d84a19dc7d906f4d4cb4da91bcf942720d8d6984c28cdd6538bfd18b",
+    "docs/decisions/ADR-sdmx-conformance-boundary.md": "be1ca8a9b63ad9a2f78ce9e7855c94f045ce108924e1c2169655ff06e20c0c96",
+    "docs/platform-decisions.md": "012c262e8bedd3d0958f09646f4c63b2b720a5011f6e7a10a02a78b9c27d70f9",
+    "docs/project/ADOPTION.md": "288991d003952989f6efa25fd8cd9865b3248f9f11a8c1840454a35005503e7f",
+    "docs/project/CATALOG.md": "0a7155f8e11df23af0fdf8eebec07ddfe23968797f53fee6d94836a77243aeef",
+    "docs/project/CURRENT.md": "d9f98d9a82740a59719618fd456e1ee0af926280536c9590a046eabf071ace58",
+    "docs/project/MANIFEST.md": "586c3aa3e4dee817b8ae3d6af851107ec238002dbcd1a0ce8d7d054b6a3eea9c",
+    "docs/project/work/completed/TASK-002-work-stream-reconciliation.md": "166c9728f781ffe59fa1f8dd7c22886f68a99883b32d39db11e17aca1aab61d6",
+    "docs/project/work/completed/TASK-005-design-entry-decisions.md": "a44cead89f39927163e1f7493aa835407df71c42252ac8420b6c27b188aba61b",
+    "docs/reference/engineering/STANDARDS.md": "5e52bb54c2f00380d56e7855f8f2be864d5503066523da2969299cdcb9fb2994",
+    "docs/standards/ARCHITECTURE-QUALITY-BENCHMARK.md": "7fe51873cfada53d1c23ae1c21ad9a0530c3779e4c79407e3b527f78cd28ff09",
+    "docs/work/GEOSTAT-ARTIFACT-COMPARATIVE-AUDIT-2026-09-21.md": "fab91021b93f90c4ddf8e745c35ccb8795ace75560df97b7aac47625f3cffbba",
+    "docs/work/GEOSTAT-CAPABILITY-INVENTORY-2026-09-21.md": "26d8286aea460c8aced72823c5fea61cf5c6877838421b93787842012060881d",
+    "docs/work/cards/artifact-comparative-audit/governance.json": "69322e0daa2d63f82b9214ae4e6ddbf2358b4004decdc969d8013e1a863b4b1c",
+    "docs/work/evidence/design-entry-decisions/capability-envelope.txt": "17715a33493792313c5a1cb5dd5abaae3232b22dfefc33fe07bcd007dc97ebec",
+    "docs/work/evidence/design-entry-decisions/design-entry.txt": "9f447ab4d5fdd65d462ef9564438b65b3648bbbb84b5ad843adb5c24477e82f7"
+  },
+  "tests": [
+    {
+      "command": "python ops/cli/validation/rcp-verify.py",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD b46c043 (dirty working tree, see baseline)"
+    },
+    {
+      "command": "python -m unittest discover -s ops/tests/governance",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD b46c043 (dirty working tree, see baseline)"
+    },
+    {
+      "command": "python ops/cli/validation/engineering-governance.py",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD b46c043 (dirty working tree, see baseline)"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/work/evidence/design-entry-decisions/design-entry.txt",
+      "sha256": "9f447ab4d5fdd65d462ef9564438b65b3648bbbb84b5ad843adb5c24477e82f7"
+    },
+    {
+      "path": "docs/work/evidence/design-entry-decisions/capability-envelope.txt",
+      "sha256": "17715a33493792313c5a1cb5dd5abaae3232b22dfefc33fe07bcd007dc97ebec"
+    }
+  ],
+  "handoff": "PHASE-004 Canonical Design is the next permitted phase and has NOT been started. Every GATE-DESIGN-ENTRY check passes and every acceptance condition is decided: ADR-014 two programmes one authority plane, ADR-015 SDMX conformance boundary, ADR-016 Access provider status, AQ-05 resolved on provenance. Design is framed in MANIFEST as a derivation, never a selection, because no artifact passes the benchmark's invariant gate; its full input list is in MANIFEST under PHASE-004. Three things are easy to miss and are therefore stated twice: the statistical programme's DECIDED entries bind M1 semantics and may be superseded only by a naming ADR, ADR-016's provider rules are unenforceable until provider capability has exactly one producer, and multi-measure sits inside the SDMX boundary while being modelled and unproven in every artifact. Six standards questions remain open and none gates design. Part 2 adds three things design must not lose: the envelope's four ownerless concerns (tidy/long structures, product-like objects, declarable MANY_TO_MANY, impact analysis); the three-graph correction to the governed-chain hypothesis, which forbids a universal edge type; and the statistical domain register in the input list. One question is the owner's and not the designer's: D3, how a legal erasure obligation is reconciled with immutable snapshots, retained raw and append-only lineage. SUPERSEDED 2026-09-21 by canonical-design: PHASE-004 edited CATALOG, CURRENT and MANIFEST, which this card covered. Nothing above is rewritten."
+}

@@ -1,0 +1,371 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.13/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Configuration on demand is an incubating feature.
+  ? Module included: api
+  ? Module included: mobile
+??????????????????????????????????
+  Active modules: core, api, mobile
+??????????????????????????????????
+> Task :mobile:processResources UP-TO-DATE
+> Task :api:processResources UP-TO-DATE
+> Task :api:processKidsCanonicalToolResources NO-SOURCE
+> Task :core:compileJava UP-TO-DATE
+> Task :core:processResources UP-TO-DATE
+> Task :core:classes UP-TO-DATE
+> Task :core:jar UP-TO-DATE
+> Task :mobile:compileJava UP-TO-DATE
+> Task :mobile:classes UP-TO-DATE
+> Task :mobile:jar UP-TO-DATE
+> Task :api:compileJava UP-TO-DATE
+> Task :api:classes UP-TO-DATE
+> Task :api:compileKidsCanonicalToolJava
+> Task :api:kidsCanonicalToolClasses
+
+> Task :api:auditAccessArtifact FAILED
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+schema=access-artifact-audit.v1
+artifact=C:\Users\Test-User\Desktop\KIDS_PACKAGE_full.accdb
+bytes=4395008
+tables=30
+TABLE|__cl_alias|rows=36|columns=7|indexes=PrimaryKey[PK:alias_ref];FK_cl_alias_item[INDEX:item_ref]|primaryKey=true|nulls=none
+COLUMN|__cl_alias|alias_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_alias|item_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_alias|source_system|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_alias|source_code_raw|type=MEMO|nullableRows=0|caption=
+COLUMN|__cl_alias|lookup_code_normalized|type=MEMO|nullableRows=0|caption=
+COLUMN|__cl_alias|normalization_rule|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_alias|lifecycle_state|type=TEXT|nullableRows=0|caption=
+TABLE|__cl_hierarchy|rows=0|columns=4|indexes=PrimaryKey[PK:child_item_ref]|primaryKey=true|nulls=none
+COLUMN|__cl_hierarchy|version_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_hierarchy|parent_item_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_hierarchy|child_item_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_hierarchy|ordinal|type=LONG|nullableRows=0|caption=
+TABLE|__cl_item|rows=85|columns=6|indexes=PrimaryKey[PK:item_ref];UX_cl_item_code[UNIQUE:version_ref,item_code];FK_cl_item_version[INDEX:version_ref];.rB[UNIQUE:item_ref];.rC[UNIQUE:item_ref];.rD[UNIQUE:item_ref];.rE[UNIQUE:item_ref];.rF[UNIQUE:item_ref];.rG[UNIQUE:item_ref];.rH[UNIQUE:item_ref];.rI[UNIQUE:item_ref];.rJ[UNIQUE:item_ref];.rK[UNIQUE:item_ref]|primaryKey=true|nulls=label_ka=18,label_en=18
+COLUMN|__cl_item|item_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_item|version_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_item|item_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_item|label_ka|type=MEMO|nullableRows=18|caption=
+COLUMN|__cl_item|label_en|type=MEMO|nullableRows=18|caption=
+COLUMN|__cl_item|lifecycle_state|type=TEXT|nullableRows=0|caption=
+TABLE|__cl_scheme|rows=6|columns=4|indexes=PrimaryKey[PK:scheme_code];.rB[UNIQUE:scheme_code]|primaryKey=true|nulls=none
+COLUMN|__cl_scheme|scheme_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_scheme|authority_mode|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_scheme|title|type=MEMO|nullableRows=0|caption=
+COLUMN|__cl_scheme|standard_reference|type=TEXT|nullableRows=0|caption=
+TABLE|__cl_version|rows=6|columns=6|indexes=PrimaryKey[PK:version_ref];UX_cl_version_code[UNIQUE:scheme_code,version_code];FK_cl_version_scheme[INDEX:scheme_code];.rB[UNIQUE:version_ref];.rC[UNIQUE:version_ref]|primaryKey=true|nulls=valid_to=6
+COLUMN|__cl_version|version_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_version|scheme_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_version|version_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_version|lifecycle_state|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_version|valid_from|type=TEXT|nullableRows=0|caption=
+COLUMN|__cl_version|valid_to|type=TEXT|nullableRows=6|caption=
+TABLE|__ent_kids_glossary_entry|rows=178|columns=6|indexes=PrimaryKey[PK:source_glossary_id];FK_glossary_language[INDEX:language_item_ref];FK_glossary_raw[INDEX:source_row_key]|primaryKey=true|nulls=none
+COLUMN|__ent_kids_glossary_entry|source_glossary_id|type=TEXT|nullableRows=0|caption=
+COLUMN|__ent_kids_glossary_entry|language_item_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__ent_kids_glossary_entry|language_raw|type=MEMO|nullableRows=0|caption=
+COLUMN|__ent_kids_glossary_entry|entry_text|type=MEMO|nullableRows=0|caption=
+COLUMN|__ent_kids_glossary_entry|source_row_key|type=TEXT|nullableRows=0|caption=
+COLUMN|__ent_kids_glossary_entry|operation|type=TEXT|nullableRows=0|caption=
+TABLE|__ent_kids_goal|rows=36|columns=8|indexes=PrimaryKey[PK:source_goal_id];FK_goal_category[INDEX:category_item_ref];FK_goal_raw[INDEX:source_row_key]|primaryKey=true|nulls=none
+COLUMN|__ent_kids_goal|source_goal_id|type=TEXT|nullableRows=0|caption=
+COLUMN|__ent_kids_goal|category_item_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__ent_kids_goal|title_ka|type=MEMO|nullableRows=0|caption=
+COLUMN|__ent_kids_goal|title_en|type=MEMO|nullableRows=0|caption=
+COLUMN|__ent_kids_goal|path_ka|type=MEMO|nullableRows=0|caption=
+COLUMN|__ent_kids_goal|path_en|type=MEMO|nullableRows=0|caption=
+COLUMN|__ent_kids_goal|source_row_key|type=TEXT|nullableRows=0|caption=
+COLUMN|__ent_kids_goal|operation|type=TEXT|nullableRows=0|caption=
+TABLE|__ent_kids_resource|rows=225|columns=8|indexes=PrimaryKey[PK:source_resource_id];FK_resource_category[INDEX:category_item_ref];.rB[UNIQUE:source_resource_id];.rC[UNIQUE:source_resource_id];FK_resource_raw[INDEX:source_row_key];.rD[UNIQUE:source_resource_id]|primaryKey=true|nulls=none
+COLUMN|__ent_kids_resource|source_resource_id|type=TEXT|nullableRows=0|caption=
+COLUMN|__ent_kids_resource|category_item_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__ent_kids_resource|title_ka|type=MEMO|nullableRows=0|caption=
+COLUMN|__ent_kids_resource|title_en|type=MEMO|nullableRows=0|caption=
+COLUMN|__ent_kids_resource|path_ka|type=MEMO|nullableRows=0|caption=
+COLUMN|__ent_kids_resource|path_en|type=MEMO|nullableRows=0|caption=
+COLUMN|__ent_kids_resource|source_row_key|type=TEXT|nullableRows=0|caption=
+COLUMN|__ent_kids_resource|operation|type=TEXT|nullableRows=0|caption=
+SAMPLE|__gs_dataset|Row[863:0][{dataset_code=STAT_STRUCTURE,access_table_name=__stat_structure,data_family=CONTRACT,business_grain=one data structure definition,authoring_class=SYSTEM}]
+SAMPLE|__gs_dataset|Row[863:1][{dataset_code=STAT_REPRESENTATION,access_table_name=__stat_representation,data_family=CONTRACT,business_grain=one value representation,authoring_class=SYSTEM}]
+SAMPLE|__gs_dataset|Row[863:2][{dataset_code=STAT_UNIT,access_table_name=__stat_unit,data_family=REFERENCE,business_grain=one unit of measure,authoring_class=SYSTEM}]
+TABLE|__gs_dataset|rows=30|columns=5|indexes=PrimaryKey[PK:dataset_code]|primaryKey=true|nulls=none
+COLUMN|__gs_dataset|dataset_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_dataset|access_table_name|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_dataset|data_family|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_dataset|business_grain|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_dataset|authoring_class|type=TEXT|nullableRows=0|caption=
+TABLE|__gs_field|rows=156|columns=6|indexes=PrimaryKey[PK:dataset_code,field_name]|primaryKey=true|nulls=none
+COLUMN|__gs_field|dataset_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_field|field_name|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_field|logical_type|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_field|semantic_role|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_field|required|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_field|authoring_class|type=TEXT|nullableRows=0|caption=
+TABLE|__gs_key|rows=25|columns=4|indexes=|primaryKey=false|nulls=none
+COLUMN|__gs_key|dataset_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_key|field_name|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_key|key_role|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_key|key_order|type=TEXT|nullableRows=0|caption=
+TABLE|__gs_metadata|rows=272|columns=12|indexes=PrimaryKey[PK:subject_type,subject_code,subject_revision,namespace_code,property_code,language_tag,ordinal]|primaryKey=true|nulls=value_json=266
+COLUMN|__gs_metadata|subject_type|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_metadata|subject_code|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_metadata|subject_revision|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_metadata|namespace_code|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_metadata|property_code|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_metadata|language_tag|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_metadata|value_type|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_metadata|value_text|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_metadata|value_json|type=MEMO|nullableRows=266|caption=
+COLUMN|__gs_metadata|ordinal|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_metadata|lifecycle_status|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_metadata|source_reference|type=MEMO|nullableRows=0|caption=
+TABLE|__gs_metadata_schema|rows=2|columns=5|indexes=PrimaryKey[PK:schema_code]|primaryKey=true|nulls=none
+COLUMN|__gs_metadata_schema|schema_code|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_metadata_schema|namespace_code|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_metadata_schema|schema_revision|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_metadata_schema|schema_json|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_metadata_schema|approval_state|type=MEMO|nullableRows=0|caption=
+SAMPLE|__gs_package|Row[431:0][{product_code=KIDS_PORTAL,contract_code=KIDS_PORTAL_V1,contract_revision=8,package_code=kids-portal-canonical,package_version=8.0.0,load_mode=SNAPSHOT,source_system=KIDS_LEGACY_ACCESS,artifact_profile=ACCESS_CANONICAL_R8_PAGE_MANIFEST}]
+TABLE|__gs_package|rows=1|columns=8|indexes=PrimaryKey[PK:package_code]|primaryKey=true|nulls=none
+COLUMN|__gs_package|product_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_package|contract_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_package|contract_revision|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_package|package_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_package|package_version|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_package|load_mode|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_package|source_system|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_package|artifact_profile|type=TEXT|nullableRows=0|caption=
+SAMPLE|__gs_page|Row[436:0][{page_code=KIDS_ROOT,node_code=KIDS_ROOT,contract_code=KIDS_PORTAL_V1,contract_revision=8,parent_page_code=<null>,node_kind=SITE_ROOT,dataset_code=,path_segment=kids,response_projection_code=,sort_order=1,required=true,approval_state=READY}]
+SAMPLE|__gs_page|Row[436:1][{page_code=KIDS_GOALS,node_code=KIDS_GOALS,contract_code=KIDS_PORTAL_V1,contract_revision=8,parent_page_code=KIDS_ROOT,node_kind=ENTITY_COLLECTION,dataset_code=KIDS_GOAL,path_segment=goals,response_projection_code=KIDS_GOAL_ENTITY,sort_order=10,required=true,approval_state=READY}]
+SAMPLE|__gs_page|Row[436:2][{page_code=KIDS_RESOURCES,node_code=KIDS_RESOURCES,contract_code=KIDS_PORTAL_V1,contract_revision=8,parent_page_code=KIDS_ROOT,node_kind=ENTITY_COLLECTION,dataset_code=KIDS_RESOURCE,path_segment=resources,response_projection_code=KIDS_RESOURCE_ENTITY,sort_order=20,required=true,approval_state=READY}]
+TABLE|__gs_page|rows=6|columns=12|indexes=PrimaryKey[PK:page_code]|primaryKey=true|nulls=parent_page_code=1
+COLUMN|__gs_page|page_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_page|node_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_page|contract_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_page|contract_revision|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_page|parent_page_code|type=TEXT|nullableRows=1|caption=
+COLUMN|__gs_page|node_kind|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_page|dataset_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_page|path_segment|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_page|response_projection_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_page|sort_order|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_page|required|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_page|approval_state|type=TEXT|nullableRows=0|caption=
+SAMPLE|__gs_projection|Row[443:0][{projection_code=KIDS_GOAL_ENTITY,dataset_code=KIDS_GOAL,projection_family=ENTITY,mapping_json={"approvalState":"READY","lineageRequired":true,"approvedBy":"USER_AUTHORITY","approvalBasis":"PAGE_8_GOALS_PARITY_2026_09_15"},approval_state=READY}]
+SAMPLE|__gs_projection|Row[443:1][{projection_code=KIDS_RESOURCE_ENTITY,dataset_code=KIDS_RESOURCE,projection_family=ENTITY,mapping_json={"approvalState":"DRAFT","lineageRequired":true},approval_state=DRAFT}]
+SAMPLE|__gs_projection|Row[443:2][{projection_code=KIDS_GLOSSARY_ENTRY_ENTITY,dataset_code=KIDS_GLOSSARY_ENTRY,projection_family=ENTITY,mapping_json={"approvalState":"DRAFT","lineageRequired":true},approval_state=DRAFT}]
+TABLE|__gs_projection|rows=6|columns=5|indexes=PrimaryKey[PK:projection_code]|primaryKey=true|nulls=none
+COLUMN|__gs_projection|projection_code|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_projection|dataset_code|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_projection|projection_family|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_projection|mapping_json|type=MEMO|nullableRows=0|caption=
+COLUMN|__gs_projection|approval_state|type=MEMO|nullableRows=0|caption=
+TABLE|__gs_relation|rows=32|columns=7|indexes=|primaryKey=false|nulls=none
+COLUMN|__gs_relation|relationship_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_relation|from_dataset_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_relation|from_field|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_relation|to_dataset_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_relation|to_field|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_relation|cardinality|type=TEXT|nullableRows=0|caption=
+COLUMN|__gs_relation|required|type=TEXT|nullableRows=0|caption=
+TABLE|__raw_document|rows=456|columns=22|indexes=PrimaryKey[PK:source_row_key];UX_raw_source[UNIQUE:source_table,source_primary_key];.rB[UNIQUE:source_row_key];.rC[UNIQUE:source_row_key];.rD[UNIQUE:source_row_key];.rE[UNIQUE:source_row_key];.rF[UNIQUE:source_row_key];.rG[UNIQUE:source_row_key]|primaryKey=true|nulls=none
+COLUMN|__raw_document|source_row_key|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|source_table|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|source_primary_key|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|extract_sequence|type=LONG|nullableRows=0|caption=
+COLUMN|__raw_document|source_system|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|source_feed|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|document_identity|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|original_filename|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|mime_type|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|byte_size|type=LONG|nullableRows=0|caption=
+COLUMN|__raw_document|checksum|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|received_at|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|source_uri|type=MEMO|nullableRows=0|caption=
+COLUMN|__raw_document|ingestion_batch|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|provenance|type=MEMO|nullableRows=0|caption=
+COLUMN|__raw_document|retention_policy|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|confidentiality_class|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|payload_reference|type=MEMO|nullableRows=0|caption=
+COLUMN|__raw_document|encryption_reference|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|parser_status|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|validation_status|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_document|supersedes_source_row_key|type=TEXT|nullableRows=0|caption=
+TABLE|__raw_kids_statistical_carrier|rows=43|columns=6|indexes=PrimaryKey[PK:carrier_code];UX_carrier_resource[UNIQUE:source_resource_id];FK_carrier_resource[UNIQUE:source_resource_id];FK_carrier_raw[INDEX:source_row_key];.rB[UNIQUE:carrier_code];.rC[UNIQUE:carrier_code]|primaryKey=true|nulls=none
+COLUMN|__raw_kids_statistical_carrier|carrier_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_kids_statistical_carrier|source_resource_id|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_kids_statistical_carrier|payload_checksum|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_kids_statistical_carrier|parse_status|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_kids_statistical_carrier|source_row_key|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_kids_statistical_carrier|operation|type=TEXT|nullableRows=0|caption=
+SAMPLE|__raw_stat_crosswalk|Row[564:0][{indicator_item_ref=INDICATOR|KIDS_PORTAL_V1_SOURCE_2026_09_R8|KIDS_DIGESTIVE_DISEASE_NEW_CASES,legacy_metric_code=KIDS_DIGESTIVE_DISEASE_NEW_CASES,carrier_code=CARRIER|178,source_resource_id=178,legacy_unit_code=COUNT_CASE,legacy_aggregation=NONE,legacy_obs_status=A,legacy_conf_status=F,quality_policy_code=KIDS_AGGREGATE_QUALITY_V1,confidentiality_policy_code=KIDS_PUBLIC_AGGREGATE_V1,inference_method=TITLE_RANGE_STANDARD_INFERENCE,lifecycle_state=PROVISIONAL_APPROVED,inference_confidence=0.9900000000000000,inference_rationale=Title explicitly states new cases,operation=UPSERT}]
+SAMPLE|__raw_stat_crosswalk|Row[564:1][{indicator_item_ref=INDICATOR|KIDS_PORTAL_V1_SOURCE_2026_09_R8|KIDS_SURVIVOR_SOCIAL_PACKAGE_RECIPIENTS,legacy_metric_code=KIDS_SURVIVOR_SOCIAL_PACKAGE_RECIPIENTS,carrier_code=CARRIER|299,source_resource_id=299,legacy_unit_code=PERSON,legacy_aggregation=NONE,legacy_obs_status=A,legacy_conf_status=F,quality_policy_code=KIDS_AGGREGATE_QUALITY_V1,confidentiality_policy_code=KIDS_PUBLIC_AGGREGATE_V1,inference_method=TITLE_RANGE_STANDARD_INFERENCE,lifecycle_state=PROVISIONAL_APPROVED,inference_confidence=0.9500000000000000,inference_rationale=Title identifies recipients by age,operation=UPSERT}]
+SAMPLE|__raw_stat_crosswalk|Row[564:2][{indicator_item_ref=INDICATOR|KIDS_PORTAL_V1_SOURCE_2026_09_R8|KIDS_INTERNALLY_DISPLACED_PERSONS,legacy_metric_code=KIDS_INTERNALLY_DISPLACED_PERSONS,carrier_code=CARRIER|310,source_resource_id=310,legacy_unit_code=PERSON,legacy_aggregation=NONE,legacy_obs_status=A,legacy_conf_status=F,quality_policy_code=KIDS_AGGREGATE_QUALITY_V1,confidentiality_policy_code=KIDS_PUBLIC_AGGREGATE_V1,inference_method=TITLE_RANGE_STANDARD_INFERENCE,lifecycle_state=PROVISIONAL_APPROVED,inference_confidence=0.9900000000000000,inference_rationale=Title states number of persons,operation=UPSERT}]
+TABLE|__raw_stat_crosswalk|rows=43|columns=15|indexes=PrimaryKey[PK:indicator_item_ref];FK_crosswalk_indicator[UNIQUE:indicator_item_ref];FK_crosswalk_carrier[INDEX:carrier_code];FK_crosswalk_resource[INDEX:source_resource_id]|primaryKey=true|nulls=none
+COLUMN|__raw_stat_crosswalk|indicator_item_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_crosswalk|legacy_metric_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_crosswalk|carrier_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_crosswalk|source_resource_id|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_crosswalk|legacy_unit_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_crosswalk|legacy_aggregation|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_crosswalk|legacy_obs_status|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_crosswalk|legacy_conf_status|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_crosswalk|quality_policy_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_crosswalk|confidentiality_policy_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_crosswalk|inference_method|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_crosswalk|lifecycle_state|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_crosswalk|inference_confidence|type=NUMERIC|nullableRows=0|caption=
+COLUMN|__raw_stat_crosswalk|inference_rationale|type=MEMO|nullableRows=0|caption=
+COLUMN|__raw_stat_crosswalk|operation|type=TEXT|nullableRows=0|caption=
+TABLE|__raw_stat_source|rows=880|columns=13|indexes=PrimaryKey[PK:input_key];FK_source_carrier[INDEX:carrier_code];FK_source_raw[INDEX:source_row_key];FK_source_observation[INDEX:TIME_PERIOD,AGE,INDICATOR]|primaryKey=true|nulls=none
+COLUMN|__raw_stat_source|input_key|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_source|TIME_PERIOD|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_source|AGE|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_source|INDICATOR|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_source|carrier_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_source|cell_ordinal|type=LONG|nullableRows=0|caption=
+COLUMN|__raw_stat_source|period_raw|type=MEMO|nullableRows=0|caption=
+COLUMN|__raw_stat_source|dimension_key_raw|type=MEMO|nullableRows=0|caption=
+COLUMN|__raw_stat_source|value_lexical|type=MEMO|nullableRows=0|caption=
+COLUMN|__raw_stat_source|json_path|type=MEMO|nullableRows=0|caption=
+COLUMN|__raw_stat_source|source_encoding|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_source|source_row_key|type=TEXT|nullableRows=0|caption=
+COLUMN|__raw_stat_source|operation|type=TEXT|nullableRows=0|caption=
+TABLE|__rel_kids_resource_subcategory_assignment|rows=230|columns=7|indexes=PrimaryKey[PK:assignment_key];UX_sub_assignment[UNIQUE:source_resource_id,ordinal];FK_sub_resource[INDEX:source_resource_id];FK_sub_item[INDEX:subcategory_item_ref];FK_sub_raw[INDEX:source_row_key]|primaryKey=true|nulls=none
+COLUMN|__rel_kids_resource_subcategory_assignment|assignment_key|type=TEXT|nullableRows=0|caption=
+COLUMN|__rel_kids_resource_subcategory_assignment|source_resource_id|type=TEXT|nullableRows=0|caption=
+COLUMN|__rel_kids_resource_subcategory_assignment|subcategory_item_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__rel_kids_resource_subcategory_assignment|source_token_raw|type=MEMO|nullableRows=0|caption=
+COLUMN|__rel_kids_resource_subcategory_assignment|ordinal|type=LONG|nullableRows=0|caption=
+COLUMN|__rel_kids_resource_subcategory_assignment|source_row_key|type=TEXT|nullableRows=0|caption=
+COLUMN|__rel_kids_resource_subcategory_assignment|operation|type=TEXT|nullableRows=0|caption=
+TABLE|__stat_attribute_attachment|rows=3|columns=4|indexes=PrimaryKey[PK:structure_ref,attribute_code];FK_attachment_structure[INDEX:structure_ref]|primaryKey=true|nulls=target=1
+COLUMN|__stat_attribute_attachment|structure_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_attribute_attachment|attribute_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_attribute_attachment|attachment_level|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_attribute_attachment|target|type=TEXT|nullableRows=1|caption=
+TABLE|__stat_attribute_value|rows=44|columns=6|indexes=PrimaryKey[PK:value_key];FK_value_structure[INDEX:structure_ref];FK_value_item[INDEX:group_item_ref];FK_value_unit[INDEX:unit_ref]|primaryKey=true|nulls=group_item_ref=1,unit_ref=1,value_text=43
+COLUMN|__stat_attribute_value|value_key|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_attribute_value|structure_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_attribute_value|attribute_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_attribute_value|group_item_ref|type=TEXT|nullableRows=1|caption=
+COLUMN|__stat_attribute_value|unit_ref|type=TEXT|nullableRows=1|caption=
+COLUMN|__stat_attribute_value|value_text|type=TEXT|nullableRows=43|caption=
+SAMPLE|__stat_component|Row[540:0][{structure_ref=dsd:STAT:INDICATORS_BY_AGE(1.0.0),component_code=TIME_PERIOD,component_role=DIMENSION,concept_ref=concept:STAT:TIME_PERIOD(1.0.0),representation_ref=rep:TIME_PERIOD_YEAR,measure_ref=<null>,required=true,position=1,authoring_class=FILL}]
+SAMPLE|__stat_component|Row[540:1][{structure_ref=dsd:STAT:INDICATORS_BY_AGE(1.0.0),component_code=AGE,component_role=DIMENSION,concept_ref=concept:STAT:AGE(1.0.0),representation_ref=rep:CL_AGE,measure_ref=<null>,required=true,position=2,authoring_class=PICK}]
+SAMPLE|__stat_component|Row[540:2][{structure_ref=dsd:STAT:INDICATORS_BY_AGE(1.0.0),component_code=INDICATOR,component_role=DIMENSION,concept_ref=concept:STAT:INDICATOR(1.0.0),representation_ref=rep:CL_INDICATOR,measure_ref=<null>,required=true,position=3,authoring_class=PICK}]
+TABLE|__stat_component|rows=7|columns=9|indexes=PrimaryKey[PK:structure_ref,component_code];FK_component_structure[INDEX:structure_ref];FK_component_representation[INDEX:representation_ref];FK_component_measure[INDEX:measure_ref]|primaryKey=true|nulls=measure_ref=6
+COLUMN|__stat_component|structure_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_component|component_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_component|component_role|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_component|concept_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_component|representation_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_component|measure_ref|type=TEXT|nullableRows=6|caption=
+COLUMN|__stat_component|required|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_component|position|type=LONG|nullableRows=0|caption=
+COLUMN|__stat_component|authoring_class|type=TEXT|nullableRows=0|caption=
+SAMPLE|__stat_measure|Row[535:0][{measure_ref=measure:STAT:OBS_VALUE(1.0.0),concept_ref=concept:STAT:OBS_VALUE(1.0.0),representation_ref=rep:DECIMAL_28_16,aggregation=NONE}]
+TABLE|__stat_measure|rows=1|columns=4|indexes=PrimaryKey[PK:measure_ref];.rB[UNIQUE:measure_ref];FK_measure_representation[INDEX:representation_ref]|primaryKey=true|nulls=none
+COLUMN|__stat_measure|measure_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_measure|concept_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_measure|representation_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_measure|aggregation|type=TEXT|nullableRows=0|caption=
+SAMPLE|__stat_observation|Row[580:0][{TIME_PERIOD=2018,AGE=AGE_GROUP|KIDS_PORTAL_V1_SOURCE_2026_09_R8|0-17,INDICATOR=INDICATOR|KIDS_PORTAL_V1_SOURCE_2026_09_R8|KIDS_ABORTIONS_COUNT,OBS_VALUE=132.0000000000000000,OBS_STATUS=OBS_STATUS|KIDS_PORTAL_V1_SOURCE_2026_09_R8|A}]
+SAMPLE|__stat_observation|Row[580:1][{TIME_PERIOD=2018,AGE=AGE_GROUP|KIDS_PORTAL_V1_SOURCE_2026_09_R8|15-24,INDICATOR=INDICATOR|KIDS_PORTAL_V1_SOURCE_2026_09_R8|KIDS_ABORTIONS_COUNT,OBS_VALUE=4631.0000000000000000,OBS_STATUS=OBS_STATUS|KIDS_PORTAL_V1_SOURCE_2026_09_R8|A}]
+SAMPLE|__stat_observation|Row[580:2][{TIME_PERIOD=2018,AGE=AGE_GROUP|KIDS_PORTAL_V1_SOURCE_2026_09_R8|15-29,INDICATOR=INDICATOR|KIDS_PORTAL_V1_SOURCE_2026_09_R8|KIDS_ABORTIONS_COUNT,OBS_VALUE=11115.0000000000000000,OBS_STATUS=OBS_STATUS|KIDS_PORTAL_V1_SOURCE_2026_09_R8|A}]
+TABLE|__stat_observation|rows=880|columns=5|indexes=PrimaryKey[PK:TIME_PERIOD,AGE,INDICATOR];FK_obs_age[INDEX:AGE];FK_obs_indicator[INDEX:INDICATOR];FK_obs_status[INDEX:OBS_STATUS];.rB[UNIQUE:TIME_PERIOD,AGE,INDICATOR]|primaryKey=true|nulls=none
+COLUMN|__stat_observation|TIME_PERIOD|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_observation|AGE|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_observation|INDICATOR|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_observation|OBS_VALUE|type=NUMERIC|nullableRows=0|caption=
+COLUMN|__stat_observation|OBS_STATUS|type=TEXT|nullableRows=0|caption=
+TABLE|__stat_representation|rows=7|columns=6|indexes=PrimaryKey[PK:representation_ref];.rB[UNIQUE:representation_ref];.rC[UNIQUE:representation_ref];FK_representation_codelist[INDEX:codelist_version_ref]|primaryKey=true|nulls=codelist_version_ref=4,format_ref=6,numeric_precision=6,numeric_scale=6
+COLUMN|__stat_representation|representation_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_representation|logical_type|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_representation|codelist_version_ref|type=TEXT|nullableRows=4|caption=
+COLUMN|__stat_representation|format_ref|type=TEXT|nullableRows=6|caption=
+COLUMN|__stat_representation|numeric_precision|type=LONG|nullableRows=6|caption=
+COLUMN|__stat_representation|numeric_scale|type=LONG|nullableRows=6|caption=
+SAMPLE|__stat_structure|Row[518:0][{structure_ref=dsd:STAT:INDICATORS_BY_AGE(1.0.0),profile_ref=profile:STAT:STAT_AGGREGATE(1.0.0),observation_table=__stat_observation,title=Indicators by period and age}]
+TABLE|__stat_structure|rows=1|columns=4|indexes=PrimaryKey[PK:structure_ref];.rB[UNIQUE:structure_ref];.rC[UNIQUE:structure_ref];.rD[UNIQUE:structure_ref]|primaryKey=true|nulls=none
+COLUMN|__stat_structure|structure_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_structure|profile_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_structure|observation_table|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_structure|title|type=MEMO|nullableRows=0|caption=
+TABLE|__stat_unit|rows=10|columns=6|indexes=PrimaryKey[PK:unit_ref];.rB[UNIQUE:unit_ref]|primaryKey=true|nulls=base_unit_ref=10
+COLUMN|__stat_unit|unit_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_unit|unit_code|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_unit|quantity_kind_ref|type=TEXT|nullableRows=0|caption=
+COLUMN|__stat_unit|base_unit_ref|type=TEXT|nullableRows=10|caption=
+COLUMN|__stat_unit|scale_factor|type=NUMERIC|nullableRows=0|caption=
+COLUMN|__stat_unit|title|type=MEMO|nullableRows=0|caption=
+relationships=32
+RELATION|FK_cl_version_scheme|__cl_scheme(scheme_code)->__cl_version(scheme_code)
+RELATION|FK_cl_item_version|__cl_version(version_ref)->__cl_item(version_ref)
+RELATION|FK_cl_alias_item|__cl_item(item_ref)->__cl_alias(item_ref)
+RELATION|FK_goal_category|__cl_item(item_ref)->__ent_kids_goal(category_item_ref)
+RELATION|FK_resource_category|__cl_item(item_ref)->__ent_kids_resource(category_item_ref)
+RELATION|FK_sub_resource|__ent_kids_resource(source_resource_id)->__rel_kids_resource_subcategory_assignment(source_resource_id)
+RELATION|FK_sub_item|__cl_item(item_ref)->__rel_kids_resource_subcategory_assignment(subcategory_item_ref)
+RELATION|FK_glossary_language|__cl_item(item_ref)->__ent_kids_glossary_entry(language_item_ref)
+RELATION|FK_carrier_resource|__ent_kids_resource(source_resource_id)->__raw_kids_statistical_carrier(source_resource_id)
+RELATION|FK_goal_raw|__raw_document(source_row_key)->__ent_kids_goal(source_row_key)
+RELATION|FK_resource_raw|__raw_document(source_row_key)->__ent_kids_resource(source_row_key)
+RELATION|FK_sub_raw|__raw_document(source_row_key)->__rel_kids_resource_subcategory_assignment(source_row_key)
+RELATION|FK_glossary_raw|__raw_document(source_row_key)->__ent_kids_glossary_entry(source_row_key)
+RELATION|FK_carrier_raw|__raw_document(source_row_key)->__raw_kids_statistical_carrier(source_row_key)
+RELATION|FK_obs_age|__cl_item(item_ref)->__stat_observation(AGE)
+RELATION|FK_obs_indicator|__cl_item(item_ref)->__stat_observation(INDICATOR)
+RELATION|FK_obs_status|__cl_item(item_ref)->__stat_observation(OBS_STATUS)
+RELATION|FK_component_structure|__stat_structure(structure_ref)->__stat_component(structure_ref)
+RELATION|FK_component_representation|__stat_representation(representation_ref)->__stat_component(representation_ref)
+RELATION|FK_component_measure|__stat_measure(measure_ref)->__stat_component(measure_ref)
+RELATION|FK_measure_representation|__stat_representation(representation_ref)->__stat_measure(representation_ref)
+RELATION|FK_representation_codelist|__cl_version(version_ref)->__stat_representation(codelist_version_ref)
+RELATION|FK_attachment_structure|__stat_structure(structure_ref)->__stat_attribute_attachment(structure_ref)
+RELATION|FK_value_structure|__stat_structure(structure_ref)->__stat_attribute_value(structure_ref)
+RELATION|FK_value_item|__cl_item(item_ref)->__stat_attribute_value(group_item_ref)
+RELATION|FK_value_unit|__stat_unit(unit_ref)->__stat_attribute_value(unit_ref)
+RELATION|FK_source_carrier|__raw_kids_statistical_carrier(carrier_code)->__raw_stat_source(carrier_code)
+RELATION|FK_source_raw|__raw_document(source_row_key)->__raw_stat_source(source_row_key)
+RELATION|FK_crosswalk_indicator|__cl_item(item_ref)->__raw_stat_crosswalk(indicator_item_ref)
+RELATION|FK_crosswalk_carrier|__raw_kids_statistical_carrier(carrier_code)->__raw_stat_crosswalk(carrier_code)
+RELATION|FK_crosswalk_resource|__ent_kids_resource(source_resource_id)->__raw_stat_crosswalk(source_resource_id)
+RELATION|FK_source_observation|__stat_observation(TIME_PERIOD,AGE,INDICATOR)->__raw_stat_source(TIME_PERIOD,AGE,INDICATOR)
+FINDINGS=11
+FINDING|NO_INDEX:__gs_key
+FINDING|NO_PRIMARY_KEY:__gs_key
+FINDING|NO_INDEX:__gs_relation
+FINDING|NO_PRIMARY_KEY:__gs_relation
+FINDING|MISSING_REQUIRED_TABLE:__stat_metric
+FINDING|MISSING_REQUIRED_TABLE:__stat_kids_statistical_input
+FINDING|MISSING_REQUIRED_TABLE:__rel_kids_statistical_semantic_binding
+FINDING|KEY_ORDER_NOT_INTEGER:TEXT
+Exception in thread "main" java.lang.IllegalStateException: Access artifact audit failed with 11 finding(s)
+	at AccessArtifactFullAudit.main(AccessArtifactFullAudit.java:77)
+FINDING|DRAFT_PROJECTION:KIDS_RESOURCE_ENTITY
+FINDING|DRAFT_PROJECTION:KIDS_GLOSSARY_ENTRY_ENTITY
+FINDING|DRAFT_PROJECTION:KIDS_SUBCATEGORY_RELATION
+status=FAIL
+
+[Incubating] Problems report is available at: file:///C:/Users/Test-User/IdeaProjects/gesotat-system/platform/apps/geostat/backend/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':api:auditAccessArtifact'.
+> Process 'command 'C:\Users\Test-User\.jdks\corretto-17.0.20.1\bin\java.exe'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+10 actionable tasks: 2 executed, 8 up-to-date
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 20s

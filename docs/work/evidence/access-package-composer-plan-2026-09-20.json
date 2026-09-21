@@ -1,0 +1,52 @@
+{
+  "evidence": "access-package-composer-plan",
+  "recordedAt": "2026-09-20",
+  "phase": "5.1 - the plan both directions share",
+  "what": "PackageContractSource (port) and JdbcPackageContractSource read ONE approved site contract revision from the Control Plane into an immutable, digested PackagePlan; AuthoringPolicy derives who fills a field and where a table is shown from metadata alone.",
+  "whyItIsTheHeart": "The file the owner asked for and the server path proven today were built from two descriptions and therefore never met. A generator and a loader derived from one plan cannot drift apart.",
+  "files": [
+    "api/src/main/java/org/base/api/service/platform/packaging/PackagePlan.java",
+    "api/src/main/java/org/base/api/service/platform/packaging/AuthoringPolicy.java",
+    "api/src/main/java/org/base/api/service/platform/packaging/PackageContractSource.java",
+    "api/src/main/java/org/base/api/service/platform/packaging/JdbcPackageContractSource.java",
+    "api/src/test/java/org/base/api/service/platform/packaging/PackageContractSourceTest.java"
+  ],
+  "tests": {
+    "class": "PackageContractSourceTest",
+    "passed": 6,
+    "failed": 0,
+    "site": "a land registry, deliberately not KIDS: other names, a composite key, RAW + REFERENCE + ENTITY (completion plan C-03)",
+    "cases": [
+      "an approved revision of any site becomes one plan",
+      "who fills what and where it is shown come from metadata alone",
+      "the digest is of the content, not of the order a store returned it",
+      "nothing but an approved revision yields a plan",
+      "a contract that cannot be honoured is refused whole (unknown family, dangling relation, undeclared key)",
+      "an empty revision is not a package"
+    ]
+  },
+  "realContractOnDev": {
+    "contract": "KIDS_PORTAL_V1 r8 APPROVED",
+    "datasets": 15,
+    "fields": 104,
+    "relations": 21,
+    "classifiers": 4,
+    "families": {
+      "ENTITY": 3,
+      "RAW": 2,
+      "REFERENCE": 7,
+      "RELATION": 2,
+      "STATISTICAL": 1
+    },
+    "datasetsWithoutKey": 0,
+    "danglingRelations": 0,
+    "verdict": "the port would yield a plan for the real contract with no refusal"
+  },
+  "findingForTheNextStep": "the Control Plane declares 104 fields for r8, the R8 file's __gs_field declares 122: the 18-field difference must be explained before parity (acceptance A) can pass.",
+  "notYet": [
+    "PackageWriter (the provider adapter)",
+    "FamilySection registry incl. the statistical section bound by structure_ref",
+    "the loader reading the same plan",
+    "no bean is wired: nothing in the running product changed"
+  ]
+}

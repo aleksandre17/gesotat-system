@@ -1,0 +1,43 @@
+{
+  "evidence": "statistical-numeric-envelope",
+  "recordedAt": "2026-09-20",
+  "decision": "ADR-012 D-3: no digit of the source is lost; an exact measure may declare scale up to 16 (precision at most 28, the Access NUMERIC limit)",
+  "why": "221 of the 880 published KIDS values carry 11 to 16 decimals; under DECIMAL(28,10) they were altered on load",
+  "change": {
+    "migrations": [
+      "111_statistical_numeric_envelope_control.sql (platform.measure CHECK: scale <= 16)",
+      "112_statistical_numeric_envelope_data.sql (statistics.observation.numeric_value and serving.metric_cache.aggregate_value -> DECIMAL(38,16))"
+    ],
+    "code": [
+      "ReferenceRegistryService: the envelope is injected instead of the literals 28 and 10",
+      "StatisticalContractConfiguration: compiler and registry read the same two properties; default max-scale 16"
+    ],
+    "tooling": "ops/tests/sql/migration-chain-fresh-replay.sh gained an optional POST_DATA_SQL hook, the twin of POST_CONTROL_SQL"
+  },
+  "tests": {
+    "statisticalPackage": "102 of 102 (2 new: registry boundary 16/17 and precision 29; sixteen decimals survive storage)",
+    "chainReplayOnRealSqlServer": {
+      "applied": 107,
+      "failed": 0,
+      "checks": [
+        "measure envelope admits scale 16",
+        "observation.numeric_value is DECIMAL(38,16)",
+        "metric_cache.aggregate_value is DECIMAL(38,16)",
+        "sixteen decimals are held exactly",
+        "the widest value of the old envelope is unchanged by the widening"
+      ]
+    }
+  },
+  "devRollout": {
+    "before": "observations=10408 withValue=7117 sum=105797489.9864595695 checksum=1935543707 type=28,10 published=42",
+    "after": "observations=10408 withValue=7117 sum=105797489.9864595695 checksum=1935543707 type=38,16 published=42",
+    "verdict": "every stored value is unchanged; 42 published snapshots untouched",
+    "alsoApplied": "110_statistical_chart_declaration.sql - the dev chain had stopped at 109"
+  },
+  "incident": {
+    "what": "dev API down for about 13 minutes",
+    "cause": "I shipped my working-tree StatisticalContractConfiguration.java, which wires ChartService and CanonicalObservationReader - classes that exist only in my working tree and were never deployed - and I had not backed the server's file up. compileJava failed at startup.",
+    "fix": "the committed (HEAD) version of the file plus only the envelope change was shipped; healthy after 3 checks",
+    "rule": "before shipping any file to dev: diff it against HEAD, back up the server's copy, and ship only files whose every dependency is already there"
+  }
+}
