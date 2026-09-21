@@ -36,9 +36,9 @@ decisions.
 | **LAST COMPLETED GATE** | `GATE-PLAN` → **PASS** (2026-09-21) |
 | **CURRENT GATE** | `GATE-EXECUTION-PACKAGE` → `READY` |
 | **ACTIVE WORK ITEM** | none. `TASK-001` … `TASK-007` all `COMPLETE` |
-| **CONTROL PLANE** | `RCP PASS` — **665 checks, 0 errors, 2 cohesion warnings, 48 governed artifacts** (working tree, 2026-09-21). `PHASE-005`'s artifacts are **not yet committed**, so the committed baseline `50d143f` still reports 620/46. Six of the 665 are cohesion checks over the three gitignored `codex-session-*.md` transcripts, which are never committed (`CF-044`). Proven by 119 governance tests: `python ops/cli/validation/rcp-verify.py` · `python -m unittest discover -s ops/tests/governance` |
+| **CONTROL PLANE** | `RCP PASS` — **659 checks, 0 errors, 2 cohesion warnings, 48 governed artifacts** from the committed state `7b00623`, verified in a clean checkout. A working tree also holding the three gitignored `codex-session-*.md` transcripts reports **665**; those six cohesion checks are over files that are never committed (`CF-044`), so the committed figure is the reproducible one. Proven by 119 governance tests: `python ops/cli/validation/rcp-verify.py` · `python -m unittest discover -s ops/tests/governance` |
 | **BOUNDED CHANGE RECORD** | `docs/work/cards/master-rehabilitation-plan/governance.json` — `VERIFIED`; `python ops/cli/validation/engineering-governance.py` → `PASS` |
-| **BASELINE** | `HEAD 50d143f` — the `PHASE-004` preservation commit on `security/hardening-2`. The working tree additionally carries the platform security-hardening change set in flight (another author, ~65 paths under `platform/`, `ops/config`, `ops/tests/{security,sql}` and the AIR register); it is **not** rehabilitation output and was neither absorbed nor modified. |
+| **BASELINE** | `HEAD 7b00623` — the `PHASE-005` closure commit on `security/hardening-2`, derived from `50d143f`. The working tree additionally carries the platform security-hardening change set in flight (another author, ~55 paths under `platform/`, `ops/config`, `ops/tests/{security,sql}`, the AIR register and three `docs/evidence/*.json` files from the statistical/Access programme); it is **not** rehabilitation output and was neither absorbed nor modified. |
 | **LAST UPDATED** | 2026-09-21 |
 
 ## Blockers
