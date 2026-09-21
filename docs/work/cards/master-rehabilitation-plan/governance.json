@@ -1,0 +1,155 @@
+{
+  "version": 1,
+  "id": "master-rehabilitation-plan",
+  "status": "VERIFIED",
+  "problem": "PHASE-004 produced an accepted target architecture. Nothing yet said how the existing system reaches it. The repository carries parallel authorities in migration, authentication, presentation, navigation, ingestion, serving and dataset semantics, and adding a canonical path beside each of them would leave every one of them standing. The failure this phase had to prevent is the one named MIGRATED != DONE.",
+  "scope": "Derive the master rehabilitation plan: responsibility inventory across every system plane, parallel-authority discovery by responsibility rather than by name, a disposition for each, target physical family classification, convergence map, dependency-ordered roadmap, elimination register, protection plan, decision register, and the PHASE-006 entry contract. Inventory derived from the committed tree 50d143f only. No implementation, no migration, no DDL or DML, no legacy deletion, no Access refinement, no Admin/UI work, no owner decision settled. Scope-corrected 2026-09-21 on authoritative user clarification: the primary target is backend/api, backend/core is in scope only where the API genuinely depends on it, the frontend admin app and kids app are designated but parked, and backend/mobile plus every other undesignated neighbouring application is OUT OF SCOPE including its databases, migrations and domain requirements. Repository proximity does not imply scope.",
+  "layer": "Control policy and repository knowledge governance",
+  "baseline": "50d143fbc9e8b70d0c67c62e02f5c2cc8555f60e on security/hardening-2. The working tree additionally carries the platform security-hardening change set in flight under platform/, ops/config, ops/tests/security, ops/tests/sql and the AIR register; it was read for dependency awareness, never treated as authority, and not one of its files was modified. Every inventory figure in PLAN-MASTER comes from git at 50d143f.",
+  "authority": [
+    "AGENTS.md",
+    "docs/project/CURRENT.md",
+    "docs/project/MANIFEST.md",
+    "docs/work/GEOSTAT-CANONICAL-ARCHITECTURE-2026-09-21.md",
+    "docs/work/GEOSTAT-PHYSICAL-RELATIONAL-BASELINE-2026-09-21.md",
+    "docs/work/GEOSTAT-PHYSICAL-DATA-DOSSIER-2026-09-21.md",
+    "docs/work/GEOSTAT-CAPABILITY-INVENTORY-2026-09-21.md",
+    "docs/standards/ARCHITECTURE-QUALITY-BENCHMARK.md",
+    "docs/work/STATISTICAL-CONTRACT-OPEN-QUESTIONS.md",
+    "docs/decisions/ADR-access-provider-status.md"
+  ],
+  "reuse": "No new authority was created for anything that already has one. Capability dispositions stay with AUD-CAPABILITY, quality criteria with STD-BENCH-001, statistical decisions with DOM-STATISTICAL, the target with ARCH-CANONICAL, the physical model with ARCH-BASELINE and ARCH-DOSSIER. The one correction this phase produced - that the auto dependency count was measured over the api and core trees only - was routed into ARCH-DOSSIER 1.1 as a pointer rather than restated here, following the R-7 precedent. The artifact is typed REGISTER rather than a new PLAN type because RCP section 5 vocabularies are closed and extending them to admit this document would have loosened a check to pass it; ARCHITECTURE remains exclusively ARCH-CANONICAL's.",
+  "impact": "PHASE-005 closes and PHASE-006 becomes READY. PHASE-005 first treated backend/mobile as a product-decision blocker for API rehabilitation; that was a scope error and is corrected. EG-01, OD-08, W-01, W-07, PA-08 and EL-10 are withdrawn - retained as withdrawn rows with their identifiers retired rather than reused, because scope exclusion is not evidence deletion. One boundary obligation survives the exclusion and it is API-side: api/build.gradle declares an implementation dependency on the out-of-scope :mobile project under conditions that both hold by default, and org.base.api.config.MobileModuleConfig carries a matchIfMissing=true component scan of that module which is commented out but re-arms silently if uncommented. W-30 severs the build edge, makes activeModules explicit, deletes the dormant switch and removes three API config references; EL-13 records the elimination; PR-17 fails the build if any of it returns. PHASE-006 therefore inherits three constraints: Stage A evidence before its dependents, OD-01 enforced as a property-level block by PR-15, and no expansion into an out-of-scope project.",
+  "compatibility": "No runtime contract, schema, migration, API surface, package or deployment artifact is affected. No database was read or written during this phase beyond confirming that platform.schema_migration is unchanged at 113. Every change is documentation and control plane.",
+  "failure": "The failure mode this card guards is a plan that adds the canonical path and calls it rehabilitation. The control is the falsification pass: 30 attacks, six of which succeeded against the draft and forced real repairs - the per-structure-table loophole in PR-10, the NFC ordering bypass that became PR-15, the build-wiring survival that became PR-03 and reclassified RF-28, the ORM/table pairing that became PR-13, the rollback that restored code but not data, and the migration that would have made historical correction impossible by dropping assertion time. Rollback for this card is textual: nothing executable changed.",
+  "security": "No credential was read, printed or written. No database was modified. The plan carries two security-relevant items rather than resolving them: EL-02 requires a privilege diff and escalation negative tests before the legacy auth substrate is removed, because an auth migration that merely works can still leave an escalation path; and OD-01 (Unicode NFC for text grain components) remains an owner decision, now enforced as a property-level CI block so that implementation ordering cannot convert today's byte-exact behaviour into permanent policy by default.",
+  "requirements": {
+    "GOV-001": {
+      "decision": "APPLY",
+      "reason": "Responsibilities were reconstructed before artifacts were classified, which is what exposed two parallel authorities no prior register held - a second ingestion model (PA-05) and 39 private dataset definitions (PA-08) - neither of which shares a class name with its canonical counterpart."
+    },
+    "GOV-002": {
+      "decision": "APPLY",
+      "reason": "The trace covers producer, contract, compiler, persistence, policy, API, page consumer and operations, and it covers all three source trees rather than the two previous phases inspected. The third tree is the finding."
+    },
+    "GOV-003": {
+      "decision": "APPLY",
+      "reason": "TASK-007 records the bounded problem, the deliverables and a handoff written for a successor who knows nothing: the mobile subsystem, why no phase saw it, and the exact blocking chain EG-01 -> OD-08 -> W-27."
+    },
+    "GOV-004": {
+      "decision": "APPLY",
+      "reason": "Ordering is derived from dependency - evidence, decision, protection, migration, cutover, elimination - not from convenience, and the derivation is shown per stage with its serialization points and irreversible steps named."
+    },
+    "ARC-001": {
+      "decision": "APPLY",
+      "reason": "The plan converges on one authority per responsibility and introduces none of its own. Where a finding touched an existing owner it was routed there (ARCH-DOSSIER 1.1) rather than restated, and the artifact type was chosen to avoid competing with ARCH-CANONICAL for the word architecture. The scope correction added the boundary this repository actually needs: section 0 states that repository proximity does not imply scope, and PR-17 enforces it in CI so that an out-of-scope application cannot re-enter the in-scope build or runtime without a decision."
+    },
+    "ARC-002": {
+      "decision": "APPLY",
+      "reason": "Provenance and lineage obligations are carried into RF-20 and W-16, and the migration correspondence model now names assertion time and release time as migration-preserved fields after falsification attack 13 showed a transformation could silently make historical correction impossible."
+    },
+    "SCH-001": {
+      "decision": "APPLY",
+      "reason": "M3 to M0 is preserved; every disposition names the canonical owner at the correct level, and the 14 target physical families are classified against ARCH-BASELINE rather than frozen as they stand."
+    },
+    "SCH-002": {
+      "decision": "APPLY",
+      "reason": "Each of the 28 families has one named owner and one invariant set; duplicate semantic authority is the thing the register exists to find, and all 11 instances carry a disposition."
+    },
+    "SCH-003": {
+      "decision": "APPLY",
+      "reason": "Family-specific work is expressed as declaration and migration, not as core branching; no site-specific branch is introduced by any workstream."
+    },
+    "DAT-001": {
+      "decision": "APPLY",
+      "reason": "All 19 baseline guarantees are carried per row with G-citations, zero cascade and the CHECK constraints are preserved by R-4, and PR-10 was extended so that a new per-structure physical table cannot appear without an approved section 31.4 declaration."
+    },
+    "DAT-002": {
+      "decision": "APPLY",
+      "reason": "Data migration is derived from semantics with eight correspondence classes, and the ten auto tables are recorded as UNRESOLVED rather than assumed equivalent to anything. AQ-05's lesson - byte identity is not meaning identity - is stated as binding."
+    },
+    "ING-001": {
+      "decision": "APPLY",
+      "reason": "PA-05 records that two ingestion models exist and W-18 merges them into one job model and one audit trail, with ImportJob read-only during the bridge."
+    },
+    "API-001": {
+      "decision": "APPLY",
+      "reason": "Serving convergence is planned across four paths with a consumer inventory (EG-05) required before EL-06 or EL-07 may remove any endpoint."
+    },
+    "UI-001": {
+      "decision": "APPLY",
+      "reason": "Admin/UI 41627 is routed to W-24, after the contracts it projects exist, and is constrained to projection and execution; PR-02 covers a UI-side registry as a duplicate authority."
+    },
+    "SEC-001": {
+      "decision": "APPLY",
+      "reason": "EL-02 requires a privilege diff and escalation negative tests, not merely a working OIDC path; OD-01 is enforced as a property-level CI block; no credential entered any artifact and no database was modified."
+    },
+    "SEC-002": {
+      "decision": "APPLY",
+      "reason": "The security-hardening work in flight was neither absorbed nor modified: zero files under platform/, ops/config or ops/tests/{security,sql} were touched, and the plan references its authority without taking ownership. The same discipline now governs application boundaries: backend/mobile is out of scope and was not inspected beyond the build and wiring files strictly necessary to prove that the API module itself declares a dependency on it. Its source, database and domain semantics were not used as evidence for anything."
+    },
+    "EVO-001": {
+      "decision": "APPLY",
+      "reason": "Expand-migrate-contract governs every schema step, every bridge names an owner and an exit condition, and PR-05 fails the build when a bridge outlives its checkpoint. Bridges without an exit condition: 0."
+    },
+    "OBS-001": {
+      "decision": "APPLY",
+      "reason": "W-13 adds the reconciliation and DDL-audit signals that section 31.6 named as its detective controls, and RF-23 carries them into the observability plane."
+    },
+    "TST-001": {
+      "decision": "APPLY",
+      "reason": "No test was weakened. W-08 pins legacy behaviour before any retirement, W-10 turns the derived section 31.6 and 31.7 claims into executable negative suites, and W-09 adds fitness functions that fail the build on architectural erosion."
+    },
+    "TST-002": {
+      "decision": "APPLY",
+      "reason": "Every count in the plan is reproducible from git at 50d143f by the commands recorded in the gate evidence, including the zero-result grep that proves the mobile tree shares no code with the canonical plane."
+    },
+    "REL-001": {
+      "decision": "NA",
+      "reason": "No release surface, image, migration or provenance artifact is affected. This card claims no release readiness and no workstream in the plan has been executed."
+    }
+  },
+  "files": [
+    "docs/project/CATALOG.md",
+    "docs/project/CURRENT.md",
+    "docs/project/MANIFEST.md",
+    "docs/project/work/completed/TASK-007-master-rehabilitation-plan.md",
+    "docs/work/GEOSTAT-MASTER-REHABILITATION-PLAN-2026-09-21.md",
+    "docs/work/GEOSTAT-PHYSICAL-DATA-DOSSIER-2026-09-21.md",
+    "docs/work/cards/master-rehabilitation-plan/governance.json",
+    "docs/work/evidence/master-rehabilitation-plan/gate-plan.txt"
+  ],
+  "sourceDigests": {
+    "docs/project/CATALOG.md": "01779a1692b66d6787bcab7caca0cfe2ebf4c371fe2f82800afc78fdc9d6dfa5",
+    "docs/project/CURRENT.md": "3b441b74dde7e33cad832fe51f77cade67cb399662c65a505923a2371973880c",
+    "docs/project/MANIFEST.md": "dca38a9dede15082db2f54c99ce879e88707196f3f653d633b4bd0c15cbde5da",
+    "docs/project/work/completed/TASK-007-master-rehabilitation-plan.md": "76c10c08404efe1f96827780e62f6bd733c1c347178d2fd4d453b00f67dca811",
+    "docs/work/GEOSTAT-MASTER-REHABILITATION-PLAN-2026-09-21.md": "264bc90c67dcf3b1e72e3e50193f18ec43bb13c2c8e5a3e8634ea50ad290588f",
+    "docs/work/GEOSTAT-PHYSICAL-DATA-DOSSIER-2026-09-21.md": "791081b4868c42184efe6f6efefc417f49a983ff7ff12ea247a556269b58dcb9",
+    "docs/work/evidence/master-rehabilitation-plan/gate-plan.txt": "25327a68608425b8cd01fdb28cf6ac89dbda452aedc53d2fee66703be253cd87"
+  },
+  "tests": [
+    {
+      "command": "python ops/cli/validation/rcp-verify.py",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD 50d143f (dirty working tree, see baseline)"
+    },
+    {
+      "command": "python -m unittest discover -s ops/tests/governance",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD 50d143f (dirty working tree, see baseline)"
+    },
+    {
+      "command": "python ops/cli/validation/engineering-governance.py",
+      "exitCode": 0,
+      "environment": "Windows 10; Python 3.13.3; repository HEAD 50d143f (dirty working tree, see baseline)"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/work/evidence/master-rehabilitation-plan/gate-plan.txt",
+      "sha256": "25327a68608425b8cd01fdb28cf6ac89dbda452aedc53d2fee66703be253cd87"
+    }
+  ],
+  "handoff": "PHASE-005 is COMPLETE and scope-corrected; GATE-PLAN passes. Rehabilitation scope is bounded and is not recursively expandable (PLAN-MASTER section 0): primary target backend/api; backend/core only where the API genuinely depends on it; frontend/geostat-system-app parked as the Admin/Authoring surface (41627); frontend/kids the designated first consumer; backend/mobile and every other undesignated neighbouring application out of scope, databases and domain requirements included. PHASE-006 turns the 28 active workstreams into execution cards and must inherit three constraints: Stage A evidence before its dependents; OD-01 enforced as a property-level block by PR-15, because falsification showed a workstream-level block could be bypassed by migration ordering; and no expansion into an out-of-scope project, enforced by PR-17. The one boundary obligation is W-30: the API module declares a build dependency on :mobile and owns a dormant, silently re-armable component scan of it, so the API side must be isolated until the API builds and runs with :mobile absent from settings.gradle entirely. What PHASE-006 must not mistake: sections 31.6 and 31.7 of ARCH-CANONICAL remain DERIVED, NOT EXECUTED, INV-006 stays PARTIAL until W-13's suites are green, and the platform security-hardening change set in the working tree is another author's and is not rehabilitation output."
+}

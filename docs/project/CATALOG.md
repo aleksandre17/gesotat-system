@@ -80,6 +80,8 @@ finding in a second register.
 
 | `ARCH-CANONICAL` | `docs/work/GEOSTAT-CANONICAL-ARCHITECTURE-2026-09-21.md` | ARCHITECTURE | CANONICAL | the canonical architecture — semantic kernel, families, identity, grain, relationships, metadata, temporality, contracts, providers, materialization, and the stable-kernel/evolvable-logical-model design | **L2** — before designing, planning or implementing anything downstream |
 
+| `PLAN-MASTER` | `docs/work/GEOSTAT-MASTER-REHABILITATION-PLAN-2026-09-21.md` | REGISTER | CANONICAL | how the existing system converges — responsibility inventory, parallel-authority register, dispositions, convergence map, ordered roadmap, elimination register, protection plan, decision register, `PHASE-006` entry contract | **L2** — before planning, ordering or scheduling any rehabilitation work |
+
 It was `BLOCKED` while its §3, §4 and §11 stood contradicted by `ARCH-BASELINE`; Part II (§30–§40)
 resolved all six contradictions against physical evidence, so it is now catalogued as canonical.
 **Part II governs where the two parts disagree.**

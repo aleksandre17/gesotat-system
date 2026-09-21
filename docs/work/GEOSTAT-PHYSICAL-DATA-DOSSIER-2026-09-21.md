@@ -76,6 +76,18 @@ semantics that were never migrated. It cannot be answered without access. **The 
 that the new system actually uses is not in `auto` at all — it is in `dbo.*` inside
 `geostat-system`** (§3), which is a materially different and more urgent fact.
 
+> **SCOPE EXTENSION (`PHASE-005`, 2026-09-21).** The dependency count above is measured over the
+> scope this section declares — *"the api and core source trees"*. There is a **third source
+> tree**: `platform/apps/geostat/backend/mobile`, a separately deployable application of 177
+> committed Java files that reads ten hard-coded `dbo.*` tables from a secondary datasource. The
+> count of **1** remains correct for `api` + `core`; it is **not** the whole-repository figure.
+> **That third tree is `OUT OF SCOPE` for the rehabilitation programme** (`PLAN-MASTER` §0), so
+> `auto` raises **no** open question, evidence gap or workstream here: the API Platform's only
+> in-scope concern is the *build/runtime coupling* its own module declares, recorded as
+> `PLAN-MASTER` §4.1 and isolated by `W-30`. This paragraph extends the **scope** of §1.1; it
+> does not falsify its conclusion, and no canonical decision changes. Retained as evidence that
+> the structures exist — **scope exclusion is not evidence deletion.**
+
 ---
 
 ## 2. Effective schema — live, not migration history

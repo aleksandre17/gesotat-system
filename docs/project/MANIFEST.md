@@ -27,8 +27,8 @@ Status vocabulary is closed (RCP §5): `NOT_STARTED` `READY` `ACTIVE` `BLOCKED` 
 | `PHASE-002` | STANDARDS & ARCHITECTURE QUALITY BENCHMARK | **COMPLETE** | benchmark recovered requirements against external standards before canonical design fixes decisions |
 | `PHASE-003` | ARTIFACT COMPARATIVE AUDIT | **COMPLETE** | compare legacy Access · R8 resource package · `KIDS_PACKAGE_candidate_2` · best justified canonical target |
 | `PHASE-004` | CANONICAL DESIGN | **COMPLETE** | define the target architecture from requirements, invariants and recovered knowledge |
-| `PHASE-005` | MASTER REHABILITATION PLAN | `READY` | dependency-ordered plan with gates — *what* is rehabilitated, in what order, and why that order |
-| `PHASE-006` | EXECUTION PACKAGE | `NOT_STARTED` | the machine-followable execution manifest derived from the plan — *how* each step is carried out and verified |
+| `PHASE-005` | MASTER REHABILITATION PLAN | **COMPLETE** | dependency-ordered plan with gates — *what* is rehabilitated, in what order, and why that order |
+| `PHASE-006` | EXECUTION PACKAGE | `READY` | the machine-followable execution manifest derived from the plan — *how* each step is carried out and verified |
 | `PHASE-007` | INDEPENDENT ADVERSARIAL REVIEW | `NOT_STARTED` | hostile review of design and plan by an independent agent/reviewer |
 | `PHASE-008` | CORRECTED / APPROVED CANONICAL PLAN | `NOT_STARTED` | incorporate review findings; the approved plan becomes the execution authority |
 | `PHASE-009` | PROTECTION | `NOT_STARTED` | build the regression and fitness protection that migration depends on |
@@ -242,13 +242,47 @@ recombining what exists.
 **Constraints carried in:** CAD-17 — legacy converges toward canonical design, never the
 reverse. Design must not be shaped around accidental legacy structure.
 
+
+### PHASE-005 · MASTER REHABILITATION PLAN — COMPLETE
+
+**Entry gate `GATE-PLAN`:** `PHASE-004` COMPLETE and accepted ✔ · canonical architecture
+committed at `50d143f` ✔ · control plane verifying ✔.
+
+**Result: `GATE-PLAN` PASS, phase COMPLETE (2026-09-21)** — work item `TASK-007`.
+
+**Output:** `PLAN-MASTER` — 28 responsibility families across every in-scope system plane, 10
+parallel authorities each with a disposition, 13 target physical families, 28 active
+dependency-ordered workstreams, 12 elimination targets, 17 protection controls, 31 falsification
+attacks of which six succeeded and were repaired.
+
+**Scope, bound at closure (`PLAN-MASTER` §0):** primary target `backend/api`; `backend/core`
+only where the API genuinely depends on it; `frontend/geostat-system-app` parked as the
+Admin/Authoring surface (`41627`); `frontend/kids` the designated first consumer.
+**`backend/mobile` and every other undesignated neighbouring application are OUT OF SCOPE.**
+Repository proximity does not imply scope, and `PR-17` enforces that in CI rather than in prose.
+
+**The one boundary finding that survives the exclusion:** the API module itself declares a build
+dependency on `:mobile` and owns a dormant `@ComponentScan` switch able to pull it into the API
+runtime. `W-30` severs that **on the API side**; nothing in the excluded module is inspected or
+rehabilitated. The module's existence stays recorded as evidence — scope exclusion is not
+evidence deletion.
+
+**Ordering law adopted:** evidence → decision → protection → migration → cutover → elimination,
+reversible before irreversible. Protection (`W-08`…`W-11`) precedes every migration;
+`W-26`/`W-27` are the only irreversible workstreams and each is gated by proof of zero runtime
+dependency, a verified backup and a rehearsed restore.
+
+**Three constraints travel into `PHASE-006`:** Stage A evidence before its dependents · `OD-01`
+enforced as a property-level block (`PR-15`) · **no expansion into an out-of-scope project**
+(`PLAN-MASTER` §0, enforced by `PR-17`).
+
 ### PHASE-009 · PROTECTION — NOT_STARTED
 
 **Entry:** `PHASE-008` COMPLETE (approved plan). **Input:** PASS 3 closure §1 (21 protection requirements).
 **Hard rule:** protection precedes the migration it protects. The publication writer,
 service and store are entirely untested today.
 
-### PHASE-003, 005–008, 010–013
+### PHASE-003, 006–008, 010–013
 
 Defined on entry. `PHASE-005` produces the dependency-ordered plan; `PHASE-006` turns it
 into an execution manifest and **may not be closed on the plan's evidence**. `PHASE-010`
@@ -270,7 +304,7 @@ repository-compliance column passes.
 | `GATE-STANDARDS` | standards benchmark | **PASS** (2026-09-21, re-confirmed the same day after adversarial acceptance review `TASK-003` found and closed two material holes) — evidence: `STD-BENCH-001` §11 and §8 F-7/F-8; `docs/work/evidence/phase-002-acceptance-review/gate-standards-reconfirmation.txt` | design proceeds unjustified |
 | `GATE-COMPARATIVE` | artifact comparative audit | **PASS** (2026-09-21) — evidence: `AUD-COMPARATIVE` §21; `docs/work/evidence/artifact-comparative-audit/gate-comparative.txt` | canonical target chosen without artifact evidence |
 | `GATE-DESIGN-ENTRY` | canonical design entry | **PASS** (2026-09-21) — evidence: `ARCH-CANONICAL` §36–§37, `ARCH-DOSSIER` §8 | design rediscovers the system |
-| `GATE-PLAN` | master rehabilitation plan (`PHASE-005`) | `READY` | migration ordered by convenience rather than dependency |
+| `GATE-PLAN` | master rehabilitation plan (`PHASE-005`) | **PASS** | migration ordered by convenience rather than dependency |
 | `GATE-EXECUTION-PACKAGE` | execution manifest (`PHASE-006`) | `NOT_STARTED` | an approved plan nobody can actually follow step by step |
 | `GATE-REVIEW` | independent adversarial review | `NOT_STARTED` | plan executes unchallenged |
 | `GATE-PLAN-APPROVED` | review findings incorporated (`PHASE-008`) | `NOT_STARTED` | review findings noted and then ignored |

@@ -30,36 +30,64 @@ decisions.
 
 | Field | Value |
 |---|---|
-| **LIFECYCLE PHASE** | `PHASE-004` — Canonical Design |
-| **STAGE** | canonical architecture derived, revised against physical evidence and closed; 19/19 guarantees preserved or strengthened |
+| **LIFECYCLE PHASE** | `PHASE-005` — Master Rehabilitation Plan |
+| **STAGE** | rehabilitation plan derived and scope-corrected — 28 responsibility families, 10 in-scope parallel authorities disposed, 28 active workstreams, 12 in-scope elimination targets, 17 protection controls |
 | **STATUS** | `COMPLETE` |
-| **LAST COMPLETED GATE** | `GATE-DESIGN-ENTRY` → **PASS** (2026-09-21) |
-| **CURRENT GATE** | `GATE-PLAN` → `READY` |
-| **ACTIVE WORK ITEM** | none. `TASK-001` … `TASK-006` all `COMPLETE` |
-| **CONTROL PLANE** | `RCP PASS` — **620 checks, 0 errors, 2 cohesion warnings, 46 governed artifacts** from the committed state (2026-09-21). Proven by 119 governance tests: `python ops/cli/validation/rcp-verify.py` · `python -m unittest discover -s ops/tests/governance`. A working tree also holding the three gitignored `codex-session-*.md` transcripts reports **626** — six extra cohesion checks over files that are deliberately never committed (`CF-044`). The committed figure is the reproducible one. |
-| **BOUNDED CHANGE RECORD** | `docs/work/cards/canonical-design/governance.json` — `VERIFIED`; `python ops/cli/validation/engineering-governance.py` → `PASS` |
-| **BASELINE** | `HEAD b46c043` · target 26 modified / 29 untracked · unchanged since recovery batch 1 |
+| **LAST COMPLETED GATE** | `GATE-PLAN` → **PASS** (2026-09-21) |
+| **CURRENT GATE** | `GATE-EXECUTION-PACKAGE` → `READY` |
+| **ACTIVE WORK ITEM** | none. `TASK-001` … `TASK-007` all `COMPLETE` |
+| **CONTROL PLANE** | `RCP PASS` — **665 checks, 0 errors, 2 cohesion warnings, 48 governed artifacts** (working tree, 2026-09-21). `PHASE-005`'s artifacts are **not yet committed**, so the committed baseline `50d143f` still reports 620/46. Six of the 665 are cohesion checks over the three gitignored `codex-session-*.md` transcripts, which are never committed (`CF-044`). Proven by 119 governance tests: `python ops/cli/validation/rcp-verify.py` · `python -m unittest discover -s ops/tests/governance` |
+| **BOUNDED CHANGE RECORD** | `docs/work/cards/master-rehabilitation-plan/governance.json` — `VERIFIED`; `python ops/cli/validation/engineering-governance.py` → `PASS` |
+| **BASELINE** | `HEAD 50d143f` — the `PHASE-004` preservation commit on `security/hardening-2`. The working tree additionally carries the platform security-hardening change set in flight (another author, ~65 paths under `platform/`, `ops/config`, `ops/tests/{security,sql}` and the AIR register); it is **not** rehabilitation output and was neither absorbed nor modified. |
 | **LAST UPDATED** | 2026-09-21 |
 
 ## Blockers
 
-**None.** `PHASE-004` closed with every baseline contradiction resolved and all 19 physical
-anti-regression guarantees preserved or strengthened.
+**None blocking `PHASE-006`.** `PHASE-005` closed with 28/28 responsibilities mapped, 11/11
+parallel authorities disposed, 48/48 capabilities traced and 0 falsification failures remaining.
 
-**Seven owner decisions are carried, none blocking `PHASE-005`:** disclosure-control policy ·
+**Rehabilitation scope is bounded and is not recursively expandable** — `PLAN-MASTER` §0.
+Primary target `platform/apps/geostat/backend/api`; `backend/core` in scope only where the API
+genuinely depends on it; `frontend/geostat-system-app` is the parked Admin/Authoring surface
+(`41627`, `W-24`); `frontend/kids` is the designated first consumer. **`backend/mobile`, other
+`mobile`/`web` projects and any other undesignated neighbouring application are OUT OF SCOPE** —
+source, architecture, contracts, databases, migrations, documentation and domain requirements
+alike. **Repository proximity does not imply scope.**
+
+**One in-scope boundary obligation follows from that.** The API module declares a build
+dependency on the out-of-scope `:mobile` module and owns a dormant switch
+(`MobileModuleConfig`, `@ConditionalOnProperty(matchIfMissing = true)`) able to component-scan it
+into the API's own runtime by uncommenting three lines. `W-30` severs the coupling **on the API
+side only**; `PR-17` keeps it severed. Nothing in the out-of-scope module is inspected,
+rehabilitated or used as canonical evidence.
+
+**Seven owner decisions are carried, none blocking `PHASE-006` as a whole** — each blocks only
+its own consumer, enumerated in `PLAN-MASTER` §18. All seven carried from `PHASE-004`: disclosure-control policy ·
 erasability classes and retention · `BM-Q-03` performance objectives · `BM-Q-05` ASVS subset ·
 reference-data agency assignment · the materialization thresholds of `ARCH-CANONICAL` §31.4 ·
 **Unicode NFC enforcement for text grain components** — added by the independent review
 correction, owned by `ARCH-CANONICAL` §39 and derived in §31.6 residual 2. It is
 **security- and integrity-relevant** and **blocks the first work that persists a text grain
 component** — the `PROTECT` stage of that work, `PHASE-009` at the latest. It does not block
-`PHASE-005` planning, and an agent may not settle it.
+`PHASE-005` planning, and an agent may not settle it. **`PHASE-005` strengthened its routing**:
+`PR-15` makes it a **property-level** block — CI fails if any structure declares a text component
+inside its grain while the decision is open — because falsification showed a workstream-level
+block could be bypassed by migration ordering (`PLAN-MASTER` §16.1 attack 25).
 
-**Seven post-acceptance obligations travel into `PHASE-005`**, owned by `ARCH-CANONICAL` §40 and
-§31.6 — the write-path permission model · the digest reconciliation check · DDL-audit detection
-of a disabled trigger · executable §31.6 false-digest negative tests · executable §31.7
-four-cardinality negative tests · the SQL↔Access correspondence table · the 19 `dbo.*`
-elimination inventory. **None is implemented; §31.6 and §31.7 are derived, not executed.**
+`PHASE-005` briefly carried an eighth (`OD-08`, the mobile subsystem's future) and an eighth
+evidence gap (`EG-01`, reaching `auto`). **Both are withdrawn by the scope correction** — they
+concerned an out-of-scope application. The rows are retained as withdrawn in `PLAN-MASTER` §18 so
+the history stays legible, and the identifiers are retired rather than reused.
+
+**All seven `PHASE-004` obligations are scheduled, not merely carried** — `PLAN-MASTER` §9 places
+them at `W-11` (permission model), `W-13` (reconciliation, DDL audit), `W-10` (both negative
+suites), `W-02` (SQL↔Access) and `W-26` (`dbo.*` elimination). **None is implemented; §31.6 and
+§31.7 remain derived, not executed, and `INV-006` stays `PARTIAL` until `W-13`'s suites are
+green** (`AL-03`).
+
+**Five evidence gaps are open and owned** (`EG-02`…`EG-06`, `PLAN-MASTER` §18): SQL↔Access
+correspondence · cross-table type consistency · production volumes (`BM-Q-03`) · consumer
+inventory for the legacy serving endpoints · second-provider proof.
 
 Two properties are **designed but unevidenced** and must not be reported as proven: a second
 provider (`ADR-016` rule 6), and the generic kernel's behaviour at production volume
@@ -99,16 +127,23 @@ reconciled with immutable snapshots, retained raw and append-only lineage (`AUD-
 
 ## Next permitted action
 
-**`PHASE-005` — Master Rehabilitation Plan**, guarded by `GATE-PLAN`.
+**`PHASE-006` — Execution Package**, guarded by `GATE-EXECUTION-PACKAGE`.
 
-It consumes `ARCH-CANONICAL` (**Part II governs where the two parts disagree**), bounded by
-`ARCH-BASELINE` and `ARCH-DOSSIER`. It produces a dependency-ordered plan — *what* is
-rehabilitated, in what order, and why that order — and it implements nothing.
+It consumes `PLAN-MASTER` and turns the 29 ordered workstreams into machine-followable execution
+cards. It implements nothing itself. **Three constraints travel with it**, from `PLAN-MASTER` §19
+conditions 13–15: Stage A evidence work is scheduled before its dependents; `OD-01` is enforced as
+a property-level block (`PR-15`); and **`PHASE-006` may not expand into an out-of-scope project**
+(`§0`, enforced by `PR-17`).
+
 
 ## Forbidden actions
 
 - Reopening PASS 1 / 2A / 2B / 3 conclusions without **new primary evidence**.
 - Beginning rehabilitation implementation, refactoring or legacy deletion.
+- Inspecting, querying, inventorying, migrating, comparing against or deriving canonical
+  requirements from any out-of-scope project or its database (`PLAN-MASTER` §0) — including
+  reachability from an in-scope module, which is not a reason.
+- Persisting a text component inside a declared grain while `OD-01` is open (`PR-15`).
 - Beginning `PHASE-006` before `GATE-PLAN` passes.
 - Making a per-structure physical table the default — it is a declared, reversible
   specialization (`ARCH-CANONICAL` §31.4), and defaulting to it loses the evolution property.
@@ -142,6 +177,7 @@ Read in this order. **This is the whole mandatory set** — everything else is r
 | 14 | `docs/work/GEOSTAT-PHYSICAL-RELATIONAL-BASELINE-2026-09-21.md` | **the physical model any canonical decision must not regress** |
 | 15 | `docs/work/GEOSTAT-PHYSICAL-DATA-DOSSIER-2026-09-21.md` | **the 19 anti-regression guarantees and the contradiction matrix** |
 | 16 | `docs/work/GEOSTAT-CANONICAL-ARCHITECTURE-2026-09-21.md` | **the canonical architecture — Part II governs** |
+| 17 | `docs/work/GEOSTAT-MASTER-REHABILITATION-PLAN-2026-09-21.md` | **how the existing system converges to it — dispositions, ordering, gates** |
 
 Evidence artifacts (checkpoint, completeness audit, layer coverage) are **L4** — read to
 falsify a specific conclusion, not by default.
